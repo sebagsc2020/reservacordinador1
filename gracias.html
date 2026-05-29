@@ -172,27 +172,6 @@
             box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4);
         }
 
-        .btn-email {
-            background: #f0f0f0;
-            color: #333;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .btn-email:hover {
-            background: #e0e0e0;
-            transform: translateY(-2px);
-        }
-
-        .btn-email.enviado {
-            background: #27ae60;
-            color: white;
-            pointer-events: none;
-        }
-
         .info-adicional {
             margin-top: 25px;
             padding-top: 20px;
@@ -203,27 +182,6 @@
 
         .info-adicional p {
             margin-bottom: 5px;
-        }
-
-        .email-confirmacion {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-size: 13px;
-            font-weight: 600;
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .email-confirmacion.mostrar {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         @media (max-width: 480px) {
@@ -268,13 +226,6 @@
             <a href="#" id="whatsappBtn" class="btn btn-whatsapp" target="_blank">
                 💬 WhatsApp
             </a>
-            <button id="btnEnviarEmail" class="btn btn-email" onclick="enviarEmailSolicitante()">
-                📧 Enviar por Email
-            </button>
-        </div>
-
-        <div id="emailConfirmacion" class="email-confirmacion">
-            ✅ Correo enviado con éxito. Revisa tu bandeja de entrada.
         </div>
 
         <div class="info-adicional">
@@ -291,7 +242,7 @@
         const status = urlParams.get('status');
         
         if (ultimaReserva) {
-            // ✅ CORREGIDO: Convertir fecha de DD-MM-YYYY a objeto Date
+            // Convertir fecha de DD-MM-YYYY a objeto Date
             const partesFecha = ultimaReserva.fecha.split('-');
             const fechaObj = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
             const fechaFormateada = fechaObj.toLocaleDateString('es-ES', {
@@ -320,6 +271,11 @@
                 `   ${index + 1}. ${exc}`
             ).join('\n');
             
+            // Icono según forma de pago
+            let iconoPago = '💳';
+            if (ultimaReserva.formaPago === 'Efectivo') iconoPago = '💵';
+            if (ultimaReserva.formaPago === 'Transferencia') iconoPago = '🏦';
+            
             const mensajeWhatsApp = `¡Hola! 🕐\n\n` +
                 `Quiero confirmar mi reserva:\n\n` +
                 `👤 Nombre: ${ultimaReserva.nombre} ${ultimaReserva.apellido || ''}\n` +
@@ -331,6 +287,7 @@
                 `${excursionesWhatsApp}\n\n` +
                 `🗓️ Fecha: ${fechaFormateada}\n` +
                 `👥 Personas: ${ultimaReserva.personas}\n` +
+                `${iconoPago} Forma de Pago: ${ultimaReserva.formaPago || 'No especificada'}\n` +
                 `🏨 Te buscamos en: ${ultimaReserva.mensaje || 'No especificado'}\n\n` +
                 `Gracias! 🙌`;
             
@@ -338,28 +295,6 @@
             const mensajeCodificado = encodeURIComponent(mensajeWhatsApp);
             const whatsappBtn = document.getElementById('whatsappBtn');
             whatsappBtn.href = `https://wa.me/5493518692251?text=${mensajeCodificado}`;
-            
-            // Función para enviar email al solicitante
-            window.enviarEmailSolicitante = function() {
-                const btnEmail = document.getElementById('btnEnviarEmail');
-                const confirmacion = document.getElementById('emailConfirmacion');
-                
-                if (btnEmail.classList.contains('enviado')) return;
-                
-                const asunto = encodeURIComponent('✅ Confirmación de Reserva - Aventura Total');
-                const cuerpo = encodeURIComponent(mensajeWhatsApp);
-                const mailtoLink = `mailto:${ultimaReserva.email}?subject=${asunto}&body=${cuerpo}`;
-                
-                window.open(mailtoLink, '_blank');
-                
-                btnEmail.classList.add('enviado');
-                btnEmail.innerHTML = '✅ Enviado';
-                confirmacion.classList.add('mostrar');
-                
-                setTimeout(() => {
-                    confirmacion.classList.remove('mostrar');
-                }, 5000);
-            };
             
             // Construir resumen HTML
             const resumenHTML = `
@@ -432,6 +367,14 @@
                 </div>
                 
                 <div class="info-item">
+                    <div class="emoji">${iconoPago}</div>
+                    <div class="texto">
+                        <strong>Forma de Pago</strong>
+                        <span>${ultimaReserva.formaPago || 'No especificada'}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
                     <div class="emoji">🏨</div>
                     <div class="texto">
                         <strong>¿Dónde te buscamos?</strong>
@@ -465,10 +408,6 @@
             const whatsappBtn = document.getElementById('whatsappBtn');
             const mensajeGenerico = encodeURIComponent('¡Hola! Quiero información sobre las excursiones 🏔️');
             whatsappBtn.href = `https://wa.me/5493518692251?text=${mensajeGenerico}`;
-            
-            document.getElementById('btnEnviarEmail').disabled = true;
-            document.getElementById('btnEnviarEmail').style.opacity = '0.5';
-            document.getElementById('btnEnviarEmail').style.cursor = 'not-allowed';
         }
         
         setTimeout(() => {
