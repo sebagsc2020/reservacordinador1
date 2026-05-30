@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservas - CRM Aventura Total</title>
+    <title>Seguimiento - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+        
         .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
         .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
@@ -16,39 +17,38 @@
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
         .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
         .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
+        
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h1 { font-size: 26px; color: #1a1a2e; }
         .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
-        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 1; min-width: 150px; }
-        .btn-filtrar { padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; }
-        .btn-recargar { padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; }
-        .tabs { display: flex; gap: 3px; margin-bottom: 20px; background: white; padding: 5px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
-        .tab { padding: 8px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; color: #666; }
-        .tab:hover { background: #f0f0ff; color: #667eea; } .tab.active { background: #667eea; color: white; }
-        .tab .count { display: inline-block; background: rgba(255,255,255,0.3); padding: 1px 6px; border-radius: 10px; font-size: 10px; margin-left: 3px; }
-        .table-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow: hidden; }
-        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .table-wrapper { overflow-x: auto; margin: 0 -15px; padding: 0 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { text-align: left; padding: 10px 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
-        td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; } tr:hover td { background: #f8f9ff; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; }
-        .badge-pendiente { background: #fff3cd; color: #856404; } .badge-confirmado { background: #d4edda; color: #155724; }
-        .badge-pagado { background: #d1ecf1; color: #0c5460; } .badge-realizado { background: #e2e3e5; color: #383d41; }
-        .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin-right: 2px; }
-        .btn-ver { background: #667eea; color: white; } .btn-confirmar { background: #27ae60; color: white; } .btn-pagar { background: #3498db; color: white; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-overlay.show { display: flex; }
-        .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .modal-header h2 { color: #667eea; font-size: 18px; } .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
-        .modal-info p { margin: 8px 0; font-size: 13px; color: #555; } .modal-info strong { color: #333; display: inline-block; width: 110px; }
-        .excursion-tag-modal { display: block; background: #f0f0ff; color: #667eea; padding: 6px 12px; margin: 4px 0; border-radius: 8px; font-size: 13px; border-left: 3px solid #667eea; }
-        .modal-acciones { display: flex; gap: 6px; margin-top: 15px; flex-wrap: wrap; } .modal-acciones .btn-accion { padding: 8px 14px; font-size: 12px; }
-        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } table { min-width: 600px; } }
+        
+        .metricas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .metrica-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; }
+        .metrica-valor { font-size: 28px; font-weight: 800; color: #667eea; } .metrica-label { font-size: 12px; color: #999; text-transform: uppercase; }
+        
+        .kanban-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .kanban-column { background: #f8f9fa; border-radius: 15px; padding: 20px; min-height: 300px; }
+        .kanban-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 3px solid #e0e0e0; }
+        .kanban-title { font-size: 16px; font-weight: 700; } .kanban-count { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        .kanban-column.pendiente .kanban-header { border-bottom-color: #ffc107; } .kanban-column.pendiente .kanban-count { background: #ffc107; color: #856404; }
+        .kanban-column.confirmado .kanban-header { border-bottom-color: #27ae60; } .kanban-column.confirmado .kanban-count { background: #27ae60; color: white; }
+        .kanban-column.pagado .kanban-header { border-bottom-color: #3498db; } .kanban-column.pagado .kanban-count { background: #3498db; color: white; }
+        .kanban-column.realizado .kanban-header { border-bottom-color: #95a5a6; } .kanban-column.realizado .kanban-count { background: #95a5a6; color: white; }
+        
+        .kanban-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #667eea; }
+        .kanban-card.pendiente { border-left-color: #ffc107; } .kanban-card.confirmado { border-left-color: #27ae60; }
+        .kanban-card.pagado { border-left-color: #3498db; } .kanban-card.realizado { border-left-color: #95a5a6; }
+        .kanban-card-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .kanban-card-id { font-size: 11px; font-weight: 700; color: #667eea; } .kanban-card-fecha { font-size: 10px; color: #999; }
+        .kanban-card-cliente { font-size: 14px; font-weight: 600; color: #333; } .kanban-card-excursion { font-size: 12px; color: #666; }
+        .kanban-card-footer { display: flex; justify-content: space-between; font-size: 11px; }
+        .kanban-card-personas { background: #f0f0ff; color: #667eea; padding: 3px 10px; border-radius: 10px; font-weight: 600; }
+        
+        .btn-recargar { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } .kanban-board { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -57,86 +57,83 @@
         <ul class="nav-menu">
             <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
             <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
-            <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
-            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
+            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="seguimiento.html" class="active"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
             <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
             <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
         </ul>
-        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar Sesión</button></div>
+        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪</button></div>
     </nav>
+    
     <div class="main-content">
-        <div class="header"><div><h1>📋 Reservas</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
-        <div class="tabs">
-            <button class="tab active" onclick="filtrarPorEstado('todas')">Todas <span class="count" id="countTodas">0</span></button>
-            <button class="tab" onclick="filtrarPorEstado('pendiente')">⏳ Pendientes <span class="count" id="countPendiente">0</span></button>
-            <button class="tab" onclick="filtrarPorEstado('confirmado')">✅ Confirmadas <span class="count" id="countConfirmado">0</span></button>
-            <button class="tab" onclick="filtrarPorEstado('pagado')">💰 Pagadas <span class="count" id="countPagado">0</span></button>
+        <div class="header">
+            <div><h1>📈 Seguimiento</h1><p style="color:#999;font-size:13px;">Pipeline de reservas</p></div>
+            <div style="display:flex;align-items:center;gap:15px;">
+                <button class="btn-recargar" onclick="cargarDatos()">🔄 Recargar</button>
+                <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+            </div>
         </div>
-        <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar..." id="busquedaReserva">
-            <button class="btn-filtrar" onclick="filtrarReservas()">🔍</button>
-            <button class="btn-recargar" onclick="cargarReservas()">🔄</button>
+        
+        <div class="metricas-grid">
+            <div class="metrica-card"><div class="metrica-valor" id="metricaTotal">--</div><div class="metrica-label">Total Reservas</div></div>
+            <div class="metrica-card"><div class="metrica-valor" id="metricaConfirmadas">--</div><div class="metrica-label">Confirmadas</div></div>
+            <div class="metrica-card"><div class="metrica-valor" id="metricaPendientes">--</div><div class="metrica-label">Pendientes</div></div>
+            <div class="metrica-card"><div class="metrica-valor" id="metricaTasa">--%</div><div class="metrica-label">Tasa Conversión</div></div>
         </div>
-        <div class="table-container">
-            <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0</span></div>
-            <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Cliente</th><th>Email</th><th>Ciudad</th><th>Excursión</th><th>Fecha</th><th>Pax</th><th>Pago</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tablaReservas"></tbody></table></div>
+        
+        <h3 style="margin-bottom:20px;color:#1a1a2e;">📋 Pipeline de Reservas</h3>
+        <div class="kanban-board" id="kanbanBoard">
+            <div class="kanban-column pendiente"><div class="kanban-header"><span class="kanban-title">⏳ Pendientes</span><span class="kanban-count">0</span></div><p style="color:#999;text-align:center;padding:20px;">Cargando...</p></div>
+            <div class="kanban-column confirmado"><div class="kanban-header"><span class="kanban-title">✅ Confirmadas</span><span class="kanban-count">0</span></div><p style="color:#999;text-align:center;padding:20px;">Cargando...</p></div>
+            <div class="kanban-column pagado"><div class="kanban-header"><span class="kanban-title">💰 Pagadas</span><span class="kanban-count">0</span></div><p style="color:#999;text-align:center;padding:20px;">Cargando...</p></div>
+            <div class="kanban-column realizado"><div class="kanban-header"><span class="kanban-title">🏁 Realizadas</span><span class="kanban-count">0</span></div><p style="color:#999;text-align:center;padding:20px;">Cargando...</p></div>
         </div>
     </div>
-    <div class="modal-overlay" id="modalReserva"><div class="modal-content"><div class="modal-header"><h2>📋 Detalle</h2><button class="modal-close" onclick="cerrarModal()">✕</button></div><div class="modal-info" id="modalInfo"></div><div class="modal-acciones"><button class="btn-accion btn-confirmar" onclick="cambiarEstado('confirmado')">✅</button><button class="btn-accion btn-pagar" onclick="cambiarEstado('pagado')">💰</button></div></div></div>
+    
     <script>
-        // ===== VERIFICACIÓN DE SESIÓN ÚNICA =====
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
-        function verificarSesionUnica() {
-            const sessionId = sessionStorage.getItem('crm_session_id');
-            const sesionActiva = JSON.parse(localStorage.getItem('crm_sesion_activa') || '{}');
-            if (!sessionId || sesionActiva.id !== sessionId) { sessionStorage.clear(); alert('⚠️ Sesión cerrada.'); window.location.href = 'index.html'; return false; }
-            localStorage.setItem('crm_sesion_activa', JSON.stringify({ ...sesionActiva, timestamp: Date.now() }));
-            return true;
-        }
-        if (!verificarSesionUnica()) throw new Error('Sesión inválida');
-        setInterval(verificarSesionUnica, 10000);
-        function logout() { const sessionId = sessionStorage.getItem('crm_session_id'); const sesionActiva = JSON.parse(localStorage.getItem('crm_sesion_activa') || '{}'); if (sesionActiva.id === sessionId) localStorage.removeItem('crm_sesion_activa'); sessionStorage.clear(); window.location.href = 'index.html'; }
+        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+        function verificarSesionUnica() { const sessionId = sessionStorage.getItem('crm_session_id'); const sesionActiva = JSON.parse(localStorage.getItem('crm_sesion_activa') || '{}'); if (!sessionId || sesionActiva.id !== sessionId) { sessionStorage.clear(); alert('⚠️ Sesión cerrada.'); window.location.href = 'index.html'; return false; } localStorage.setItem('crm_sesion_activa', JSON.stringify({ ...sesionActiva, timestamp: Date.now() })); return true; }
+        if (!verificarSesionUnica()) throw new Error('Sesión inválida'); setInterval(verificarSesionUnica, 10000);
         
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
-        let reservasData = [], estadoFiltro = 'todas', reservaSeleccionada = null;
-        function cargarEstadosGuardados() { try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } catch(e) { return {}; } }
-        function guardarEstado(id, estado) { const e = cargarEstadosGuardados(); e[id] = estado; localStorage.setItem('estadosReservas', JSON.stringify(e)); }
+        let reservasData = [];
         
-        async function cargarReservas() {
+        async function cargarDatos() {
             try {
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;">⏳ Cargando...</td></tr>';
-                const r = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
-                const csv = await r.text(); const lineas = csv.split('\n');
+                const r = await fetch(SHEET_CSV_URL, { cache: 'no-store' }); const csv = await r.text(); const lineas = csv.split('\n');
                 reservasData = []; let actual = null, le = [];
-                for (let i = 1; i < lineas.length; i++) {
-                    const linea = lineas[i].trim(); if (!linea) continue;
+                for (let i = 1; i < lineas.length; i++) { const linea = lineas[i].trim(); if (!linea) continue;
                     if (linea.startsWith('"RES-') || linea.startsWith('RES-')) {
                         if (actual && le.length > 0) { const u = le[le.length-1]; const p = u.replace(/^"|"$/g,'').split('","'); if (p.length >= 4) { actual.fecha = p[1]||''; actual.personas = p[2]||'0'; actual.formaPago = p[3]||'No especificada'; } le.pop(); if (le.length > 0) actual.excursion += '\n' + le.join('\n'); }
                         if (actual) reservasData.push(actual);
-                        const v = []; let a = '', c = false;
-                        for (let j = 0; j < linea.length; j++) { const ch = linea[j]; if (ch === '"') c = !c; else if (ch === ',' && !c) { v.push(a.trim()); a = ''; } else a += ch; }
+                        const v = []; let a = '', c = false; for (let j = 0; j < linea.length; j++) { const ch = linea[j]; if (ch === '"') c = !c; else if (ch === ',' && !c) { v.push(a.trim()); a = ''; } else a += ch; }
                         v.push(a.trim()); const l = v.map(x => x.replace(/^"|"$/g,'').trim());
-                        actual = { id: l[0]||`R${i}`, nombre: l[2]||'', apellido: l[3]||'', email: l[4]||'', telefono: l[5]||'', pais: l[6]||'', ciudad: l[7]||'', excursion: l[8]||'', fecha: '', personas: '0', formaPago: 'No especificada', busqueda: '', estado: 'confirmado' }; le = [];
+                        actual = { id: l[0]||`R${i}`, nombre: l[2]||'', apellido: l[3]||'', email: l[4]||'', excursion: l[8]||'', fecha: '', personas: '0', formaPago: 'No especificada', estado: 'confirmado' }; le = [];
                     } else { if (actual) { const x = linea.replace(/^"|"$/g,'').trim(); if (x && !x.startsWith(',') && x.length > 3) le.push(x); } }
                 }
                 if (actual) { if (le.length > 0) { const u = le[le.length-1]; const p = u.replace(/^"|"$/g,'').split('","'); if (p.length >= 4) { actual.fecha = p[1]||''; actual.personas = p[2]||'0'; actual.formaPago = p[3]||'No especificada'; } le.pop(); if (le.length > 0) actual.excursion += '\n' + le.join('\n'); } reservasData.push(actual); }
-                const eg = cargarEstadosGuardados(); reservasData.forEach(r => { if (eg[r.id]) r.estado = eg[r.id]; });
-                renderReservas(reservasData); actualizarContadores();
-            } catch(e) { document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;color:red;">Error</td></tr>'; }
+                
+                // Cargar estados guardados
+                const eg = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
+                reservasData.forEach(r => { if (eg[r.id]) r.estado = eg[r.id]; });
+                
+                document.getElementById('metricaTotal').textContent = reservasData.length;
+                document.getElementById('metricaConfirmadas').textContent = reservasData.filter(r => r.estado === 'confirmado').length;
+                document.getElementById('metricaPendientes').textContent = reservasData.filter(r => r.estado === 'pendiente').length;
+                const tasa = reservasData.length > 0 ? Math.round((reservasData.filter(r => r.estado !== 'pendiente').length / reservasData.length) * 100) : 0;
+                document.getElementById('metricaTasa').textContent = tasa + '%';
+                
+                const estados = ['pendiente', 'confirmado', 'pagado', 'realizado'];
+                const labels = { pendiente: '⏳ Pendientes', confirmado: '✅ Confirmadas', pagado: '💰 Pagadas', realizado: '🏁 Realizadas' };
+                document.getElementById('kanbanBoard').innerHTML = estados.map(e => {
+                    const items = reservasData.filter(r => r.estado === e);
+                    return `<div class="kanban-column ${e}"><div class="kanban-header"><span class="kanban-title">${labels[e]}</span><span class="kanban-count">${items.length}</span></div>${items.length === 0 ? '<p style="color:#999;text-align:center;">Sin reservas</p>' : items.slice(0, 8).map(r => `<div class="kanban-card ${r.estado}"><div class="kanban-card-header"><span class="kanban-card-id">${r.id}</span><span class="kanban-card-fecha">${r.fecha}</span></div><div class="kanban-card-cliente">${r.nombre} ${r.apellido}</div><div class="kanban-card-excursion">${(r.excursion||'').split('\n')[0].replace(/^\d+\.\s*/,'').substring(0,35)}</div><div class="kanban-card-footer"><span class="kanban-card-personas">👥 ${r.personas}</span><span>${r.formaPago}</span></div></div>`).join('')}</div>`;
+                }).join('');
+            } catch(e) { console.error(e); }
         }
-        function actualizarContadores() { document.getElementById('countTodas').textContent = reservasData.length; document.getElementById('countPendiente').textContent = reservasData.filter(r => r.estado === 'pendiente').length; document.getElementById('countConfirmado').textContent = reservasData.filter(r => r.estado === 'confirmado').length; document.getElementById('countPagado').textContent = reservasData.filter(r => r.estado === 'pagado').length; }
-        function renderReservas(data) { document.getElementById('totalReservasSpan').textContent = data.length + ' reservas'; if (!data.length) { document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;">📋 Sin reservas</td></tr>'; return; } document.getElementById('tablaReservas').innerHTML = data.map(r => { let e = r.excursion || ''; if (e.includes('\n')) { const l = e.split('\n').filter(x => x.trim()); e = l[0].trim().replace(/^\d+\.\s*/,'').substring(0,20) + (l.length>1?` (+${l.length-1})`:''); } else e = e.substring(0,20); return `<tr><td><strong>${r.id}</strong></td><td>${r.nombre} ${r.apellido}</td><td style="font-size:11px">${r.email}</td><td>${r.ciudad}</td><td>${e}</td><td>${r.fecha}</td><td>${r.personas}</td><td>${r.formaPago}</td><td><span class="badge badge-${r.estado}">${r.estado}</span></td><td><button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button><button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')">✅</button><button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')">💰</button></td></tr>`; }).join(''); }
-        function filtrarPorEstado(e) { estadoFiltro = e; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); renderReservas(e === 'todas' ? reservasData : reservasData.filter(r => r.estado === e)); }
-        function filtrarReservas() { const b = document.getElementById('busquedaReserva').value.toLowerCase(); let f = reservasData; if (estadoFiltro !== 'todas') f = f.filter(r => r.estado === estadoFiltro); if (b) f = f.filter(r => r.id.toLowerCase().includes(b) || r.nombre.toLowerCase().includes(b) || r.email.toLowerCase().includes(b)); renderReservas(f); }
-        function verReserva(id) { reservaSeleccionada = reservasData.find(r => r.id === id); if (reservaSeleccionada) { let ex = ''; const er = reservaSeleccionada.excursion || ''; if (er.includes('\n')) ex = er.split('\n').filter(e => e.trim()).map(e => `<div class="excursion-tag-modal">${e.trim()}</div>`).join(''); document.getElementById('modalInfo').innerHTML = `<p><strong>ID:</strong> ${reservaSeleccionada.id}</p><p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p><p><strong>Email:</strong> ${reservaSeleccionada.email}</p><p><strong>Tel:</strong> ${reservaSeleccionada.telefono}</p><p><strong>País:</strong> ${reservaSeleccionada.pais}</p><p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p><p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p><p><strong>Pax:</strong> ${reservaSeleccionada.personas}</p><p><strong>Pago:</strong> ${reservaSeleccionada.formaPago}</p><p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p><div style="margin-top:12px"><strong>🕐 Excursiones:</strong><div>${ex}</div></div>`; document.getElementById('modalReserva').classList.add('show'); } }
-        function cerrarModal() { document.getElementById('modalReserva').classList.remove('show'); }
-        function cambiarEstado(nuevo) { if (reservaSeleccionada) { reservaSeleccionada.estado = nuevo; guardarEstado(reservaSeleccionada.id, nuevo); renderReservas(reservasData); actualizarContadores(); cerrarModal(); } }
-        function cambiarEstadoDirecto(id, nuevo) { const r = reservasData.find(r => r.id === id); if (r) { r.estado = nuevo; guardarEstado(id, nuevo); renderReservas(reservasData); actualizarContadores(); } }
-        document.getElementById('busquedaReserva').addEventListener('keypress', function(e) { if (e.key === 'Enter') filtrarReservas(); });
-        document.getElementById('modalReserva').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarModal(); });
-        cargarReservas();
+        cargarDatos();
     </script>
 </body>
 </html>
