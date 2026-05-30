@@ -107,18 +107,21 @@
                     if (!linea) continue;
                     
                     if (linea.startsWith('"RES-') || linea.startsWith('RES-')) {
-                        if (actual && ultima) {
-                            const m = ultima.match(/"([^"]*)"/g);
-                            // m[0]=excursión, m[1]=fecha, m[2]=personas, m[3]=pago, m[4]=lugar, resto vacíos
-                            if (m && m.length >= 4) {
-                                actual.fecha = (m[1] || '').replace(/"/g,'').trim();
-                                actual.personas = (m[2] || '').replace(/"/g,'').trim();
-                                actual.formaPago = (m[3] || '').replace(/"/g,'').trim();
-                                actual.busqueda = (m[4] || '').replace(/"/g,'').trim();
+                        // Guardar reserva anterior con sus datos extraídos
+                        if (actual) {
+                            if (ultima) {
+                                const m = ultima.match(/"([^"]*)"/g);
+                                if (m && m.length >= 4) {
+                                    actual.fecha = (m[1] || '').replace(/"/g,'').trim();
+                                    actual.personas = (m[2] || '').replace(/"/g,'').trim();
+                                    actual.formaPago = (m[3] || '').replace(/"/g,'').trim();
+                                    actual.busqueda = (m[4] || '').replace(/"/g,'').trim();
+                                }
                             }
+                            reservasData.push(actual);
                         }
-                        if (actual) reservasData.push(actual);
                         
+                        // Parsear nueva reserva
                         const v = []; let a = '', com = false;
                         for (let j = 0; j < linea.length; j++) {
                             const c = linea[j];
@@ -135,6 +138,7 @@
                         if (actual) { const x = linea.replace(/^"|"$/g,'').trim(); if (x && !x.startsWith(',') && x.length > 3) { actual.excursion += '\n' + x; ultima = x; } }
                     }
                 }
+                // Última reserva
                 if (actual) {
                     if (ultima) {
                         const m = ultima.match(/"([^"]*)"/g);
@@ -151,8 +155,9 @@
                 const eg = cargarEstadosGuardados();
                 reservasData.forEach(r => { if (eg[r.id]) r.estado = eg[r.id]; });
                 
+                // Mostrar resumen final
                 console.log('✅ Cargadas:', reservasData.length);
-                reservasData.forEach(r => console.log(`   ${r.id} | Fecha=${r.fecha} | Pax=${r.personas} | Pago=${r.formaPago}`));
+                console.table(reservasData.map(r => ({ID: r.id, Fecha: r.fecha, Pax: r.personas, Pago: r.formaPago, Lugar: r.busqueda})));
                 
                 if (reservasData.length === 0) reservasData = [{ id: 'R-001', nombre: 'Juan', apellido: 'Pérez', email: 'j@e.com', ciudad: 'VCP', excursion: '1. City Tour', fecha: '29-05-2026', personas: '4', formaPago: 'Efectivo', estado: 'confirmado' }];
                 
