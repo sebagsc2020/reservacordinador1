@@ -14,7 +14,6 @@
             min-height: 100vh;
         }
         
-        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 250px;
             background: #1a1a2e;
@@ -26,321 +25,218 @@
             z-index: 100;
         }
         
-        .sidebar-logo {
-            text-align: center;
-            padding: 0 20px 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-        
+        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .sidebar-logo .logo-icon { font-size: 40px; }
-        
-        .sidebar-logo h2 {
-            font-size: 18px;
-            margin-top: 8px;
-        }
-        
+        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; }
         .sidebar-logo h2 span { color: #667eea; }
         
         .nav-menu { list-style: none; padding: 0 15px; }
-        
         .nav-menu li { margin-bottom: 5px; }
-        
         .nav-menu a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 15px;
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            font-weight: 500;
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+            color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px;
+            transition: all 0.3s ease; font-size: 14px; font-weight: 500;
         }
-        
-        .nav-menu a:hover,
-        .nav-menu a.active {
-            background: rgba(102,126,234,0.2);
-            color: white;
-        }
-        
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
         .nav-menu a.active { background: #667eea; }
-        
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
         
-        .sidebar-footer {
-            position: absolute;
-            bottom: 20px;
-            left: 15px;
-            right: 15px;
-        }
-        
+        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
         .btn-logout-sidebar {
-            width: 100%;
-            padding: 12px;
-            background: rgba(231,76,60,0.2);
-            color: #e74c3c;
-            border: 1px solid rgba(231,76,60,0.3);
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.3s ease;
+            width: 100%; padding: 12px; background: rgba(231,76,60,0.2);
+            color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); border-radius: 10px;
+            cursor: pointer; font-weight: 600; font-size: 13px;
         }
+        .btn-logout-sidebar:hover { background: rgba(231,76,60,0.4); }
         
-        .btn-logout-sidebar:hover {
-            background: rgba(231,76,60,0.4);
-        }
-        
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            margin-left: 250px;
-            flex: 1;
-            padding: 30px;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h1 { font-size: 26px; color: #1a1a2e; }
         
-        .header-derecha {
+        .header-derecha { display: flex; align-items: center; gap: 15px; }
+        .user-info {
+            display: flex; align-items: center; gap: 10px; background: white;
+            padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px;
+        }
+        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
+        .fecha-actual { background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 13px; color: #666; }
+        
+        /* ===== BOTÓN APAGAR RESERVAS ===== */
+        .btn-apagar {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 8px;
+            letter-spacing: 0.5px;
         }
         
-        .user-info {
+        .btn-apagar.encendido {
+            background: #e74c3c;
+            color: white;
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+            animation: pulseRed 2s infinite;
+        }
+        
+        .btn-apagar.apagado {
+            background: #95a5a6;
+            color: white;
+            box-shadow: 0 5px 20px rgba(149, 165, 166, 0.3);
+        }
+        
+        .btn-apagar:hover {
+            transform: translateY(-3px);
+        }
+        
+        .btn-apagar.encendido:hover {
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.6);
+        }
+        
+        @keyframes pulseRed {
+            0%, 100% { box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4); }
+            50% { box-shadow: 0 8px 30px rgba(231, 76, 60, 0.7); }
+        }
+        
+        /* Indicador de estado */
+        .estado-indicador {
             display: flex;
             align-items: center;
             gap: 10px;
             background: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            font-size: 14px;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
         }
         
-        .user-avatar {
-            width: 35px;
-            height: 35px;
-            background: #667eea;
+        .estado-dot {
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 14px;
+            animation: blink 1.5s infinite;
         }
         
-        .fecha-actual {
-            background: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            font-size: 13px;
-            color: #666;
+        .estado-dot.activo {
+            background: #27ae60;
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.6);
         }
         
-        /* ===== STATS ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+        .estado-dot.inactivo {
+            background: #e74c3c;
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
+            animation: none;
         }
         
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        .estado-texto {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .estado-texto.activo { color: #27ae60; }
+        .estado-texto.inactivo { color: #e74c3c; }
+        
+        /* ===== MODAL CONFIRMACIÓN ===== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-overlay.show { display: flex; }
+        
+        .modal-content {
+            background: white; border-radius: 20px; padding: 40px;
+            max-width: 450px; width: 90%; text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4); animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-icon { font-size: 60px; margin-bottom: 15px; }
+        .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+        .modal-text { color: #666; margin-bottom: 25px; line-height: 1.5; }
+        
+        .modal-buttons { display: flex; gap: 10px; justify-content: center; }
+        .btn-cancelar { padding: 14px 30px; background: #95a5a6; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 15px; }
+        .btn-confirmar { padding: 14px 30px; background: #e74c3c; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 15px; }
+        .btn-activar { padding: 14px 30px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 15px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
-            cursor: pointer;
+            background: white; padding: 25px; border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease; cursor: pointer;
         }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .stat-icon { font-size: 35px; margin-bottom: 8px; }
+        .stat-number { font-size: 32px; font-weight: 800; color: #1a1a2e; }
+        .stat-label { font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        .stat-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .stat-icon { font-size: 35px; }
-        
-        .stat-tendencia {
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 700;
-        }
-        
-        .tendencia-up { background: #d4edda; color: #155724; }
-        
-        .stat-number {
-            font-size: 32px;
-            font-weight: 800;
-            color: #1a1a2e;
-        }
-        
-        .stat-label {
-            font-size: 13px;
-            color: #999;
-            margin-top: 3px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        /* ===== GRÁFICO ===== */
         .chart-container {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
+            background: white; border-radius: 15px; padding: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 30px;
         }
-        
-        .chart-title {
-            font-size: 18px;
-            color: #1a1a2e;
-            margin-bottom: 20px;
-        }
-        
-        .chart-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 15px;
-            height: 200px;
-            padding: 20px 0;
-        }
-        
+        .chart-title { font-size: 18px; color: #1a1a2e; margin-bottom: 20px; }
+        .chart-bars { display: flex; align-items: flex-end; gap: 15px; height: 200px; padding: 20px 0; }
         .chart-bar {
-            flex: 1;
-            background: linear-gradient(180deg, #667eea, #764ba2);
-            border-radius: 8px 8px 0 0;
-            position: relative;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            min-width: 40px;
+            flex: 1; background: linear-gradient(180deg, #667eea, #764ba2);
+            border-radius: 8px 8px 0 0; position: relative; transition: all 0.3s ease; cursor: pointer; min-width: 40px;
         }
+        .chart-bar:hover { opacity: 0.8; }
+        .chart-bar-label { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #666; text-align: center; }
+        .chart-bar-value { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 700; color: #667eea; }
         
-        .chart-bar:hover {
-            opacity: 0.8;
-            transform: scaleY(1.05);
-        }
-        
-        .chart-bar-label {
-            position: absolute;
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 10px;
-            color: #666;
-            text-align: center;
-            white-space: nowrap;
-        }
-        
-        .chart-bar-value {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 11px;
-            font-weight: 700;
-            color: #667eea;
-        }
-        
-        /* ===== TABLA ===== */
-        .table-container {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-        }
-        
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
+        .table-container { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .table-header h3 { font-size: 18px; color: #1a1a2e; }
-        
         table { width: 100%; border-collapse: collapse; }
-        
-        th {
-            text-align: left;
-            padding: 12px 15px;
-            background: #f8f9fa;
-            color: #666;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
-            color: #333;
-        }
-        
+        th { text-align: left; padding: 12px 15px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #333; }
         tr:hover td { background: #f8f9ff; }
         
-        .badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        
-        .badge-pendiente { background: #fff3cd; color: #856404; }
-        .badge-confirmado { background: #d4edda; color: #155724; }
-        .badge-pagado { background: #d1ecf1; color: #0c5460; }
-        .badge-realizado { background: #e2e3e5; color: #383d41; }
-        .badge-cancelado { background: #f8d7da; color: #721c24; }
-        
-        .btn-accion {
-            padding: 6px 15px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
+        .btn-accion { padding: 6px 15px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; }
         .btn-ver { background: #667eea; color: white; }
-        .btn-ver:hover { background: #5a6fd6; }
+        .btn-retry { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .link-ver-todas { color: #667eea; font-weight: 600; font-size: 13px; text-decoration: none; }
         
-        .link-ver-todas {
-            color: #667eea;
-            font-weight: 600;
-            font-size: 13px;
-            text-decoration: none;
-        }
-        
-        .link-ver-todas:hover { text-decoration: underline; }
-        
-        .loading-text {
+        /* Overlay cuando está apagado */
+        .apagado-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 250px;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            color: #999;
-            padding: 40px;
-            font-size: 16px;
         }
+        
+        .apagado-overlay.show {
+            display: flex;
+        }
+        
+        .apagado-mensaje {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-width: 500px;
+        }
+        
+        .apagado-mensaje .icono { font-size: 70px; }
+        .apagado-mensaje h2 { color: #e74c3c; margin: 15px 0; }
+        .apagado-mensaje p { color: #666; margin-bottom: 20px; }
         
         @media (max-width: 768px) {
             .sidebar { width: 70px; padding: 15px 0; }
@@ -349,18 +245,17 @@
             .main-content { margin-left: 70px; padding: 15px; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .chart-bars { height: 150px; }
+            .apagado-overlay { left: 70px; }
         }
     </style>
 </head>
 <body>
-    <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar">
         <div class="sidebar-logo">
             <div class="logo-icon">🏔️</div>
             <h2>Aventura <span>Total</span></h2>
             <p style="font-size:11px;opacity:0.6;margin-top:5px;">Panel CRM</p>
         </div>
-        
         <ul class="nav-menu">
             <li><a href="dashboard.html" class="active"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
             <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
@@ -369,20 +264,34 @@
             <li><a href="emails.html"><span class="nav-icon">📧</span> <span>Emails</span></a></li>
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
         </ul>
-        
         <div class="sidebar-footer">
             <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar Sesión</button>
         </div>
     </nav>
     
-    <!-- ===== MAIN CONTENT ===== -->
+    <!-- Overlay cuando reservas están apagadas -->
+    <div class="apagado-overlay" id="apagadoOverlay">
+        <div class="apagado-mensaje">
+            <div class="icono">🚫</div>
+            <h2>Reservas Desactivadas</h2>
+            <p>El sistema de reservas está temporalmente desactivado. Los clientes no pueden hacer nuevas reservas en este momento.</p>
+            <p style="font-size:13px;color:#999;">Activá las reservas desde el botón superior</p>
+        </div>
+    </div>
+    
     <div class="main-content">
         <div class="header">
             <div>
                 <h1>📊 Dashboard</h1>
-                <p style="color:#999;font-size:13px;margin-top:3px;">Resumen general - Conectado a Google Sheets</p>
+                <p style="color:#999;font-size:13px;">Conectado a Google Sheets</p>
             </div>
             <div class="header-derecha">
+                <!-- Botón Apagar/Encender Reservas -->
+                <button class="btn-apagar encendido" id="btnApagar" onclick="confirmarToggleReservas()">
+                    <span id="btnApagarIcono">🟢</span>
+                    <span id="btnApagarTexto">Reservas Activas</span>
+                </button>
+                
                 <div class="fecha-actual" id="fechaActual"></div>
                 <div class="user-info">
                     <div class="user-avatar">A</div>
@@ -391,50 +300,42 @@
             </div>
         </div>
         
-        <!-- Stats -->
+        <!-- Indicador de estado -->
+        <div class="estado-indicador" id="estadoIndicador">
+            <div class="estado-dot activo" id="estadoDot"></div>
+            <span class="estado-texto activo" id="estadoTexto">✅ Sistema de reservas ACTIVO - Recibiendo reservas normalmente</span>
+        </div>
+        
         <div class="stats-grid">
             <div class="stat-card" onclick="window.location.href='reservas.html'">
-                <div class="stat-card-header">
-                    <div class="stat-icon">📋</div>
-                </div>
+                <div class="stat-icon">📋</div>
                 <div class="stat-number" id="totalReservas">--</div>
                 <div class="stat-label">Total Reservas</div>
             </div>
-            
             <div class="stat-card" onclick="window.location.href='clientes.html'">
-                <div class="stat-card-header">
-                    <div class="stat-icon">👥</div>
-                </div>
+                <div class="stat-icon">👥</div>
                 <div class="stat-number" id="totalClientes">--</div>
                 <div class="stat-label">Clientes Únicos</div>
             </div>
-            
             <div class="stat-card">
-                <div class="stat-card-header">
-                    <div class="stat-icon">✅</div>
-                </div>
+                <div class="stat-icon">✅</div>
                 <div class="stat-number" id="reservasHoy">--</div>
                 <div class="stat-label">Reservas Hoy</div>
             </div>
-            
             <div class="stat-card">
-                <div class="stat-card-header">
-                    <div class="stat-icon">🌎</div>
-                </div>
+                <div class="stat-icon">🌎</div>
                 <div class="stat-number" id="totalPaises">--</div>
                 <div class="stat-label">Países con Reservas</div>
             </div>
         </div>
         
-        <!-- Gráfico -->
         <div class="chart-container">
             <h3 class="chart-title">📊 Reservas por Mes</h3>
             <div class="chart-bars" id="chartBars">
-                <div class="loading-text">⏳ Cargando datos...</div>
+                <p style="text-align:center;color:#999;width:100%;padding:40px;">⏳ Cargando datos...</p>
             </div>
         </div>
         
-        <!-- Últimas Reservas -->
         <div class="table-container">
             <div class="table-header">
                 <h3>🕐 Últimas Reservas</h3>
@@ -456,11 +357,16 @@
                         </tr>
                     </thead>
                     <tbody id="tablaReservas">
-                        <tr><td colspan="9" class="loading-text">⏳ Cargando datos desde Google Sheets...</td></tr>
+                        <tr><td colspan="9" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
+    </div>
+    
+    <!-- Modal Confirmación -->
+    <div class="modal-overlay" id="modalConfirmacion">
+        <div class="modal-content" id="modalContent"></div>
     </div>
     
     <script>
@@ -468,105 +374,170 @@
         if (sessionStorage.getItem('crm_logged') !== 'true') {
             window.location.href = 'index.html';
         }
-        
         document.getElementById('userName').textContent = sessionStorage.getItem('crm_user') || 'Admin';
         
-        // ===== FECHA ACTUAL =====
         const fecha = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         document.getElementById('fechaActual').textContent = '📅 ' + fecha;
         
-        // ===== LOGOUT =====
         function logout() {
-            sessionStorage.removeItem('crm_logged');
-            sessionStorage.removeItem('crm_user');
+            sessionStorage.clear();
             window.location.href = 'index.html';
         }
         
-        // ===== CONFIGURACIÓN GOOGLE SHEETS =====
+        // ===== ESTADO DE RESERVAS =====
+        let reservasActivas = localStorage.getItem('reservasActivas') !== 'false'; // Por defecto: true
+        
+        function actualizarBotonReservas() {
+            const btn = document.getElementById('btnApagar');
+            const icono = document.getElementById('btnApagarIcono');
+            const texto = document.getElementById('btnApagarTexto');
+            const dot = document.getElementById('estadoDot');
+            const estado = document.getElementById('estadoTexto');
+            const overlay = document.getElementById('apagadoOverlay');
+            
+            if (reservasActivas) {
+                btn.className = 'btn-apagar encendido';
+                icono.textContent = '🟢';
+                texto.textContent = 'Reservas Activas';
+                dot.className = 'estado-dot activo';
+                estado.className = 'estado-texto activo';
+                estado.textContent = '✅ Sistema de reservas ACTIVO - Recibiendo reservas normalmente';
+                overlay.classList.remove('show');
+            } else {
+                btn.className = 'btn-apagar apagado';
+                icono.textContent = '🔴';
+                texto.textContent = 'Reservas Apagadas';
+                dot.className = 'estado-dot inactivo';
+                estado.className = 'estado-texto inactivo';
+                estado.textContent = '🚫 Sistema de reservas APAGADO - No se reciben nuevas reservas';
+                overlay.classList.add('show');
+            }
+            
+            localStorage.setItem('reservasActivas', reservasActivas);
+        }
+        
+        function confirmarToggleReservas() {
+            const modal = document.getElementById('modalConfirmacion');
+            const content = document.getElementById('modalContent');
+            
+            if (reservasActivas) {
+                // Va a APAGAR
+                content.innerHTML = `
+                    <div class="modal-icon">⚠️</div>
+                    <div class="modal-title" style="color:#e74c3c;">¿Apagar Sistema de Reservas?</div>
+                    <div class="modal-text">
+                        Los clientes <strong>NO podrán</strong> hacer nuevas reservas desde la página web.<br><br>
+                        Las reservas existentes no se verán afectadas.
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+                        <button class="btn-confirmar" onclick="apagarReservas()">🔴 Sí, Apagar</button>
+                    </div>
+                `;
+            } else {
+                // Va a ENCENDER
+                content.innerHTML = `
+                    <div class="modal-icon">✅</div>
+                    <div class="modal-title" style="color:#27ae60;">¿Activar Sistema de Reservas?</div>
+                    <div class="modal-text">
+                        Los clientes <strong>podrán</strong> volver a hacer reservas desde la página web.
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+                        <button class="btn-activar" onclick="encenderReservas()">🟢 Sí, Activar</button>
+                    </div>
+                `;
+            }
+            
+            modal.classList.add('show');
+        }
+        
+        function apagarReservas() {
+            reservasActivas = false;
+            actualizarBotonReservas();
+            cerrarModal();
+        }
+        
+        function encenderReservas() {
+            reservasActivas = true;
+            actualizarBotonReservas();
+            cerrarModal();
+        }
+        
+        function cerrarModal() {
+            document.getElementById('modalConfirmacion').classList.remove('show');
+        }
+        
+        // Inicializar estado
+        actualizarBotonReservas();
+        
+        // ===== GOOGLE SHEETS =====
         const SPREADSHEET_ID = '1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q';
         const SHEET_NAME = 'Hoja 1';
         const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
         
         let reservasData = [];
         
-        // ===== CARGAR DATOS =====
         async function cargarReservas() {
             try {
-                const respuesta = await fetch(SHEET_CSV_URL);
-                const csv = await respuesta.text();
+                const respuesta = await fetch(SHEET_CSV_URL, { cache: 'no-store', headers: { 'Accept': 'text/csv' } });
+                if (!respuesta.ok) throw new Error('Error HTTP: ' + respuesta.status);
                 
-                // Parsear CSV
+                const csv = await respuesta.text();
                 const lineas = csv.split('\n');
                 reservasData = [];
                 
                 for (let i = 1; i < lineas.length; i++) {
                     const linea = lineas[i].trim();
                     if (!linea) continue;
-                    
-                    // Parsear respetando comillas
-                    const valores = [];
-                    let actual = '';
-                    let entreComillas = false;
-                    
-                    for (let j = 0; j < linea.length; j++) {
-                        const char = linea[j];
-                        if (char === '"') {
-                            entreComillas = !entreComillas;
-                        } else if (char === ',' && !entreComillas) {
-                            valores.push(actual.trim());
-                            actual = '';
-                        } else {
-                            actual += char;
-                        }
-                    }
-                    valores.push(actual.trim());
-                    
+                    const valores = parsearCSV(linea);
                     if (valores.length >= 10 && valores[2]) {
                         reservasData.push({
-                            id: valores[0].replace(/"/g, '').trim(),
-                            fechaReserva: valores[1].replace(/"/g, '').trim(),
-                            nombre: valores[2].replace(/"/g, '').trim(),
-                            apellido: valores[3].replace(/"/g, '').trim(),
-                            email: valores[4].replace(/"/g, '').trim(),
-                            telefono: valores[5].replace(/"/g, '').trim(),
-                            pais: valores[6].replace(/"/g, '').trim(),
-                            ciudad: valores[7].replace(/"/g, '').trim(),
-                            excursion: valores[8].replace(/"/g, '').trim(),
-                            fecha: valores[9].replace(/"/g, '').trim(),
-                            personas: valores[10].replace(/"/g, '').trim(),
-                            formaPago: valores[11] ? valores[11].replace(/"/g, '').trim() : 'No especificada',
-                            busqueda: valores[12] ? valores[12].replace(/"/g, '').trim() : ''
+                            id: limpiar(valores[0]), fechaReserva: limpiar(valores[1]),
+                            nombre: limpiar(valores[2]), apellido: limpiar(valores[3]),
+                            email: limpiar(valores[4]), telefono: limpiar(valores[5]),
+                            pais: limpiar(valores[6]), ciudad: limpiar(valores[7]),
+                            excursion: limpiar(valores[8]), fecha: limpiar(valores[9]),
+                            personas: limpiar(valores[10]),
+                            formaPago: valores[11] ? limpiar(valores[11]) : 'No especificada',
+                            busqueda: valores[12] ? limpiar(valores[12]) : ''
                         });
                     }
                 }
                 
                 actualizarDashboard();
             } catch (error) {
-                console.error('Error al cargar datos:', error);
                 document.getElementById('tablaReservas').innerHTML = 
-                    '<tr><td colspan="9" style="text-align:center;color:#e74c3c;padding:20px;">❌ Error al conectar con Google Sheets<br><small>Verificá que la hoja esté publicada como CSV</small></td></tr>';
+                    `<tr><td colspan="9" style="text-align:center;color:#e74c3c;padding:30px;">
+                        <p>❌ Error al conectar</p>
+                        <button class="btn-retry" onclick="cargarReservas()">🔄 Reintentar</button>
+                    </td></tr>`;
             }
         }
         
+        function parsearCSV(linea) {
+            const valores = []; let actual = ''; let entreComillas = false;
+            for (let j = 0; j < linea.length; j++) {
+                const char = linea[j];
+                if (char === '"') entreComillas = !entreComillas;
+                else if (char === ',' && !entreComillas) { valores.push(actual.trim()); actual = ''; }
+                else actual += char;
+            }
+            valores.push(actual.trim());
+            return valores;
+        }
+        
+        function limpiar(valor) { return valor ? valor.replace(/^"|"$/g, '').trim() : ''; }
+        
         function actualizarDashboard() {
-            // Total reservas
             document.getElementById('totalReservas').textContent = reservasData.length;
+            document.getElementById('totalClientes').textContent = new Set(reservasData.map(r => r.email.toLowerCase())).size;
             
-            // Clientes únicos
-            const clientesUnicos = new Set(reservasData.map(r => r.email.toLowerCase()));
-            document.getElementById('totalClientes').textContent = clientesUnicos.size;
-            
-            // Reservas hoy
             const hoy = new Date();
             const hoyStr = `${String(hoy.getDate()).padStart(2,'0')}-${String(hoy.getMonth()+1).padStart(2,'0')}-${hoy.getFullYear()}`;
-            const reservasHoy = reservasData.filter(r => r.fechaReserva && r.fechaReserva.includes(hoyStr));
-            document.getElementById('reservasHoy').textContent = reservasHoy.length;
+            document.getElementById('reservasHoy').textContent = reservasData.filter(r => r.fechaReserva && r.fechaReserva.includes(hoyStr)).length;
+            document.getElementById('totalPaises').textContent = new Set(reservasData.map(r => r.pais).filter(Boolean)).size;
             
-            // Países únicos
-            const paisesUnicos = new Set(reservasData.map(r => r.pais).filter(Boolean));
-            document.getElementById('totalPaises').textContent = paisesUnicos.size;
-            
-            // Gráfico por mes
             const mesesCount = {};
             reservasData.forEach(r => {
                 if (r.fechaReserva && r.fechaReserva.includes('/')) {
@@ -583,21 +554,22 @@
             const valores = meses.map(m => mesesCount[m] || 0);
             const maxValor = Math.max(...valores, 1);
             
-            document.getElementById('chartBars').innerHTML = meses.map((mes, i) => `
-                <div class="chart-bar" style="height: ${Math.max((valores[i] / maxValor) * 100, 5)}%">
-                    <span class="chart-bar-value">${valores[i]}</span>
-                    <span class="chart-bar-label">${mes}</span>
-                </div>
-            `).join('');
+            document.getElementById('chartBars').innerHTML = valores.every(v => v === 0) 
+                ? '<p style="text-align:center;color:#999;width:100%;padding:40px;">📊 Sin datos</p>'
+                : meses.map((mes, i) => `
+                    <div class="chart-bar" style="height: ${Math.max((valores[i] / maxValor) * 100, 5)}%">
+                        <span class="chart-bar-value">${valores[i]}</span>
+                        <span class="chart-bar-label">${mes}</span>
+                    </div>
+                `).join('');
             
-            // Tabla (últimas 8)
             const ultimas = reservasData.slice(-8).reverse();
             document.getElementById('tablaReservas').innerHTML = ultimas.length > 0 ? ultimas.map(r => `
                 <tr>
                     <td><strong>${r.id}</strong></td>
                     <td>${r.nombre} ${r.apellido}</td>
                     <td style="font-size:12px;">${r.email}</td>
-                    <td>${r.excursion.length > 25 ? r.excursion.substring(0, 25) + '...' : r.excursion}</td>
+                    <td>${r.excursion.length > 28 ? r.excursion.substring(0, 28) + '...' : r.excursion}</td>
                     <td>${r.fecha}</td>
                     <td>${r.personas}</td>
                     <td>${r.pais}</td>
@@ -605,18 +577,21 @@
                     <td><button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">Ver</button></td>
                 </tr>
             `).join('') : 
-            '<tr><td colspan="9" style="text-align:center;color:#999;padding:20px;">No hay reservas todavía</td></tr>';
+            '<tr><td colspan="9" style="text-align:center;color:#999;padding:30px;">📋 No hay reservas</td></tr>';
         }
         
-        function verReserva(id) {
-            window.location.href = `reservas.html?id=${id}`;
-        }
+        function verReserva(id) { window.location.href = `reservas.html?id=${id}`; }
         
-        // ===== RECARGAR DATOS CADA 5 MINUTOS =====
         setInterval(cargarReservas, 300000);
-        
-        // ===== CARGAR AL INICIAR =====
         cargarReservas();
+        
+        // Cerrar modal con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') cerrarModal();
+        });
+        document.getElementById('modalConfirmacion').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
     </script>
 </body>
 </html>
