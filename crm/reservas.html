@@ -22,9 +22,11 @@
         .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 1; min-width: 150px; }
-        .btn-filtrar { padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; }
-        .btn-recargar { padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; }
+        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 150px; }
+        .filter-select { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; min-width: 180px; background: white; }
+        .filter-input:focus, .filter-select:focus { outline: none; border-color: #667eea; }
+        .btn-filtrar { padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-recargar { padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .tabs { display: flex; gap: 3px; margin-bottom: 20px; background: white; padding: 5px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
         .tab { padding: 8px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; color: #666; }
         .tab:hover { background: #f0f0ff; color: #667eea; } .tab.active { background: #667eea; color: white; }
@@ -48,7 +50,7 @@
         .modal-info p { margin: 8px 0; font-size: 13px; color: #555; } .modal-info strong { color: #333; display: inline-block; width: 110px; }
         .excursion-tag-modal { display: block; background: #f0f0ff; color: #667eea; padding: 6px 12px; margin: 4px 0; border-radius: 8px; font-size: 13px; border-left: 3px solid #667eea; }
         .modal-acciones { display: flex; gap: 6px; margin-top: 15px; flex-wrap: wrap; } .modal-acciones .btn-accion { padding: 8px 14px; font-size: 12px; }
-        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } table { min-width: 600px; } }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } table { min-width: 600px; } .filters-bar { flex-direction: column; } .filter-input, .filter-select { width: 100%; } }
     </style>
 </head>
 <body>
@@ -74,9 +76,12 @@
             <button class="tab" onclick="filtrarPorEstado('pagado')">💰 Pagadas <span class="count" id="countPagado">0</span></button>
         </div>
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar..." id="busquedaReserva">
-            <button class="btn-filtrar" onclick="filtrarReservas()">🔍</button>
-            <button class="btn-recargar" onclick="cargarReservas()">🔄</button>
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por ID, cliente, email o excursión..." id="busquedaReserva">
+            <select class="filter-select" id="filtroCiudad">
+                <option value="">🏙️ Todas las ciudades</option>
+            </select>
+            <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
+            <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
         </div>
         <div class="table-container">
             <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0</span></div>
@@ -113,6 +118,12 @@
                 
                 reservasData.sort((a, b) => { const na = parseInt(a.id.replace(/\D/g,''))||0; const nb = parseInt(b.id.replace(/\D/g,''))||0; return nb - na; });
                 const eg = cargarEstadosGuardados(); reservasData.forEach(r => { if (eg[r.id]) r.estado = eg[r.id]; });
+                
+                // Llenar selector de ciudades
+                const ciudades = [...new Set(reservasData.map(r => r.ciudad).filter(Boolean))].sort();
+                const selectCiudad = document.getElementById('filtroCiudad');
+                if (selectCiudad) selectCiudad.innerHTML = '<option value="">🏙️ Todas las ciudades</option>' + ciudades.map(c => `<option value="${c}">${c}</option>`).join('');
+                
                 renderReservas(reservasData); actualizarContadores();
             } catch(e) { document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;color:red;padding:30px;">Error al cargar</td></tr>'; }
         }
@@ -120,12 +131,21 @@
         function actualizarContadores() { document.getElementById('countTodas').textContent = reservasData.length; document.getElementById('countPendiente').textContent = reservasData.filter(r => r.estado === 'pendiente').length; document.getElementById('countConfirmado').textContent = reservasData.filter(r => r.estado === 'confirmado').length; document.getElementById('countPagado').textContent = reservasData.filter(r => r.estado === 'pagado').length; }
         function renderReservas(data) { document.getElementById('totalReservasSpan').textContent = data.length + ' reservas'; if (!data.length) { document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;">📋 Sin reservas</td></tr>'; return; } document.getElementById('tablaReservas').innerHTML = data.map(r => { let e = r.excursion || ''; if (e.includes('\n')) { const l = e.split('\n').filter(x => x.trim()); e = l[0].trim().replace(/^\d+\.\s*/,'').substring(0,20) + (l.length>1?` (+${l.length-1})`:''); } else e = e.substring(0,20); return `<tr><td><strong>${r.id}</strong></td><td>${r.nombre} ${r.apellido}</td><td style="font-size:11px">${r.email}</td><td>${r.ciudad}</td><td>${e}</td><td>${r.fecha}</td><td>${r.personas}</td><td>${r.formaPago}</td><td><span class="badge badge-${r.estado}">${r.estado}</span></td><td><button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button><button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')">✅</button><button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')">💰</button></td></tr>`; }).join(''); }
         function filtrarPorEstado(e) { estadoFiltro = e; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); renderReservas(e === 'todas' ? reservasData : reservasData.filter(r => r.estado === e)); }
-        function filtrarReservas() { const b = document.getElementById('busquedaReserva').value.toLowerCase(); let f = reservasData; if (estadoFiltro !== 'todas') f = f.filter(r => r.estado === estadoFiltro); if (b) f = f.filter(r => r.id.toLowerCase().includes(b) || r.nombre.toLowerCase().includes(b) || r.email.toLowerCase().includes(b)); renderReservas(f); }
+        function filtrarReservas() {
+            const b = document.getElementById('busquedaReserva').value.toLowerCase();
+            const ciudad = document.getElementById('filtroCiudad').value;
+            let f = reservasData;
+            if (estadoFiltro !== 'todas') f = f.filter(r => r.estado === estadoFiltro);
+            if (b) f = f.filter(r => r.id.toLowerCase().includes(b) || r.nombre.toLowerCase().includes(b) || r.email.toLowerCase().includes(b) || (r.excursion||'').toLowerCase().includes(b));
+            if (ciudad) f = f.filter(r => r.ciudad === ciudad);
+            renderReservas(f);
+        }
         function verReserva(id) { reservaSeleccionada = reservasData.find(r => r.id === id); if (reservaSeleccionada) { let ex = ''; const er = reservaSeleccionada.excursion || ''; if (er.includes('\n')) ex = er.split('\n').filter(e => e.trim()).map(e => `<div class="excursion-tag-modal">${e.trim()}</div>`).join(''); document.getElementById('modalInfo').innerHTML = `<p><strong>ID:</strong> ${reservaSeleccionada.id}</p><p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p><p><strong>Email:</strong> ${reservaSeleccionada.email}</p><p><strong>Tel:</strong> ${reservaSeleccionada.telefono}</p><p><strong>País:</strong> ${reservaSeleccionada.pais}</p><p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p><p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p><p><strong>Pax:</strong> ${reservaSeleccionada.personas}</p><p><strong>Pago:</strong> ${reservaSeleccionada.formaPago}</p><p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p><div style="margin-top:12px"><strong>🕐 Excursiones:</strong><div>${ex}</div></div>`; document.getElementById('modalReserva').classList.add('show'); } }
         function cerrarModal() { document.getElementById('modalReserva').classList.remove('show'); }
         function cambiarEstado(nuevo) { if (reservaSeleccionada) { reservaSeleccionada.estado = nuevo; guardarEstado(reservaSeleccionada.id, nuevo); renderReservas(reservasData); actualizarContadores(); cerrarModal(); } }
         function cambiarEstadoDirecto(id, nuevo) { const r = reservasData.find(r => r.id === id); if (r) { r.estado = nuevo; guardarEstado(id, nuevo); renderReservas(reservasData); actualizarContadores(); } }
         document.getElementById('busquedaReserva').addEventListener('keypress', function(e) { if (e.key === 'Enter') filtrarReservas(); });
+        document.getElementById('filtroCiudad').addEventListener('change', function() { filtrarReservas(); });
         document.getElementById('modalReserva').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarModal(); });
         cargarReservas();
