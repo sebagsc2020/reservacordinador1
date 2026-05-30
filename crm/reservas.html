@@ -107,16 +107,28 @@
                     if (!linea) continue;
                     
                     if (linea.startsWith('"RES-') || linea.startsWith('RES-')) {
+                        // Procesar datos de la reserva anterior
                         if (actual && ultima) {
+                            // La última línea tiene: "Excursión","Fecha","Personas","Forma de pago","Lugar"
                             const m = ultima.match(/"([^"]*)"/g);
+                            console.log('📋 Última línea:', ultima.substring(0, 100));
+                            console.log('   Matches encontrados:', m ? m.length : 0);
                             if (m && m.length >= 5) {
-                                actual.fecha = m[m.length-4].replace(/"/g,'').trim();
-                                actual.personas = m[m.length-3].replace(/"/g,'').trim();
-                                actual.formaPago = m[m.length-2].replace(/"/g,'').trim();
+                                actual.fecha = m[1].replace(/"/g,'').trim();
+                                actual.personas = m[2].replace(/"/g,'').trim();
+                                actual.formaPago = m[3].replace(/"/g,'').trim();
+                                actual.busqueda = m[4].replace(/"/g,'').trim();
+                                console.log('   ✅ Fecha=' + actual.fecha + ' | Pax=' + actual.personas + ' | Pago=' + actual.formaPago + ' | Lugar=' + actual.busqueda);
+                            } else if (m && m.length >= 4) {
+                                actual.fecha = m[1].replace(/"/g,'').trim();
+                                actual.personas = m[2].replace(/"/g,'').trim();
+                                actual.formaPago = m[3].replace(/"/g,'').trim();
+                                console.log('   ✅ Fecha=' + actual.fecha + ' | Pax=' + actual.personas + ' | Pago=' + actual.formaPago);
                             }
                         }
                         if (actual) reservasData.push(actual);
                         
+                        // Parsear línea principal
                         const v = []; let a = '', com = false;
                         for (let j = 0; j < linea.length; j++) {
                             const c = linea[j];
@@ -130,16 +142,23 @@
                         actual = { id: l[0]||`R${i}`, fechaReserva: l[1]||'', nombre: l[2]||'', apellido: l[3]||'', email: l[4]||'', telefono: l[5]||'', pais: l[6]||'', ciudad: l[7]||'', excursion: l[8]||'', fecha: '', personas: '0', formaPago: 'No especificada', busqueda: '', estado: 'confirmado' };
                         ultima = '';
                     } else {
+                        // Línea de continuación
                         if (actual) { const x = linea.replace(/^"|"$/g,'').trim(); if (x && !x.startsWith(',') && x.length > 3) { actual.excursion += '\n' + x; ultima = x; } }
                     }
                 }
+                // Última reserva
                 if (actual) {
                     if (ultima) {
                         const m = ultima.match(/"([^"]*)"/g);
                         if (m && m.length >= 5) {
-                            actual.fecha = m[m.length-4].replace(/"/g,'').trim();
-                            actual.personas = m[m.length-3].replace(/"/g,'').trim();
-                            actual.formaPago = m[m.length-2].replace(/"/g,'').trim();
+                            actual.fecha = m[1].replace(/"/g,'').trim();
+                            actual.personas = m[2].replace(/"/g,'').trim();
+                            actual.formaPago = m[3].replace(/"/g,'').trim();
+                            actual.busqueda = m[4].replace(/"/g,'').trim();
+                        } else if (m && m.length >= 4) {
+                            actual.fecha = m[1].replace(/"/g,'').trim();
+                            actual.personas = m[2].replace(/"/g,'').trim();
+                            actual.formaPago = m[3].replace(/"/g,'').trim();
                         }
                     }
                     reservasData.push(actual);
@@ -180,7 +199,7 @@
                 let ex = ''; const er = reservaSeleccionada.excursion || '';
                 if (er.includes('\n')) ex = er.split('\n').filter(e => e.trim()).map(e => `<div class="excursion-tag-modal">${e.trim()}</div>`).join('');
                 else ex = `<div class="excursion-tag-modal">${er}</div>`;
-                document.getElementById('modalInfo').innerHTML = `<p><strong>ID:</strong> ${reservaSeleccionada.id}</p><p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p><p><strong>Email:</strong> ${reservaSeleccionada.email}</p><p><strong>Tel:</strong> ${reservaSeleccionada.telefono}</p><p><strong>País:</strong> ${reservaSeleccionada.pais}</p><p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p><p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p><p><strong>Pax:</strong> ${reservaSeleccionada.personas}</p><p><strong>Pago:</strong> ${reservaSeleccionada.formaPago}</p><p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p><div style="margin-top:12px"><strong>🕐 Excursiones:</strong><div>${ex}</div></div>`;
+                document.getElementById('modalInfo').innerHTML = `<p><strong>ID:</strong> ${reservaSeleccionada.id}</p><p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p><p><strong>Email:</strong> ${reservaSeleccionada.email}</p><p><strong>Tel:</strong> ${reservaSeleccionada.telefono}</p><p><strong>País:</strong> ${reservaSeleccionada.pais}</p><p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p><p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p><p><strong>Pax:</strong> ${reservaSeleccionada.personas}</p><p><strong>Pago:</strong> ${reservaSeleccionada.formaPago}</p><p><strong>Lugar:</strong> ${reservaSeleccionada.busqueda || 'No especificado'}</p><p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p><div style="margin-top:12px"><strong>🕐 Excursiones:</strong><div>${ex}</div></div>`;
                 document.getElementById('modalReserva').classList.add('show');
             }
         }
