@@ -5,46 +5,345 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendario - CRM Aventura Total</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
-        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
-        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar (mismo estilo que en otras páginas) */
+        .sidebar {
+            width: 250px;
+            background: #1a1a2e;
+            color: white;
+            padding: 25px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            text-align: center;
+            padding: 0 20px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo .logo-icon { font-size: 40px; }
+        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; }
+        .sidebar-logo h2 span { color: #667eea; }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 15px;
+        }
+        .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .nav-menu a:hover, .nav-menu a.active {
+            background: rgba(102,126,234,0.2);
+            color: white;
+        }
+        .nav-menu a.active { background: #667eea; }
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
-        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 15px;
+            right: 15px;
+        }
+        .btn-logout-sidebar {
+            width: 100%;
+            padding: 12px;
+            background: rgba(231,76,60,0.2);
+            color: #e74c3c;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 30px;
+            min-width: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
         .header h1 { font-size: 26px; color: #1a1a2e; }
-        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
-        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
-        .rango-filter { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-        .rango-filter label { font-weight: 600; font-size: 13px; } .rango-filter input[type="date"] { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; }
-        .btn-filtrar { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
-        .btn-whatsapp { padding: 10px 20px; background: #25D366; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
-        .btn-limpiar { padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
-        .calendar-nav { display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .calendar-nav button { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
-        .calendar-nav h2 { font-size: 22px; color: #1a1a2e; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
-        .calendar-day-header { text-align: center; padding: 10px; font-weight: 700; color: #666; font-size: 12px; text-transform: uppercase; }
-        .calendar-day { min-height: 100px; padding: 8px; border-radius: 10px; cursor: pointer; border: 2px solid transparent; position: relative; }
-        .calendar-day:hover { background: #f0f0ff; border-color: #667eea; }
-        .calendar-day.today { background: #f0f0ff; border-color: #667eea; }
-        .calendar-day.otro-mes { opacity: 0.3; }
-        .calendar-day.en-rango { background: #e8f5e9; border-color: #27ae60; }
-        .calendar-day.fuera-rango { opacity: 0.2; pointer-events: none; }
-        .calendar-day-numero { font-size: 14px; font-weight: 700; color: #333; }
-        .calendar-event { font-size: 10px; padding: 3px 6px; border-radius: 4px; background: #d1ecf1; color: #0c5460; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
-        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } .calendar-day { min-height: 60px; } }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            font-size: 14px;
+        }
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        /* Controles de rango de fechas */
+        .date-range-container {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .date-range-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .date-range-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+        }
+        .date-range-group input {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        .btn-aplicar-rango {
+            padding: 8px 18px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .btn-limpiar-rango {
+            padding: 8px 18px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* Calendario en cuadrícula */
+        .calendar-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .month-nav button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0 3px;
+            font-size: 13px;
+        }
+        .current-month {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            min-width: 600px;
+        }
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #555;
+        }
+        .calendar-day {
+            background: #fefefe;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px 6px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .calendar-day.out-of-range {
+            background: #f5f5f5;
+            opacity: 0.5;
+            filter: grayscale(0.1);
+        }
+        .day-number {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #1a1a2e;
+        }
+        .event-item {
+            background: #e8f0fe;
+            border-left: 3px solid #667eea;
+            padding: 4px 6px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            font-size: 11px;
+            word-break: break-word;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .event-text {
+            flex: 1;
+            cursor: pointer;
+        }
+        .delete-event {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 5px;
+            padding: 0 3px;
+        }
+        .add-event-btn {
+            margin-top: 5px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 15px;
+            padding: 3px 0;
+            font-size: 10px;
+            cursor: pointer;
+            color: #2c3e50;
+        }
+        .add-event-btn:hover {
+            background: #d5dbdb;
+        }
+
+        /* Modal para crear evento */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .modal-header h2 { color: #667eea; font-size: 18px; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .modal-save {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; }
+            .nav-menu a { justify-content: center; }
+            .main-content { margin-left: 60px; padding: 15px; }
+            .calendar-grid { gap: 4px; }
+            .calendar-day { min-height: 70px; padding: 6px 3px; }
+        }
     </style>
 </head>
 <body>
     <nav class="sidebar">
-        <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2></div>
+        <div class="sidebar-logo">
+            <div class="logo-icon">🏔️</div>
+            <h2>Aventura <span>Total</span></h2>
+        </div>
         <ul class="nav-menu">
             <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
             <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
@@ -54,64 +353,279 @@
             <li><a href="calendario.html" class="active"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
             <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
         </ul>
-        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar Sesión</button></div>
+        <div class="sidebar-footer">
+            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
+        </div>
     </nav>
+
     <div class="main-content">
-        <div class="header"><div><h1>📅 Calendario de Eventos</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
-        <div class="rango-filter">
-            <label>📅 Desde:</label><input type="date" id="fechaDesde">
-            <label>Hasta:</label><input type="date" id="fechaHasta">
-            <button class="btn-filtrar" onclick="filtrarPorRango()">🔍 Filtrar</button>
-            <button class="btn-whatsapp" onclick="compartirPorWhatsApp()">💬 Compartir</button>
-            <button class="btn-limpiar" onclick="limpiarFiltro()">🔄 Ver todo</button>
+        <div class="header">
+            <div><h1>📅 Calendario de Eventos</h1></div>
+            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
         </div>
-        <div class="calendar-nav">
-            <button onclick="cambiarMes(-1)">◀</button>
-            <h2 id="mesTitulo">Mayo 2026</h2>
-            <button onclick="cambiarMes(1)">▶</button>
+
+        <!-- Selector de rango de fechas -->
+        <div class="date-range-container">
+            <div class="date-range-group">
+                <label>📅 Fecha inicio</label>
+                <input type="date" id="fechaInicio">
+            </div>
+            <div class="date-range-group">
+                <label>📅 Fecha fin</label>
+                <input type="date" id="fechaFin">
+            </div>
+            <button class="btn-aplicar-rango" onclick="aplicarRangoFechas()">🔍 Filtrar por rango</button>
+            <button class="btn-limpiar-rango" onclick="limpiarRangoFechas()">🗑️ Limpiar filtro</button>
         </div>
-        <div class="calendar-grid" id="calendarGrid"></div>
+
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="month-nav">
+                    <button onclick="cambiarMes(-1)">◀ Mes anterior</button>
+                    <button onclick="cambiarMes(1)">Mes siguiente ▶</button>
+                </div>
+                <div class="current-month" id="currentMonthYear"></div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Los días se generan dinámicamente -->
+            </div>
+        </div>
     </div>
+
+    <!-- Modal para crear/editar evento -->
+    <div class="modal-overlay" id="modalEvento">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">➕ Nuevo evento</h2>
+                <button class="modal-close" onclick="cerrarModalEvento()">✕</button>
+            </div>
+            <div>
+                <p><strong>Fecha:</strong> <span id="modalFecha"></span></p>
+                <input type="text" id="eventoTexto" class="modal-input" placeholder="Descripción del evento" autocomplete="off">
+                <button class="modal-save" onclick="guardarEvento()">💾 Guardar evento</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
-        function verificarSesionUnica() { const sessionId = sessionStorage.getItem('crm_session_id'); const sesionActiva = JSON.parse(localStorage.getItem('crm_sesion_activa') || '{}'); if (!sessionId || sesionActiva.id !== sessionId) { sessionStorage.clear(); alert('⚠️ Sesión cerrada.'); window.location.href = 'index.html'; return false; } localStorage.setItem('crm_sesion_activa', JSON.stringify({ ...sesionActiva, timestamp: Date.now() })); return true; }
-        if (!verificarSesionUnica()) throw new Error('Sesión inválida'); setInterval(verificarSesionUnica, 10000);
-        function logout() { const sessionId = sessionStorage.getItem('crm_session_id'); const sesionActiva = JSON.parse(localStorage.getItem('crm_sesion_activa') || '{}'); if (sesionActiva.id === sessionId) localStorage.removeItem('crm_sesion_activa'); sessionStorage.clear(); window.location.href = 'index.html'; }
-        
-        let fechaActual = new Date(), mesActual = fechaActual.getMonth(), añoActual = fechaActual.getFullYear(), rangoSeleccionado = null;
-        let eventosManuales = JSON.parse(localStorage.getItem('eventosManuales') || '[]');
-        const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-        const diasSemana = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-        
-        function guardarEventos() { localStorage.setItem('eventosManuales', JSON.stringify(eventosManuales)); }
-        function renderCalendar() {
-            document.getElementById('mesTitulo').textContent = `${meses[mesActual]} ${añoActual}`;
-            let html = ''; diasSemana.forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
-            const primerDia = new Date(añoActual, mesActual, 1).getDay(), diasEnMes = new Date(añoActual, mesActual + 1, 0).getDate(), diasMesAnterior = new Date(añoActual, mesActual, 0).getDate();
-            const hoy = new Date(), hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
-            for (let i = primerDia - 1; i >= 0; i--) { const fuera = rangoSeleccionado ? 'fuera-rango' : ''; html += `<div class="calendar-day otro-mes ${fuera}"><div class="calendar-day-numero">${diasMesAnterior - i}</div></div>`; }
-            for (let dia = 1; dia <= diasEnMes; dia++) {
-                const fechaStr = `${añoActual}-${String(mesActual+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
-                const esHoy = fechaStr === hoyStr, enRango = rangoSeleccionado && fechaStr >= rangoSeleccionado.desde && fechaStr <= rangoSeleccionado.hasta;
-                const fueraRango = rangoSeleccionado && !enRango, eventosDelDia = eventosManuales.filter(e => e.fecha === fechaStr);
-                html += `<div class="calendar-day ${esHoy ? 'today' : ''} ${enRango ? 'en-rango' : ''} ${fueraRango ? 'fuera-rango' : ''}"><div class="calendar-day-numero">${dia}</div>${eventosDelDia.map(e => `<div class="calendar-event">${e.titulo.substring(0,15)}</div>`).join('')}</div>`;
+        // ---------- SESIÓN (simulada para demo, pero puedes integrar tu validación) ----------
+        // Si usas sistema de login, descomenta lo siguiente:
+        // if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
+        // function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+        function logout() {
+            // Versión demo: redirige a login o recarga
+            alert("Cerrando sesión... (demo)");
+            // window.location.href = 'index.html';
+        }
+
+        // ---------- Variables globales ----------
+        let fechaActual = new Date(); // Mes actual en curso
+        let currentYear = fechaActual.getFullYear();
+        let currentMonth = fechaActual.getMonth(); // 0-11
+
+        // Almacenamiento de eventos: objeto con clave "YYYY-MM-DD" y array de strings
+        let eventos = {};
+
+        // Filtro de rango de fechas (en milisegundos, inicio y fin inclusivo)
+        let rangoInicio = null;
+        let rangoFin = null;
+
+        // Modal
+        let fechaSeleccionada = null; // Formato YYYY-MM-DD
+
+        // ---------- Cargar eventos desde localStorage ----------
+        function cargarEventos() {
+            const stored = localStorage.getItem('eventosCalendario');
+            if (stored) {
+                eventos = JSON.parse(stored);
+            } else {
+                // Eventos de ejemplo
+                eventos = {
+                    "2026-05-30": ["Reunión con clientes", "Enviar cotizaciones"],
+                    "2026-06-05": ["Excursión a la montaña"],
+                    "2026-06-15": ["Cumpleaños empresa"]
+                };
             }
-            document.getElementById('calendarGrid').innerHTML = html;
         }
-        function cambiarMes(dir) { mesActual += dir; if (mesActual > 11) { mesActual = 0; añoActual++; } if (mesActual < 0) { mesActual = 11; añoActual--; } renderCalendar(); }
-        function filtrarPorRango() { const desde = document.getElementById('fechaDesde').value, hasta = document.getElementById('fechaHasta').value; if (desde && hasta) { rangoSeleccionado = { desde, hasta }; renderCalendar(); } }
-        function limpiarFiltro() { rangoSeleccionado = null; document.getElementById('fechaDesde').value = ''; document.getElementById('fechaHasta').value = ''; renderCalendar(); }
-        function compartirPorWhatsApp() {
-            if (!rangoSeleccionado) { alert('⚠️ Seleccioná un rango'); return; }
-            const eventosRango = eventosManuales.filter(e => e.fecha >= rangoSeleccionado.desde && e.fecha <= rangoSeleccionado.hasta);
-            if (eventosRango.length === 0) { alert('⚠️ No hay eventos'); return; }
-            eventosRango.sort((a,b) => a.fecha.localeCompare(b.fecha));
-            let m = `🌟 *Bienvenidos!!!*\n*Nos espera una estadía maravillosa!!!*\n\n📅 *CRONOGRAMA*\n${eventosRango.length} actividades\n\n`;
-            eventosRango.forEach(e => { const ff = new Date(e.fecha+'T00:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}); m += `📅 *${ff}*\n   🕐 ${e.titulo}\n${e.horario?'   ⏰ '+e.horario+'\n':''}${e.descripcion?'   📝 '+e.descripcion+'\n':''}\n`; });
-            m += `😢 *A no ponerse triste, volvemos a casa!!*\n\n🎯 *Asegurá tu lugar, sé el primero en reservar!!*\n👉 *Hacé click y entrá a nuestro sistema de reservas!!*\nhttps://sebagsc2020.github.io/reservacordinador1/index.html\n\n🏔️ Aventura Total`;
-            window.open('https://wa.me/?text='+encodeURIComponent(m), '_blank');
+
+        function guardarEventosEnLocalStorage() {
+            localStorage.setItem('eventosCalendario', JSON.stringify(eventos));
         }
-        renderCalendar();
+
+        // ---------- Persistir eventos ----------
+        function agregarEvento(fecha, texto) {
+            if (!eventos[fecha]) {
+                eventos[fecha] = [];
+            }
+            eventos[fecha].push(texto);
+            guardarEventosEnLocalStorage();
+            renderizarCalendario(); // Refrescar vista
+        }
+
+        function eliminarEvento(fecha, index) {
+            if (eventos[fecha] && eventos[fecha][index]) {
+                eventos[fecha].splice(index, 1);
+                if (eventos[fecha].length === 0) {
+                    delete eventos[fecha];
+                }
+                guardarEventosEnLocalStorage();
+                renderizarCalendario();
+            }
+        }
+
+        // ---------- Lógica de rango de fechas ----------
+        function aplicarRangoFechas() {
+            const inicioInput = document.getElementById('fechaInicio').value;
+            const finInput = document.getElementById('fechaFin').value;
+            if (!inicioInput || !finInput) {
+                alert("Por favor selecciona fecha de inicio y fecha fin.");
+                return;
+            }
+            const inicio = new Date(inicioInput);
+            const fin = new Date(finInput);
+            if (inicio > fin) {
+                alert("La fecha de inicio debe ser anterior o igual a la fecha fin.");
+                return;
+            }
+            rangoInicio = inicio;
+            rangoFin = fin;
+            renderizarCalendario(); // Re-renderizar aplicando el filtro visual
+        }
+
+        function limpiarRangoFechas() {
+            rangoInicio = null;
+            rangoFin = null;
+            document.getElementById('fechaInicio').value = '';
+            document.getElementById('fechaFin').value = '';
+            renderizarCalendario();
+        }
+
+        // Verifica si una fecha está dentro del rango actual (si rango está definido)
+        function estaEnRango(fechaDate) {
+            if (rangoInicio === null || rangoFin === null) return true;
+            // Comparar solo año-mes-día, sin horas
+            const fechaComparar = new Date(fechaDate.getFullYear(), fechaDate.getMonth(), fechaDate.getDate());
+            const inicioComparar = new Date(rangoInicio.getFullYear(), rangoInicio.getMonth(), rangoInicio.getDate());
+            const finComparar = new Date(rangoFin.getFullYear(), rangoFin.getMonth(), rangoFin.getDate());
+            return fechaComparar >= inicioComparar && fechaComparar <= finComparar;
+        }
+
+        // ---------- Renderizado del calendario con cuadrícula ----------
+        function renderizarCalendario() {
+            const year = currentYear;
+            const month = currentMonth;
+            const firstDayOfMonth = new Date(year, month, 1);
+            const startDayOfWeek = firstDayOfMonth.getDay(); // 0 domingo, 1 lunes...
+            // Ajuste para que el calendario empiece en lunes (día 1 = lunes)
+            let startOffset = (startDayOfWeek === 0 ? 6 : startDayOfWeek - 1);
+            
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const totalCells = 42; // 6 filas x 7 días
+            let calendarHTML = '';
+            
+            // Días de la semana (encabezados)
+            const weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+            weekdays.forEach(day => {
+                calendarHTML += `<div class="calendar-day-header">${day}</div>`;
+            });
+            
+            // Llenar celdas vacías antes del día 1
+            for (let i = 0; i < startOffset; i++) {
+                calendarHTML += `<div class="calendar-day out-of-range"></div>`;
+            }
+            
+            // Días del mes
+            for (let day = 1; day <= daysInMonth; day++) {
+                const fechaObj = new Date(year, month, day);
+                const fechaKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const eventosDelDia = eventos[fechaKey] || [];
+                const dentroRango = estaEnRango(fechaObj);
+                const claseRango = dentroRango ? '' : 'out-of-range';
+                
+                let dayHTML = `<div class="calendar-day ${claseRango}">
+                                <div class="day-number">${day}</div>`;
+                
+                // Mostrar eventos
+                eventosDelDia.forEach((ev, idx) => {
+                    dayHTML += `<div class="event-item">
+                                    <span class="event-text" title="${ev}">${ev.length > 25 ? ev.substring(0,22)+'...' : ev}</span>
+                                    <button class="delete-event" onclick="eliminarEvento('${fechaKey}', ${idx})">🗑️</button>
+                                </div>`;
+                });
+                
+                // Botón para CREAR evento (si el día está dentro del rango o no hay rango)
+                // Incluso si está fuera de rango, puedes permitir crear, pero mejor si lo permites o no según diseño. Aquí lo permitimos siempre.
+                dayHTML += `<button class="add-event-btn" onclick="abrirModalCrear('${fechaKey}')">+ Crear evento</button>`;
+                dayHTML += `</div>`;
+                calendarHTML += dayHTML;
+            }
+            
+            // Completar celdas restantes hasta 42
+            const cellsFilled = startOffset + daysInMonth;
+            for (let i = cellsFilled; i < totalCells; i++) {
+                calendarHTML += `<div class="calendar-day out-of-range"></div>`;
+            }
+            
+            document.getElementById('calendarGrid').innerHTML = calendarHTML;
+            // Actualizar título del mes
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            document.getElementById('currentMonthYear').innerText = `${monthNames[month]} ${year}`;
+        }
+        
+        function cambiarMes(delta) {
+            let newMonth = currentMonth + delta;
+            let newYear = currentYear;
+            if (newMonth < 0) {
+                newMonth = 11;
+                newYear--;
+            } else if (newMonth > 11) {
+                newMonth = 0;
+                newYear++;
+            }
+            currentMonth = newMonth;
+            currentYear = newYear;
+            renderizarCalendario();
+        }
+        
+        // ---------- Modal para crear evento ----------
+        function abrirModalCrear(fechaKey) {
+            fechaSeleccionada = fechaKey;
+            const [year, month, day] = fechaKey.split('-');
+            document.getElementById('modalFecha').innerText = `${day}/${month}/${year}`;
+            document.getElementById('eventoTexto').value = '';
+            document.getElementById('modalTitle').innerText = '➕ Nuevo evento';
+            document.getElementById('modalEvento').classList.add('show');
+        }
+        
+        function cerrarModalEvento() {
+            document.getElementById('modalEvento').classList.remove('show');
+            fechaSeleccionada = null;
+        }
+        
+        function guardarEvento() {
+            const texto = document.getElementById('eventoTexto').value.trim();
+            if (!texto) {
+                alert("Escribe una descripción para el evento.");
+                return;
+            }
+            if (fechaSeleccionada) {
+                agregarEvento(fechaSeleccionada, texto);
+            }
+            cerrarModalEvento();
+        }
+        
+        // Cerrar modal si click fuera
+        document.getElementById('modalEvento').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModalEvento();
+        });
+        
+        // ---------- Inicialización ----------
+        function init() {
+            cargarEventos();
+            renderizarCalendario();
+        }
+        
+        init();
     </script>
 </body>
 </html>
