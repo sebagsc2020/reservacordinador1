@@ -160,6 +160,12 @@
                 const lineas = csv.split('\n');
                 
                 console.log('📊 Total líneas:', lineas.length);
+                console.log('📋 Encabezados CRUDOS:', lineas[0]);
+                
+                // Mostrar encabezados por posición
+                const encabezados = lineas[0].split(',');
+                console.log('📋 Columnas detectadas:');
+                encabezados.forEach((h, i) => console.log(`   [${i}] = ${h.replace(/"/g,'').trim()}`));
                 
                 reservasData = [];
                 let reservaActual = null;
@@ -185,7 +191,27 @@
                         
                         const limpio = valores.map(v => v.replace(/^"|"$/g, '').trim());
                         
-                        console.log(`📋 ${limpio[0]} | J(Fecha)=${limpio[9] || '?'} | K(Pax)=${limpio[10] || '?'} | L(Pago)=${limpio[11] || '?'}`);
+                        // MOSTRAR TODAS LAS COLUMNAS
+                        console.log(`\n📋 ${limpio[0]}:`);
+                        limpio.forEach((v, j) => {
+                            if (v) console.log(`   [${j}] = "${v.substring(0, 40)}"`);
+                        });
+                        
+                        // Buscar la fecha (contiene "2026") y tomar las 2 siguientes
+                        let fechaEncontrada = '';
+                        let paxEncontrado = '0';
+                        let pagoEncontrado = 'No especificada';
+                        
+                        for (let j = 0; j < limpio.length; j++) {
+                            if (limpio[j] && limpio[j].includes('2026') && !limpio[j].includes('@')) {
+                                fechaEncontrada = limpio[j];
+                                paxEncontrado = limpio[j+1] || '0';
+                                pagoEncontrado = limpio[j+2] || 'No especificada';
+                                break;
+                            }
+                        }
+                        
+                        console.log(`   ✅ Fecha=${fechaEncontrada} | Pax=${paxEncontrado} | Pago=${pagoEncontrado}`);
                         
                         reservaActual = {
                             id: limpio[0] || `RES-${i}`,
@@ -197,10 +223,10 @@
                             pais: limpio[6] || '',
                             ciudad: limpio[7] || '',
                             excursion: limpio[8] || '',
-                            fecha: limpio[9] || '',
-                            personas: limpio[10] || '0',
-                            formaPago: limpio[11] || 'No especificada',
-                            busqueda: limpio[12] || '',
+                            fecha: fechaEncontrada,
+                            personas: paxEncontrado,
+                            formaPago: pagoEncontrado,
+                            busqueda: '',
                             estado: 'confirmado'
                         };
                     } else {
@@ -219,6 +245,7 @@
                 reservasData.forEach(r => { if (estadosGuardados[r.id]) r.estado = estadosGuardados[r.id]; });
                 
                 console.log('✅ Reservas cargadas:', reservasData.length);
+                console.log('📋 Datos:', reservasData.map(r => ({ id: r.id, fecha: r.fecha, pax: r.personas, pago: r.formaPago })));
                 
                 if (reservasData.length === 0) {
                     reservasData = [
