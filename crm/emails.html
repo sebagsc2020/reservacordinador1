@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emails - CRM Aventura Total</title>
+    <title>WhatsApp - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -60,59 +60,52 @@
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
         /* ===== COMPOSITOR ===== */
-        .email-composer {
+        .whatsapp-composer {
             background: white; border-radius: 15px; padding: 30px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 30px;
         }
         
-        .email-composer h3 { margin-bottom: 20px; color: #1a1a2e; font-size: 20px; }
+        .whatsapp-composer h3 { margin-bottom: 20px; color: #1a1a2e; font-size: 20px; }
         
         .form-group { margin-bottom: 18px; }
         .form-group label {
             display: block; font-size: 13px; font-weight: 600; color: #333;
             margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        .form-group input, .form-group select, .form-group textarea {
+        .form-group input, .form-group textarea {
             width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0;
             border-radius: 10px; font-size: 14px; font-family: inherit;
             transition: all 0.3s ease;
         }
         .form-group textarea { min-height: 180px; resize: vertical; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none; border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none; border-color: #25D366;
+            box-shadow: 0 0 0 3px rgba(37,211,102,0.1);
         }
         
         .form-row { display: flex; gap: 15px; }
         .form-row .form-group { flex: 1; }
         
         .btn-enviar {
-            padding: 14px 35px; background: linear-gradient(135deg, #27ae60, #2ecc71);
-            color: white; border: none; border-radius: 10px; font-size: 15px;
-            font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+            padding: 14px 35px; background: #25D366; color: white; border: none;
+            border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(39,174,96,0.3); }
-        
-        .btn-programar {
-            padding: 14px 35px; background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white; border: none; border-radius: 10px; font-size: 15px;
-            font-weight: 700; cursor: pointer; transition: all 0.3s ease; margin-left: 10px;
-        }
-        .btn-programar:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(243,156,18,0.3); }
-        
-        .btn-guardar {
-            padding: 14px 35px; background: #95a5a6;
-            color: white; border: none; border-radius: 10px; font-size: 15px;
-            font-weight: 700; cursor: pointer; transition: all 0.3s ease; margin-left: 10px;
-        }
+        .btn-enviar:hover { background: #1da851; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37,211,102,0.3); }
         
         .mensaje-exito {
             background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;
             margin-top: 15px; display: none; font-weight: 600; text-align: center;
         }
         .mensaje-exito.show { display: block; animation: fadeIn 0.5s ease; }
-        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .preview-box {
+            background: #e8f5e9; border: 2px solid #25D366; border-radius: 10px;
+            padding: 15px; margin-top: 15px; max-height: 200px; overflow-y: auto;
+            font-size: 13px; color: #333; white-space: pre-wrap; font-family: 'Segoe UI', sans-serif;
+        }
+        .preview-box strong { color: #25D366; }
         
         /* ===== PLANTILLAS ===== */
         .template-section { margin-bottom: 30px; }
@@ -127,7 +120,7 @@
         .template-card {
             background: white; padding: 20px; border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); cursor: pointer;
-            transition: all 0.3s ease; border-left: 4px solid #667eea;
+            transition: all 0.3s ease; border-left: 4px solid #25D366;
         }
         .template-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .template-card h4 { color: #333; margin-bottom: 5px; font-size: 15px; }
@@ -153,10 +146,8 @@
             padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;
         }
         .badge-enviado { background: #d4edda; color: #155724; }
-        .badge-programado { background: #d1ecf1; color: #0c5460; }
-        .badge-error { background: #f8d7da; color: #721c24; }
         
-        .btn-reenviar { padding: 5px 12px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; }
+        .btn-reenviar { padding: 5px 12px; background: #25D366; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; }
         
         @media (max-width: 768px) {
             .sidebar { width: 70px; }
@@ -179,7 +170,7 @@
             <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
             <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
             <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="emails.html" class="active"><span class="nav-icon">📧</span> <span>Emails</span></a></li>
+            <li><a href="emails.html" class="active"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
         </ul>
         <div class="sidebar-footer">
@@ -190,8 +181,8 @@
     <div class="main-content">
         <div class="header">
             <div>
-                <h1>📧 Emails</h1>
-                <p style="color:#999;font-size:13px;">Envío de comunicaciones y notificaciones</p>
+                <h1>💬 WhatsApp</h1>
+                <p style="color:#999;font-size:13px;">Envío de mensajes por WhatsApp</p>
             </div>
             <div class="user-info">
                 <div class="user-avatar">A</div>
@@ -206,7 +197,7 @@
                 <div class="template-card" onclick="usarPlantilla('confirmacion')">
                     <div class="template-icon">✅</div>
                     <h4>Confirmación de Reserva</h4>
-                    <p>Email automático que se envía al confirmar una reserva nueva</p>
+                    <p>Mensaje automático que se envía al confirmar una reserva nueva</p>
                 </div>
                 <div class="template-card" onclick="usarPlantilla('recordatorio')">
                     <div class="template-icon">🔔</div>
@@ -237,43 +228,39 @@
         </div>
         
         <!-- Compositor -->
-        <div class="email-composer">
-            <h3>✍️ Redactar Email</h3>
+        <div class="whatsapp-composer">
+            <h3>💬 Enviar Mensaje por WhatsApp</h3>
             
             <div class="form-row">
                 <div class="form-group">
-                    <label>👤 Para:</label>
-                    <input type="text" id="emailPara" placeholder="cliente@email.com (separar con coma para múltiples)">
+                    <label>📞 Número de WhatsApp:</label>
+                    <input type="text" id="whatsappNumero" placeholder="5493518692251 (código país + número, sin + ni espacios)">
                 </div>
                 <div class="form-group">
-                    <label>📂 Tipo:</label>
-                    <select id="emailTipo">
-                        <option value="manual">Manual</option>
-                        <option value="automatico">Automático</option>
-                        <option value="masivo">Masivo</option>
-                    </select>
+                    <label>👤 Cliente (opcional):</label>
+                    <input type="text" id="whatsappCliente" placeholder="Nombre del cliente">
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label>📝 Asunto:</label>
-                <input type="text" id="emailAsunto" placeholder="Asunto del email">
             </div>
             
             <div class="form-group">
                 <label>💬 Mensaje:</label>
-                <textarea id="emailMensaje" placeholder="Escribí tu mensaje aquí... 
-                
+                <textarea id="whatsappMensaje" placeholder="Escribí tu mensaje aquí... 
+
 Tip: Usá [NOMBRE] para personalizar con el nombre del cliente."></textarea>
             </div>
             
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                <button class="btn-enviar" onclick="enviarEmail()">📧 Enviar Ahora</button>
-                <button class="btn-programar" onclick="programarEmail()">⏰ Programar Envío</button>
-                <button class="btn-guardar" onclick="guardarBorrador()">💾 Guardar Borrador</button>
+            <!-- Vista previa -->
+            <div class="preview-box" id="previewBox" style="display:none;">
+                <strong>📱 Vista previa en WhatsApp:</strong>
+                <div id="previewTexto"></div>
             </div>
             
-            <div class="mensaje-exito" id="mensajeExito">✅ Email enviado con éxito</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:15px;flex-wrap:wrap;">
+                <button class="btn-enviar" onclick="enviarWhatsApp()">💬 Enviar por WhatsApp</button>
+                <button class="btn-enviar" style="background:#128C7E;" onclick="abrirWhatsAppWeb()">🌐 Abrir WhatsApp Web</button>
+            </div>
+            
+            <div class="mensaje-exito" id="mensajeExito">✅ Mensaje listo para enviar por WhatsApp</div>
         </div>
         
         <!-- Historial -->
@@ -283,14 +270,14 @@ Tip: Usá [NOMBRE] para personalizar con el nombre del cliente."></textarea>
                 <thead>
                     <tr>
                         <th>Fecha</th>
-                        <th>Destinatario</th>
-                        <th>Asunto</th>
+                        <th>Cliente</th>
+                        <th>Número</th>
                         <th>Tipo</th>
                         <th>Estado</th>
                         <th>Acción</th>
                     </tr>
                 </thead>
-                <tbody id="historialEmails"></tbody>
+                <tbody id="historialWhatsApp"></tbody>
             </table>
         </div>
     </div>
@@ -299,152 +286,120 @@ Tip: Usá [NOMBRE] para personalizar con el nombre del cliente."></textarea>
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         
-        // Plantillas
+        // ===== PLANTILLAS =====
         const plantillas = {
             confirmacion: {
-                asunto: '✅ Confirmación de Reserva - Aventura Total',
-                mensaje: '¡Hola [NOMBRE]!\n\nTu reserva ha sido confirmada exitosamente.\n\n📍 Detalles de tu reserva:\n• Excursión: [EXCURSION]\n• Fecha: [FECHA]\n• Personas: [PERSONAS]\n• Forma de Pago: [PAGO]\n\n📞 ¿Dudas? Contactanos por WhatsApp: +54 9 351 869-2251\n\n¡Te esperamos para vivir una experiencia inolvidable!\n\nSaludos,\nEl equipo de Aventura Total 🏔️'
+                mensaje: `✅ ¡Hola [NOMBRE]!\n\nTu reserva en Aventura Total ha sido CONFIRMADA.\n\n📍 Detalles:\n• Excursión: [EXCURSION]\n• Fecha: [FECHA]\n• Personas: [PERSONAS]\n• Forma de Pago: [PAGO]\n\n📞 ¿Dudas? Contactanos por acá mismo.\n\n¡Te esperamos para vivir una experiencia inolvidable!\n\n🏔️ Aventura Total`
             },
             recordatorio: {
-                asunto: '🔔 Recordatorio de Pago Pendiente - Aventura Total',
-                mensaje: '¡Hola [NOMBRE]!\n\nTe recordamos que tenés un pago pendiente para confirmar tu reserva.\n\n💳 Podés abonar por:\n• Efectivo\n• Débito/Crédito\n• Transferencia bancaria\n\n⏰ El plazo de pago vence en 48 horas.\n\nAnte cualquier duda, contactanos.\n\nSaludos,\nAventura Total 🏔️'
+                mensaje: `🔔 ¡Hola [NOMBRE]!\n\nTenés un pago pendiente para confirmar tu reserva en Aventura Total.\n\n💳 Podés abonar por:\n• Efectivo\n• Débito/Crédito\n• Transferencia\n\n⏰ El plazo vence en 48 horas.\n\nAnte cualquier duda, respondé este mensaje.\n\n🏔️ Aventura Total`
             },
             salida: {
-                asunto: '🚌 ¡Mañana es tu excursión! - Aventura Total',
-                mensaje: '¡Hola [NOMBRE]!\n\n¡Mañana es el gran día! 🌟\n\n🎒 Recordá llevar:\n• Ropa y calzado cómodo\n• Protector solar\n• Agua (al menos 1 litro)\n• Cámara de fotos\n• ¡Muchas ganas de divertirte!\n\n📍 Punto de encuentro: [LUGAR]\n⏰ Horario: [HORA]\n\n¡Te esperamos!\nAventura Total 🏔️'
+                mensaje: `🚌 ¡Hola [NOMBRE]!\n\n¡Mañana es tu excursión! 🌟\n\n🎒 Recordá llevar:\n• Ropa y calzado cómodo\n• Protector solar\n• Agua (al menos 1 litro)\n• Cámara de fotos\n• ¡Muchas ganas!\n\n📍 Punto de encuentro: [LUGAR]\n⏰ Horario: [HORA]\n\n¡Te esperamos!\n🏔️ Aventura Total`
             },
             agradecimiento: {
-                asunto: '🙏 ¡Gracias por viajar con nosotros! - Aventura Total',
-                mensaje: '¡Hola [NOMBRE]!\n\nEsperamos que hayas disfrutado de la excursión tanto como nosotros.\n\n⭐ Nos encantaría conocer tu opinión. ¿Nos dejás una reseña?\n\n🎉 Además, por ser parte de Aventura Total, tenés un 10% de descuento en tu próxima reserva.\n\n¡Hasta la próxima aventura!\nAventura Total 🏔️'
+                mensaje: `🙏 ¡Hola [NOMBRE]!\n\nEsperamos que hayas disfrutado la excursión tanto como nosotros.\n\n⭐ ¿Nos dejás una reseña en Google?\n\n🎉 Además, tenés 10% OFF en tu próxima reserva.\n\n¡Hasta la próxima aventura!\n🏔️ Aventura Total`
             },
             promocion: {
-                asunto: '🎉 ¡Promo Especial para Vos! - Aventura Total',
-                mensaje: '¡Hola [NOMBRE]!\n\nPor ser parte de la familia Aventura Total, queremos compartirte una promoción exclusiva:\n\n🔥 15% OFF en tu próxima reserva\n👥 2x1 en excursiones seleccionadas\n🎁 Regalo sorpresa en tu próxima salida\n\n⏰ Válido hasta el [FECHA]\n\n¡Reservá ahora!\nAventura Total 🏔️'
+                mensaje: `🎉 ¡Hola [NOMBRE]!\n\nPor ser parte de Aventura Total, tenés beneficios exclusivos:\n\n🔥 15% OFF en tu próxima reserva\n👥 2x1 en excursiones seleccionadas\n🎁 Regalo sorpresa\n\n⏰ Válido hasta [FECHA]\n\n¡Reservá ahora!\n🏔️ Aventura Total`
             },
             personalizado: {
-                asunto: '',
                 mensaje: ''
             }
         };
         
         function usarPlantilla(tipo) {
             const plantilla = plantillas[tipo];
-            document.getElementById('emailAsunto').value = plantilla.asunto;
-            document.getElementById('emailMensaje').value = plantilla.mensaje;
-            document.getElementById('emailAsunto').focus();
+            document.getElementById('whatsappMensaje').value = plantilla.mensaje;
+            actualizarPreview();
         }
         
-        function enviarEmail() {
-            const para = document.getElementById('emailPara').value;
-            const asunto = document.getElementById('emailAsunto').value;
-            const mensaje = document.getElementById('emailMensaje').value;
-            const tipo = document.getElementById('emailTipo').value;
+        // ===== VISTA PREVIA =====
+        document.getElementById('whatsappMensaje').addEventListener('input', actualizarPreview);
+        
+        function actualizarPreview() {
+            const mensaje = document.getElementById('whatsappMensaje').value;
+            const previewBox = document.getElementById('previewBox');
+            const previewTexto = document.getElementById('previewTexto');
             
-            if (!para || !asunto || !mensaje) {
-                alert('⚠️ Completá todos los campos: Para, Asunto y Mensaje');
-                return;
+            if (mensaje.trim()) {
+                previewBox.style.display = 'block';
+                previewTexto.innerHTML = mensaje.replace(/\n/g, '<br>').replace(/\[NOMBRE\]/g, '<strong>[NOMBRE]</strong>');
+            } else {
+                previewBox.style.display = 'none';
             }
+        }
+        
+        // ===== ENVIAR WHATSAPP =====
+        function enviarWhatsApp() {
+            const numero = document.getElementById('whatsappNumero').value.replace(/[^0-9]/g, '');
+            const mensaje = document.getElementById('whatsappMensaje').value;
+            const cliente = document.getElementById('whatsappCliente').value || 'Cliente';
             
-            // Simular envío
-            const mailtoLink = `mailto:${para}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(mensaje)}`;
-            window.open(mailtoLink, '_blank');
+            if (!numero) { alert('⚠️ Ingresá un número de WhatsApp'); return; }
+            if (!mensaje) { alert('⚠️ Escribí un mensaje'); return; }
+            
+            // Abrir WhatsApp
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            const url = `https://wa.me/${numero}?text=${mensajeCodificado}`;
+            window.open(url, '_blank');
             
             // Agregar al historial
-            agregarAlHistorial(para, asunto, tipo, 'enviado');
+            agregarAlHistorial(cliente, numero, 'manual');
             
             // Mostrar mensaje
-            const mensajeExito = document.getElementById('mensajeExito');
-            mensajeExito.classList.add('show');
-            setTimeout(() => mensajeExito.classList.remove('show'), 4000);
-            
-            // Limpiar campos
-            document.getElementById('emailPara').value = '';
-            document.getElementById('emailAsunto').value = '';
-            document.getElementById('emailMensaje').value = '';
+            const msgExito = document.getElementById('mensajeExito');
+            msgExito.textContent = '✅ WhatsApp abierto. Revisá la pestaña nueva.';
+            msgExito.classList.add('show');
+            setTimeout(() => msgExito.classList.remove('show'), 4000);
         }
         
-        function programarEmail() {
-            const para = document.getElementById('emailPara').value;
-            const asunto = document.getElementById('emailAsunto').value;
-            const mensaje = document.getElementById('emailMensaje').value;
+        function abrirWhatsAppWeb() {
+            const numero = document.getElementById('whatsappNumero').value.replace(/[^0-9]/g, '');
+            const mensaje = document.getElementById('whatsappMensaje').value;
             
-            if (!para || !asunto || !mensaje) {
-                alert('⚠️ Completá todos los campos antes de programar');
-                return;
-            }
+            if (!numero) { alert('⚠️ Ingresá un número de WhatsApp'); return; }
+            if (!mensaje) { alert('⚠️ Escribí un mensaje'); return; }
             
-            const fecha = prompt('📅 ¿Para cuándo querés programar el envío?\nFormato: DD/MM/AAAA HH:MM', '30/05/2026 10:00');
-            
-            if (fecha) {
-                agregarAlHistorial(para, asunto, 'programado', 'programado', fecha);
-                
-                const mensajeExito = document.getElementById('mensajeExito');
-                mensajeExito.textContent = `✅ Email programado para el ${fecha}`;
-                mensajeExito.classList.add('show');
-                setTimeout(() => {
-                    mensajeExito.classList.remove('show');
-                    mensajeExito.textContent = '✅ Email enviado con éxito';
-                }, 4000);
-                
-                document.getElementById('emailPara').value = '';
-                document.getElementById('emailAsunto').value = '';
-                document.getElementById('emailMensaje').value = '';
-            }
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            window.open(`https://web.whatsapp.com/send?phone=${numero}&text=${mensajeCodificado}`, '_blank');
         }
         
-        function guardarBorrador() {
-            const asunto = document.getElementById('emailAsunto').value;
-            const mensaje = document.getElementById('emailMensaje').value;
-            
-            if (asunto || mensaje) {
-                localStorage.setItem('borradorEmail', JSON.stringify({ asunto, mensaje }));
-                alert('💾 Borrador guardado correctamente');
-            }
-        }
+        // ===== HISTORIAL =====
+        const historial = JSON.parse(localStorage.getItem('historialWhatsApp') || '[]');
         
-        // Cargar borrador al iniciar
-        window.addEventListener('load', function() {
-            const borrador = JSON.parse(localStorage.getItem('borradorEmail'));
-            if (borrador) {
-                if (borrador.asunto) document.getElementById('emailAsunto').value = borrador.asunto;
-                if (borrador.mensaje) document.getElementById('emailMensaje').value = borrador.mensaje;
-            }
-        });
-        
-        // Historial
-        const historial = [
-            { fecha: '29/05/2026 14:30', destinatario: 'juan@email.com', asunto: 'Confirmación de Reserva', tipo: 'automático', estado: 'enviado' },
-            { fecha: '29/05/2026 10:15', destinatario: 'maria@email.com', asunto: 'Recordatorio de Pago', tipo: 'automático', estado: 'enviado' },
-            { fecha: '28/05/2026 16:45', destinatario: 'carlos@email.com', asunto: 'Promoción Especial', tipo: 'masivo', estado: 'enviado' },
-            { fecha: '30/05/2026 09:00', destinatario: 'ana@email.com', asunto: 'Tu excursión es mañana', tipo: 'programado', estado: 'programado' },
-            { fecha: '27/05/2026 11:20', destinatario: 'pedro@email.com', asunto: 'Gracias por viajar', tipo: 'automático', estado: 'enviado' }
-        ];
-        
-        function agregarAlHistorial(para, asunto, tipo, estado, fechaProgramada) {
-            const ahora = new Date();
-            const fecha = fechaProgramada || ahora.toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            historial.unshift({ fecha, destinatario: para, asunto, tipo, estado });
+        function agregarAlHistorial(cliente, numero, tipo) {
+            const ahora = new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            historial.unshift({ fecha: ahora, cliente, numero, tipo, estado: 'enviado' });
+            if (historial.length > 20) historial.pop();
+            localStorage.setItem('historialWhatsApp', JSON.stringify(historial));
             renderHistorial();
         }
         
         function renderHistorial() {
-            document.getElementById('historialEmails').innerHTML = historial.map(h => `
+            document.getElementById('historialWhatsApp').innerHTML = historial.length > 0 ? historial.map(h => `
                 <tr>
                     <td>${h.fecha}</td>
-                    <td>${h.destinatario}</td>
-                    <td>${h.asunto}</td>
+                    <td>${h.cliente}</td>
+                    <td>${h.numero}</td>
                     <td>${h.tipo}</td>
-                    <td><span class="badge badge-${h.estado}">${h.estado}</span></td>
-                    <td>${h.estado === 'enviado' ? '<button class="btn-reenviar" onclick="reenviarEmail(\'' + h.destinatario + '\',\'' + h.asunto + '\')">Reenviar</button>' : '-'}</td>
+                    <td><span class="badge badge-enviado">${h.estado}</span></td>
+                    <td><button class="btn-reenviar" onclick="reenviar('${h.numero}')">💬 Reenviar</button></td>
                 </tr>
-            `).join('');
+            `).join('') : '<tr><td colspan="6" style="text-align:center;color:#999;padding:20px;">No hay envíos todavía</td></tr>';
         }
         
-        function reenviarEmail(destinatario, asunto) {
-            document.getElementById('emailPara').value = destinatario;
-            document.getElementById('emailAsunto').value = 'Re: ' + asunto;
-            document.getElementById('emailAsunto').focus();
+        function reenviar(numero) {
+            document.getElementById('whatsappNumero').value = numero;
+            document.getElementById('whatsappNumero').focus();
         }
+        
+        // Cargar último número usado
+        const ultimoNumero = localStorage.getItem('ultimoWhatsApp') || '5493518692251';
+        document.getElementById('whatsappNumero').value = ultimoNumero;
+        document.getElementById('whatsappNumero').addEventListener('change', function() {
+            localStorage.setItem('ultimoWhatsApp', this.value);
+        });
         
         renderHistorial();
     </script>
