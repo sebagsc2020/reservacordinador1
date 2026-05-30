@@ -5,216 +5,160 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¡Reserva Exitosa! - Aventura Total</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f0f2f5;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 30px 20px;
         }
-
+        
         .container {
             background: white;
-            border-radius: 20px;
-            padding: 50px 40px;
+            border-radius: 24px;
+            padding: 45px 40px;
             max-width: 550px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             text-align: center;
-            animation: fadeInUp 0.6s ease;
+            animation: fadeInUp 0.5s ease;
         }
-
+        
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
+        
         .icono-exito {
-            font-size: 80px;
+            font-size: 70px;
             margin-bottom: 20px;
             animation: bounce 2s ease infinite;
         }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
         h1 {
-            color: #27ae60;
-            font-size: 28px;
-            margin-bottom: 15px;
+            color: #1a1a2e;
+            font-size: 26px;
+            margin-bottom: 10px;
+            font-weight: 800;
         }
-
+        h1 span { color: #27ae60; }
+        
         .mensaje-principal {
-            color: #666;
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 20px;
+            color: #888;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 25px;
         }
-
+        
+        /* ===== RESUMEN ===== */
         .info-box {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
+            background: #fafbfc;
+            border: 1px solid #f0f0f0;
+            border-radius: 16px;
+            padding: 25px;
             margin: 20px 0;
             text-align: left;
         }
-
+        
         .info-box h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
+            color: #1a1a2e;
+            margin-bottom: 18px;
+            font-size: 17px;
+            font-weight: 700;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
         }
-
+        
         .info-item {
             display: flex;
             align-items: flex-start;
             margin-bottom: 12px;
-            padding: 10px;
+            padding: 10px 12px;
             background: white;
-            border-radius: 8px;
-            transition: transform 0.2s ease;
+            border-radius: 10px;
+            border: 1px solid #f5f5f5;
+            transition: all 0.2s ease;
         }
-
-        .info-item:hover {
-            transform: translateX(5px);
-        }
-
-        .info-item .emoji {
-            font-size: 24px;
-            margin-right: 15px;
-            min-width: 30px;
-            padding-top: 2px;
-        }
-
+        .info-item:hover { background: #fafbfc; transform: translateX(3px); }
+        
+        .info-item .emoji { font-size: 22px; margin-right: 14px; min-width: 28px; padding-top: 2px; }
         .info-item .texto strong {
-            color: #333;
+            color: #555;
             display: block;
-            font-size: 13px;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
+            margin-bottom: 2px;
         }
-
-        .info-item .texto span {
-            color: #666;
-            font-size: 15px;
-        }
-
-        .excursiones-lista {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 5px;
-        }
-
+        .info-item .texto span { color: #333; font-size: 15px; font-weight: 500; }
+        
+        .excursiones-lista { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; }
         .excursion-tag {
             display: inline-block;
             background: #f0f0ff;
             color: #667eea;
             padding: 5px 12px;
-            border-radius: 20px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
-            border: 1px solid #d0d0ff;
             width: fit-content;
         }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-        }
-
+        
+        /* ===== BOTONES ===== */
+        .btn-group { display: flex; gap: 12px; margin-top: 25px; }
+        
         .btn {
             flex: 1;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 16px;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
             text-decoration: none;
             text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
         }
-
+        
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.3); }
+        
         .btn-whatsapp {
             background: #25D366;
             color: white;
             border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
         }
-
-        .btn-whatsapp:hover {
-            background: #20BD5A;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4);
-        }
-
+        .btn-whatsapp:hover { background: #1da851; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,211,102,0.3); }
+        
+        /* ===== INFO ADICIONAL ===== */
         .info-adicional {
             margin-top: 25px;
             padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-            font-size: 14px;
-            color: #999;
+            border-top: 1px solid #f0f0f0;
+            font-size: 13px;
+            color: #aaa;
         }
-
-        .info-adicional p {
-            margin-bottom: 5px;
-        }
-
+        .info-adicional p { margin-bottom: 4px; }
+        
         @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-        }
-
-        @media print {
-            body {
-                background: white;
-            }
-            .btn-group {
-                display: none;
-            }
-            .container {
-                box-shadow: none;
-            }
+            .container { padding: 30px 20px; border-radius: 16px; }
+            .btn-group { flex-direction: column; }
+            h1 { font-size: 22px; }
+            .icono-exito { font-size: 55px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="icono-exito">✅</div>
-        <h1>¡Reserva Enviada con Éxito!</h1>
+        <h1>¡Reserva <span>Enviada!</span></h1>
         <p class="mensaje-principal">Gracias por confiar en nosotros. Tu aventura está a punto de comenzar.</p>
         
         <div class="info-box" id="resumenReserva">
@@ -223,202 +167,67 @@
 
         <div class="btn-group">
             <a href="reservar.html" class="btn btn-primary">🏠 Nueva Reserva</a>
-            <a href="#" id="whatsappBtn" class="btn btn-whatsapp" target="_blank">
-                💬 WhatsApp
-            </a>
+            <a href="#" id="whatsappBtn" class="btn btn-whatsapp" target="_blank">💬 WhatsApp</a>
         </div>
 
         <div class="info-adicional">
-            <p>- Puedes confirmar tu reserva por WhatsApp -</p>
-            <p>📞 Te contactaremos si hubiera alguna modificación con el horario de salida</p>
+            <p>📞 Te contactaremos si hubiera alguna modificación</p>
             <p>💳 No se ha realizado ningún cobro todavía</p>
         </div>
     </div>
 
     <script>
-        // Recuperar datos de la reserva
         const ultimaReserva = JSON.parse(sessionStorage.getItem('ultimaReserva'));
         const urlParams = new URLSearchParams(window.location.search);
         const status = urlParams.get('status');
         
         if (ultimaReserva) {
-            // Convertir fecha de DD-MM-YYYY a objeto Date
             const partesFecha = ultimaReserva.fecha.split('-');
             const fechaObj = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
-            const fechaFormateada = fechaObj.toLocaleDateString('es-ES', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
+            const fechaFormateada = fechaObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             
-            // Procesar excursiones múltiples
             let excursionesArray = [];
+            if (ultimaReserva.excursiones) excursionesArray = ultimaReserva.excursiones.split(' | ');
+            else if (ultimaReserva.excursion) excursionesArray = [ultimaReserva.excursion];
             
-            if (ultimaReserva.excursiones) {
-                excursionesArray = ultimaReserva.excursiones.split(' | ');
-            } else if (ultimaReserva.excursion) {
-                excursionesArray = [ultimaReserva.excursion];
-            }
+            const excursionesHTML = excursionesArray.map(exc => `<span class="excursion-tag">${exc.trim()}</span>`).join('');
             
-            // Crear HTML para las excursiones (tags visuales)
-            const excursionesHTML = excursionesArray.map(exc => 
-                `<span class="excursion-tag">${exc}</span>`
-            ).join('');
+            const excursionesWhatsApp = excursionesArray.map((exc, i) => `   ${i+1}. ${exc.trim()}`).join('\n');
             
-            // Crear mensaje de WhatsApp con excursiones una debajo de otra
-            const excursionesWhatsApp = excursionesArray.map((exc, index) => 
-                `   ${index + 1}. ${exc}`
-            ).join('\n');
-            
-            // Icono según forma de pago
             let iconoPago = '💳';
             if (ultimaReserva.formaPago === 'Efectivo') iconoPago = '💵';
             if (ultimaReserva.formaPago === 'Transferencia') iconoPago = '🏦';
             
-            const mensajeWhatsApp = `¡Hola! 🕐\n\n` +
-                `Quiero confirmar mi reserva:\n\n` +
-                `👤 Nombre: ${ultimaReserva.nombre} ${ultimaReserva.apellido || ''}\n` +
-                `📧 Email: ${ultimaReserva.email}\n` +
-                `📞 Teléfono: ${ultimaReserva.telefono}\n` +
-                `🌎 País: ${ultimaReserva.pais || 'No especificado'}\n` +
-                `📂 Categoría: ${ultimaReserva.categoria || 'No especificado'}\n\n` +
-                `🕐 Excursiones reservadas:\n` +
-                `${excursionesWhatsApp}\n\n` +
-                `🗓️ Fecha: ${fechaFormateada}\n` +
-                `👥 Personas: ${ultimaReserva.personas}\n` +
-                `${iconoPago} Forma de Pago: ${ultimaReserva.formaPago || 'No especificada'}\n` +
-                `🏨 Te buscamos en: ${ultimaReserva.mensaje || 'No especificado'}\n\n` +
-                `Gracias! 🙌`;
+            const mensajeWhatsApp = `¡Hola! 🕐\n\nQuiero confirmar mi reserva:\n\n👤 Nombre: ${ultimaReserva.nombre} ${ultimaReserva.apellido||''}\n📧 Email: ${ultimaReserva.email}\n📞 Teléfono: ${ultimaReserva.telefono}\n🌎 País: ${ultimaReserva.pais||''}\n📂 Categoría: ${ultimaReserva.categoria||''}\n\n🕐 Excursiones:\n${excursionesWhatsApp}\n\n🗓️ Fecha: ${fechaFormateada}\n👥 Personas: ${ultimaReserva.personas}\n${iconoPago} Forma de Pago: ${ultimaReserva.formaPago||'No especificada'}\n🏨 Te buscamos en: ${ultimaReserva.mensaje||'No especificado'}\n\nGracias! 🙌`;
             
-            // Configurar enlace de WhatsApp
-            const mensajeCodificado = encodeURIComponent(mensajeWhatsApp);
-            const whatsappBtn = document.getElementById('whatsappBtn');
-            whatsappBtn.href = `https://wa.me/5493518692251?text=${mensajeCodificado}`;
+            document.getElementById('whatsappBtn').href = `https://wa.me/5493518692251?text=${encodeURIComponent(mensajeWhatsApp)}`;
             
-            // Construir resumen HTML
             const resumenHTML = `
                 <h3>📋 Resumen de tu Reserva</h3>
-                
-                <div class="info-item">
-                    <div class="emoji">👤</div>
-                    <div class="texto">
-                        <strong>Cliente</strong>
-                        <span>${ultimaReserva.nombre} ${ultimaReserva.apellido || ''}</span>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="emoji">📧</div>
-                    <div class="texto">
-                        <strong>Email de contacto</strong>
-                        <span>${ultimaReserva.email}</span>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="emoji">📞</div>
-                    <div class="texto">
-                        <strong>Teléfono</strong>
-                        <span>${ultimaReserva.telefono}</span>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="emoji">🌎</div>
-                    <div class="texto">
-                        <strong>País</strong>
-                        <span>${ultimaReserva.pais || 'No especificado'}</span>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="emoji">📂</div>
-                    <div class="texto">
-                        <strong>Categoría</strong>
-                        <span>${ultimaReserva.categoria || 'No especificado'}</span>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="emoji">🕐</div>
-                    <div class="texto">
-                        <strong>Excursión(es) reservada(s)</strong>
-                        <div class="excursiones-lista">
-                            ${excursionesHTML}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="emoji">🗓️</div>
-                    <div class="texto">
-                        <strong>Fecha</strong>
-                        <span>${fechaFormateada}</span>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="emoji">👥</div>
-                    <div class="texto">
-                        <strong>Número de personas</strong>
-                        <span>${ultimaReserva.personas} persona(s)</span>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="emoji">${iconoPago}</div>
-                    <div class="texto">
-                        <strong>Forma de Pago</strong>
-                        <span>${ultimaReserva.formaPago || 'No especificada'}</span>
-                    </div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="emoji">🏨</div>
-                    <div class="texto">
-                        <strong>¿Dónde te buscamos?</strong>
-                        <span>${ultimaReserva.mensaje || 'No especificado'}</span>
-                    </div>
-                </div>
+                <div class="info-item"><div class="emoji">👤</div><div class="texto"><strong>Cliente</strong><span>${ultimaReserva.nombre} ${ultimaReserva.apellido||''}</span></div></div>
+                <div class="info-item"><div class="emoji">📧</div><div class="texto"><strong>Email</strong><span>${ultimaReserva.email}</span></div></div>
+                <div class="info-item"><div class="emoji">📞</div><div class="texto"><strong>Teléfono</strong><span>${ultimaReserva.telefono}</span></div></div>
+                <div class="info-item"><div class="emoji">🌎</div><div class="texto"><strong>País</strong><span>${ultimaReserva.pais||'No especificado'}</span></div></div>
+                <div class="info-item"><div class="emoji">📂</div><div class="texto"><strong>Categoría</strong><span>${ultimaReserva.categoria||'No especificado'}</span></div></div>
+                <div class="info-item"><div class="emoji">🕐</div><div class="texto"><strong>Excursiones</strong><div class="excursiones-lista">${excursionesHTML}</div></div></div>
+                <div class="info-item"><div class="emoji">🗓️</div><div class="texto"><strong>Fecha</strong><span>${fechaFormateada}</span></div></div>
+                <div class="info-item"><div class="emoji">👥</div><div class="texto"><strong>Personas</strong><span>${ultimaReserva.personas}</span></div></div>
+                <div class="info-item"><div class="emoji">${iconoPago}</div><div class="texto"><strong>Forma de Pago</strong><span>${ultimaReserva.formaPago||'No especificada'}</span></div></div>
+                <div class="info-item"><div class="emoji">🏨</div><div class="texto"><strong>Te buscamos en</strong><span>${ultimaReserva.mensaje||'No especificado'}</span></div></div>
             `;
             
             document.getElementById('resumenReserva').innerHTML = resumenHTML;
             
             if (status === 'parcial') {
-                const avisoHTML = `
-                    <div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
-                        <p style="color: #856404; margin: 0; font-size: 14px;">
-                            ⚠️ La reserva se guardó pero hubo un problema técnico. 
-                            Te contactaremos para confirmar.
-                        </p>
-                    </div>
-                `;
-                document.getElementById('resumenReserva').insertAdjacentHTML('beforebegin', avisoHTML);
+                document.getElementById('resumenReserva').insertAdjacentHTML('beforebegin', '<div style="background:#fff8e1;color:#f39c12;padding:12px;border-radius:10px;margin-bottom:15px;text-align:center;font-size:13px;font-weight:600;">⚠️ La reserva se guardó pero hubo un problema técnico. Te contactaremos.</div>');
             }
-            
         } else {
-            document.getElementById('resumenReserva').innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                    <p style="font-size: 40px; margin-bottom: 10px;">📧</p>
-                    <p style="color: #666;">Recibirás un email con todos los detalles de tu reserva</p>
-                </div>
-            `;
-            
-            const whatsappBtn = document.getElementById('whatsappBtn');
-            const mensajeGenerico = encodeURIComponent('¡Hola! Quiero información sobre las excursiones 🏔️');
-            whatsappBtn.href = `https://wa.me/5493518692251?text=${mensajeGenerico}`;
+            document.getElementById('resumenReserva').innerHTML = '<div style="text-align:center;padding:20px;"><p style="font-size:40px;">📧</p><p style="color:#888;">Recibirás un email con todos los detalles</p></div>';
+            document.getElementById('whatsappBtn').href = 'https://wa.me/5493518692251?text=¡Hola!%20Quiero%20información%20sobre%20las%20excursiones%20🏔️';
         }
         
-        setTimeout(() => {
-            sessionStorage.removeItem('ultimaReserva');
-        }, 600000);
-        
-        window.addEventListener('pageshow', function(event) {
-            if (event.persisted) {
-                window.location.reload();
-            }
-        });
+        setTimeout(() => sessionStorage.removeItem('ultimaReserva'), 600000);
+        window.addEventListener('pageshow', function(event) { if (event.persisted) window.location.reload(); });
     </script>
 </body>
 </html>
