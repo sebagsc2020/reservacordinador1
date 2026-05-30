@@ -6,47 +6,21 @@
     <title>Reservas - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        .sidebar {
-            width: 250px;
-            background: #1a1a2e;
-            color: white;
-            padding: 25px 0;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 100;
-        }
-        
+        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
         .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .sidebar-logo .logo-icon { font-size: 40px; }
         .sidebar-logo h2 { font-size: 18px; margin-top: 8px; }
         .sidebar-logo h2 span { color: #667eea; }
-        
         .nav-menu { list-style: none; padding: 0 15px; }
         .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a {
-            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
-            color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px;
-            transition: all 0.3s ease; font-size: 14px; font-weight: 500;
-        }
+        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; transition: all 0.3s ease; font-size: 14px; font-weight: 500; }
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
         .nav-menu a.active { background: #667eea; }
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        
         .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
-        .btn-logout-sidebar {
-            width: 100%; padding: 12px; background: rgba(231,76,60,0.2);
-            color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); border-radius: 10px;
-            cursor: pointer; font-weight: 600; font-size: 13px;
-        }
+        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
         
         .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
@@ -60,7 +34,6 @@
         .filter-input { flex: 1; min-width: 150px; }
         .btn-filtrar { padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-recargar { padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
-        .btn-exportar { padding: 10px 15px; background: #3498db; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         
         .tabs { display: flex; gap: 3px; margin-bottom: 20px; background: white; padding: 5px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
         .tabs::-webkit-scrollbar { height: 0; }
@@ -85,13 +58,11 @@
         .badge-confirmado { background: #d4edda; color: #155724; }
         .badge-pagado { background: #d1ecf1; color: #0c5460; }
         .badge-realizado { background: #e2e3e5; color: #383d41; }
-        .badge-cancelado { background: #f8d7da; color: #721c24; }
         
         .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin-right: 2px; }
         .btn-ver { background: #667eea; color: white; }
         .btn-confirmar { background: #27ae60; color: white; }
         .btn-pagar { background: #3498db; color: white; }
-        .btn-cancelar { background: #e74c3c; color: white; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.show { display: flex; }
@@ -101,30 +72,11 @@
         .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
         .modal-info p { margin: 8px 0; font-size: 13px; color: #555; }
         .modal-info strong { color: #333; display: inline-block; width: 110px; }
-        
-        .excursiones-modal { margin-top: 10px; }
-        .excursion-tag-modal {
-            display: block;
-            background: #f0f0ff;
-            color: #667eea;
-            padding: 6px 12px;
-            margin: 4px 0;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            border-left: 3px solid #667eea;
-        }
-        
+        .excursion-tag-modal { display: block; background: #f0f0ff; color: #667eea; padding: 6px 12px; margin: 4px 0; border-radius: 8px; font-size: 13px; font-weight: 500; border-left: 3px solid #667eea; }
         .modal-acciones { display: flex; gap: 6px; margin-top: 15px; flex-wrap: wrap; }
         .modal-acciones .btn-accion { padding: 8px 14px; font-size: 12px; }
         
-        @media (max-width: 768px) {
-            .sidebar { width: 60px; padding: 15px 0; }
-            .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon), .sidebar-footer span { display: none; }
-            .nav-menu a { justify-content: center; padding: 10px; }
-            .main-content { margin-left: 60px; padding: 15px; }
-            table { min-width: 700px; }
-        }
+        @media (max-width: 768px) { .sidebar { width: 60px; padding: 15px 0; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon), .sidebar-footer span { display: none; } .nav-menu a { justify-content: center; padding: 10px; } .main-content { margin-left: 60px; padding: 15px; } table { min-width: 700px; } }
     </style>
 </head>
 <body>
@@ -152,26 +104,14 @@
         </div>
         
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por ID, cliente o email..." id="busquedaReserva">
-            <select class="filter-select" id="filtroPais">
-                <option value="">🌎 Todos los países</option>
-                <option value="Argentina">Argentina</option>
-                <option value="Brasil">Brasil</option>
-                <option value="Chile">Chile</option>
-            </select>
+            <input type="text" class="filter-input" placeholder="🔍 Buscar..." id="busquedaReserva">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
-            <button class="btn-exportar" onclick="exportarReservas()">📥 Exportar</button>
         </div>
         
         <div class="table-container">
             <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0 reservas</span></div>
-            <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>ID</th><th>Cliente</th><th>Email</th><th>País</th><th>Ciudad</th><th>Excursión</th><th>Fecha</th><th>Pax</th><th>Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
-                    <tbody id="tablaReservas"><tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos...</td></tr></tbody>
-                </table>
-            </div>
+            <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Cliente</th><th>Email</th><th>País</th><th>Ciudad</th><th>Excursión</th><th>Fecha</th><th>Pax</th><th>Pago</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tablaReservas"><tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos...</td></tr></tbody></table></div>
         </div>
     </div>
     
@@ -182,7 +122,6 @@
             <div class="modal-acciones">
                 <button class="btn-accion btn-confirmar" onclick="cambiarEstado('confirmado')">✅ Confirmar</button>
                 <button class="btn-accion btn-pagar" onclick="cambiarEstado('pagado')">💰 Marcar Pagada</button>
-                <button class="btn-accion btn-cancelar" onclick="cambiarEstado('cancelado')">❌ Cancelar</button>
             </div>
         </div>
     </div>
@@ -199,19 +138,22 @@
         
         async function cargarReservas() {
             try {
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">⏳ Cargando todas las reservas...</td></tr>';
+                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos...</td></tr>';
                 
                 const respuesta = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 const csv = await respuesta.text();
                 const lineas = csv.split('\n');
                 
-                console.log('📊 Total líneas en CSV:', lineas.length);
+                console.log('📊 Total líneas:', lineas.length);
+                console.log('📋 Encabezados:', lineas[0]);
                 
                 reservasData = [];
                 
                 for (let i = 1; i < lineas.length; i++) {
                     const linea = lineas[i].trim();
                     if (!linea) continue;
+                    
+                    console.log(`📋 Línea ${i}:`, linea.substring(0, 80) + '...');
                     
                     const valores = [];
                     let actual = '';
@@ -227,16 +169,18 @@
                     
                     const limpio = valores.map(v => v.replace(/^"|"$/g, '').trim());
                     
-                    if (limpio.length >= 5 && limpio[2] && limpio[4]) {
+                    console.log(`   Columnas: ${limpio.length} | Nombre: "${limpio[2] || 'VACÍO'}" | Email: "${limpio[4] || 'VACÍO'}"`);
+                    
+                    if (limpio.length >= 3 && (limpio[2] || limpio[4])) {
                         reservasData.push({
-                            id: limpio[0] || 'SIN-ID',
+                            id: limpio[0] || `RES-${i}`,
                             fechaReserva: limpio[1] || '',
-                            nombre: limpio[2] || '',
+                            nombre: limpio[2] || 'Sin nombre',
                             apellido: limpio[3] || '',
-                            email: limpio[4] || '',
+                            email: limpio[4] || 'Sin email',
                             telefono: limpio[5] || '',
-                            pais: limpio[6] || 'Sin país',
-                            ciudad: limpio[7] || 'Sin ciudad',
+                            pais: limpio[6] || '',
+                            ciudad: limpio[7] || '',
                             excursion: limpio[8] || 'Sin excursión',
                             fecha: limpio[9] || '',
                             personas: limpio[10] || '0',
@@ -244,27 +188,29 @@
                             busqueda: limpio[12] || '',
                             estado: 'confirmado'
                         });
+                    } else {
+                        console.log(`   ⚠️ Fila ${i} ignorada`);
                     }
                 }
                 
                 console.log('✅ Reservas cargadas:', reservasData.length);
                 
                 if (reservasData.length === 0) {
+                    console.log('⚠️ Usando datos de prueba');
                     reservasData = [
                         { id: 'RES-001', fechaReserva: '29/05/2026', nombre: 'Juan', apellido: 'Pérez', email: 'juan@email.com', telefono: '+543511234567', pais: 'Argentina', ciudad: 'Villa Carlos Paz', excursion: '1. City Tour Local\n2. Aerosilla\n3. Noche de Teatros', fecha: '29-05-2026', personas: '4', formaPago: 'Efectivo', estado: 'confirmado' },
                         { id: 'RES-002', fechaReserva: '30/05/2026', nombre: 'María', apellido: 'García', email: 'maria@email.com', telefono: '+543517654321', pais: 'Brasil', ciudad: 'Balneário Camboriú', excursion: '1. Barco Pirata\n2. Parque Unipraias', fecha: '30-05-2026', personas: '2', formaPago: 'Débito/Crédito', estado: 'pendiente' },
-                        { id: 'RES-003', fechaReserva: '01/06/2026', nombre: 'Carlos', apellido: 'López', email: 'carlos@email.com', telefono: '+54112345678', pais: 'Chile', ciudad: 'Santiago de Chile', excursion: '1. Valle Nevado\n2. City Tour Histórico\n3. Sky Costanera', fecha: '01-06-2026', personas: '6', formaPago: 'Transferencia', estado: 'pagado' }
+                        { id: 'RES-003', fechaReserva: '01/06/2026', nombre: 'Carlos', apellido: 'López', email: 'carlos@email.com', telefono: '+54112345678', pais: 'Chile', ciudad: 'Santiago de Chile', excursion: '1. City Tour\n2. Valle Nevado\n3. Sky Costanera', fecha: '01-06-2026', personas: '6', formaPago: 'Transferencia', estado: 'pagado' }
                     ];
                 }
                 
                 reservasData.sort((a, b) => (b.fechaReserva || '').localeCompare(a.fechaReserva || ''));
-                
                 renderReservas(reservasData);
                 actualizarContadores();
                 
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;color:#e74c3c;padding:30px;">❌ Error al cargar<br><button class="btn-recargar" onclick="cargarReservas()">🔄 Reintentar</button></td></tr>';
+                console.error('❌ Error:', error.message);
+                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;color:#e74c3c;padding:30px;">❌ Error: ' + error.message + '<br><br><button class="btn-recargar" onclick="cargarReservas()">🔄 Reintentar</button></td></tr>';
             }
         }
         
@@ -282,31 +228,10 @@
                 return;
             }
             document.getElementById('tablaReservas').innerHTML = data.map(r => {
-                let excursionMostrar = '';
-                const excursionRaw = r.excursion || '';
-                if (excursionRaw.includes('\n')) {
-                    const lineas = excursionRaw.split('\n').filter(e => e.trim());
-                    excursionMostrar = lineas[0].trim().replace(/^\d+\.\s*/, '').substring(0, 22) + (lineas.length > 1 ? ` (+${lineas.length-1})` : '');
-                } else {
-                    excursionMostrar = excursionRaw.substring(0, 22) + (excursionRaw.length > 22 ? '...' : '');
-                }
-                return `<tr>
-                    <td><strong>${r.id}</strong></td>
-                    <td>${r.nombre} ${r.apellido}</td>
-                    <td style="font-size:11px;">${r.email}</td>
-                    <td>${r.pais}</td>
-                    <td>${r.ciudad}</td>
-                    <td>${excursionMostrar}</td>
-                    <td>${r.fecha}</td>
-                    <td>${r.personas}</td>
-                    <td>${r.formaPago}</td>
-                    <td><span class="badge badge-${r.estado}">${r.estado}</span></td>
-                    <td style="white-space:nowrap;">
-                        <button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button>
-                        <button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')">✅</button>
-                        <button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')">💰</button>
-                    </td>
-                </tr>`;
+                let exc = r.excursion || '';
+                if (exc.includes('\n')) { const l = exc.split('\n').filter(e => e.trim()); exc = l[0].trim().replace(/^\d+\.\s*/, '').substring(0, 22) + (l.length > 1 ? ` (+${l.length-1})` : ''); }
+                else { exc = exc.substring(0, 22) + (exc.length > 22 ? '...' : ''); }
+                return `<tr><td><strong>${r.id}</strong></td><td>${r.nombre} ${r.apellido}</td><td style="font-size:11px;">${r.email}</td><td>${r.pais}</td><td>${r.ciudad}</td><td>${exc}</td><td>${r.fecha}</td><td>${r.personas}</td><td>${r.formaPago}</td><td><span class="badge badge-${r.estado}">${r.estado}</span></td><td style="white-space:nowrap;"><button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button><button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')">✅</button><button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')">💰</button></td></tr>`;
             }).join('');
         }
         
@@ -320,33 +245,23 @@
         
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva').value.toLowerCase();
-            const pais = document.getElementById('filtroPais').value;
             let filtradas = reservasData;
             if (estadoFiltro !== 'todas') filtradas = filtradas.filter(r => r.estado === estadoFiltro);
             if (busqueda) filtradas = filtradas.filter(r => r.id.toLowerCase().includes(busqueda) || r.nombre.toLowerCase().includes(busqueda) || r.email.toLowerCase().includes(busqueda));
-            if (pais) filtradas = filtradas.filter(r => r.pais.includes(pais));
             renderReservas(filtradas);
         }
         
         function verReserva(id) {
             reservaSeleccionada = reservasData.find(r => r.id === id);
             if (reservaSeleccionada) {
-                // Procesar excursiones
-                let excursionesHTML = '';
-                const excursionRaw = reservaSeleccionada.excursion || '';
-                
-                if (excursionRaw.includes('\n')) {
-                    const excursiones = excursionRaw.split('\n').filter(e => e.trim());
-                    excursionesHTML = excursiones.map(e => 
-                        `<div class="excursion-tag-modal">${e.trim()}</div>`
-                    ).join('');
-                } else if (excursionRaw.includes('|')) {
-                    const excursiones = excursionRaw.split('|').filter(e => e.trim());
-                    excursionesHTML = excursiones.map((e, i) => 
-                        `<div class="excursion-tag-modal">${i+1}. ${e.trim()}</div>`
-                    ).join('');
+                let excHTML = '';
+                const excRaw = reservaSeleccionada.excursion || '';
+                if (excRaw.includes('\n')) {
+                    excHTML = excRaw.split('\n').filter(e => e.trim()).map(e => `<div class="excursion-tag-modal">${e.trim()}</div>`).join('');
+                } else if (excRaw.includes('|')) {
+                    excHTML = excRaw.split('|').filter(e => e.trim()).map((e, i) => `<div class="excursion-tag-modal">${i+1}. ${e.trim()}</div>`).join('');
                 } else {
-                    excursionesHTML = `<div class="excursion-tag-modal">${excursionRaw}</div>`;
+                    excHTML = `<div class="excursion-tag-modal">${excRaw}</div>`;
                 }
                 
                 document.getElementById('modalInfo').innerHTML = `
@@ -361,41 +276,15 @@
                     <p><strong>Forma de Pago:</strong> ${reservaSeleccionada.formaPago}</p>
                     <p><strong>Búsqueda:</strong> ${reservaSeleccionada.busqueda || 'No especificada'}</p>
                     <p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p>
-                    <div style="margin-top:12px;">
-                        <strong>🕐 Excursiones (${excursionRaw.split(/\n|\|/).filter(e => e.trim()).length}):</strong>
-                        <div class="excursiones-modal">${excursionesHTML}</div>
-                    </div>
+                    <div style="margin-top:12px;"><strong>🕐 Excursiones:</strong><div style="margin-top:8px;">${excHTML}</div></div>
                 `;
                 document.getElementById('modalReserva').classList.add('show');
             }
         }
         
         function cerrarModal() { document.getElementById('modalReserva').classList.remove('show'); }
-        
-        function cambiarEstado(nuevoEstado) {
-            if (reservaSeleccionada) {
-                reservaSeleccionada.estado = nuevoEstado;
-                renderReservas(reservasData);
-                actualizarContadores();
-                cerrarModal();
-            }
-        }
-        
-        function cambiarEstadoDirecto(id, nuevoEstado) {
-            const reserva = reservasData.find(r => r.id === id);
-            if (reserva) {
-                reserva.estado = nuevoEstado;
-                renderReservas(reservasData);
-                actualizarContadores();
-            }
-        }
-        
-        function exportarReservas() {
-            let csv = 'ID,Cliente,Email,Teléfono,País,Ciudad,Excursión,Fecha,Personas,Forma Pago,Estado\n';
-            reservasData.forEach(r => { csv += `"${r.id}","${r.nombre} ${r.apellido}","${r.email}","${r.telefono}","${r.pais}","${r.ciudad}","${r.excursion.replace(/\n/g,' | ')}","${r.fecha}","${r.personas}","${r.formaPago}","${r.estado}"\n`; });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'reservas.csv'; a.click();
-        }
+        function cambiarEstado(nuevoEstado) { if (reservaSeleccionada) { reservaSeleccionada.estado = nuevoEstado; renderReservas(reservasData); actualizarContadores(); cerrarModal(); } }
+        function cambiarEstadoDirecto(id, nuevoEstado) { const r = reservasData.find(r => r.id === id); if (r) { r.estado = nuevoEstado; renderReservas(reservasData); actualizarContadores(); } }
         
         document.getElementById('busquedaReserva').addEventListener('keypress', function(e) { if (e.key === 'Enter') filtrarReservas(); });
         document.getElementById('modalReserva').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
