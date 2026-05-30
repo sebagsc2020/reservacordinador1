@@ -39,40 +39,15 @@
                     if (actual) reservasData.push(actual);
                     
                     const v = []; let a = '', c = false;
-                    for (let j = 0; j < linea.length; j++) {
-                        const ch = linea[j];
-                        if (ch === '"') c = !c;
-                        else if (ch === ',' && !c) { v.push(a.trim()); a = ''; }
-                        else a += ch;
-                    }
-                    v.push(a.trim());
-                    const l = v.map(x => x.replace(/^"|"$/g,'').trim());
+                    for (let j = 0; j < linea.length; j++) { const ch = linea[j]; if (ch === '"') c = !c; else if (ch === ',' && !c) { v.push(a.trim()); a = ''; } else a += ch; }
+                    v.push(a.trim()); const l = v.map(x => x.replace(/^"|"$/g,'').trim());
                     
-                    actual = {
-                        id: l[0]||`R${i}`, nombre: l[2]||'', apellido: l[3]||'', email: l[4]||'',
-                        telefono: l[5]||'', pais: l[6]||'', ciudad: l[7]||'', excursion: l[8]||'',
-                        fecha: '', personas: '0', formaPago: 'No especificada', busqueda: '', estado: 'confirmado'
-                    };
+                    actual = { id: l[0]||`R${i}`, nombre: l[2]||'', apellido: l[3]||'', email: l[4]||'', telefono: l[5]||'', pais: l[6]||'', ciudad: l[7]||'', excursion: l[8]||'', fecha: '', personas: '0', formaPago: 'No especificada', busqueda: '', estado: 'confirmado' };
                     le = [];
-                    
-                    if (l[4] && !clientesMap[l[4].toLowerCase()]) {
-                        clientesMap[l[4].toLowerCase()] = {
-                            nombre: (l[2]+' '+(l[3]||'')).trim(), email: l[4],
-                            telefono: l[5]||'', pais: l[6]||'', ciudad: l[7]||''
-                        };
-                    }
-                } else {
-                    if (actual) { const x = linea.replace(/^"|"$/g,'').trim(); if (x && !x.startsWith(',') && x.length > 3) le.push(x); }
-                }
+                    if (l[4] && !clientesMap[l[4].toLowerCase()]) { clientesMap[l[4].toLowerCase()] = { nombre: (l[2]+' '+(l[3]||'')).trim(), email: l[4], telefono: l[5]||'', pais: l[6]||'', ciudad: l[7]||'' }; }
+                } else { if (actual) { const x = linea.replace(/^"|"$/g,'').trim(); if (x && !x.startsWith(',') && x.length > 3) le.push(x); } }
             }
-            if (actual) {
-                if (le.length > 0) {
-                    const u = le[le.length-1]; const p = u.replace(/^"|"$/g,'').split('","');
-                    if (p.length >= 4) { actual.fecha = p[1]||''; actual.personas = p[2]||'0'; actual.formaPago = p[3]||'No especificada'; if (p.length >= 5) actual.busqueda = p[4]||''; }
-                    le.pop(); if (le.length > 0) actual.excursion += '\n' + le.join('\n');
-                }
-                reservasData.push(actual);
-            }
+            if (actual) { if (le.length > 0) { const u = le[le.length-1]; const p = u.replace(/^"|"$/g,'').split('","'); if (p.length >= 4) { actual.fecha = p[1]||''; actual.personas = p[2]||'0'; actual.formaPago = p[3]||'No especificada'; if (p.length >= 5) actual.busqueda = p[4]||''; } le.pop(); if (le.length > 0) actual.excursion += '\n' + le.join('\n'); } reservasData.push(actual); }
             clientesData = Object.values(clientesMap);
             console.log('✅ WhatsApp: ' + clientesData.length + ' clientes, ' + reservasData.length + ' reservas');
         } catch(e) { console.error(e); }
@@ -82,71 +57,80 @@
         if (!reservasData.length) return null;
         const emailLimpio = email.toLowerCase().trim();
         const reservas = reservasData.filter(r => r.email && r.email.toLowerCase().trim() === emailLimpio);
-        console.log('🔍 Buscando:', emailLimpio, '| Encontradas:', reservas.length);
-        if (reservas.length > 0) {
-            const ultima = reservas[reservas.length-1];
-            console.log('   ✅ Fecha:', ultima.fecha, '| Pax:', ultima.personas, '| Pago:', ultima.formaPago, '| Lugar:', ultima.busqueda);
-            return ultima;
-        }
+        if (reservas.length > 0) { const u = reservas[reservas.length-1]; console.log('✅ Fecha:', u.fecha, '| Pax:', u.personas, '| Pago:', u.formaPago); return u; }
         return null;
     }
     
     function seleccionarCliente(telefono, nombre, email) {
-        document.getElementById('whatsappNumero').value = telefono.replace(/[^0-9]/g,'');
-        document.getElementById('whatsappCliente').value = nombre;
-        document.getElementById('whatsappCliente').classList.add('cliente-encontrado');
-        
+        const numEl = document.getElementById('whatsappNumero');
+        const nomEl = document.getElementById('whatsappCliente');
         const badge = document.getElementById('clienteEncontradoBadge');
-        badge.style.display = 'inline-block'; badge.className = 'cliente-badge';
+        const msgEl = document.getElementById('whatsappMensaje');
+        
+        if (numEl) numEl.value = telefono.replace(/[^0-9]/g,'');
+        if (nomEl) { nomEl.value = nombre; nomEl.classList.add('cliente-encontrado'); }
+        if (badge) { badge.style.display = 'inline-block'; badge.className = 'cliente-badge'; }
         
         const reserva = buscarUltimaReserva(email);
         let info = '';
-        
-        if (reserva) {
-            const primeraExcursion = (reserva.excursion||'').split('\n')[0].replace(/^\d+\.\s*/,'').trim();
-            info = ` | 🕐 ${primeraExcursion.substring(0,25)} | 📅 ${reserva.fecha} | 👥 ${reserva.personas} | 💳 ${reserva.formaPago}`;
-            
-            const msgEl = document.getElementById('whatsappMensaje');
-            if (msgEl && msgEl.value) {
-                msgEl.value = msgEl.value
-                    .replace(/\[NOMBRE\]/g, nombre)
-                    .replace(/\[EXCURSION\]/g, primeraExcursion || '[EXCURSION]')
-                    .replace(/\[FECHA\]/g, reserva.fecha || '[FECHA]')
-                    .replace(/\[PERSONAS\]/g, reserva.personas || '[PERSONAS]')
-                    .replace(/\[PAGO\]/g, reserva.formaPago || '[PAGO]')
-                    .replace(/\[LUGAR\]/g, reserva.busqueda || '[LUGAR]');
+        if (reserva && msgEl) {
+            const pe = (reserva.excursion||'').split('\n')[0].replace(/^\d+\.\s*/,'').trim();
+            info = ` | 🕐 ${pe.substring(0,25)} | 📅 ${reserva.fecha} | 👥 ${reserva.personas} | 💳 ${reserva.formaPago}`;
+            if (msgEl.value) {
+                msgEl.value = msgEl.value.replace(/\[NOMBRE\]/g, nombre).replace(/\[EXCURSION\]/g, pe||'[EXCURSION]').replace(/\[FECHA\]/g, reserva.fecha||'[FECHA]').replace(/\[PERSONAS\]/g, reserva.personas||'[PERSONAS]').replace(/\[PAGO\]/g, reserva.formaPago||'[PAGO]').replace(/\[LUGAR\]/g, reserva.busqueda||'[LUGAR]');
             }
         }
-        
-        badge.textContent = '✅ ' + nombre + ' | ' + email + info;
-        document.getElementById('resultadosBusqueda').classList.remove('show');
-        document.getElementById('buscadorCliente').value = '';
+        if (badge) badge.textContent = '✅ ' + nombre + ' | ' + email + info;
+        const divRes = document.getElementById('resultadosBusqueda');
+        if (divRes) divRes.classList.remove('show');
+        const buscador = document.getElementById('buscadorCliente');
+        if (buscador) buscador.value = '';
         localStorage.setItem('ultimoClienteWhatsApp', JSON.stringify({telefono, nombre, email}));
     }
     
-    document.getElementById('buscadorCliente').addEventListener('input', function() {
-        const t = this.value.toLowerCase().trim();
-        const div = document.getElementById('resultadosBusqueda');
-        if (t.length < 2) { div.classList.remove('show'); return; }
-        const r = clientesData.filter(c => c.nombre.toLowerCase().includes(t) || c.email.toLowerCase().includes(t) || c.telefono.includes(t.replace(/[^0-9]/g,''))).slice(0,8);
-        div.innerHTML = r.length === 0 ? '<div class="sin-resultados">No se encontraron</div>' : r.map(c => `<div class="resultado-item" onclick="seleccionarCliente('${c.telefono}','${c.nombre.replace(/'/g,"\\'")}','${c.email}')"><div class="resultado-info"><div class="resultado-nombre">${c.nombre}</div><div class="resultado-email">${c.email}</div></div><div class="resultado-telefono">📞 ${c.telefono||'Sin tel'}</div></div>`).join('');
-        div.classList.add('show');
+    // Envolver en DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+        const buscadorInput = document.getElementById('buscadorCliente');
+        const resultadosDiv = document.getElementById('resultadosBusqueda');
+        
+        if (buscadorInput) {
+            buscadorInput.addEventListener('input', function() {
+                const t = this.value.toLowerCase().trim();
+                if (t.length < 2) { resultadosDiv.classList.remove('show'); return; }
+                const r = clientesData.filter(c => c.nombre.toLowerCase().includes(t) || c.email.toLowerCase().includes(t) || (c.telefono||'').includes(t.replace(/[^0-9]/g,''))).slice(0,8);
+                resultadosDiv.innerHTML = r.length === 0 ? '<div class="sin-resultados">No se encontraron</div>' : r.map(c => `<div class="resultado-item" onclick="seleccionarCliente('${c.telefono}','${c.nombre.replace(/'/g,"\\'")}','${c.email}')"><div class="resultado-info"><div class="resultado-nombre">${c.nombre}</div><div class="resultado-email">${c.email}</div></div><div class="resultado-telefono">📞 ${c.telefono||'Sin tel'}</div></div>`).join('');
+                resultadosDiv.classList.add('show');
+            });
+        }
+        
+        document.addEventListener('click', function(e) { if (!e.target.closest('.buscador-container') && resultadosDiv) resultadosDiv.classList.remove('show'); });
+        
+        const ultimo = JSON.parse(localStorage.getItem('ultimoClienteWhatsApp')||'null');
+        if (ultimo) {
+            const numEl = document.getElementById('whatsappNumero');
+            const nomEl = document.getElementById('whatsappCliente');
+            if (numEl) numEl.value = ultimo.telefono?.replace(/[^0-9]/g,'')||'';
+            if (nomEl) nomEl.value = ultimo.nombre||'';
+        }
+        
+        const histEl = document.getElementById('historialWhatsApp');
+        const historial = JSON.parse(localStorage.getItem('historialWhatsApp')||'[]');
+        if (histEl) histEl.innerHTML = historial.length>0 ? historial.map(h => `<tr><td>${h.fecha}</td><td>${h.cliente}</td><td>${h.numero}</td><td><span class="badge badge-enviado">${h.estado}</span></td><td><button class="btn-reenviar" onclick="reenviar('${h.numero}','${h.cliente}')">💬</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#999;">Sin envíos</td></tr>';
     });
-    document.addEventListener('click', function(e) { if (!e.target.closest('.buscador-container')) document.getElementById('resultadosBusqueda').classList.remove('show'); });
     
     const plantillas = {
-        confirmacion: { mensaje: `✅ ¡Hola [NOMBRE]!\n\nTu reserva en Aventura Total ha sido CONFIRMADA.\n\n📍 Detalles:\n• Excursión: [EXCURSION]\n• Fecha: [FECHA]\n• Personas: [PERSONAS]\n• Forma de Pago: [PAGO]\n• Lugar: [LUGAR]\n\n📞 ¿Dudas? Contactanos.\n\n🏔️ Aventura Total` },
-        recordatorio: { mensaje: `🔔 ¡Hola [NOMBRE]!\n\nTenés un pago pendiente.\n\n💳 Podés abonar por:\n• Efectivo\n• Débito/Crédito\n• Transferencia\n\n⏰ Vence en 48hs.\n\n🏔️ Aventura Total` },
-        salida: { mensaje: `🚌 ¡Hola [NOMBRE]!\n\n¡Mañana es tu excursión! 🌟\n\n🎒 Llevá:\n• Ropa cómoda\n• Protector solar\n• Agua\n• Cámara\n\n📍 [LUGAR]\n\n¡Te esperamos!\n🏔️ Aventura Total` },
+        confirmacion: { mensaje: `✅ ¡Hola [NOMBRE]!\n\nTu reserva en Aventura Total ha sido CONFIRMADA.\n\n📍 Detalles:\n• Excursión: [EXCURSION]\n• Fecha: [FECHA]\n• Personas: [PERSONAS]\n• Forma de Pago: [PAGO]\n• Lugar: [LUGAR]\n\n🏔️ Aventura Total` },
+        recordatorio: { mensaje: `🔔 ¡Hola [NOMBRE]!\n\nTenés un pago pendiente.\n\n💳 Podés abonar por:\n• Efectivo\n• Débito/Crédito\n• Transferencia\n\n🏔️ Aventura Total` },
+        salida: { mensaje: `🚌 ¡Hola [NOMBRE]!\n\n¡Mañana es tu excursión! 🌟\n\n🎒 Llevá:\n• Ropa cómoda\n• Protector solar\n• Agua\n• Cámara\n\n📍 [LUGAR]\n\n🏔️ Aventura Total` },
         agradecimiento: { mensaje: `🙏 ¡Hola [NOMBRE]!\n\n¿Disfrutaste la excursión?\n\n⭐ ¡Dejanos una reseña!\n\n🎉 10% OFF próxima reserva.\n\n🏔️ Aventura Total` },
-        promocion: { mensaje: `🎉 ¡Hola [NOMBRE]!\n\nBeneficios exclusivos:\n🔥 15% OFF\n👥 2x1 seleccionadas\n🎁 Regalo sorpresa\n\n🏔️ Aventura Total` },
+        promocion: { mensaje: `🎉 ¡Hola [NOMBRE]!\n\nBeneficios exclusivos:\n🔥 15% OFF\n👥 2x1 seleccionadas\n\n🏔️ Aventura Total` },
         personalizado: { mensaje: '' }
     };
     
     function usarPlantilla(tipo) {
         let msg = plantillas[tipo].mensaje;
-        const nombre = document.getElementById('whatsappCliente').value;
-        if (nombre) msg = msg.replace(/\[NOMBRE\]/g, nombre);
+        const nomEl = document.getElementById('whatsappCliente');
+        if (nomEl && nomEl.value) msg = msg.replace(/\[NOMBRE\]/g, nomEl.value);
         const ultimo = JSON.parse(localStorage.getItem('ultimoClienteWhatsApp')||'null');
         if (ultimo) {
             const reserva = buscarUltimaReserva(ultimo.email);
@@ -155,18 +139,47 @@
                 msg = msg.replace(/\[EXCURSION\]/g, pe||'[EXCURSION]').replace(/\[FECHA\]/g, reserva.fecha||'[FECHA]').replace(/\[PERSONAS\]/g, reserva.personas||'[PERSONAS]').replace(/\[PAGO\]/g, reserva.formaPago||'[PAGO]').replace(/\[LUGAR\]/g, reserva.busqueda||'[LUGAR]');
             }
         }
-        document.getElementById('whatsappMensaje').value = msg;
+        const msgEl = document.getElementById('whatsappMensaje');
+        if (msgEl) msgEl.value = msg;
     }
     
-    function enviarWhatsApp() { const n=document.getElementById('whatsappNumero').value.replace(/[^0-9]/g,''), m=document.getElementById('whatsappMensaje').value, c=document.getElementById('whatsappCliente').value||'Cliente'; if(!n||!m){alert('⚠️ Completá los campos');return;} window.open('https://wa.me/'+n+'?text='+encodeURIComponent(m),'_blank'); agregarHistorial(c,n); document.getElementById('mensajeExito').classList.add('show'); setTimeout(()=>document.getElementById('mensajeExito').classList.remove('show'),4000); }
-    function abrirWhatsAppWeb() { const n=document.getElementById('whatsappNumero').value.replace(/[^0-9]/g,''), m=document.getElementById('whatsappMensaje').value; if(!n){alert('⚠️ Seleccioná un cliente');return;} window.open('https://web.whatsapp.com/send?phone='+n+'&text='+encodeURIComponent(m),'_blank'); }
+    function enviarWhatsApp() {
+        const numEl = document.getElementById('whatsappNumero');
+        const msgEl = document.getElementById('whatsappMensaje');
+        const nomEl = document.getElementById('whatsappCliente');
+        const n = numEl ? numEl.value.replace(/[^0-9]/g,'') : '';
+        const m = msgEl ? msgEl.value : '';
+        const c = nomEl ? nomEl.value || 'Cliente' : 'Cliente';
+        if (!n || !m) { alert('⚠️ Completá los campos'); return; }
+        window.open('https://wa.me/'+n+'?text='+encodeURIComponent(m), '_blank');
+        agregarHistorial(c, n);
+        const exito = document.getElementById('mensajeExito');
+        if (exito) { exito.classList.add('show'); setTimeout(() => exito.classList.remove('show'), 4000); }
+    }
+    
+    function abrirWhatsAppWeb() {
+        const numEl = document.getElementById('whatsappNumero');
+        const msgEl = document.getElementById('whatsappMensaje');
+        const n = numEl ? numEl.value.replace(/[^0-9]/g,'') : '';
+        const m = msgEl ? msgEl.value : '';
+        if (!n) { alert('⚠️ Seleccioná un cliente'); return; }
+        window.open('https://web.whatsapp.com/send?phone='+n+'&text='+encodeURIComponent(m), '_blank');
+    }
     
     const historial = JSON.parse(localStorage.getItem('historialWhatsApp')||'[]');
-    function agregarHistorial(cliente, numero) { historial.unshift({fecha:new Date().toLocaleString('es-ES'),cliente,numero,estado:'enviado'}); if(historial.length>20)historial.pop(); localStorage.setItem('historialWhatsApp',JSON.stringify(historial)); document.getElementById('historialWhatsApp').innerHTML=historial.length>0?historial.map(h=>`<tr><td>${h.fecha}</td><td>${h.cliente}</td><td>${h.numero}</td><td><span class="badge badge-enviado">${h.estado}</span></td><td><button class="btn-reenviar" onclick="reenviar('${h.numero}','${h.cliente}')">💬</button></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:#999;">Sin envíos</td></tr>'; }
-    function reenviar(num,cliente){document.getElementById('whatsappNumero').value=num;document.getElementById('whatsappCliente').value=cliente;}
+    function agregarHistorial(cliente, numero) {
+        historial.unshift({fecha: new Date().toLocaleString('es-ES'), cliente, numero, estado: 'enviado'});
+        if (historial.length > 20) historial.pop();
+        localStorage.setItem('historialWhatsApp', JSON.stringify(historial));
+        const histEl = document.getElementById('historialWhatsApp');
+        if (histEl) histEl.innerHTML = historial.length>0 ? historial.map(h => `<tr><td>${h.fecha}</td><td>${h.cliente}</td><td>${h.numero}</td><td><span class="badge badge-enviado">${h.estado}</span></td><td><button class="btn-reenviar" onclick="reenviar('${h.numero}','${h.cliente}')">💬</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#999;">Sin envíos</td></tr>';
+    }
+    function reenviar(num, cliente) {
+        const numEl = document.getElementById('whatsappNumero');
+        const nomEl = document.getElementById('whatsappCliente');
+        if (numEl) numEl.value = num;
+        if (nomEl) nomEl.value = cliente;
+    }
     
-    const ultimo = JSON.parse(localStorage.getItem('ultimoClienteWhatsApp')||'null');
-    if(ultimo){document.getElementById('whatsappNumero').value=ultimo.telefono?.replace(/[^0-9]/g,'')||'';document.getElementById('whatsappCliente').value=ultimo.nombre||'';}
-    document.getElementById('historialWhatsApp').innerHTML = historial.length>0?historial.map(h=>`<tr><td>${h.fecha}</td><td>${h.cliente}</td><td>${h.numero}</td><td><span class="badge badge-enviado">${h.estado}</span></td><td><button class="btn-reenviar" onclick="reenviar('${h.numero}','${h.cliente}')">💬</button></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:#999;">Sin envíos</td></tr>';
     cargarDatos();
 </script>
