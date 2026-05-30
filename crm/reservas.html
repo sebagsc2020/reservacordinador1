@@ -159,24 +159,32 @@
                 const csv = await respuesta.text();
                 const lineas = csv.split('\n');
                 
-                console.log('📊 Total líneas:', lineas.length);
-                console.log('📋 Encabezados CRUDOS:', lineas[0]);
-                
-                // Mostrar encabezados por posición
-                const encabezados = lineas[0].split(',');
-                console.log('📋 Columnas detectadas:');
-                encabezados.forEach((h, i) => console.log(`   [${i}] = ${h.replace(/"/g,'').trim()}`));
-                
                 reservasData = [];
                 let reservaActual = null;
+                let ultimaLineaExcursion = '';
                 
                 for (let i = 1; i < lineas.length; i++) {
                     const linea = lineas[i].trim();
                     if (!linea) continue;
                     
                     if (linea.startsWith('"RES-') || linea.startsWith('RES-')) {
-                        if (reservaActual) { reservasData.push(reservaActual); }
+                        // Procesar última línea de la reserva anterior (contiene fecha, pax, pago)
+                        if (reservaActual && ultimaLineaExcursion) {
+                            const datosFinales = ultimaLineaExcursion.replace(/^"|"$/g, '').trim();
+                            const partes = datosFinales.split(',');
+                            if (partes.length >= 3) {
+                                reservaActual.fecha = partes[0].replace(/"/g, '').trim();
+                                reservaActual.personas = partes[1].replace(/"/g, '').trim();
+                                reservaActual.formaPago = partes[2].replace(/"/g, '').trim();
+                            }
+                        }
                         
+                        // Guardar reserva anterior
+                        if (reservaActual) { 
+                            reservasData.push(reservaActual); 
+                        }
+                        
+                        // Parsear nueva reserva
                         const valores = [];
                         let actual = '';
                         let entreComillas = false;
@@ -191,28 +199,6 @@
                         
                         const limpio = valores.map(v => v.replace(/^"|"$/g, '').trim());
                         
-                        // MOSTRAR TODAS LAS COLUMNAS
-                        console.log(`\n📋 ${limpio[0]}:`);
-                        limpio.forEach((v, j) => {
-                            if (v) console.log(`   [${j}] = "${v.substring(0, 40)}"`);
-                        });
-                        
-                        // Buscar la fecha (contiene "2026") y tomar las 2 siguientes
-                        let fechaEncontrada = '';
-                        let paxEncontrado = '0';
-                        let pagoEncontrado = 'No especificada';
-                        
-                        for (let j = 0; j < limpio.length; j++) {
-                            if (limpio[j] && limpio[j].includes('2026') && !limpio[j].includes('@')) {
-                                fechaEncontrada = limpio[j];
-                                paxEncontrado = limpio[j+1] || '0';
-                                pagoEncontrado = limpio[j+2] || 'No especificada';
-                                break;
-                            }
-                        }
-                        
-                        console.log(`   ✅ Fecha=${fechaEncontrada} | Pax=${paxEncontrado} | Pago=${pagoEncontrado}`);
-                        
                         reservaActual = {
                             id: limpio[0] || `RES-${i}`,
                             fechaReserva: limpio[1] || '',
@@ -223,29 +209,46 @@
                             pais: limpio[6] || '',
                             ciudad: limpio[7] || '',
                             excursion: limpio[8] || '',
-                            fecha: fechaEncontrada,
-                            personas: paxEncontrado,
-                            formaPago: pagoEncontrado,
+                            fecha: '',
+                            personas: '0',
+                            formaPago: 'No especificada',
                             busqueda: '',
                             estado: 'confirmado'
                         };
+                        
+                        ultimaLineaExcursion = '';
+                        
                     } else {
+                        // Línea de continuación (excursión adicional con fecha, pax, pago al final)
                         if (reservaActual) {
                             const l = linea.replace(/^"|"$/g, '').trim();
                             if (l && !l.startsWith(',') && l.length > 3) {
                                 reservaActual.excursion += '\n' + l;
+                                ultimaLineaExcursion = l;
                             }
                         }
                     }
                 }
                 
-                if (reservaActual) { reservasData.push(reservaActual); }
+                // Procesar última reserva
+                if (reservaActual) {
+                    if (ultimaLineaExcursion) {
+                        const datosFinales = ultimaLineaExcursion.replace(/^"|"$/g, '').trim();
+                        const partes = datosFinales.split(',');
+                        if (partes.length >= 3) {
+                            reservaActual.fecha = partes[0].replace(/"/g, '').trim();
+                            reservaActual.personas = partes[1].replace(/"/g, '').trim();
+                            reservaActual.formaPago = partes[2].replace(/"/g, '').trim();
+                        }
+                    }
+                    reservasData.push(reservaActual);
+                }
                 
+                // Restaurar estados guardados
                 const estadosGuardados = cargarEstadosGuardados();
                 reservasData.forEach(r => { if (estadosGuardados[r.id]) r.estado = estadosGuardados[r.id]; });
                 
                 console.log('✅ Reservas cargadas:', reservasData.length);
-                console.log('📋 Datos:', reservasData.map(r => ({ id: r.id, fecha: r.fecha, pax: r.personas, pago: r.formaPago })));
                 
                 if (reservasData.length === 0) {
                     reservasData = [
