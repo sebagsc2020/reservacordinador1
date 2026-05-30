@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - CRM Aventura Total</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #1a1a2e;
+            color: white;
+            padding: 25px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo .logo-icon { font-size: 40px; }
+        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; }
+        .sidebar-logo h2 span { color: #667eea; }
+        
+        .nav-menu { list-style: none; padding: 0 15px; }
+        .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a {
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+            color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px;
+            transition: all 0.3s ease; font-size: 14px; font-weight: 500;
+        }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
+        .nav-menu a.active { background: #667eea; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        
+        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
+        .btn-logout-sidebar {
+            width: 100%; padding: 12px; background: rgba(231,76,60,0.2);
+            color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); border-radius: 10px;
+            cursor: pointer; font-weight: 600; font-size: 13px;
+        }
+        
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 26px; color: #1a1a2e; }
+        
+        .user-info {
+            display: flex; align-items: center; gap: 10px; background: white;
+            padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px;
+        }
+        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        
+        /* ===== BÚSQUEDA ===== */
+        .search-bar {
+            background: white; padding: 20px; border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
+            display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
+        }
+        .search-input { flex: 1; min-width: 200px; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
+        .search-input:focus { outline: none; border-color: #667eea; }
+        
+        .btn-buscar { padding: 12px 25px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        .btn-agregar { padding: 12px 25px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        .btn-recargar { padding: 12px 25px; background: #f39c12; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        .btn-exportar { padding: 12px 25px; background: #3498db; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        
+        /* ===== TABLA ===== */
+        .table-container { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .table-header h3 { font-size: 18px; color: #1a1a2e; }
+        .table-header span { font-size: 13px; color: #999; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 15px; background: #f8f9fa; color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #333; }
+        tr:hover td { background: #f8f9ff; }
+        
+        .cliente-nombre { font-weight: 600; color: #667eea; cursor: pointer; }
+        .cliente-nombre:hover { text-decoration: underline; }
+        
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .badge-frecuente { background: #d4edda; color: #155724; }
+        .badge-nuevo { background: #d1ecf1; color: #0c5460; }
+        .badge-vip { background: #fff3cd; color: #856404; }
+        
+        .btn-accion { padding: 7px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; margin-right: 4px; transition: all 0.3s ease; }
+        .btn-ver { background: #667eea; color: white; }
+        .btn-email { background: #3498db; color: white; }
+        .btn-whatsapp { background: #25D366; color: white; }
+        .btn-eliminar { background: #e74c3c; color: white; }
+        
+        /* ===== MODALES ===== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-overlay.show { display: flex; }
+        
+        .modal-content {
+            background: white; border-radius: 20px; padding: 35px; max-width: 500px;
+            width: 90%; max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4); animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-close { float: right; background: #f0f0f0; border: none; font-size: 22px; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: #e74c3c; color: white; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+        
+        .btn-guardar { padding: 14px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 15px; width: 100%; }
+        .btn-guardar:hover { background: #219a52; }
+        
+        .mensaje-exito { background: #d4edda; color: #155724; padding: 12px; border-radius: 10px; margin-top: 15px; display: none; text-align: center; font-weight: 600; }
+        .mensaje-exito.show { display: block; }
+        
+        .confirmacion-botones { display: flex; gap: 10px; justify-content: center; }
+        .btn-si { padding: 12px 30px; background: #e74c3c; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; }
+        .btn-no { padding: 12px 30px; background: #95a5a6; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; }
+            .nav-menu a { justify-content: center; padding: 12px; }
+            .main-content { margin-left: 70px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">🏔️</div>
+            <h2>Aventura <span>Total</span></h2>
+            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a href="clientes.html" class="active"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">📧</span> <span>Emails</span></a></li>
+            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar Sesión</button>
+        </div>
+    </nav>
+    
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1>👥 Clientes</h1>
+                <p style="color:#999;font-size:13px;">Datos reales desde Google Sheets</p>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <span>Admin</span>
+            </div>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="🔍 Buscar por nombre, email o teléfono..." id="busqueda">
+            <button class="btn-buscar" onclick="buscarClientes()">🔍 Buscar</button>
+            <button class="btn-agregar" onclick="abrirModalAgregar()">➕ Agregar Cliente</button>
+            <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
+            <button class="btn-exportar" onclick="exportarClientes()">📥 Exportar CSV</button>
+        </div>
+        
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Lista de Clientes</h3>
+                <span id="totalClientesSpan">0 clientes únicos</span>
+            </div>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Reservas</th>
+                            <th>Última Reserva</th>
+                            <th>País</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaClientes">
+                        <tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">⏳ Cargando clientes desde Google Sheets...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Ver Cliente -->
+    <div class="modal-overlay" id="modalCliente">
+        <div class="modal-content">
+            <button class="modal-close" onclick="cerrarModal()">✕</button>
+            <h2 style="color:#667eea;margin-bottom:20px;">👤 Detalle del Cliente</h2>
+            <div id="modalInfo"></div>
+            <br>
+            <button class="btn-accion btn-email" onclick="enviarEmailCliente()" style="margin-right:5px;">📧 Email</button>
+            <button class="btn-accion btn-whatsapp" onclick="enviarWhatsAppCliente()">💬 WhatsApp</button>
+        </div>
+    </div>
+    
+    <!-- Modal Agregar -->
+    <div class="modal-overlay" id="modalAgregarCliente">
+        <div class="modal-content">
+            <button class="modal-close" onclick="cerrarModalAgregar()">✕</button>
+            <h2 style="color:#27ae60;margin-bottom:20px;">➕ Agregar Cliente</h2>
+            <div class="form-group"><label>👤 Nombre *</label><input type="text" id="nuevoNombre" placeholder="Ej: Juan Pérez"></div>
+            <div class="form-group"><label>📧 Email *</label><input type="email" id="nuevoEmail" placeholder="cliente@email.com"></div>
+            <div class="form-group"><label>📞 Teléfono *</label><input type="text" id="nuevoTelefono" placeholder="+54 351 1234567"></div>
+            <button class="btn-guardar" onclick="guardarCliente()">💾 Guardar Cliente</button>
+            <div class="mensaje-exito" id="mensajeExito">✅ Cliente agregado correctamente</div>
+        </div>
+    </div>
+    
+    <!-- Modal Eliminar -->
+    <div class="modal-overlay" id="modalEliminar">
+        <div class="modal-content" style="text-align:center;">
+            <h3 style="color:#e74c3c;">🗑️ ¿Eliminar Cliente?</h3>
+            <p id="textoEliminar" style="color:#666;margin:15px 0;"></p>
+            <div class="confirmacion-botones">
+                <button class="btn-no" onclick="cerrarModalEliminar()">❌ Cancelar</button>
+                <button class="btn-si" id="btnConfirmarEliminar">✅ Eliminar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
+        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+        
+        // ===== CONFIGURACIÓN =====
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
+        
+        let clientes = [];
+        let clienteSeleccionado = null;
+        let clienteAEliminar = null;
+        
+        // ===== CARGAR CLIENTES DESDE GOOGLE SHEETS =====
+        async function cargarClientes() {
+            try {
+                document.getElementById('tablaClientes').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">⏳ Cargando clientes...</td></tr>';
+                
+                const respuesta = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                if (!respuesta.ok) throw new Error('Error HTTP: ' + respuesta.status);
+                
+                const csv = await respuesta.text();
+                const lineas = csv.split('\n');
+                
+                // Objeto para agrupar por email (cliente único)
+                const clientesMap = {};
+                
+                for (let i = 1; i < lineas.length; i++) {
+                    const linea = lineas[i].trim();
+                    if (!linea) continue;
+                    
+                    const valores = [];
+                    let actual = '', entreComillas = false;
+                    for (let j = 0; j < linea.length; j++) {
+                        const char = linea[j];
+                        if (char === '"') entreComillas = !entreComillas;
+                        else if (char === ',' && !entreComillas) { valores.push(actual.trim()); actual = ''; }
+                        else actual += char;
+                    }
+                    valores.push(actual.trim());
+                    
+                    if (valores.length >= 6 && valores[4]) {
+                        const email = limpiar(valores[4]).toLowerCase();
+                        const nombre = limpiar(valores[2]);
+                        const apellido = limpiar(valores[3]);
+                        const nombreCompleto = (nombre + ' ' + apellido).trim();
+                        const telefono = limpiar(valores[5]);
+                        const pais = limpiar(valores[6]);
+                        const fechaReserva = limpiar(valores[1]);
+                        
+                        if (email && nombreCompleto) {
+                            if (clientesMap[email]) {
+                                // Ya existe, incrementar contador
+                                clientesMap[email].reservas++;
+                                // Actualizar última fecha si es más reciente
+                                if (fechaReserva > clientesMap[email].ultima) {
+                                    clientesMap[email].ultima = fechaReserva;
+                                }
+                            } else {
+                                // Nuevo cliente
+                                clientesMap[email] = {
+                                    nombre: nombreCompleto,
+                                    email: email,
+                                    telefono: telefono || 'No especificado',
+                                    reservas: 1,
+                                    ultima: fechaReserva || 'Sin fecha',
+                                    pais: pais || 'No especificado'
+                                };
+                            }
+                        }
+                    }
+                }
+                
+                // Convertir a array
+                clientes = Object.values(clientesMap);
+                
+                // Ordenar por cantidad de reservas (más frecuentes primero)
+                clientes.sort((a, b) => b.reservas - a.reservas);
+                
+                renderClientes(clientes);
+                
+            } catch (error) {
+                document.getElementById('tablaClientes').innerHTML = 
+                    `<tr><td colspan="7" style="text-align:center;color:#e74c3c;padding:30px;">
+                        ❌ Error al cargar<br><small>${error.message}</small><br><br>
+                        <button class="btn-buscar" onclick="cargarClientes()">🔄 Reintentar</button>
+                    </td></tr>`;
+            }
+        }
+        
+        function limpiar(valor) { return valor ? valor.replace(/^"|"$/g, '').trim() : ''; }
+        
+        function renderClientes(data) {
+            document.getElementById('totalClientesSpan').textContent = data.length + ' clientes únicos';
+            
+            if (data.length === 0) {
+                document.getElementById('tablaClientes').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">📋 No hay clientes todavía</td></tr>';
+                return;
+            }
+            
+            document.getElementById('tablaClientes').innerHTML = data.map(c => {
+                let tipo = 'nuevo';
+                if (c.reservas >= 8) tipo = 'vip';
+                else if (c.reservas >= 3) tipo = 'frecuente';
+                
+                return `
+                <tr>
+                    <td><span class="cliente-nombre" onclick="verCliente('${c.email}')">${c.nombre}</span></td>
+                    <td>${c.email}</td>
+                    <td>${c.telefono}</td>
+                    <td>${c.reservas}</td>
+                    <td>${c.ultima}</td>
+                    <td>${c.pais}</td>
+                    <td>
+                        <button class="btn-accion btn-ver" onclick="verCliente('${c.email}')">👁️</button>
+                        <button class="btn-accion btn-email" onclick="enviarEmail('${c.email}')">📧</button>
+                        <button class="btn-accion btn-whatsapp" onclick="enviarWhatsApp('${c.telefono}')">💬</button>
+                        <button class="btn-accion btn-eliminar" onclick="confirmarEliminar('${c.email}')">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+        
+        function buscarClientes() {
+            const termino = document.getElementById('busqueda').value.toLowerCase();
+            const filtrados = clientes.filter(c => 
+                c.nombre.toLowerCase().includes(termino) || 
+                c.email.toLowerCase().includes(termino) || 
+                c.telefono.includes(termino)
+            );
+            renderClientes(filtrados);
+        }
+        
+        document.getElementById('busqueda').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') buscarClientes();
+        });
+        
+        // ===== VER CLIENTE =====
+        function verCliente(email) {
+            clienteSeleccionado = clientes.find(c => c.email === email);
+            if (clienteSeleccionado) {
+                let tipo = 'Nuevo';
+                if (clienteSeleccionado.reservas >= 8) tipo = '👑 VIP';
+                else if (clienteSeleccionado.reservas >= 3) tipo = '🔄 Frecuente';
+                
+                document.getElementById('modalInfo').innerHTML = `
+                    <p><strong>Nombre:</strong> ${clienteSeleccionado.nombre}</p>
+                    <p><strong>Email:</strong> ${clienteSeleccionado.email}</p>
+                    <p><strong>Teléfono:</strong> ${clienteSeleccionado.telefono}</p>
+                    <p><strong>Reservas:</strong> ${clienteSeleccionado.reservas}</p>
+                    <p><strong>Tipo:</strong> ${tipo}</p>
+                    <p><strong>Última reserva:</strong> ${clienteSeleccionado.ultima}</p>
+                    <p><strong>País:</strong> ${clienteSeleccionado.pais}</p>
+                `;
+                document.getElementById('modalCliente').classList.add('show');
+            }
+        }
+        
+        function cerrarModal() { document.getElementById('modalCliente').classList.remove('show'); }
+        
+        function enviarEmailCliente() {
+            if (clienteSeleccionado) window.open('mailto:' + clienteSeleccionado.email);
+        }
+        function enviarWhatsAppCliente() {
+            if (clienteSeleccionado) window.open('https://wa.me/' + clienteSeleccionado.telefono.replace(/[^0-9]/g, ''));
+        }
+        function enviarEmail(email) { window.open('mailto:' + email); }
+        function enviarWhatsApp(telefono) { window.open('https://wa.me/' + telefono.replace(/[^0-9]/g, '')); }
+        
+        // ===== AGREGAR CLIENTE =====
+        function abrirModalAgregar() {
+            document.getElementById('modalAgregarCliente').classList.add('show');
+            document.getElementById('nuevoNombre').focus();
+        }
+        function cerrarModalAgregar() {
+            document.getElementById('modalAgregarCliente').classList.remove('show');
+            document.getElementById('nuevoNombre').value = '';
+            document.getElementById('nuevoEmail').value = '';
+            document.getElementById('nuevoTelefono').value = '';
+        }
+        
+        function guardarCliente() {
+            const nombre = document.getElementById('nuevoNombre').value.trim();
+            const email = document.getElementById('nuevoEmail').value.trim().toLowerCase();
+            const telefono = document.getElementById('nuevoTelefono').value.trim();
+            
+            if (!nombre || !email || !telefono) { alert('⚠️ Completá todos los campos'); return; }
+            if (clientes.find(c => c.email === email)) { alert('⚠️ Ya existe un cliente con ese email'); return; }
+            
+            const hoy = new Date().toLocaleDateString('es-ES');
+            clientes.unshift({ nombre, email, telefono, reservas: 0, ultima: hoy, pais: 'Manual' });
+            clientes.sort((a, b) => b.reservas - a.reservas);
+            renderClientes(clientes);
+            
+            document.getElementById('mensajeExito').classList.add('show');
+            setTimeout(() => document.getElementById('mensajeExito').classList.remove('show'), 3000);
+            setTimeout(() => cerrarModalAgregar(), 1500);
+        }
+        
+        // ===== ELIMINAR CLIENTE =====
+        function confirmarEliminar(email) {
+            clienteAEliminar = email;
+            const cliente = clientes.find(c => c.email === email);
+            document.getElementById('textoEliminar').textContent = `¿Eliminar a "${cliente.nombre}"?\nEsta acción no se puede deshacer.`;
+            document.getElementById('modalEliminar').classList.add('show');
+            document.getElementById('btnConfirmarEliminar').onclick = function() {
+                clientes = clientes.filter(c => c.email !== clienteAEliminar);
+                renderClientes(clientes);
+                cerrarModalEliminar();
+            };
+        }
+        function cerrarModalEliminar() { document.getElementById('modalEliminar').classList.remove('show'); }
+        
+        function exportarClientes() {
+            let csv = 'Nombre,Email,Teléfono,Reservas,Última Reserva,País\n';
+            clientes.forEach(c => { csv += `"${c.nombre}","${c.email}","${c.telefono}",${c.reservas},"${c.ultima}","${c.pais}"\n`; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'clientes.csv'; a.click();
+        }
+        
+        // Cerrar modales
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { cerrarModal(); cerrarModalAgregar(); cerrarModalEliminar(); } });
+        document.getElementById('modalCliente').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
+        document.getElementById('modalAgregarCliente').addEventListener('click', function(e) { if (e.target === this) cerrarModalAgregar(); });
+        document.getElementById('modalEliminar').addEventListener('click', function(e) { if (e.target === this) cerrarModalEliminar(); });
+        
+        // Cargar al iniciar
+        cargarClientes();
+    </script>
+</body>
+</html>
