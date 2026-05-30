@@ -7,76 +7,50 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
-        
         .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
         .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; }
-        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; }
-        .sidebar-logo h2 span { color: #667eea; }
-        .nav-menu { list-style: none; padding: 0 15px; }
-        .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; transition: all 0.3s ease; font-size: 14px; font-weight: 500; }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
-        .nav-menu a.active { background: #667eea; }
+        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; font-weight: 500; }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
         .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
-        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        
+        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
         .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
         .header h1 { font-size: 26px; color: #1a1a2e; }
         .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
-        
         .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-input, .filter-select { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; font-family: inherit; }
-        .filter-input:focus, .filter-select:focus { outline: none; border-color: #667eea; }
-        .filter-input { flex: 1; min-width: 150px; }
+        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 1; min-width: 150px; }
+        .filter-input:focus { outline: none; border-color: #667eea; }
         .btn-filtrar { padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-recargar { padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
-        
         .tabs { display: flex; gap: 3px; margin-bottom: 20px; background: white; padding: 5px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
-        .tabs::-webkit-scrollbar { height: 0; }
-        .tab { padding: 8px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; transition: all 0.3s ease; color: #666; }
-        .tab:hover { background: #f0f0ff; color: #667eea; }
-        .tab.active { background: #667eea; color: white; }
+        .tab { padding: 8px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; color: #666; }
+        .tab:hover { background: #f0f0ff; color: #667eea; } .tab.active { background: #667eea; color: white; }
         .tab .count { display: inline-block; background: rgba(255,255,255,0.3); padding: 1px 6px; border-radius: 10px; font-size: 10px; margin-left: 3px; }
-        
         .table-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow: hidden; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .table-header h3 { font-size: 18px; color: #1a1a2e; }
-        .table-header span { font-size: 13px; color: #999; }
+        .table-header h3 { font-size: 18px; color: #1a1a2e; } .table-header span { font-size: 13px; color: #999; }
         .table-wrapper { overflow-x: auto; margin: 0 -15px; padding: 0 15px; }
-        
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { text-align: left; padding: 10px 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-        td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; }
-        tr:hover td { background: #f8f9ff; }
-        
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
-        .badge-pendiente { background: #fff3cd; color: #856404; }
-        .badge-confirmado { background: #d4edda; color: #155724; }
-        .badge-pagado { background: #d1ecf1; color: #0c5460; }
-        .badge-realizado { background: #e2e3e5; color: #383d41; }
-        
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; padding: 10px 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; } tr:hover td { background: #f8f9ff; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        .badge-pendiente { background: #fff3cd; color: #856404; } .badge-confirmado { background: #d4edda; color: #155724; }
+        .badge-pagado { background: #d1ecf1; color: #0c5460; } .badge-realizado { background: #e2e3e5; color: #383d41; }
         .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin-right: 2px; }
-        .btn-ver { background: #667eea; color: white; }
-        .btn-confirmar { background: #27ae60; color: white; }
-        .btn-pagar { background: #3498db; color: white; }
-        
+        .btn-ver { background: #667eea; color: white; } .btn-confirmar { background: #27ae60; color: white; } .btn-pagar { background: #3498db; color: white; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.show { display: flex; }
         .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .modal-header h2 { color: #667eea; font-size: 18px; }
-        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
-        .modal-info p { margin: 8px 0; font-size: 13px; color: #555; }
-        .modal-info strong { color: #333; display: inline-block; width: 110px; }
-        .excursion-tag-modal { display: block; background: #f0f0ff; color: #667eea; padding: 6px 12px; margin: 4px 0; border-radius: 8px; font-size: 13px; font-weight: 500; border-left: 3px solid #667eea; }
-        .modal-acciones { display: flex; gap: 6px; margin-top: 15px; flex-wrap: wrap; }
-        .modal-acciones .btn-accion { padding: 8px 14px; font-size: 12px; }
-        
-        @media (max-width: 768px) { .sidebar { width: 60px; padding: 15px 0; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon), .sidebar-footer span { display: none; } .nav-menu a { justify-content: center; padding: 10px; } .main-content { margin-left: 60px; padding: 15px; } table { min-width: 700px; } }
+        .modal-header h2 { color: #667eea; font-size: 18px; } .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
+        .modal-info p { margin: 8px 0; font-size: 13px; color: #555; } .modal-info strong { color: #333; display: inline-block; width: 110px; }
+        .excursion-tag-modal { display: block; background: #f0f0ff; color: #667eea; padding: 6px 12px; margin: 4px 0; border-radius: 8px; font-size: 13px; border-left: 3px solid #667eea; }
+        .modal-acciones { display: flex; gap: 6px; margin-top: 15px; flex-wrap: wrap; } .modal-acciones .btn-accion { padding: 8px 14px; font-size: 12px; }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } table { min-width: 600px; } }
     </style>
 </head>
 <body>
@@ -87,131 +61,99 @@
             <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
             <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
             <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="emails.html"><span class="nav-icon">📧</span> <span>Emails</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
         </ul>
         <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪</button></div>
     </nav>
-    
     <div class="main-content">
-        <div class="header"><div><h1>📋 Reservas</h1><p style="color:#999;font-size:13px;">Datos desde Google Sheets</p></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
-        
+        <div class="header"><div><h1>📋 Reservas</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
         <div class="tabs">
             <button class="tab active" onclick="filtrarPorEstado('todas')">Todas <span class="count" id="countTodas">0</span></button>
             <button class="tab" onclick="filtrarPorEstado('pendiente')">⏳ Pendientes <span class="count" id="countPendiente">0</span></button>
             <button class="tab" onclick="filtrarPorEstado('confirmado')">✅ Confirmadas <span class="count" id="countConfirmado">0</span></button>
             <button class="tab" onclick="filtrarPorEstado('pagado')">💰 Pagadas <span class="count" id="countPagado">0</span></button>
         </div>
-        
         <div class="filters-bar">
             <input type="text" class="filter-input" placeholder="🔍 Buscar..." id="busquedaReserva">
-            <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
-            <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
+            <button class="btn-filtrar" onclick="filtrarReservas()">🔍</button>
+            <button class="btn-recargar" onclick="cargarReservas()">🔄</button>
         </div>
-        
         <div class="table-container">
-            <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0 reservas</span></div>
-            <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Cliente</th><th>Email</th><th>País</th><th>Ciudad</th><th>Excursión</th><th>Fecha</th><th>Personas</th><th>Forma de Pago</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tablaReservas"><tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos...</td></tr></tbody></table></div>
+            <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0</span></div>
+            <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Cliente</th><th>Email</th><th>Ciudad</th><th>Excursión</th><th>Fecha</th><th>Pax</th><th>Pago</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tablaReservas"></tbody></table></div>
         </div>
     </div>
-    
-    <div class="modal-overlay" id="modalReserva">
-        <div class="modal-content">
-            <div class="modal-header"><h2>📋 Detalle de Reserva</h2><button class="modal-close" onclick="cerrarModal()">✕</button></div>
-            <div class="modal-info" id="modalInfo"></div>
-            <div class="modal-acciones">
-                <button class="btn-accion btn-confirmar" onclick="cambiarEstado('confirmado')">✅ Confirmar</button>
-                <button class="btn-accion btn-pagar" onclick="cambiarEstado('pagado')">💰 Marcar Pagada</button>
-            </div>
-        </div>
-    </div>
-    
+    <div class="modal-overlay" id="modalReserva"><div class="modal-content"><div class="modal-header"><h2>📋 Detalle</h2><button class="modal-close" onclick="cerrarModal()">✕</button></div><div class="modal-info" id="modalInfo"></div><div class="modal-acciones"><button class="btn-accion btn-confirmar" onclick="cambiarEstado('confirmado')">✅</button><button class="btn-accion btn-pagar" onclick="cambiarEstado('pagado')">💰</button></div></div></div>
     <script>
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
-        
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
-        
-        let reservasData = [];
-        let estadoFiltro = 'todas';
-        let reservaSeleccionada = null;
+        let reservasData = [], estadoFiltro = 'todas', reservaSeleccionada = null;
+        function cargarEstadosGuardados() { try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } catch(e) { return {}; } }
+        function guardarEstado(id, estado) { const e = cargarEstadosGuardados(); e[id] = estado; localStorage.setItem('estadosReservas', JSON.stringify(e)); }
         
         async function cargarReservas() {
             try {
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos...</td></tr>';
-                
-                const respuesta = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
-                const csv = await respuesta.text();
+                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;">⏳ Cargando...</td></tr>';
+                const r = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                const csv = await r.text();
                 const lineas = csv.split('\n');
-                
-                console.log('📊 Total líneas:', lineas.length);
-                console.log('📋 Encabezados:', lineas[0]);
-                
                 reservasData = [];
+                let actual = null, ultima = '';
                 
                 for (let i = 1; i < lineas.length; i++) {
                     const linea = lineas[i].trim();
                     if (!linea) continue;
                     
-                    console.log(`📋 Línea ${i}:`, linea.substring(0, 80) + '...');
-                    
-                    const valores = [];
-                    let actual = '';
-                    let entreComillas = false;
-                    
-                    for (let j = 0; j < linea.length; j++) {
-                        const char = linea[j];
-                        if (char === '"') { entreComillas = !entreComillas; }
-                        else if (char === ',' && !entreComillas) { valores.push(actual.trim()); actual = ''; }
-                        else { actual += char; }
-                    }
-                    valores.push(actual.trim());
-                    
-                    const limpio = valores.map(v => v.replace(/^"|"$/g, '').trim());
-                    
-                    console.log(`   Columnas: ${limpio.length} | Nombre: "${limpio[2] || 'VACÍO'}" | Email: "${limpio[4] || 'VACÍO'}"`);
-                    
-                    if (limpio.length >= 3 && (limpio[2] || limpio[4])) {
-                        reservasData.push({
-                            id: limpio[0] || `RES-${i}`,
-                            fechaReserva: limpio[1] || '',
-                            nombre: limpio[2] || 'Sin nombre',
-                            apellido: limpio[3] || '',
-                            email: limpio[4] || 'Sin email',
-                            telefono: limpio[5] || '',
-                            pais: limpio[6] || '',
-                            ciudad: limpio[7] || '',
-                            excursion: limpio[8] || 'Sin excursión',
-                            fecha: limpio[9] || '',
-                            personas: limpio[10] || '0',
-                            formaPago: limpio[11] || 'No especificada',
-                            busqueda: limpio[12] || '',
-                            estado: 'confirmado'
-                        });
+                    if (linea.startsWith('"RES-') || linea.startsWith('RES-')) {
+                        if (actual && ultima) {
+                            // Extraer fecha, pax, pago de la última línea
+                            const m = ultima.match(/"([^"]*)"/g);
+                            if (m && m.length >= 4) {
+                                actual.fecha = m[m.length-3].replace(/"/g,'').trim();
+                                actual.personas = m[m.length-2].replace(/"/g,'').trim();
+                                actual.formaPago = m[m.length-1].replace(/"/g,'').trim();
+                            }
+                        }
+                        if (actual) reservasData.push(actual);
+                        
+                        const v = []; let a = '', com = false;
+                        for (let j = 0; j < linea.length; j++) {
+                            const c = linea[j];
+                            if (c === '"') com = !com;
+                            else if (c === ',' && !com) { v.push(a.trim()); a = ''; }
+                            else a += c;
+                        }
+                        v.push(a.trim());
+                        const l = v.map(x => x.replace(/^"|"$/g,'').trim());
+                        
+                        actual = { id: l[0]||`R${i}`, fechaReserva: l[1]||'', nombre: l[2]||'', apellido: l[3]||'', email: l[4]||'', telefono: l[5]||'', pais: l[6]||'', ciudad: l[7]||'', excursion: l[8]||'', fecha: '', personas: '0', formaPago: 'No especificada', busqueda: '', estado: 'confirmado' };
+                        ultima = '';
                     } else {
-                        console.log(`   ⚠️ Fila ${i} ignorada`);
+                        if (actual) { const x = linea.replace(/^"|"$/g,'').trim(); if (x && !x.startsWith(',') && x.length > 3) { actual.excursion += '\n' + x; ultima = x; } }
                     }
                 }
-                
-                console.log('✅ Reservas cargadas:', reservasData.length);
-                
-                if (reservasData.length === 0) {
-                    console.log('⚠️ Usando datos de prueba');
-                    reservasData = [
-                        { id: 'RES-001', fechaReserva: '29/05/2026', nombre: 'Juan', apellido: 'Pérez', email: 'juan@email.com', telefono: '+543511234567', pais: 'Argentina', ciudad: 'Villa Carlos Paz', excursion: '1. City Tour Local\n2. Aerosilla\n3. Noche de Teatros', fecha: '29-05-2026', personas: '4', formaPago: 'Efectivo', estado: 'confirmado' },
-                        { id: 'RES-002', fechaReserva: '30/05/2026', nombre: 'María', apellido: 'García', email: 'maria@email.com', telefono: '+543517654321', pais: 'Brasil', ciudad: 'Balneário Camboriú', excursion: '1. Barco Pirata\n2. Parque Unipraias', fecha: '30-05-2026', personas: '2', formaPago: 'Débito/Crédito', estado: 'pendiente' },
-                        { id: 'RES-003', fechaReserva: '01/06/2026', nombre: 'Carlos', apellido: 'López', email: 'carlos@email.com', telefono: '+54112345678', pais: 'Chile', ciudad: 'Santiago de Chile', excursion: '1. City Tour\n2. Valle Nevado\n3. Sky Costanera', fecha: '01-06-2026', personas: '6', formaPago: 'Transferencia', estado: 'pagado' }
-                    ];
+                if (actual) {
+                    if (ultima) {
+                        const m = ultima.match(/"([^"]*)"/g);
+                        if (m && m.length >= 4) {
+                            actual.fecha = m[m.length-3].replace(/"/g,'').trim();
+                            actual.personas = m[m.length-2].replace(/"/g,'').trim();
+                            actual.formaPago = m[m.length-1].replace(/"/g,'').trim();
+                        }
+                    }
+                    reservasData.push(actual);
                 }
                 
-                reservasData.sort((a, b) => (b.fechaReserva || '').localeCompare(a.fechaReserva || ''));
-                renderReservas(reservasData);
-                actualizarContadores();
+                const eg = cargarEstadosGuardados();
+                reservasData.forEach(r => { if (eg[r.id]) r.estado = eg[r.id]; });
                 
-            } catch (error) {
-                console.error('❌ Error:', error.message);
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;color:#e74c3c;padding:30px;">❌ Error: ' + error.message + '<br><br><button class="btn-recargar" onclick="cargarReservas()">🔄 Reintentar</button></td></tr>';
-            }
+                console.log('✅ Cargadas:', reservasData.length);
+                if (reservasData.length === 0) reservasData = [{ id: 'R-001', nombre: 'Juan', apellido: 'Pérez', email: 'j@e.com', ciudad: 'VCP', excursion: '1. City Tour', fecha: '29-05-2026', personas: '4', formaPago: 'Efectivo', estado: 'confirmado' }];
+                
+                renderReservas(reservasData); actualizarContadores();
+            } catch(e) { document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;color:red;padding:30px;">Error: '+e.message+'</td></tr>'; }
         }
         
         function actualizarContadores() {
@@ -223,73 +165,33 @@
         
         function renderReservas(data) {
             document.getElementById('totalReservasSpan').textContent = data.length + ' reservas';
-            if (data.length === 0) {
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">📋 No se encontraron reservas</td></tr>';
-                return;
-            }
+            if (!data.length) { document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;">📋 Sin reservas</td></tr>'; return; }
             document.getElementById('tablaReservas').innerHTML = data.map(r => {
-                let exc = r.excursion || '';
-                if (exc.includes('\n')) { const l = exc.split('\n').filter(e => e.trim()); exc = l[0].trim().replace(/^\d+\.\s*/, '').substring(0, 22) + (l.length > 1 ? ` (+${l.length-1})` : ''); }
-                else { exc = exc.substring(0, 22) + (exc.length > 22 ? '...' : ''); }
-                return `<tr><td><strong>${r.id}</strong></td><td>${r.nombre} ${r.apellido}</td><td style="font-size:11px;">${r.email}</td><td>${r.pais}</td><td>${r.ciudad}</td><td>${exc}</td><td>${r.fecha}</td><td>${r.personas}</td><td>${r.formaPago}</td><td><span class="badge badge-${r.estado}">${r.estado}</span></td><td style="white-space:nowrap;"><button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button><button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')">✅</button><button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')">💰</button></td></tr>`;
+                let e = r.excursion || ''; if (e.includes('\n')) { const l = e.split('\n').filter(x => x.trim()); e = l[0].trim().replace(/^\d+\.\s*/,'').substring(0,20) + (l.length>1?` (+${l.length-1})`:''); } else e = e.substring(0,20);
+                return `<tr><td><strong>${r.id}</strong></td><td>${r.nombre} ${r.apellido}</td><td style="font-size:11px">${r.email}</td><td>${r.ciudad}</td><td>${e}</td><td>${r.fecha}</td><td>${r.personas}</td><td>${r.formaPago}</td><td><span class="badge badge-${r.estado}">${r.estado}</span></td><td><button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button><button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')">✅</button><button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')">💰</button></td></tr>`;
             }).join('');
         }
         
-        function filtrarPorEstado(estado) {
-            estadoFiltro = estado;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            if (estado === 'todas') renderReservas(reservasData);
-            else renderReservas(reservasData.filter(r => r.estado === estado));
-        }
-        
-        function filtrarReservas() {
-            const busqueda = document.getElementById('busquedaReserva').value.toLowerCase();
-            let filtradas = reservasData;
-            if (estadoFiltro !== 'todas') filtradas = filtradas.filter(r => r.estado === estadoFiltro);
-            if (busqueda) filtradas = filtradas.filter(r => r.id.toLowerCase().includes(busqueda) || r.nombre.toLowerCase().includes(busqueda) || r.email.toLowerCase().includes(busqueda));
-            renderReservas(filtradas);
-        }
+        function filtrarPorEstado(e) { estadoFiltro = e; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); renderReservas(e === 'todas' ? reservasData : reservasData.filter(r => r.estado === e)); }
+        function filtrarReservas() { const b = document.getElementById('busquedaReserva').value.toLowerCase(); let f = reservasData; if (estadoFiltro !== 'todas') f = f.filter(r => r.estado === estadoFiltro); if (b) f = f.filter(r => r.id.toLowerCase().includes(b) || r.nombre.toLowerCase().includes(b) || r.email.toLowerCase().includes(b)); renderReservas(f); }
         
         function verReserva(id) {
             reservaSeleccionada = reservasData.find(r => r.id === id);
             if (reservaSeleccionada) {
-                let excHTML = '';
-                const excRaw = reservaSeleccionada.excursion || '';
-                if (excRaw.includes('\n')) {
-                    excHTML = excRaw.split('\n').filter(e => e.trim()).map(e => `<div class="excursion-tag-modal">${e.trim()}</div>`).join('');
-                } else if (excRaw.includes('|')) {
-                    excHTML = excRaw.split('|').filter(e => e.trim()).map((e, i) => `<div class="excursion-tag-modal">${i+1}. ${e.trim()}</div>`).join('');
-                } else {
-                    excHTML = `<div class="excursion-tag-modal">${excRaw}</div>`;
-                }
-                
-                document.getElementById('modalInfo').innerHTML = `
-                    <p><strong>ID:</strong> ${reservaSeleccionada.id}</p>
-                    <p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p>
-                    <p><strong>Email:</strong> ${reservaSeleccionada.email}</p>
-                    <p><strong>Teléfono:</strong> ${reservaSeleccionada.telefono}</p>
-                    <p><strong>País:</strong> ${reservaSeleccionada.pais}</p>
-                    <p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p>
-                    <p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p>
-                    <p><strong>Personas:</strong> ${reservaSeleccionada.personas}</p>
-                    <p><strong>Forma de Pago:</strong> ${reservaSeleccionada.formaPago}</p>
-                    <p><strong>Búsqueda:</strong> ${reservaSeleccionada.busqueda || 'No especificada'}</p>
-                    <p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p>
-                    <div style="margin-top:12px;"><strong>🕐 Excursiones:</strong><div style="margin-top:8px;">${excHTML}</div></div>
-                `;
+                let ex = ''; const er = reservaSeleccionada.excursion || '';
+                if (er.includes('\n')) ex = er.split('\n').filter(e => e.trim()).map(e => `<div class="excursion-tag-modal">${e.trim()}</div>`).join('');
+                else ex = `<div class="excursion-tag-modal">${er}</div>`;
+                document.getElementById('modalInfo').innerHTML = `<p><strong>ID:</strong> ${reservaSeleccionada.id}</p><p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p><p><strong>Email:</strong> ${reservaSeleccionada.email}</p><p><strong>Tel:</strong> ${reservaSeleccionada.telefono}</p><p><strong>País:</strong> ${reservaSeleccionada.pais}</p><p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p><p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p><p><strong>Pax:</strong> ${reservaSeleccionada.personas}</p><p><strong>Pago:</strong> ${reservaSeleccionada.formaPago}</p><p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p><div style="margin-top:12px"><strong>🕐 Excursiones:</strong><div>${ex}</div></div>`;
                 document.getElementById('modalReserva').classList.add('show');
             }
         }
-        
         function cerrarModal() { document.getElementById('modalReserva').classList.remove('show'); }
-        function cambiarEstado(nuevoEstado) { if (reservaSeleccionada) { reservaSeleccionada.estado = nuevoEstado; renderReservas(reservasData); actualizarContadores(); cerrarModal(); } }
-        function cambiarEstadoDirecto(id, nuevoEstado) { const r = reservasData.find(r => r.id === id); if (r) { r.estado = nuevoEstado; renderReservas(reservasData); actualizarContadores(); } }
+        function cambiarEstado(nuevo) { if (reservaSeleccionada) { reservaSeleccionada.estado = nuevo; guardarEstado(reservaSeleccionada.id, nuevo); renderReservas(reservasData); actualizarContadores(); cerrarModal(); } }
+        function cambiarEstadoDirecto(id, nuevo) { const r = reservasData.find(r => r.id === id); if (r) { r.estado = nuevo; guardarEstado(id, nuevo); renderReservas(reservasData); actualizarContadores(); } }
         
         document.getElementById('busquedaReserva').addEventListener('keypress', function(e) { if (e.key === 'Enter') filtrarReservas(); });
         document.getElementById('modalReserva').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarModal(); });
-        
         cargarReservas();
     </script>
 </body>
