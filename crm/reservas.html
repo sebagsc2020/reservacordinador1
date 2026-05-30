@@ -145,58 +145,77 @@
                 const lineas = csv.split('\n');
                 
                 console.log('📊 Total líneas:', lineas.length);
-                console.log('📋 Encabezados:', lineas[0]);
                 
                 reservasData = [];
+                let reservaActual = null;
                 
                 for (let i = 1; i < lineas.length; i++) {
                     const linea = lineas[i].trim();
                     if (!linea) continue;
                     
-                    console.log(`📋 Línea ${i}:`, linea.substring(0, 80) + '...');
-                    
-                    const valores = [];
-                    let actual = '';
-                    let entreComillas = false;
-                    
-                    for (let j = 0; j < linea.length; j++) {
-                        const char = linea[j];
-                        if (char === '"') { entreComillas = !entreComillas; }
-                        else if (char === ',' && !entreComillas) { valores.push(actual.trim()); actual = ''; }
-                        else { actual += char; }
-                    }
-                    valores.push(actual.trim());
-                    
-                    const limpio = valores.map(v => v.replace(/^"|"$/g, '').trim());
-                    
-                    console.log(`   Columnas: ${limpio.length} | Nombre: "${limpio[2] || 'VACÍO'}" | Email: "${limpio[4] || 'VACÍO'}"`);
-                    
-                    if (limpio.length >= 3 && (limpio[2] || limpio[4])) {
-                        reservasData.push({
+                    // Si la línea empieza con "RES-" es una nueva reserva
+                    if (linea.startsWith('"RES-') || linea.startsWith('RES-')) {
+                        // Guardar la reserva anterior si existe
+                        if (reservaActual) {
+                            reservasData.push(reservaActual);
+                        }
+                        
+                        // Parsear nueva reserva
+                        const valores = [];
+                        let actual = '';
+                        let entreComillas = false;
+                        
+                        for (let j = 0; j < linea.length; j++) {
+                            const char = linea[j];
+                            if (char === '"') { entreComillas = !entreComillas; }
+                            else if (char === ',' && !entreComillas) { valores.push(actual.trim()); actual = ''; }
+                            else { actual += char; }
+                        }
+                        valores.push(actual.trim());
+                        
+                        const limpio = valores.map(v => v.replace(/^"|"$/g, '').trim());
+                        const totalCols = limpio.length;
+                        
+                        console.log(`📋 Nueva reserva: ${limpio[0]} | ${limpio[2]} | Columnas: ${totalCols}`);
+                        
+                        reservaActual = {
                             id: limpio[0] || `RES-${i}`,
                             fechaReserva: limpio[1] || '',
-                            nombre: limpio[2] || 'Sin nombre',
+                            nombre: limpio[2] || '',
                             apellido: limpio[3] || '',
-                            email: limpio[4] || 'Sin email',
+                            email: limpio[4] || '',
                             telefono: limpio[5] || '',
                             pais: limpio[6] || '',
                             ciudad: limpio[7] || '',
-                            excursion: limpio[8] || 'Sin excursión',
-                            fecha: limpio[9] || '',
-                            personas: limpio[10] || '0',
-                            formaPago: limpio[11] || 'No especificada',
-                            busqueda: limpio[12] || '',
+                            excursion: limpio[8] || '',
+                            fecha: totalCols >= 10 ? limpio[totalCols - 4] || '' : '',
+                            personas: totalCols >= 10 ? limpio[totalCols - 3] || '0' : '0',
+                            formaPago: totalCols >= 10 ? limpio[totalCols - 2] || 'No especificada' : 'No especificada',
+                            busqueda: totalCols >= 10 ? limpio[totalCols - 1] || '' : '',
                             estado: 'confirmado'
-                        });
+                        };
+                        
                     } else {
-                        console.log(`   ⚠️ Fila ${i} ignorada`);
+                        // Es una línea de continuación (excursión adicional)
+                        if (reservaActual) {
+                            const lineaExcursion = linea.replace(/^"|"$/g, '').trim();
+                            if (lineaExcursion && !lineaExcursion.startsWith(',') && lineaExcursion.length > 3) {
+                                reservaActual.excursion += '\n' + lineaExcursion;
+                                console.log(`   ➕ Excursión extra: ${lineaExcursion.substring(0, 50)}`);
+                            }
+                        }
                     }
                 }
                 
+                // Guardar última reserva
+                if (reservaActual) {
+                    reservasData.push(reservaActual);
+                }
+                
                 console.log('✅ Reservas cargadas:', reservasData.length);
+                console.log('📋 IDs:', reservasData.map(r => r.id).join(', '));
                 
                 if (reservasData.length === 0) {
-                    console.log('⚠️ Usando datos de prueba');
                     reservasData = [
                         { id: 'RES-001', fechaReserva: '29/05/2026', nombre: 'Juan', apellido: 'Pérez', email: 'juan@email.com', telefono: '+543511234567', pais: 'Argentina', ciudad: 'Villa Carlos Paz', excursion: '1. City Tour Local\n2. Aerosilla\n3. Noche de Teatros', fecha: '29-05-2026', personas: '4', formaPago: 'Efectivo', estado: 'confirmado' },
                         { id: 'RES-002', fechaReserva: '30/05/2026', nombre: 'María', apellido: 'García', email: 'maria@email.com', telefono: '+543517654321', pais: 'Brasil', ciudad: 'Balneário Camboriú', excursion: '1. Barco Pirata\n2. Parque Unipraias', fecha: '30-05-2026', personas: '2', formaPago: 'Débito/Crédito', estado: 'pendiente' },
@@ -204,7 +223,6 @@
                     ];
                 }
                 
-                reservasData.sort((a, b) => (b.fechaReserva || '').localeCompare(a.fechaReserva || ''));
                 renderReservas(reservasData);
                 actualizarContadores();
                 
@@ -276,7 +294,7 @@
                     <p><strong>Forma de Pago:</strong> ${reservaSeleccionada.formaPago}</p>
                     <p><strong>Búsqueda:</strong> ${reservaSeleccionada.busqueda || 'No especificada'}</p>
                     <p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p>
-                    <div style="margin-top:12px;"><strong>🕐 Excursiones:</strong><div style="margin-top:8px;">${excHTML}</div></div>
+                    <div style="margin-top:12px;"><strong>🕐 Excursiones (${excRaw.split('\n').filter(e => e.trim()).length}):</strong><div style="margin-top:8px;">${excHTML}</div></div>
                 `;
                 document.getElementById('modalReserva').classList.add('show');
             }
