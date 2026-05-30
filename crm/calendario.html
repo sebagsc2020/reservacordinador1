@@ -59,23 +59,18 @@
         }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
-        /* ===== RANGO ===== */
         .rango-filter {
             background: white; padding: 20px; border-radius: 15px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
             display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
         }
-        
         .rango-filter label { font-weight: 600; font-size: 13px; color: #333; text-transform: uppercase; }
         .rango-filter input[type="date"] { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
         .rango-filter input[type="date"]:focus { outline: none; border-color: #667eea; }
-        
         .btn-filtrar { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
         .btn-whatsapp { padding: 10px 20px; background: #25D366; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
         .btn-limpiar { padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
-        .btn-agregar { padding: 10px 20px; background: #f39c12; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
         
-        /* ===== RESUMEN ===== */
         .resumen-container {
             background: white; border-radius: 15px; padding: 20px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
@@ -86,8 +81,10 @@
         .resumen-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #667eea;
+            flex-wrap: wrap; gap: 10px;
         }
         .resumen-header h3 { color: #1a1a2e; font-size: 18px; }
+        .btn-agregar-evento { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
         
         .resumen-lista { max-height: 400px; overflow-y: auto; }
         
@@ -95,26 +92,22 @@
             display: flex; align-items: center; gap: 15px; padding: 12px;
             border-radius: 10px; margin-bottom: 8px; background: #f8f9fa;
         }
-        
         .resumen-fecha {
-            font-weight: 700; color: #667eea; min-width: 90px; font-size: 13px;
+            font-weight: 700; color: #667eea; min-width: 100px; font-size: 12px;
             text-align: center; background: #f0f0ff; padding: 8px; border-radius: 8px;
         }
-        
         .resumen-info { flex: 1; }
         .resumen-info strong { color: #333; font-size: 14px; }
-        
+        .resumen-info p { color: #666; font-size: 12px; margin-top: 2px; }
         .resumen-acciones { display: flex; gap: 5px; }
         .btn-editar { padding: 5px 10px; background: #f39c12; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; }
         .btn-eliminar { padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; }
         
-        /* ===== CALENDARIO ===== */
         .calendar-nav {
             display: flex; justify-content: space-between; align-items: center;
             background: white; padding: 20px; border-radius: 15px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
         }
-        
         .calendar-nav button { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
         .calendar-nav h2 { font-size: 22px; color: #1a1a2e; }
         .btn-hoy { background: #27ae60 !important; }
@@ -124,7 +117,6 @@
             background: white; padding: 20px; border-radius: 15px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.05);
         }
-        
         .calendar-day-header { text-align: center; padding: 10px; font-weight: 700; color: #666; font-size: 12px; text-transform: uppercase; }
         
         .calendar-day {
@@ -132,12 +124,11 @@
             cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent;
             position: relative;
         }
-        
         .calendar-day:hover { background: #f0f0ff; border-color: #667eea; }
         .calendar-day.today { background: #f0f0ff; border-color: #667eea; }
         .calendar-day.otro-mes { opacity: 0.3; }
         .calendar-day.en-rango { background: #e8f5e9; border-color: #27ae60; }
-        
+        .calendar-day.fuera-rango { opacity: 0.2; pointer-events: none; }
         .calendar-day-numero { font-size: 14px; font-weight: 700; color: #333; margin-bottom: 5px; }
         
         .calendar-event {
@@ -145,7 +136,6 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600;
             cursor: pointer;
         }
-        
         .event-manual { background: #d1ecf1; color: #0c5460; }
         
         .btn-agregar-dia {
@@ -157,29 +147,24 @@
         }
         .calendar-day:hover .btn-agregar-dia { display: flex; }
         
-        /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); display: none; justify-content: center;
             align-items: center; z-index: 1000;
         }
         .modal-overlay.show { display: flex; }
-        
         .modal-content {
             background: white; border-radius: 20px; padding: 30px;
             max-width: 450px; width: 90%; box-shadow: 0 25px 60px rgba(0,0,0,0.4);
         }
-        
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-header h2 { color: #667eea; font-size: 20px; }
         .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; }
-        
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 5px; }
         .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
         .form-group textarea { min-height: 80px; resize: vertical; }
         .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; }
-        
         .btn-guardar { padding: 12px 25px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; font-size: 15px; }
         
         @media (max-width: 768px) {
@@ -212,7 +197,6 @@
             <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
         </div>
         
-        <!-- Filtro de rango -->
         <div class="rango-filter">
             <label>📅 Desde:</label>
             <input type="date" id="fechaDesde">
@@ -220,32 +204,26 @@
             <input type="date" id="fechaHasta">
             <button class="btn-filtrar" onclick="filtrarPorRango()">🔍 Filtrar</button>
             <button class="btn-whatsapp" onclick="compartirPorWhatsApp()">💬 Compartir</button>
-            <button class="btn-limpiar" onclick="limpiarFiltro()">🔄 Limpiar</button>
+            <button class="btn-limpiar" onclick="limpiarFiltro()">🔄 Ver todo</button>
         </div>
         
-        <!-- Resumen del rango -->
         <div class="resumen-container" id="resumenContainer">
             <div class="resumen-header">
-                <h3>📋 Resumen del período</h3>
+                <h3>📋 Eventos del período</h3>
+                <button class="btn-agregar-evento" onclick="abrirModalAgregar('')">➕ Agregar Evento</button>
             </div>
             <div class="resumen-lista" id="resumenLista"></div>
         </div>
         
-        <!-- Navegación -->
         <div class="calendar-nav">
-            <button onclick="cambiarMes(-1)">◀ Anterior</button>
+            <button onclick="cambiarMes(-1)">◀</button>
             <h2 id="mesTitulo">Mayo 2026</h2>
-            <div>
-                <button class="btn-hoy" onclick="irAHoy()">📅 Hoy</button>
-            </div>
-            <button onclick="cambiarMes(1)">Siguiente ▶</button>
+            <button onclick="cambiarMes(1)">▶</button>
         </div>
         
-        <!-- Calendario -->
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
     
-    <!-- Modal Agregar/Editar Evento -->
     <div class="modal-overlay" id="modalEvento">
         <div class="modal-content">
             <div class="modal-header">
@@ -253,20 +231,23 @@
                 <button class="modal-close" onclick="cerrarModal()">✕</button>
             </div>
             <input type="hidden" id="eventoId">
-            <input type="hidden" id="eventoFecha">
             <div class="form-group">
-                <label>📝 Título del evento</label>
+                <label>📅 Fecha</label>
+                <input type="date" id="eventoFecha">
+            </div>
+            <div class="form-group">
+                <label>📝 Título del evento *</label>
                 <input type="text" id="eventoTitulo" placeholder="Ej: City Tour + Almuerzo">
             </div>
             <div class="form-group">
-                <label>📍 Descripción (opcional)</label>
+                <label>📍 Descripción</label>
                 <textarea id="eventoDescripcion" placeholder="Detalles del evento..."></textarea>
             </div>
             <div class="form-group">
-                <label>⏰ Horario (opcional)</label>
+                <label>⏰ Horario</label>
                 <input type="text" id="eventoHorario" placeholder="Ej: 09:00 - 18:00">
             </div>
-            <button class="btn-guardar" onclick="guardarEvento()">💾 Guardar Evento</button>
+            <button class="btn-guardar" onclick="guardarEvento()">💾 Guardar</button>
         </div>
     </div>
     
@@ -278,16 +259,12 @@
         let mesActual = fechaActual.getMonth();
         let añoActual = fechaActual.getFullYear();
         let rangoSeleccionado = null;
-        
-        // Eventos manuales guardados en localStorage
         let eventosManuales = JSON.parse(localStorage.getItem('eventosManuales') || '[]');
         
         const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
         const diasSemana = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
         
-        function guardarEventos() {
-            localStorage.setItem('eventosManuales', JSON.stringify(eventosManuales));
-        }
+        function guardarEventos() { localStorage.setItem('eventosManuales', JSON.stringify(eventosManuales)); }
         
         function renderCalendar() {
             document.getElementById('mesTitulo').textContent = `${meses[mesActual]} ${añoActual}`;
@@ -300,24 +277,34 @@
             const hoy = new Date();
             const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
             
-            for (let i = primerDia - 1; i >= 0; i--) { html += `<div class="calendar-day otro-mes"><div class="calendar-day-numero">${diasMesAnterior - i}</div></div>`; }
+            for (let i = primerDia - 1; i >= 0; i--) {
+                const dia = diasMesAnterior - i;
+                const fuera = rangoSeleccionado ? 'fuera-rango' : '';
+                html += `<div class="calendar-day otro-mes ${fuera}"><div class="calendar-day-numero">${dia}</div></div>`;
+            }
             
             for (let dia = 1; dia <= diasEnMes; dia++) {
                 const fechaStr = `${añoActual}-${String(mesActual+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
                 const esHoy = fechaStr === hoyStr;
                 const enRango = rangoSeleccionado && fechaStr >= rangoSeleccionado.desde && fechaStr <= rangoSeleccionado.hasta;
+                const fueraRango = rangoSeleccionado && !enRango;
                 const eventosDelDia = eventosManuales.filter(e => e.fecha === fechaStr);
                 
-                html += `<div class="calendar-day ${esHoy ? 'today' : ''} ${enRango ? 'en-rango' : ''}">
+                html += `<div class="calendar-day ${esHoy ? 'today' : ''} ${enRango ? 'en-rango' : ''} ${fueraRango ? 'fuera-rango' : ''}">
                     <div class="calendar-day-numero">${dia}</div>
                     ${eventosDelDia.map(e => `<div class="calendar-event event-manual" onclick="event.stopPropagation(); editarEvento('${e.id}')" title="${e.titulo}">${e.titulo.substring(0, 18)}</div>`).join('')}
-                    <button class="btn-agregar-dia" onclick="event.stopPropagation(); abrirModalAgregar('${fechaStr}')">+</button>
+                    ${!fueraRango ? `<button class="btn-agregar-dia" onclick="event.stopPropagation(); abrirModalAgregar('${fechaStr}')">+</button>` : ''}
                 </div>`;
             }
             
             const totalCeldas = primerDia + diasEnMes;
             const diasRestantes = 7 - (totalCeldas % 7);
-            if (diasRestantes < 7) { for (let dia = 1; dia <= diasRestantes; dia++) { html += `<div class="calendar-day otro-mes"><div class="calendar-day-numero">${dia}</div></div>`; } }
+            if (diasRestantes < 7) {
+                for (let dia = 1; dia <= diasRestantes; dia++) {
+                    const fuera = rangoSeleccionado ? 'fuera-rango' : '';
+                    html += `<div class="calendar-day otro-mes ${fuera}"><div class="calendar-day-numero">${dia}</div></div>`;
+                }
+            }
             
             document.getElementById('calendarGrid').innerHTML = html;
         }
@@ -328,7 +315,7 @@
         function abrirModalAgregar(fecha) {
             document.getElementById('modalTitulo').textContent = '➕ Agregar Evento';
             document.getElementById('eventoId').value = '';
-            document.getElementById('eventoFecha').value = fecha;
+            document.getElementById('eventoFecha').value = fecha || (rangoSeleccionado ? rangoSeleccionado.desde : '');
             document.getElementById('eventoTitulo').value = '';
             document.getElementById('eventoDescripcion').value = '';
             document.getElementById('eventoHorario').value = '';
@@ -355,25 +342,19 @@
             const descripcion = document.getElementById('eventoDescripcion').value.trim();
             const horario = document.getElementById('eventoHorario').value.trim();
             
+            if (!fecha) { alert('⚠️ Seleccioná una fecha'); return; }
             if (!titulo) { alert('⚠️ El título es obligatorio'); return; }
             
             if (id) {
-                // Editar
                 const idx = eventosManuales.findIndex(e => e.id === id);
                 if (idx >= 0) {
+                    eventosManuales[idx].fecha = fecha;
                     eventosManuales[idx].titulo = titulo;
                     eventosManuales[idx].descripcion = descripcion;
                     eventosManuales[idx].horario = horario;
                 }
             } else {
-                // Nuevo
-                eventosManuales.push({
-                    id: 'EVT-' + Date.now(),
-                    fecha: fecha,
-                    titulo: titulo,
-                    descripcion: descripcion,
-                    horario: horario
-                });
+                eventosManuales.push({ id: 'EVT-' + Date.now(), fecha, titulo, descripcion, horario });
             }
             
             guardarEventos();
@@ -424,7 +405,6 @@
                 return;
             }
             
-            // Ordenar por fecha
             eventosRango.sort((a, b) => a.fecha.localeCompare(b.fecha));
             
             lista.innerHTML = eventosRango.map(e => {
@@ -434,7 +414,7 @@
                         <div class="resumen-fecha">${fechaFormateada}</div>
                         <div class="resumen-info">
                             <strong>${e.titulo}</strong>
-                            ${e.descripcion ? `<p style="color:#666;font-size:12px;">${e.descripcion}</p>` : ''}
+                            ${e.descripcion ? `<p>${e.descripcion}</p>` : ''}
                             ${e.horario ? `<p style="color:#999;font-size:11px;">⏰ ${e.horario}</p>` : ''}
                         </div>
                         <div class="resumen-acciones">
@@ -457,25 +437,18 @@
             const fechaDesde = new Date(rangoSeleccionado.desde + 'T00:00:00').toLocaleDateString('es-ES');
             const fechaHasta = new Date(rangoSeleccionado.hasta + 'T00:00:00').toLocaleDateString('es-ES');
             
-            // Mensaje especial primer día
-            let mensaje = `🌟 *Bienvenidos!!!*\n`;
-            mensaje += `*Nos espera una estadía maravillosa!!!*\n\n`;
-            mensaje += `📅 *CRONOGRAMA DE ACTIVIDADES*\n`;
-            mensaje += `Período: ${fechaDesde} al ${fechaHasta}\n`;
-            mensaje += `Total: ${eventosRango.length} actividades\n\n`;
+            let mensaje = `🌟 *Bienvenidos!!!*\n*Nos espera una estadía maravillosa!!!*\n\n`;
+            mensaje += `📅 *CRONOGRAMA*\n${fechaDesde} al ${fechaHasta}\n${eventosRango.length} actividades\n\n`;
             
-            eventosRango.forEach((e, i) => {
-                const fechaFormateada = new Date(e.fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-                mensaje += `📅 *${fechaFormateada}*\n`;
-                mensaje += `   🕐 ${e.titulo}\n`;
+            eventosRango.forEach(e => {
+                const ff = new Date(e.fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+                mensaje += `📅 *${ff}*\n   🕐 ${e.titulo}\n`;
                 if (e.horario) mensaje += `   ⏰ ${e.horario}\n`;
                 if (e.descripcion) mensaje += `   📝 ${e.descripcion}\n`;
                 mensaje += '\n';
             });
             
-            // Mensaje especial último día
-            mensaje += `😢 *A no ponerse triste, volvemos a casa!!*\n\n`;
-            mensaje += `🏔️ Aventura Total`;
+            mensaje += `😢 *A no ponerse triste, volvemos a casa!!*\n\n🏔️ Aventura Total`;
             
             window.open('https://wa.me/?text=' + encodeURIComponent(mensaje), '_blank');
         }
