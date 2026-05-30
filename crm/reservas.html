@@ -50,7 +50,7 @@
         .modal-info p { margin: 8px 0; font-size: 13px; color: #555; } .modal-info strong { color: #333; display: inline-block; width: 110px; }
         .excursion-tag-modal { display: block; background: #f0f0ff; color: #667eea; padding: 6px 12px; margin: 4px 0; border-radius: 8px; font-size: 13px; border-left: 3px solid #667eea; }
         .modal-acciones { display: flex; gap: 6px; margin-top: 15px; flex-wrap: wrap; } .modal-acciones .btn-accion { padding: 8px 14px; font-size: 12px; }
-        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } table { min-width: 600px; } .filters-bar { flex-direction: column; } .filter-input, .filter-select { width: 100%; } }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } table { min-width: 600px; } }
     </style>
 </head>
 <body>
@@ -85,19 +85,19 @@
         </div>
         <div class="table-container">
             <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0</span></div>
-            <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Cliente</th><th>Email</th><th>Ciudad</th><th>Excursión</th><th>Fecha</th><th>Pax</th><th>Pago</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tablaReservas"><tr><td colspan="10" style="text-align:center;padding:30px;">⏳ Cargando...</td></tr></tbody></table></div>
+            <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Cliente</th><th>Email</th><th>Ciudad</th><th>Excursión</th><th>Fecha</th><th>Pax</th><th>Pago</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tablaReservas"><tr><td colspan="10" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr></tbody></table></div>
         </div>
     </div>
     <div class="modal-overlay" id="modalReserva"><div class="modal-content"><div class="modal-header"><h2>📋 Detalle</h2><button class="modal-close" onclick="cerrarModal()">✕</button></div><div class="modal-info" id="modalInfo"></div><div class="modal-acciones"><button class="btn-accion btn-confirmar" onclick="cambiarEstado('confirmado')">✅</button><button class="btn-accion btn-pagar" onclick="cambiarEstado('pagado')">💰</button></div></div></div>
     <script>
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
-        function verificarSesionUnica() { const sessionId = sessionStorage.getItem('crm_session_id'); const sesionActiva = JSON.parse(localStorage.getItem('crm_sesion_activa') || '{}'); if (!sessionId || sesionActiva.id !== sessionId) { sessionStorage.clear(); alert('⚠️ Sesión cerrada.'); window.location.href = 'index.html'; return false; } localStorage.setItem('crm_sesion_activa', JSON.stringify({ ...sesionActiva, timestamp: Date.now() })); return true; }
+        function verificarSesionUnica() { const s = sessionStorage.getItem('crm_session_id'); const a = JSON.parse(localStorage.getItem('crm_sesion_activa')||'{}'); if (!s || a.id !== s) { sessionStorage.clear(); window.location.href = 'index.html'; return false; } localStorage.setItem('crm_sesion_activa', JSON.stringify({...a, timestamp: Date.now()})); return true; }
         if (!verificarSesionUnica()) throw new Error('Sesión inválida'); setInterval(verificarSesionUnica, 10000);
         
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
         let reservasData = [], estadoFiltro = 'todas', reservaSeleccionada = null;
-        function cargarEstadosGuardados() { try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } catch(e) { return {}; } }
+        function cargarEstadosGuardados() { try { return JSON.parse(localStorage.getItem('estadosReservas')||'{}'); } catch(e) { return {}; } }
         function guardarEstado(id, estado) { const e = cargarEstadosGuardados(); e[id] = estado; localStorage.setItem('estadosReservas', JSON.stringify(e)); }
         
         async function cargarReservas() {
@@ -121,26 +121,21 @@
                 
                 // Llenar selector de ciudades
                 const ciudades = [...new Set(reservasData.map(r => r.ciudad).filter(Boolean))].sort();
-                const selectCiudad = document.getElementById('filtroCiudad');
-                if (selectCiudad) selectCiudad.innerHTML = '<option value="">🏙️ Todas las ciudades</option>' + ciudades.map(c => `<option value="${c}">${c}</option>`).join('');
+                const sel = document.getElementById('filtroCiudad');
+                if (sel) sel.innerHTML = '<option value="">🏙️ Todas las ciudades</option>' + ciudades.map(c => `<option value="${c}">${c}</option>`).join('');
+                
+                console.log('✅ Cargadas:', reservasData.length);
+                reservasData.forEach(r => console.log(r.id, '| Fecha:', r.fecha, '| Pax:', r.personas, '| Pago:', r.formaPago));
                 
                 renderReservas(reservasData); actualizarContadores();
-            } catch(e) { document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;color:red;padding:30px;">Error al cargar</td></tr>'; }
+            } catch(e) { document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;color:red;padding:30px;">Error: '+e.message+'</td></tr>'; }
         }
         
         function actualizarContadores() { document.getElementById('countTodas').textContent = reservasData.length; document.getElementById('countPendiente').textContent = reservasData.filter(r => r.estado === 'pendiente').length; document.getElementById('countConfirmado').textContent = reservasData.filter(r => r.estado === 'confirmado').length; document.getElementById('countPagado').textContent = reservasData.filter(r => r.estado === 'pagado').length; }
         function renderReservas(data) { document.getElementById('totalReservasSpan').textContent = data.length + ' reservas'; if (!data.length) { document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;">📋 Sin reservas</td></tr>'; return; } document.getElementById('tablaReservas').innerHTML = data.map(r => { let e = r.excursion || ''; if (e.includes('\n')) { const l = e.split('\n').filter(x => x.trim()); e = l[0].trim().replace(/^\d+\.\s*/,'').substring(0,20) + (l.length>1?` (+${l.length-1})`:''); } else e = e.substring(0,20); return `<tr><td><strong>${r.id}</strong></td><td>${r.nombre} ${r.apellido}</td><td style="font-size:11px">${r.email}</td><td>${r.ciudad}</td><td>${e}</td><td>${r.fecha}</td><td>${r.personas}</td><td>${r.formaPago}</td><td><span class="badge badge-${r.estado}">${r.estado}</span></td><td><button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button><button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')">✅</button><button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')">💰</button></td></tr>`; }).join(''); }
         function filtrarPorEstado(e) { estadoFiltro = e; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); renderReservas(e === 'todas' ? reservasData : reservasData.filter(r => r.estado === e)); }
-        function filtrarReservas() {
-            const b = document.getElementById('busquedaReserva').value.toLowerCase();
-            const ciudad = document.getElementById('filtroCiudad').value;
-            let f = reservasData;
-            if (estadoFiltro !== 'todas') f = f.filter(r => r.estado === estadoFiltro);
-            if (b) f = f.filter(r => r.id.toLowerCase().includes(b) || r.nombre.toLowerCase().includes(b) || r.email.toLowerCase().includes(b) || (r.excursion||'').toLowerCase().includes(b));
-            if (ciudad) f = f.filter(r => r.ciudad === ciudad);
-            renderReservas(f);
-        }
-        function verReserva(id) { reservaSeleccionada = reservasData.find(r => r.id === id); if (reservaSeleccionada) { let ex = ''; const er = reservaSeleccionada.excursion || ''; if (er.includes('\n')) ex = er.split('\n').filter(e => e.trim()).map(e => `<div class="excursion-tag-modal">${e.trim()}</div>`).join(''); document.getElementById('modalInfo').innerHTML = `<p><strong>ID:</strong> ${reservaSeleccionada.id}</p><p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p><p><strong>Email:</strong> ${reservaSeleccionada.email}</p><p><strong>Tel:</strong> ${reservaSeleccionada.telefono}</p><p><strong>País:</strong> ${reservaSeleccionada.pais}</p><p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p><p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p><p><strong>Pax:</strong> ${reservaSeleccionada.personas}</p><p><strong>Pago:</strong> ${reservaSeleccionada.formaPago}</p><p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p><div style="margin-top:12px"><strong>🕐 Excursiones:</strong><div>${ex}</div></div>`; document.getElementById('modalReserva').classList.add('show'); } }
+        function filtrarReservas() { const b = document.getElementById('busquedaReserva').value.toLowerCase(); const ciudad = document.getElementById('filtroCiudad').value; let f = reservasData; if (estadoFiltro !== 'todas') f = f.filter(r => r.estado === estadoFiltro); if (b) f = f.filter(r => r.id.toLowerCase().includes(b) || r.nombre.toLowerCase().includes(b) || r.email.toLowerCase().includes(b) || (r.excursion||'').toLowerCase().includes(b)); if (ciudad) f = f.filter(r => r.ciudad === ciudad); renderReservas(f); }
+        function verReserva(id) { reservaSeleccionada = reservasData.find(r => r.id === id); if (reservaSeleccionada) { let ex = ''; const er = reservaSeleccionada.excursion || ''; if (er.includes('\n')) ex = er.split('\n').filter(e => e.trim()).map(e => `<div class="excursion-tag-modal">${e.trim()}</div>`).join(''); document.getElementById('modalInfo').innerHTML = `<p><strong>ID:</strong> ${reservaSeleccionada.id}</p><p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p><p><strong>Email:</strong> ${reservaSeleccionada.email}</p><p><strong>Tel:</strong> ${reservaSeleccionada.telefono}</p><p><strong>País:</strong> ${reservaSeleccionada.pais}</p><p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p><p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p><p><strong>Pax:</strong> ${reservaSeleccionada.personas}</p><p><strong>Pago:</strong> ${reservaSeleccionada.formaPago}</p><p><strong>Lugar:</strong> ${reservaSeleccionada.busqueda||'No especificado'}</p><p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p><div style="margin-top:12px"><strong>🕐 Excursiones:</strong><div>${ex}</div></div>`; document.getElementById('modalReserva').classList.add('show'); } }
         function cerrarModal() { document.getElementById('modalReserva').classList.remove('show'); }
         function cambiarEstado(nuevo) { if (reservaSeleccionada) { reservaSeleccionada.estado = nuevo; guardarEstado(reservaSeleccionada.id, nuevo); renderReservas(reservasData); actualizarContadores(); cerrarModal(); } }
         function cambiarEstadoDirecto(id, nuevo) { const r = reservasData.find(r => r.id === id); if (r) { r.estado = nuevo; guardarEstado(id, nuevo); renderReservas(reservasData); actualizarContadores(); } }
