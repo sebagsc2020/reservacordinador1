@@ -108,25 +108,28 @@
                     if (!linea) continue;
                     
                     if (linea.startsWith('"RES-') || linea.startsWith('RES-')) {
-                        // Procesar reserva anterior
                         if (actual && lineasExcursion.length > 0) {
                             const ultima = lineasExcursion[lineasExcursion.length - 1];
-                            const m = ultima.match(/"([^"]*)"/g);
-                            if (m && m.length >= 4) {
-                                actual.fecha = (m[1] || '').replace(/"/g,'').trim();
-                                actual.personas = (m[2] || '').replace(/"/g,'').trim();
-                                actual.formaPago = (m[3] || '').replace(/"/g,'').trim();
-                                actual.busqueda = (m[4] || '').replace(/"/g,'').trim();
+                            // Buscar patrones de fecha, número, texto
+                            const fechaMatch = ultima.match(/"(\d{2}-\d{2}-\d{4})"/);
+                            const paxMatch = ultima.match(/"(\d+)"(?:,"[^"]*")?,"/);
+                            const pagoMatch = ultima.match(/"([^"]*)","([^"]*)","([^"]*)"/);
+                            
+                            if (fechaMatch) actual.fecha = fechaMatch[1];
+                            if (ultima.split('","').length >= 3) {
+                                const partes = ultima.replace(/^"|"$/g,'').split('","');
+                                if (partes.length >= 4) {
+                                    actual.fecha = partes[1] || '';
+                                    actual.personas = partes[2] || '0';
+                                    actual.formaPago = partes[3] || '';
+                                    if (partes.length >= 5) actual.busqueda = partes[4] || '';
+                                }
                             }
-                            // Quitar última línea (datos) y reconstruir excursiones
                             lineasExcursion.pop();
-                            if (lineasExcursion.length > 0) {
-                                actual.excursion += '\n' + lineasExcursion.join('\n');
-                            }
+                            if (lineasExcursion.length > 0) actual.excursion += '\n' + lineasExcursion.join('\n');
                         }
                         if (actual) reservasData.push(actual);
                         
-                        // Parsear nueva reserva
                         const v = []; let a = '', com = false;
                         for (let j = 0; j < linea.length; j++) {
                             const c = linea[j];
@@ -143,21 +146,18 @@
                         if (actual) { const x = linea.replace(/^"|"$/g,'').trim(); if (x && !x.startsWith(',') && x.length > 3) { lineasExcursion.push(x); } }
                     }
                 }
-                // Última reserva
                 if (actual) {
                     if (lineasExcursion.length > 0) {
                         const ultima = lineasExcursion[lineasExcursion.length - 1];
-                        const m = ultima.match(/"([^"]*)"/g);
-                        if (m && m.length >= 4) {
-                            actual.fecha = (m[1] || '').replace(/"/g,'').trim();
-                            actual.personas = (m[2] || '').replace(/"/g,'').trim();
-                            actual.formaPago = (m[3] || '').replace(/"/g,'').trim();
-                            actual.busqueda = (m[4] || '').replace(/"/g,'').trim();
+                        const partes = ultima.replace(/^"|"$/g,'').split('","');
+                        if (partes.length >= 4) {
+                            actual.fecha = partes[1] || '';
+                            actual.personas = partes[2] || '0';
+                            actual.formaPago = partes[3] || '';
+                            if (partes.length >= 5) actual.busqueda = partes[4] || '';
                         }
                         lineasExcursion.pop();
-                        if (lineasExcursion.length > 0) {
-                            actual.excursion += '\n' + lineasExcursion.join('\n');
-                        }
+                        if (lineasExcursion.length > 0) actual.excursion += '\n' + lineasExcursion.join('\n');
                     }
                     reservasData.push(actual);
                 }
@@ -166,7 +166,8 @@
                 reservasData.forEach(r => { if (eg[r.id]) r.estado = eg[r.id]; });
                 
                 console.log('✅ Cargadas:', reservasData.length);
-                console.table(reservasData.map(r => ({ID: r.id, Fecha: r.fecha, Pax: r.personas, Pago: r.formaPago, Lugar: r.busqueda})));
+                // Mostrar datos reales
+                reservasData.forEach(r => console.log(`   ${r.id} | Fecha="${r.fecha}" | Pax="${r.personas}" | Pago="${r.formaPago}" | Lugar="${r.busqueda}"`));
                 
                 if (reservasData.length === 0) reservasData = [{ id: 'R-001', nombre: 'Juan', apellido: 'Pérez', email: 'j@e.com', ciudad: 'VCP', excursion: '1. City Tour\n2. Aerosilla', fecha: '29-05-2026', personas: '4', formaPago: 'Efectivo', estado: 'confirmado' }];
                 
