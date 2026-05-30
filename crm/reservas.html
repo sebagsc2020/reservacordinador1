@@ -71,14 +71,9 @@
         .filter-input:focus, .filter-select:focus { outline: none; border-color: #667eea; }
         .filter-input { flex: 1; min-width: 180px; }
         
-        .btn-filtrar {
-            padding: 10px 20px; background: #667eea; color: white; border: none;
-            border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px;
-        }
-        .btn-recargar {
-            padding: 10px 20px; background: #27ae60; color: white; border: none;
-            border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px;
-        }
+        .btn-filtrar { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .btn-recargar { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .btn-exportar { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
         
         /* ===== TABS ===== */
         .tabs {
@@ -117,30 +112,41 @@
         .badge-cancelado { background: #f8d7da; color: #721c24; }
         
         .btn-accion {
-            padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer;
-            font-size: 11px; font-weight: 600; margin-right: 3px; transition: all 0.3s ease;
+            padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer;
+            font-size: 11px; font-weight: 600; margin-right: 2px; transition: all 0.3s ease;
         }
         .btn-ver { background: #667eea; color: white; }
         .btn-confirmar { background: #27ae60; color: white; }
+        .btn-pagar { background: #3498db; color: white; }
+        .btn-realizar { background: #95a5a6; color: white; }
         .btn-cancelar { background: #e74c3c; color: white; }
-        .btn-email { background: #3498db; color: white; }
+        .btn-email { background: #8e44ad; color: white; }
         .btn-whatsapp { background: #25D366; color: white; }
         
+        .btn-accion:hover { opacity: 0.85; transform: scale(1.05); }
+        
+        /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); display: none; justify-content: center;
             align-items: center; z-index: 1000;
         }
         .modal-overlay.show { display: flex; }
+        
         .modal-content {
-            background: white; border-radius: 20px; padding: 35px; max-width: 550px;
+            background: white; border-radius: 20px; padding: 35px; max-width: 600px;
             width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            animation: slideUp 0.3s ease;
         }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-header h2 { color: #667eea; }
         .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; }
         .modal-info p { margin: 10px 0; font-size: 14px; color: #555; }
-        .modal-info strong { color: #333; display: inline-block; width: 110px; }
+        .modal-info strong { color: #333; display: inline-block; width: 120px; }
+        
+        .modal-acciones { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
         
         @media (max-width: 768px) {
             .sidebar { width: 70px; }
@@ -188,6 +194,8 @@
             <button class="tab" onclick="filtrarPorEstado('pendiente')">⏳ Pendientes <span class="count" id="countPendiente">0</span></button>
             <button class="tab" onclick="filtrarPorEstado('confirmado')">✅ Confirmadas <span class="count" id="countConfirmado">0</span></button>
             <button class="tab" onclick="filtrarPorEstado('pagado')">💰 Pagadas <span class="count" id="countPagado">0</span></button>
+            <button class="tab" onclick="filtrarPorEstado('realizado')">🏁 Realizadas <span class="count" id="countRealizado">0</span></button>
+            <button class="tab" onclick="filtrarPorEstado('cancelado')">❌ Canceladas <span class="count" id="countCancelado">0</span></button>
         </div>
         
         <!-- Filtros -->
@@ -201,6 +209,7 @@
             </select>
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
+            <button class="btn-exportar" onclick="exportarReservas()">📥 Exportar</button>
         </div>
         
         <!-- Tabla -->
@@ -216,19 +225,18 @@
                             <th>ID</th>
                             <th>Cliente</th>
                             <th>Email</th>
-                            <th>Teléfono</th>
                             <th>País</th>
                             <th>Ciudad</th>
                             <th>Excursión</th>
                             <th>Fecha</th>
-                            <th>Personas</th>
-                            <th>Forma Pago</th>
+                            <th>Pax</th>
+                            <th>Pago</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tablaReservas">
-                        <tr><td colspan="12" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos desde Google Sheets...</td></tr>
+                        <tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -243,10 +251,14 @@
                 <button class="modal-close" onclick="cerrarModal()">✕</button>
             </div>
             <div class="modal-info" id="modalInfo"></div>
-            <br>
-            <button class="btn-accion btn-confirmar" onclick="cambiarEstado('confirmado')">✅ Confirmar</button>
-            <button class="btn-accion btn-email" onclick="enviarEmailCliente()">📧 Email</button>
-            <button class="btn-accion btn-whatsapp" onclick="enviarWhatsAppCliente()">💬 WhatsApp</button>
+            <div class="modal-acciones">
+                <button class="btn-accion btn-confirmar" onclick="cambiarEstado('confirmado')" style="padding:10px 18px;font-size:13px;">✅ Confirmar</button>
+                <button class="btn-accion btn-pagar" onclick="cambiarEstado('pagado')" style="padding:10px 18px;font-size:13px;">💰 Marcar Pagada</button>
+                <button class="btn-accion btn-realizar" onclick="cambiarEstado('realizado')" style="padding:10px 18px;font-size:13px;">🏁 Realizada</button>
+                <button class="btn-accion btn-cancelar" onclick="cambiarEstado('cancelado')" style="padding:10px 18px;font-size:13px;">❌ Cancelar</button>
+                <button class="btn-accion btn-email" onclick="enviarEmailCliente()" style="padding:10px 18px;font-size:13px;">📧 Email</button>
+                <button class="btn-accion btn-whatsapp" onclick="enviarWhatsAppCliente()" style="padding:10px 18px;font-size:13px;">💬 WhatsApp</button>
+            </div>
         </div>
     </div>
     
@@ -255,9 +267,7 @@
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         
         // ===== CONFIGURACIÓN =====
-        const SPREADSHEET_ID = '1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q';
-        const SHEET_NAME = 'Hoja 1';
-        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
         
         let reservasData = [];
         let estadoFiltro = 'todas';
@@ -265,7 +275,7 @@
         
         async function cargarReservas() {
             try {
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="12" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos...</td></tr>';
+                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos...</td></tr>';
                 
                 const respuesta = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!respuesta.ok) throw new Error('Error HTTP: ' + respuesta.status);
@@ -303,7 +313,7 @@
                             personas: limpiar(valores[10]),
                             formaPago: valores[11] ? limpiar(valores[11]) : 'No especificada',
                             busqueda: valores[12] ? limpiar(valores[12]) : '',
-                            estado: 'confirmado' // Por defecto
+                            estado: 'confirmado'
                         });
                     }
                 }
@@ -312,10 +322,9 @@
                 actualizarContadores();
             } catch (error) {
                 document.getElementById('tablaReservas').innerHTML = 
-                    `<tr><td colspan="12" style="text-align:center;color:#e74c3c;padding:30px;">
-                        ❌ Error al cargar datos<br>
-                        <small>${error.message}</small><br><br>
-                        <button class="btn-accion btn-confirmar" onclick="cargarReservas()">🔄 Reintentar</button>
+                    `<tr><td colspan="11" style="text-align:center;color:#e74c3c;padding:30px;">
+                        ❌ Error al cargar<br><small>${error.message}</small><br><br>
+                        <button class="btn-recargar" onclick="cargarReservas()">🔄 Reintentar</button>
                     </td></tr>`;
             }
         }
@@ -327,14 +336,15 @@
             document.getElementById('countPendiente').textContent = reservasData.filter(r => r.estado === 'pendiente').length;
             document.getElementById('countConfirmado').textContent = reservasData.filter(r => r.estado === 'confirmado').length;
             document.getElementById('countPagado').textContent = reservasData.filter(r => r.estado === 'pagado').length;
+            document.getElementById('countRealizado').textContent = reservasData.filter(r => r.estado === 'realizado').length;
+            document.getElementById('countCancelado').textContent = reservasData.filter(r => r.estado === 'cancelado').length;
         }
         
         function renderReservas(data) {
             document.getElementById('totalReservasSpan').textContent = data.length + ' reservas';
             
             if (data.length === 0) {
-                document.getElementById('tablaReservas').innerHTML = 
-                    '<tr><td colspan="12" style="text-align:center;color:#999;padding:30px;">📋 No se encontraron reservas</td></tr>';
+                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">📋 No se encontraron reservas</td></tr>';
                 return;
             }
             
@@ -343,18 +353,18 @@
                     <td><strong>${r.id}</strong></td>
                     <td>${r.nombre} ${r.apellido}</td>
                     <td style="font-size:12px;">${r.email}</td>
-                    <td>${r.telefono}</td>
                     <td>${r.pais}</td>
                     <td>${r.ciudad}</td>
-                    <td>${r.excursion.length > 25 ? r.excursion.substring(0,25) + '...' : r.excursion}</td>
+                    <td>${r.excursion.length > 22 ? r.excursion.substring(0,22)+'...' : r.excursion}</td>
                     <td>${r.fecha}</td>
                     <td>${r.personas}</td>
                     <td>${r.formaPago}</td>
                     <td><span class="badge badge-${r.estado}">${r.estado}</span></td>
-                    <td>
-                        <button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button>
-                        <button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')">✅</button>
-                        <button class="btn-accion btn-cancelar" onclick="cambiarEstadoDirecto('${r.id}','cancelado')">❌</button>
+                    <td style="white-space:nowrap;">
+                        <button class="btn-accion btn-ver" onclick="verReserva('${r.id}')" title="Ver">👁️</button>
+                        <button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')" title="Confirmar">✅</button>
+                        <button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')" title="Marcar Pagada">💰</button>
+                        <button class="btn-accion btn-cancelar" onclick="cambiarEstadoDirecto('${r.id}','cancelado')" title="Cancelar">❌</button>
                     </td>
                 </tr>
             `).join('');
@@ -365,11 +375,8 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             
-            if (estado === 'todas') {
-                renderReservas(reservasData);
-            } else {
-                renderReservas(reservasData.filter(r => r.estado === estado));
-            }
+            if (estado === 'todas') renderReservas(reservasData);
+            else renderReservas(reservasData.filter(r => r.estado === estado));
         }
         
         function filtrarReservas() {
@@ -377,20 +384,9 @@
             const pais = document.getElementById('filtroPais').value;
             
             let filtradas = reservasData;
-            
-            if (estadoFiltro !== 'todas') {
-                filtradas = filtradas.filter(r => r.estado === estadoFiltro);
-            }
-            if (busqueda) {
-                filtradas = filtradas.filter(r => 
-                    r.id.toLowerCase().includes(busqueda) || 
-                    r.nombre.toLowerCase().includes(busqueda) || 
-                    r.email.toLowerCase().includes(busqueda)
-                );
-            }
-            if (pais) {
-                filtradas = filtradas.filter(r => r.pais.includes(pais));
-            }
+            if (estadoFiltro !== 'todas') filtradas = filtradas.filter(r => r.estado === estadoFiltro);
+            if (busqueda) filtradas = filtradas.filter(r => r.id.toLowerCase().includes(busqueda) || r.nombre.toLowerCase().includes(busqueda) || r.email.toLowerCase().includes(busqueda));
+            if (pais) filtradas = filtradas.filter(r => r.pais.includes(pais));
             
             renderReservas(filtradas);
         }
@@ -409,7 +405,6 @@
                     <p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p>
                     <p><strong>Personas:</strong> ${reservaSeleccionada.personas}</p>
                     <p><strong>Forma de Pago:</strong> ${reservaSeleccionada.formaPago}</p>
-                    <p><strong>Búsqueda:</strong> ${reservaSeleccionada.busqueda || 'No especificada'}</p>
                     <p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p>
                 `;
                 document.getElementById('modalReserva').classList.add('show');
@@ -439,27 +434,21 @@
         function enviarEmailCliente() {
             if (reservaSeleccionada) window.open('mailto:' + reservaSeleccionada.email);
         }
-        
         function enviarWhatsAppCliente() {
             if (reservaSeleccionada) window.open('https://wa.me/' + reservaSeleccionada.telefono.replace(/[^0-9]/g, ''));
         }
+        function exportarReservas() {
+            let csv = 'ID,Cliente,Email,Teléfono,País,Ciudad,Excursión,Fecha,Personas,Forma Pago,Estado\n';
+            reservasData.forEach(r => { csv += `"${r.id}","${r.nombre} ${r.apellido}","${r.email}","${r.telefono}","${r.pais}","${r.ciudad}","${r.excursion}","${r.fecha}","${r.personas}","${r.formaPago}","${r.estado}"\n`; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'reservas.csv'; a.click();
+        }
         
-        document.getElementById('busquedaReserva').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') filtrarReservas();
-        });
+        document.getElementById('busquedaReserva').addEventListener('keypress', function(e) { if (e.key === 'Enter') filtrarReservas(); });
+        document.getElementById('modalReserva').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarModal(); });
         
-        document.getElementById('modalReserva').addEventListener('click', function(e) {
-            if (e.target === this) cerrarModal();
-        });
-        
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') cerrarModal();
-        });
-        
-        // Cargar al iniciar
         cargarReservas();
-        
-        // Recargar cada 5 minutos
         setInterval(cargarReservas, 300000);
     </script>
 </body>
