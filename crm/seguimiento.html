@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento - CRM Aventura Total</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #1a1a2e;
+            color: white;
+            padding: 25px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo .logo-icon { font-size: 40px; }
+        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; }
+        .sidebar-logo h2 span { color: #667eea; }
+        
+        .nav-menu { list-style: none; padding: 0 15px; }
+        .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a {
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+            color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px;
+            transition: all 0.3s ease; font-size: 14px; font-weight: 500;
+        }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
+        .nav-menu a.active { background: #667eea; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        
+        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
+        .btn-logout-sidebar {
+            width: 100%; padding: 12px; background: rgba(231,76,60,0.2);
+            color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); border-radius: 10px;
+            cursor: pointer; font-weight: 600; font-size: 13px;
+        }
+        
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 26px; color: #1a1a2e; }
+        
+        .user-info {
+            display: flex; align-items: center; gap: 10px; background: white;
+            padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px;
+        }
+        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        
+        /* ===== KANBAN BOARD ===== */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .kanban-column {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 400px;
+        }
+        
+        .kanban-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e0e0e0;
+        }
+        
+        .kanban-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .kanban-count {
+            background: #667eea;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .kanban-column.pendiente .kanban-header { border-bottom-color: #ffc107; }
+        .kanban-column.pendiente .kanban-count { background: #ffc107; color: #856404; }
+        .kanban-column.confirmado .kanban-header { border-bottom-color: #27ae60; }
+        .kanban-column.confirmado .kanban-count { background: #27ae60; }
+        .kanban-column.pagado .kanban-header { border-bottom-color: #3498db; }
+        .kanban-column.pagado .kanban-count { background: #3498db; }
+        .kanban-column.realizado .kanban-header { border-bottom-color: #95a5a6; }
+        .kanban-column.realizado .kanban-count { background: #95a5a6; }
+        
+        .kanban-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+        
+        .kanban-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .kanban-card.pendiente { border-left-color: #ffc107; }
+        .kanban-card.confirmado { border-left-color: #27ae60; }
+        .kanban-card.pagado { border-left-color: #3498db; }
+        .kanban-card.realizado { border-left-color: #95a5a6; }
+        
+        .kanban-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .kanban-card-id {
+            font-size: 11px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .kanban-card-fecha {
+            font-size: 10px;
+            color: #999;
+        }
+        
+        .kanban-card-cliente {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .kanban-card-excursion {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .kanban-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+        
+        .kanban-card-personas {
+            background: #f0f0ff;
+            color: #667eea;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .kanban-card-pago {
+            font-weight: 600;
+        }
+        
+        /* ===== TIMELINE ===== */
+        .timeline-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+        
+        .timeline-title {
+            font-size: 18px;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #e0e0e0;
+            border-radius: 2px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 3px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+        
+        .timeline-dot.pendiente { background: #ffc107; box-shadow: 0 0 0 3px #ffc107; }
+        .timeline-dot.confirmado { background: #27ae60; box-shadow: 0 0 0 3px #27ae60; }
+        .timeline-dot.pagado { background: #3498db; box-shadow: 0 0 0 3px #3498db; }
+        .timeline-dot.realizado { background: #95a5a6; box-shadow: 0 0 0 3px #95a5a6; }
+        
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .timeline-content strong {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .timeline-content p {
+            color: #666;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        
+        .timeline-content .fecha {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        /* ===== MÉTRICAS ===== */
+        .metricas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .metrica-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .metrica-valor {
+            font-size: 28px;
+            font-weight: 800;
+            color: #667eea;
+        }
+        
+        .metrica-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; }
+            .nav-menu a { justify-content: center; padding: 12px; }
+            .main-content { margin-left: 70px; padding: 15px; }
+            .kanban-board { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">🏔️</div>
+            <h2>Aventura <span>Total</span></h2>
+            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="seguimiento.html" class="active"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">📧</span> <span>Emails</span></a></li>
+            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar Sesión</button>
+        </div>
+    </nav>
+    
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1>📈 Seguimiento</h1>
+                <p style="color:#999;font-size:13px;">Pipeline de reservas y estados</p>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <span>Admin</span>
+            </div>
+        </div>
+        
+        <!-- Métricas de conversión -->
+        <div class="metricas-grid">
+            <div class="metrica-card">
+                <div class="metrica-valor">85%</div>
+                <div class="metrica-label">Tasa de Conversión</div>
+            </div>
+            <div class="metrica-card">
+                <div class="metrica-valor">2.3 días</div>
+                <div class="metrica-label">Tiempo Promedio Confirmación</div>
+            </div>
+            <div class="metrica-card">
+                <div class="metrica-valor">68%</div>
+                <div class="metrica-label">Pagos Completados</div>
+            </div>
+            <div class="metrica-card">
+                <div class="metrica-valor">4.8</div>
+                <div class="metrica-label">Calificación Promedio</div>
+            </div>
+        </div>
+        
+        <!-- Kanban Board -->
+        <h3 style="margin-bottom:20px;color:#1a1a2e;">📋 Pipeline de Reservas</h3>
+        <div class="kanban-board" id="kanbanBoard"></div>
+        
+        <!-- Timeline -->
+        <div class="timeline-section">
+            <h3 class="timeline-title">🕐 Actividad Reciente</h3>
+            <div class="timeline" id="timeline"></div>
+        </div>
+    </div>
+    
+    <script>
+        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
+        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+        
+        // Datos para Kanban
+        const reservasKanban = [
+            { id: 'RES-001', cliente: 'Juan Pérez', excursion: 'City Tour Local', fecha: '29/05/2026', personas: 4, formaPago: 'Débito', estado: 'confirmado' },
+            { id: 'RES-002', cliente: 'María García', excursion: 'Barco Pirata', fecha: '30/05/2026', personas: 2, formaPago: 'Efectivo', estado: 'pendiente' },
+            { id: 'RES-003', cliente: 'Carlos López', excursion: 'Valle Nevado', fecha: '01/06/2026', personas: 6, formaPago: 'Transferencia', estado: 'pagado' },
+            { id: 'RES-004', cliente: 'Ana Martínez', excursion: 'Circuito Chico', fecha: '02/06/2026', personas: 3, formaPago: 'Débito', estado: 'realizado' },
+            { id: 'RES-005', cliente: 'Pedro Sánchez', excursion: 'City Tour Histórico', fecha: '03/06/2026', personas: 2, formaPago: 'Efectivo', estado: 'pendiente' },
+            { id: 'RES-006', cliente: 'Laura Fernández', excursion: 'Camino del Vino', fecha: '04/06/2026', personas: 5, formaPago: 'Transferencia', estado: 'confirmado' },
+            { id: 'RES-007', cliente: 'Diego Torres', excursion: 'Sky Costanera', fecha: '05/06/2026', personas: 4, formaPago: 'Débito', estado: 'pendiente' },
+            { id: 'RES-008', cliente: 'Sofía Rodríguez', excursion: 'Tren del Fin del Mundo', fecha: '06/06/2026', personas: 2, formaPago: 'Efectivo', estado: 'pagado' }
+        ];
+        
+        // Renderizar Kanban
+        const estados = ['pendiente', 'confirmado', 'pagado', 'realizado'];
+        const estadosLabels = { pendiente: '⏳ Pendientes', confirmado: '✅ Confirmadas', pagado: '💰 Pagadas', realizado: '🏁 Realizadas' };
+        
+        document.getElementById('kanbanBoard').innerHTML = estados.map(estado => `
+            <div class="kanban-column ${estado}">
+                <div class="kanban-header">
+                    <span class="kanban-title">${estadosLabels[estado]}</span>
+                    <span class="kanban-count">${reservasKanban.filter(r => r.estado === estado).length}</span>
+                </div>
+                ${reservasKanban.filter(r => r.estado === estado).map(r => `
+                    <div class="kanban-card ${r.estado}" draggable="true" ondragstart="drag(event)" id="${r.id}">
+                        <div class="kanban-card-header">
+                            <span class="kanban-card-id">${r.id}</span>
+                            <span class="kanban-card-fecha">${r.fecha}</span>
+                        </div>
+                        <div class="kanban-card-cliente">${r.cliente}</div>
+                        <div class="kanban-card-excursion">${r.excursion}</div>
+                        <div class="kanban-card-footer">
+                            <span class="kanban-card-personas">👥 ${r.personas}</span>
+                            <span class="kanban-card-pago">${r.formaPago}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `).join('');
+        
+        // Drag and Drop
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault();
+            const id = ev.dataTransfer.getData("text");
+            const card = document.getElementById(id);
+            if (card && ev.target.closest('.kanban-column')) {
+                ev.target.closest('.kanban-column').querySelector('.kanban-header').after(card);
+            }
+        }
+        
+        document.querySelectorAll('.kanban-column').forEach(col => {
+            col.addEventListener('dragover', allowDrop);
+            col.addEventListener('drop', drop);
+        });
+        
+        // Timeline
+        const timelineData = [
+            { accion: 'Reserva confirmada', cliente: 'Laura Fernández', excursion: 'Camino del Vino', fecha: 'Hace 2 horas', estado: 'confirmado' },
+            { accion: 'Pago recibido', cliente: 'Sofía Rodríguez', excursion: 'Tren del Fin del Mundo', fecha: 'Hace 5 horas', estado: 'pagado' },
+            { accion: 'Nueva reserva', cliente: 'Diego Torres', excursion: 'Sky Costanera', fecha: 'Hace 8 horas', estado: 'pendiente' },
+            { accion: 'Reserva realizada', cliente: 'Ana Martínez', excursion: 'Circuito Chico', fecha: 'Ayer', estado: 'realizado' },
+            { accion: 'Pago confirmado', cliente: 'Carlos López', excursion: 'Valle Nevado', fecha: 'Ayer', estado: 'pagado' },
+            { accion: 'Reserva confirmada', cliente: 'Juan Pérez', excursion: 'City Tour Local', fecha: 'Hace 2 días', estado: 'confirmado' }
+        ];
+        
+        document.getElementById('timeline').innerHTML = timelineData.map(t => `
+            <div class="timeline-item">
+                <div class="timeline-dot ${t.estado}"></div>
+                <div class="timeline-content">
+                    <strong>${t.accion}</strong>
+                    <p>${t.cliente} - ${t.excursion}</p>
+                    <div class="fecha">${t.fecha}</div>
+                </div>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>
