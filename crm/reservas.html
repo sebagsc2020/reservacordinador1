@@ -86,7 +86,7 @@
             <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
             <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
             <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="emails.html"><span class="nav-icon">📧</span> <span>WhatsApp</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
         </ul>
         <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪</button></div>
@@ -140,20 +140,15 @@
         let estadoFiltro = 'todas';
         let reservaSeleccionada = null;
         
-        // ===== PERSISTENCIA DE ESTADOS =====
         function cargarEstadosGuardados() {
-            try {
-                return JSON.parse(localStorage.getItem('estadosReservas') || '{}');
-            } catch(e) {
-                return {};
-            }
+            try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); }
+            catch(e) { return {}; }
         }
         
         function guardarEstado(id, estado) {
             const estados = cargarEstadosGuardados();
             estados[id] = estado;
             localStorage.setItem('estadosReservas', JSON.stringify(estados));
-            console.log('💾 Estado guardado:', id, '→', estado);
         }
         
         async function cargarReservas() {
@@ -163,6 +158,8 @@
                 const respuesta = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 const csv = await respuesta.text();
                 const lineas = csv.split('\n');
+                
+                console.log('📊 Total líneas:', lineas.length);
                 
                 reservasData = [];
                 let reservaActual = null;
@@ -187,7 +184,8 @@
                         valores.push(actual.trim());
                         
                         const limpio = valores.map(v => v.replace(/^"|"$/g, '').trim());
-                        const totalCols = limpio.length;
+                        
+                        console.log(`📋 ${limpio[0]} | J(Fecha)=${limpio[9] || '?'} | K(Pax)=${limpio[10] || '?'} | L(Pago)=${limpio[11] || '?'}`);
                         
                         reservaActual = {
                             id: limpio[0] || `RES-${i}`,
@@ -199,17 +197,17 @@
                             pais: limpio[6] || '',
                             ciudad: limpio[7] || '',
                             excursion: limpio[8] || '',
-                            fecha: totalCols >= 10 ? limpio[totalCols - 4] || '' : '',
-                            personas: totalCols >= 10 ? limpio[totalCols - 3] || '0' : '0',
-                            formaPago: totalCols >= 10 ? limpio[totalCols - 2] || 'No especificada' : 'No especificada',
-                            busqueda: totalCols >= 10 ? limpio[totalCols - 1] || '' : '',
+                            fecha: limpio[9] || '',
+                            personas: limpio[10] || '0',
+                            formaPago: limpio[11] || 'No especificada',
+                            busqueda: limpio[12] || '',
                             estado: 'confirmado'
                         };
                     } else {
                         if (reservaActual) {
-                            const lineaExcursion = linea.replace(/^"|"$/g, '').trim();
-                            if (lineaExcursion && !lineaExcursion.startsWith(',') && lineaExcursion.length > 3) {
-                                reservaActual.excursion += '\n' + lineaExcursion;
+                            const l = linea.replace(/^"|"$/g, '').trim();
+                            if (l && !l.startsWith(',') && l.length > 3) {
+                                reservaActual.excursion += '\n' + l;
                             }
                         }
                     }
@@ -217,13 +215,10 @@
                 
                 if (reservaActual) { reservasData.push(reservaActual); }
                 
-                // ✅ Restaurar estados guardados
                 const estadosGuardados = cargarEstadosGuardados();
-                reservasData.forEach(r => {
-                    if (estadosGuardados[r.id]) {
-                        r.estado = estadosGuardados[r.id];
-                    }
-                });
+                reservasData.forEach(r => { if (estadosGuardados[r.id]) r.estado = estadosGuardados[r.id]; });
+                
+                console.log('✅ Reservas cargadas:', reservasData.length);
                 
                 if (reservasData.length === 0) {
                     reservasData = [
