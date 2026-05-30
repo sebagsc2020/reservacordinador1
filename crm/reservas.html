@@ -140,6 +140,22 @@
         let estadoFiltro = 'todas';
         let reservaSeleccionada = null;
         
+        // ===== PERSISTENCIA DE ESTADOS =====
+        function cargarEstadosGuardados() {
+            try {
+                return JSON.parse(localStorage.getItem('estadosReservas') || '{}');
+            } catch(e) {
+                return {};
+            }
+        }
+        
+        function guardarEstado(id, estado) {
+            const estados = cargarEstadosGuardados();
+            estados[id] = estado;
+            localStorage.setItem('estadosReservas', JSON.stringify(estados));
+            console.log('💾 Estado guardado:', id, '→', estado);
+        }
+        
         async function cargarReservas() {
             try {
                 document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;color:#999;padding:30px;">⏳ Cargando datos...</td></tr>';
@@ -201,11 +217,18 @@
                 
                 if (reservaActual) { reservasData.push(reservaActual); }
                 
+                // ✅ Restaurar estados guardados
+                const estadosGuardados = cargarEstadosGuardados();
+                reservasData.forEach(r => {
+                    if (estadosGuardados[r.id]) {
+                        r.estado = estadosGuardados[r.id];
+                    }
+                });
+                
                 if (reservasData.length === 0) {
                     reservasData = [
-                        { id: 'RES-001', fechaReserva: '29/05/2026', nombre: 'Juan', apellido: 'Pérez', email: 'juan@email.com', telefono: '+543511234567', pais: 'Argentina', ciudad: 'Villa Carlos Paz', excursion: '1. City Tour Local\n2. Aerosilla\n3. Noche de Teatros', fecha: '29-05-2026', personas: '4', formaPago: 'Efectivo', estado: 'confirmado' },
-                        { id: 'RES-002', fechaReserva: '30/05/2026', nombre: 'María', apellido: 'García', email: 'maria@email.com', telefono: '+543517654321', pais: 'Brasil', ciudad: 'Balneário Camboriú', excursion: '1. Barco Pirata\n2. Parque Unipraias', fecha: '30-05-2026', personas: '2', formaPago: 'Débito/Crédito', estado: 'pendiente' },
-                        { id: 'RES-003', fechaReserva: '01/06/2026', nombre: 'Carlos', apellido: 'López', email: 'carlos@email.com', telefono: '+54112345678', pais: 'Chile', ciudad: 'Santiago de Chile', excursion: '1. City Tour\n2. Valle Nevado\n3. Sky Costanera', fecha: '01-06-2026', personas: '6', formaPago: 'Transferencia', estado: 'pagado' }
+                        { id: 'RES-001', nombre: 'Juan', apellido: 'Pérez', email: 'juan@email.com', ciudad: 'Villa Carlos Paz', excursion: '1. City Tour\n2. Aerosilla', fecha: '29-05-2026', personas: '4', formaPago: 'Efectivo', estado: 'confirmado' },
+                        { id: 'RES-002', nombre: 'María', apellido: 'García', email: 'maria@email.com', ciudad: 'Balneário Camboriú', excursion: '1. Barco Pirata', fecha: '30-05-2026', personas: '2', formaPago: 'Débito', estado: 'pendiente' }
                     ];
                 }
                 
@@ -286,8 +309,26 @@
         }
         
         function cerrarModal() { document.getElementById('modalReserva').classList.remove('show'); }
-        function cambiarEstado(nuevoEstado) { if (reservaSeleccionada) { reservaSeleccionada.estado = nuevoEstado; renderReservas(reservasData); actualizarContadores(); cerrarModal(); } }
-        function cambiarEstadoDirecto(id, nuevoEstado) { const r = reservasData.find(r => r.id === id); if (r) { r.estado = nuevoEstado; renderReservas(reservasData); actualizarContadores(); } }
+        
+        function cambiarEstado(nuevoEstado) {
+            if (reservaSeleccionada) {
+                reservaSeleccionada.estado = nuevoEstado;
+                guardarEstado(reservaSeleccionada.id, nuevoEstado);
+                renderReservas(reservasData);
+                actualizarContadores();
+                cerrarModal();
+            }
+        }
+        
+        function cambiarEstadoDirecto(id, nuevoEstado) {
+            const r = reservasData.find(r => r.id === id);
+            if (r) {
+                r.estado = nuevoEstado;
+                guardarEstado(id, nuevoEstado);
+                renderReservas(reservasData);
+                actualizarContadores();
+            }
+        }
         
         document.getElementById('busquedaReserva').addEventListener('keypress', function(e) { if (e.key === 'Enter') filtrarReservas(); });
         document.getElementById('modalReserva').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
