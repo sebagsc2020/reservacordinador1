@@ -6,175 +6,40 @@
     <title>Calendario - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        .sidebar {
-            width: 250px;
-            background: #1a1a2e;
-            color: white;
-            padding: 25px 0;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 100;
-        }
-        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
         .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; }
-        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; }
-        .sidebar-logo h2 span { color: #667eea; }
-        
-        .nav-menu { list-style: none; padding: 0 15px; }
-        .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a {
-            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
-            color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px;
-            transition: all 0.3s ease; font-size: 14px; font-weight: 500;
-        }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
-        .nav-menu a.active { background: #667eea; }
+        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        
         .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
-        .btn-logout-sidebar {
-            width: 100%; padding: 12px; background: rgba(231,76,60,0.2);
-            color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); border-radius: 10px;
-            cursor: pointer; font-weight: 600; font-size: 13px;
-        }
-        
+        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
         .main-content { margin-left: 250px; flex: 1; padding: 30px; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h1 { font-size: 26px; color: #1a1a2e; }
-        
-        .user-info {
-            display: flex; align-items: center; gap: 10px; background: white;
-            padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px;
-        }
+        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
-        
-        .rango-filter {
-            background: white; padding: 20px; border-radius: 15px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
-            display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
-        }
-        .rango-filter label { font-weight: 600; font-size: 13px; color: #333; text-transform: uppercase; }
-        .rango-filter input[type="date"] { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
-        .rango-filter input[type="date"]:focus { outline: none; border-color: #667eea; }
+        .rango-filter { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .rango-filter label { font-weight: 600; font-size: 13px; } .rango-filter input[type="date"] { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; }
         .btn-filtrar { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
         .btn-whatsapp { padding: 10px 20px; background: #25D366; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
         .btn-limpiar { padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
-        
-        .resumen-container {
-            background: white; border-radius: 15px; padding: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
-            display: none;
-        }
-        .resumen-container.show { display: block; }
-        
-        .resumen-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #667eea;
-            flex-wrap: wrap; gap: 10px;
-        }
-        .resumen-header h3 { color: #1a1a2e; font-size: 18px; }
-        .btn-agregar-evento { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        
-        .resumen-lista { max-height: 400px; overflow-y: auto; }
-        
-        .resumen-item {
-            display: flex; align-items: center; gap: 15px; padding: 12px;
-            border-radius: 10px; margin-bottom: 8px; background: #f8f9fa;
-        }
-        .resumen-fecha {
-            font-weight: 700; color: #667eea; min-width: 100px; font-size: 12px;
-            text-align: center; background: #f0f0ff; padding: 8px; border-radius: 8px;
-        }
-        .resumen-info { flex: 1; }
-        .resumen-info strong { color: #333; font-size: 14px; }
-        .resumen-info p { color: #666; font-size: 12px; margin-top: 2px; }
-        .resumen-acciones { display: flex; gap: 5px; }
-        .btn-editar { padding: 5px 10px; background: #f39c12; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; }
-        .btn-eliminar { padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; }
-        
-        .calendar-nav {
-            display: flex; justify-content: space-between; align-items: center;
-            background: white; padding: 20px; border-radius: 15px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
-        }
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
         .calendar-nav button { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
         .calendar-nav h2 { font-size: 22px; color: #1a1a2e; }
-        .btn-hoy { background: #27ae60 !important; }
-        
-        .calendar-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
-            background: white; padding: 20px; border-radius: 15px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-        }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
         .calendar-day-header { text-align: center; padding: 10px; font-weight: 700; color: #666; font-size: 12px; text-transform: uppercase; }
-        
-        .calendar-day {
-            min-height: 100px; padding: 8px; border-radius: 10px;
-            cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent;
-            position: relative;
-        }
+        .calendar-day { min-height: 100px; padding: 8px; border-radius: 10px; cursor: pointer; border: 2px solid transparent; position: relative; }
         .calendar-day:hover { background: #f0f0ff; border-color: #667eea; }
         .calendar-day.today { background: #f0f0ff; border-color: #667eea; }
         .calendar-day.otro-mes { opacity: 0.3; }
         .calendar-day.en-rango { background: #e8f5e9; border-color: #27ae60; }
         .calendar-day.fuera-rango { opacity: 0.2; pointer-events: none; }
-        .calendar-day-numero { font-size: 14px; font-weight: 700; color: #333; margin-bottom: 5px; }
-        
-        .calendar-event {
-            font-size: 10px; padding: 3px 6px; border-radius: 4px; margin-bottom: 2px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600;
-            cursor: pointer;
-        }
-        .event-manual { background: #d1ecf1; color: #0c5460; }
-        
-        .btn-agregar-dia {
-            position: absolute; top: 5px; right: 5px;
-            width: 22px; height: 22px; border-radius: 50%;
-            background: #27ae60; color: white; border: none;
-            font-size: 14px; cursor: pointer; display: none;
-            align-items: center; justify-content: center;
-        }
-        .calendar-day:hover .btn-agregar-dia { display: flex; }
-        
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); display: none; justify-content: center;
-            align-items: center; z-index: 1000;
-        }
-        .modal-overlay.show { display: flex; }
-        .modal-content {
-            background: white; border-radius: 20px; padding: 30px;
-            max-width: 450px; width: 90%; box-shadow: 0 25px 60px rgba(0,0,0,0.4);
-        }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h2 { color: #667eea; font-size: 20px; }
-        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 5px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
-        .form-group textarea { min-height: 80px; resize: vertical; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; }
-        .btn-guardar { padding: 12px 25px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; font-size: 15px; }
-        
-        @media (max-width: 768px) {
-            .sidebar { width: 60px; }
-            .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; }
-            .nav-menu a { justify-content: center; padding: 10px; }
-            .main-content { margin-left: 60px; padding: 15px; }
-            .calendar-day { min-height: 60px; }
-            .rango-filter { flex-direction: column; align-items: stretch; }
-        }
+        .calendar-day-numero { font-size: 14px; font-weight: 700; color: #333; }
+        .calendar-event { font-size: 10px; padding: 3px 6px; border-radius: 4px; background: #d1ecf1; color: #0c5460; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } .calendar-day { min-height: 60px; } }
     </style>
 </head>
 <body>
@@ -189,278 +54,31 @@
             <li><a href="calendario.html" class="active"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
             <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
         </ul>
-        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪</button></div>
+        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar Sesión</button></div>
     </nav>
-    
     <div class="main-content">
-        <div class="header">
-            <div><h1>📅 Calendario de Eventos</h1><p style="color:#999;font-size:13px;">Agregá eventos manualmente</p></div>
-            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
-        </div>
-        
+        <div class="header"><div><h1>📅 Calendario de Eventos</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
         <div class="rango-filter">
-            <label>📅 Desde:</label>
-            <input type="date" id="fechaDesde">
-            <label>Hasta:</label>
-            <input type="date" id="fechaHasta">
+            <label>📅 Desde:</label><input type="date" id="fechaDesde">
+            <label>Hasta:</label><input type="date" id="fechaHasta">
             <button class="btn-filtrar" onclick="filtrarPorRango()">🔍 Filtrar</button>
             <button class="btn-whatsapp" onclick="compartirPorWhatsApp()">💬 Compartir</button>
             <button class="btn-limpiar" onclick="limpiarFiltro()">🔄 Ver todo</button>
         </div>
-        
-        <div class="resumen-container" id="resumenContainer">
-            <div class="resumen-header">
-                <h3>📋 Eventos del período</h3>
-                <button class="btn-agregar-evento" onclick="abrirModalAgregar('')">➕ Agregar Evento</button>
-            </div>
-            <div class="resumen-lista" id="resumenLista"></div>
-        </div>
-        
         <div class="calendar-nav">
             <button onclick="cambiarMes(-1)">◀</button>
             <h2 id="mesTitulo">Mayo 2026</h2>
             <button onclick="cambiarMes(1)">▶</button>
         </div>
-        
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
-    
-    <div class="modal-overlay" id="modalEvento">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitulo">➕ Agregar Evento</h2>
-                <button class="modal-close" onclick="cerrarModal()">✕</button>
-            </div>
-            <input type="hidden" id="eventoId">
-            <div class="form-group">
-                <label>📅 Fecha</label>
-                <input type="date" id="eventoFecha">
-            </div>
-            <div class="form-group">
-                <label>📝 Título del evento *</label>
-                <input type="text" id="eventoTitulo" placeholder="Ej: City Tour + Almuerzo">
-            </div>
-            <div class="form-group">
-                <label>📍 Descripción</label>
-                <textarea id="eventoDescripcion" placeholder="Detalles del evento..."></textarea>
-            </div>
-            <div class="form-group">
-                <label>⏰ Horario</label>
-                <input type="text" id="eventoHorario" placeholder="Ej: 09:00 - 18:00">
-            </div>
-            <button class="btn-guardar" onclick="guardarEvento()">💾 Guardar</button>
-        </div>
-    </div>
-    
     <script>
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
-        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+        function verificarSesionUnica() { const sessionId = sessionStorage.getItem('crm_session_id'); const sesionActiva = JSON.parse(localStorage.getItem('crm_sesion_activa') || '{}'); if (!sessionId || sesionActiva.id !== sessionId) { sessionStorage.clear(); alert('⚠️ Sesión cerrada.'); window.location.href = 'index.html'; return false; } localStorage.setItem('crm_sesion_activa', JSON.stringify({ ...sesionActiva, timestamp: Date.now() })); return true; }
+        if (!verificarSesionUnica()) throw new Error('Sesión inválida'); setInterval(verificarSesionUnica, 10000);
+        function logout() { const sessionId = sessionStorage.getItem('crm_session_id'); const sesionActiva = JSON.parse(localStorage.getItem('crm_sesion_activa') || '{}'); if (sesionActiva.id === sessionId) localStorage.removeItem('crm_sesion_activa'); sessionStorage.clear(); window.location.href = 'index.html'; }
         
-        let fechaActual = new Date();
-        let mesActual = fechaActual.getMonth();
-        let añoActual = fechaActual.getFullYear();
-        let rangoSeleccionado = null;
+        let fechaActual = new Date(), mesActual = fechaActual.getMonth(), añoActual = fechaActual.getFullYear(), rangoSeleccionado = null;
         let eventosManuales = JSON.parse(localStorage.getItem('eventosManuales') || '[]');
-        
         const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-        const diasSemana = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-        
-        function guardarEventos() { localStorage.setItem('eventosManuales', JSON.stringify(eventosManuales)); }
-        
-        function renderCalendar() {
-            document.getElementById('mesTitulo').textContent = `${meses[mesActual]} ${añoActual}`;
-            let html = '';
-            diasSemana.forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
-            
-            const primerDia = new Date(añoActual, mesActual, 1).getDay();
-            const diasEnMes = new Date(añoActual, mesActual + 1, 0).getDate();
-            const diasMesAnterior = new Date(añoActual, mesActual, 0).getDate();
-            const hoy = new Date();
-            const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
-            
-            for (let i = primerDia - 1; i >= 0; i--) {
-                const dia = diasMesAnterior - i;
-                const fuera = rangoSeleccionado ? 'fuera-rango' : '';
-                html += `<div class="calendar-day otro-mes ${fuera}"><div class="calendar-day-numero">${dia}</div></div>`;
-            }
-            
-            for (let dia = 1; dia <= diasEnMes; dia++) {
-                const fechaStr = `${añoActual}-${String(mesActual+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
-                const esHoy = fechaStr === hoyStr;
-                const enRango = rangoSeleccionado && fechaStr >= rangoSeleccionado.desde && fechaStr <= rangoSeleccionado.hasta;
-                const fueraRango = rangoSeleccionado && !enRango;
-                const eventosDelDia = eventosManuales.filter(e => e.fecha === fechaStr);
-                
-                html += `<div class="calendar-day ${esHoy ? 'today' : ''} ${enRango ? 'en-rango' : ''} ${fueraRango ? 'fuera-rango' : ''}">
-                    <div class="calendar-day-numero">${dia}</div>
-                    ${eventosDelDia.map(e => `<div class="calendar-event event-manual" onclick="event.stopPropagation(); editarEvento('${e.id}')" title="${e.titulo}">${e.titulo.substring(0, 18)}</div>`).join('')}
-                    ${!fueraRango ? `<button class="btn-agregar-dia" onclick="event.stopPropagation(); abrirModalAgregar('${fechaStr}')">+</button>` : ''}
-                </div>`;
-            }
-            
-            const totalCeldas = primerDia + diasEnMes;
-            const diasRestantes = 7 - (totalCeldas % 7);
-            if (diasRestantes < 7) {
-                for (let dia = 1; dia <= diasRestantes; dia++) {
-                    const fuera = rangoSeleccionado ? 'fuera-rango' : '';
-                    html += `<div class="calendar-day otro-mes ${fuera}"><div class="calendar-day-numero">${dia}</div></div>`;
-                }
-            }
-            
-            document.getElementById('calendarGrid').innerHTML = html;
-        }
-        
-        function cambiarMes(dir) { mesActual += dir; if (mesActual > 11) { mesActual = 0; añoActual++; } if (mesActual < 0) { mesActual = 11; añoActual--; } renderCalendar(); }
-        
-        function abrirModalAgregar(fecha) {
-            document.getElementById('modalTitulo').textContent = '➕ Agregar Evento';
-            document.getElementById('eventoId').value = '';
-            document.getElementById('eventoFecha').value = fecha || (rangoSeleccionado ? rangoSeleccionado.desde : '');
-            document.getElementById('eventoTitulo').value = '';
-            document.getElementById('eventoDescripcion').value = '';
-            document.getElementById('eventoHorario').value = '';
-            document.getElementById('modalEvento').classList.add('show');
-        }
-        
-        function editarEvento(id) {
-            const evento = eventosManuales.find(e => e.id === id);
-            if (evento) {
-                document.getElementById('modalTitulo').textContent = '✏️ Editar Evento';
-                document.getElementById('eventoId').value = evento.id;
-                document.getElementById('eventoFecha').value = evento.fecha;
-                document.getElementById('eventoTitulo').value = evento.titulo;
-                document.getElementById('eventoDescripcion').value = evento.descripcion || '';
-                document.getElementById('eventoHorario').value = evento.horario || '';
-                document.getElementById('modalEvento').classList.add('show');
-            }
-        }
-        
-        function guardarEvento() {
-            const id = document.getElementById('eventoId').value;
-            const fecha = document.getElementById('eventoFecha').value;
-            const titulo = document.getElementById('eventoTitulo').value.trim();
-            const descripcion = document.getElementById('eventoDescripcion').value.trim();
-            const horario = document.getElementById('eventoHorario').value.trim();
-            
-            if (!fecha) { alert('⚠️ Seleccioná una fecha'); return; }
-            if (!titulo) { alert('⚠️ El título es obligatorio'); return; }
-            
-            if (id) {
-                const idx = eventosManuales.findIndex(e => e.id === id);
-                if (idx >= 0) {
-                    eventosManuales[idx].fecha = fecha;
-                    eventosManuales[idx].titulo = titulo;
-                    eventosManuales[idx].descripcion = descripcion;
-                    eventosManuales[idx].horario = horario;
-                }
-            } else {
-                eventosManuales.push({ id: 'EVT-' + Date.now(), fecha, titulo, descripcion, horario });
-            }
-            
-            guardarEventos();
-            cerrarModal();
-            renderCalendar();
-            if (rangoSeleccionado) actualizarResumen();
-        }
-        
-        function eliminarEvento(id) {
-            if (confirm('¿Eliminar este evento?')) {
-                eventosManuales = eventosManuales.filter(e => e.id !== id);
-                guardarEventos();
-                renderCalendar();
-                if (rangoSeleccionado) actualizarResumen();
-            }
-        }
-        
-        function cerrarModal() { document.getElementById('modalEvento').classList.remove('show'); }
-        
-        function filtrarPorRango() {
-            const desde = document.getElementById('fechaDesde').value;
-            const hasta = document.getElementById('fechaHasta').value;
-            if (desde && hasta) {
-                rangoSeleccionado = { desde, hasta };
-                actualizarResumen();
-                renderCalendar();
-            }
-        }
-        
-        function limpiarFiltro() {
-            rangoSeleccionado = null;
-            document.getElementById('fechaDesde').value = '';
-            document.getElementById('fechaHasta').value = '';
-            document.getElementById('resumenContainer').classList.remove('show');
-            renderCalendar();
-        }
-        
-        function actualizarResumen() {
-            if (!rangoSeleccionado) return;
-            
-            const eventosRango = eventosManuales.filter(e => e.fecha >= rangoSeleccionado.desde && e.fecha <= rangoSeleccionado.hasta);
-            const container = document.getElementById('resumenContainer');
-            const lista = document.getElementById('resumenLista');
-            container.classList.add('show');
-            
-            if (eventosRango.length === 0) {
-                lista.innerHTML = '<p style="color:#999;text-align:center;padding:20px;">No hay eventos en este período</p>';
-                return;
-            }
-            
-            eventosRango.sort((a, b) => a.fecha.localeCompare(b.fecha));
-            
-            lista.innerHTML = eventosRango.map(e => {
-                const fechaFormateada = new Date(e.fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-                return `
-                    <div class="resumen-item">
-                        <div class="resumen-fecha">${fechaFormateada}</div>
-                        <div class="resumen-info">
-                            <strong>${e.titulo}</strong>
-                            ${e.descripcion ? `<p>${e.descripcion}</p>` : ''}
-                            ${e.horario ? `<p style="color:#999;font-size:11px;">⏰ ${e.horario}</p>` : ''}
-                        </div>
-                        <div class="resumen-acciones">
-                            <button class="btn-editar" onclick="editarEvento('${e.id}')">✏️</button>
-                            <button class="btn-eliminar" onclick="eliminarEvento('${e.id}')">🗑️</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function compartirPorWhatsApp() {
-            if (!rangoSeleccionado) { alert('⚠️ Primero seleccioná un rango de fechas'); return; }
-            
-            const eventosRango = eventosManuales.filter(e => e.fecha >= rangoSeleccionado.desde && e.fecha <= rangoSeleccionado.hasta);
-            if (eventosRango.length === 0) { alert('⚠️ No hay eventos en este período'); return; }
-            
-            eventosRango.sort((a, b) => a.fecha.localeCompare(b.fecha));
-            
-            const fechaDesde = new Date(rangoSeleccionado.desde + 'T00:00:00').toLocaleDateString('es-ES');
-            const fechaHasta = new Date(rangoSeleccionado.hasta + 'T00:00:00').toLocaleDateString('es-ES');
-            
-            let mensaje = `🌟 *Bienvenidos!!!*\n*Nos espera una estadía maravillosa!!!*\n\n`;
-            mensaje += `📅 *CRONOGRAMA*\n${fechaDesde} al ${fechaHasta}\n${eventosRango.length} actividades\n\n`;
-            
-            eventosRango.forEach(e => {
-                const ff = new Date(e.fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-                mensaje += `📅 *${ff}*\n   🕐 ${e.titulo}\n`;
-                if (e.horario) mensaje += `   ⏰ ${e.horario}\n`;
-                if (e.descripcion) mensaje += `   📝 ${e.descripcion}\n`;
-                mensaje += '\n';
-            });
-            
-            mensaje += `😢 *A no ponerse triste, volvemos a casa!!*\n\n`;
-            mensaje += `🎯 *Asegurá tu lugar, sé el primero en reservar!!*\n`;
-            mensaje += `👉 *Hacé click y entrá a nuestro sistema de reservas!!*\n`;
-            mensaje += `https://sebagsc2020.github.io/reservacordinador1/index.html\n\n`;
-            mensaje += `🏔️ Aventura Total`;
-            
-            window.open('https://wa.me/?text=' + encodeURIComponent(mensaje), '_blank');
-        }
-        
-        document.getElementById('modalEvento').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarModal(); });
-        
-        renderCalendar();
-    </script>
-</body>
-</html>
+        const diasSemana = ['Dom','Lun','Mar
