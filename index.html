@@ -8,118 +8,301 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow-x: hidden; }
-        .landing-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         
-        .hero-section { text-align: center; padding: 25px 20px 20px; animation: fadeInDown 0.8s ease; }
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
         
-        .hero-logo { font-size: 80px; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .landing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
         
-        .hero-title { font-size: 42px; font-weight: 800; color: white; margin-bottom: 12px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); line-height: 1.1; }
+        /* ===== HERO ===== */
+        .hero-section {
+            text-align: center;
+            padding: 40px 20px 30px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .hero-logo {
+            font-size: 70px;
+            margin-bottom: 15px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        .hero-title {
+            font-size: 38px;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+        .hero-title span { color: #667eea; }
         
         .hero-bienvenida {
-            font-size: 20px; color: rgba(255,255,255,0.95); margin-bottom: 12px;
-            font-weight: 500; max-width: 650px; margin-left: auto; margin-right: auto;
-            line-height: 1.6; background: rgba(255,255,255,0.1); padding: 18px 28px;
-            border-radius: 15px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2);
+            font-size: 17px;
+            color: #555;
+            max-width: 600px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+            background: #fafbfc;
+            padding: 20px 28px;
+            border-radius: 16px;
+            border: 1px solid #f0f0f0;
         }
-        .hero-bienvenida strong { color: #ffd93d; font-size: 22px; }
-
+        .hero-bienvenida strong { color: #667eea; font-size: 18px; }
+        
+        /* ===== TIPS ===== */
         .tips-section {
-            background: rgba(255,255,255,0.1); border-radius: 20px; padding: 30px 25px;
-            margin-top: 15px; margin-bottom: 35px; backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2); animation: fadeInUp 0.6s ease;
+            background: white;
+            border-radius: 24px;
+            padding: 35px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
         }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .tips-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
-        .tips-title { color: white; font-size: 28px; margin: 0; }
-        .tips-clima { color: white; font-size: 20px; font-weight: 700; background: rgba(255,255,255,0.15); padding: 10px 18px; border-radius: 20px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 8px; }
-        .tips-clima .temperatura { font-size: 22px; } .tips-clima .clima-icono { font-size: 24px; }
-        .tips-subtitle { text-align: center; color: rgba(255,255,255,0.8); margin-bottom: 25px; font-size: 17px; }
-        .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px; }
-        .tip-card { background: white; border-radius: 12px; padding: 20px; display: flex; align-items: flex-start; gap: 12px; transition: all 0.3s ease; }
-        .tip-card:hover { transform: translateX(3px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
-        .tip-icon { font-size: 38px; min-width: 42px; }
-        .tip-content h4 { color: #333; font-size: 18px; margin-bottom: 6px; }
-        .tip-content p { color: #666; font-size: 15px; line-height: 1.5; }
+        .tips-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
         
-        .btn-reservar-hero { display: inline-block; padding: 18px 50px; background: white; color: #667eea; text-decoration: none; border-radius: 50px; font-size: 20px; font-weight: 700; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.2); animation: pulse 2s infinite; }
-        .btn-reservar-hero:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.3); background: #f8f9fa; }
-        @keyframes pulse { 0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.2); } 50% { box-shadow: 0 12px 35px rgba(255,255,255,0.4); } }
+        .tips-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1a1a2e;
+        }
         
-        .whatsapp-float { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; text-decoration: none; box-shadow: 0 4px 15px rgba(37,211,102,0.4); z-index: 1000; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(37,211,102,0.6); }
+        .tips-clima {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            background: #f0f0ff;
+            padding: 10px 18px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #e0e0ff;
+        }
+        .tips-clima .temperatura { font-size: 20px; }
+        .tips-clima .clima-icono { font-size: 22px; }
         
-        .footer { text-align: center; color: rgba(255,255,255,0.7); padding: 20px 0; font-size: 15px; }
-        .footer a { color: white; text-decoration: none; font-weight: 600; } .footer a:hover { text-decoration: underline; }
-        .footer-separador { color: rgba(255,255,255,0.4); margin: 0 8px; }
+        .tips-subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
         
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 10000; }
-        .modal-content { background: white; border-radius: 20px; width: 90%; max-width: 600px; max-height: 80vh; box-shadow: 0 25px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; border-bottom: 1px solid #e0e0e0; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 20px 20px 0 0; }
-        .modal-header h2 { color: white; font-size: 20px; margin: 0; } .modal-close { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 28px; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .modal-body { padding: 25px; overflow-y: auto; flex: 1; font-size: 15px; } .modal-body h3 { color: #667eea; font-size: 17px; } .modal-body p { color: #555; line-height: 1.6; } .modal-body ul { padding-left: 20px; } .modal-body ul li { color: #555; line-height: 1.6; }
-        .modal-footer { padding: 15px 25px; border-top: 1px solid #e0e0e0; text-align: center; } .btn-modal-cerrar { padding: 14px 40px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 15px;
+        }
+        
+        .tip-card {
+            background: #fafbfc;
+            border: 1px solid #f0f0f0;
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: all 0.2s ease;
+        }
+        .tip-card:hover {
+            background: #f0f0ff;
+            border-color: #d0d0ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.1);
+        }
+        
+        .tip-icon { font-size: 36px; min-width: 42px; }
+        .tip-content h4 { color: #1a1a2e; font-size: 16px; margin-bottom: 5px; font-weight: 700; }
+        .tip-content p { color: #666; font-size: 14px; line-height: 1.5; }
+        
+        /* ===== BOTÓN CTA ===== */
+        .btn-reservar-hero {
+            display: inline-block;
+            padding: 16px 45px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102,126,234,0.3);
+        }
+        .btn-reservar-hero:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102,126,234,0.4);
+        }
+        
+        /* ===== WHATSAPP ===== */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 58px;
+            height: 58px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 5px 20px rgba(37,211,102,0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        .whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 8px 25px rgba(37,211,102,0.4); }
+        
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            color: #888;
+            padding: 20px 0;
+            font-size: 14px;
+        }
+        .footer a { color: #667eea; text-decoration: none; font-weight: 600; }
+        .footer a:hover { text-decoration: underline; }
+        .footer-separador { color: #ddd; margin: 0 10px; }
+        
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+            display: flex; justify-content: center; align-items: center; z-index: 10000;
+        }
+        .modal-content {
+            background: white; border-radius: 20px; width: 90%; max-width: 550px;
+            max-height: 80vh; box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 25px; border-bottom: 1px solid #f0f0f0;
+            background: #fafbfc; border-radius: 20px 20px 0 0;
+        }
+        .modal-header h2 { font-size: 18px; color: #1a1a2e; }
+        .modal-close { background: #f0f0f0; border: none; font-size: 20px; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: #e74c3c; color: white; }
+        .modal-body { padding: 25px; overflow-y: auto; flex: 1; }
+        .modal-body h3 { color: #667eea; font-size: 15px; margin: 15px 0 8px; }
+        .modal-body p { color: #555; font-size: 14px; line-height: 1.6; }
+        .modal-body ul { padding-left: 18px; } .modal-body ul li { color: #555; font-size: 14px; line-height: 1.6; }
+        .modal-footer { padding: 15px 25px; border-top: 1px solid #f0f0f0; text-align: center; }
+        .btn-modal-cerrar { padding: 12px 35px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
         body.modal-abierto { overflow: hidden; }
         
-        @media (max-width: 768px) { .hero-logo { font-size: 65px; } .hero-title { font-size: 34px; } .hero-bienvenida { font-size: 18px; } .tips-title { font-size: 26px; } .btn-reservar-hero { padding: 16px 40px; font-size: 18px; } }
-        @media (max-width: 480px) { .hero-logo { font-size: 55px; } .hero-title { font-size: 28px; } .hero-bienvenida { font-size: 17px; padding: 15px 18px; } .hero-bienvenida strong { font-size: 19px; } .tips-header { flex-direction: column; } .tips-title { font-size: 24px; } .tips-grid { grid-template-columns: 1fr; } .btn-reservar-hero { width: 100%; font-size: 17px; } .whatsapp-float { width: 52px; height: 52px; font-size: 26px; } }
+        @media (max-width: 768px) {
+            .hero-title { font-size: 30px; }
+            .hero-bienvenida { font-size: 15px; }
+            .tips-title { font-size: 22px; }
+            .btn-reservar-hero { padding: 14px 35px; font-size: 16px; }
+            .whatsapp-float { width: 50px; height: 50px; font-size: 24px; }
+        }
+        @media (max-width: 480px) {
+            .landing-container { padding: 15px 10px; }
+            .hero-section { padding: 25px 15px; }
+            .hero-logo { font-size: 55px; }
+            .hero-title { font-size: 26px; }
+            .hero-bienvenida { font-size: 14px; padding: 15px; }
+            .tips-section { padding: 20px 15px; }
+            .tips-header { flex-direction: column; text-align: center; }
+            .tips-title { font-size: 20px; }
+            .tips-grid { grid-template-columns: 1fr; }
+            .btn-reservar-hero { width: 100%; text-align: center; }
+        }
     </style>
 </head>
 <body>
     <a href="https://wa.me/5493518692251?text=¡Hola!%20Quiero%20información%20sobre%20las%20excursiones%20🏔️" class="whatsapp-float" target="_blank">💬</a>
 
     <div class="landing-container">
+        
+        <!-- HERO -->
         <header class="hero-section">
             <div class="hero-logo">🧭</div>
-            <h1 class="hero-title">Aventura Total</h1>
+            <h1 class="hero-title">Aventura <span>Total</span></h1>
             <p class="hero-bienvenida">
-                🌟 <strong>¡Bienvenidos, pasajeros!</strong> 🌟<br>
+                🌟 <strong>¡Bienvenidos, pasajeros!</strong><br>
                 Nos llena de alegría tenerlos a bordo. Prepárense para vivir momentos inolvidables 
                 y descubrir paisajes increíbles.
             </p>
         </header>
 
+        <!-- TIPS -->
         <section class="tips-section">
             <div class="tips-header">
                 <h2 class="tips-title">💡 Tips para Nuevos Pasajeros</h2>
-                <div class="tips-clima"><span class="clima-icono" id="climaIcono">😎</span><span class="temperatura" id="temperaturaValor">--°</span></div>
+                <div class="tips-clima">
+                    <span class="clima-icono" id="climaIcono">😎</span>
+                    <span class="temperatura" id="temperaturaValor">--°</span>
+                </div>
             </div>
             <p class="tips-subtitle">Todo lo que necesitas saber para disfrutar al máximo</p>
+            
             <div class="tips-grid">
-                <div class="tip-card"><div class="tip-icon">👟</div><div class="tip-content"><h4>Ropa y Calzado</h4><p>Usa ropa cómoda y calzado apropiado para caminar.</p></div></div>
-                <div class="tip-card"><div class="tip-icon">🎒</div><div class="tip-content"><h4>Mochila de Día</h4><p>Lleva agua, snacks, protector solar y chaqueta ligera.</p></div></div>
-                <div class="tip-card"><div class="tip-icon">📸</div><div class="tip-content"><h4>Cámara y Batería</h4><p>Captura cada momento. Lleva batería extra.</p></div></div>
-                <div class="tip-card"><div class="tip-icon">🧴</div><div class="tip-content"><h4>Protección Solar</h4><p>Aplica protector solar cada 2 horas.</p></div></div>
-                <div class="tip-card"><div class="tip-icon">💧</div><div class="tip-content"><h4>Hidratación</h4><p>Lleva al menos 1 litro de agua.</p></div></div>
-                <div class="tip-card"><div class="tip-icon">🤝</div><div class="tip-content"><h4>Sigue Instrucciones</h4><p>Nuestros guías son expertos.</p></div></div>
-                <div class="tip-card"><div class="tip-icon">🍎</div><div class="tip-content"><h4>Alimentación</h4><p>Desayuna bien. Lleva frutas o frutos secos.</p></div></div>
-                <div class="tip-card"><div class="tip-icon">🩹</div><div class="tip-content"><h4>Botiquín Personal</h4><p>Medicamentos, tiritas y analgésicos.</p></div></div>
+                <div class="tip-card"><div class="tip-icon">👟</div><div class="tip-content"><h4>Ropa y Calzado</h4><p>Usa ropa cómoda y calzado apropiado para caminar. Zapatillas de trekking o deportivas.</p></div></div>
+                <div class="tip-card"><div class="tip-icon">🎒</div><div class="tip-content"><h4>Mochila de Día</h4><p>Lleva agua, snacks, protector solar, repelente y una chaqueta ligera.</p></div></div>
+                <div class="tip-card"><div class="tip-icon">📸</div><div class="tip-content"><h4>Cámara y Batería</h4><p>Captura cada momento. Lleva batería extra y espacio en la memoria.</p></div></div>
+                <div class="tip-card"><div class="tip-icon">🧴</div><div class="tip-content"><h4>Protección Solar</h4><p>Aplica protector solar antes de salir y reaplica cada 2 horas.</p></div></div>
+                <div class="tip-card"><div class="tip-icon">💧</div><div class="tip-content"><h4>Hidratación</h4><p>Lleva al menos 1 litro de agua. Mantenerte hidratado es clave.</p></div></div>
+                <div class="tip-card"><div class="tip-icon">🤝</div><div class="tip-content"><h4>Sigue Instrucciones</h4><p>Nuestros guías son expertos. Sigue sus indicaciones para tu seguridad.</p></div></div>
+                <div class="tip-card"><div class="tip-icon">🍎</div><div class="tip-content"><h4>Alimentación</h4><p>Desayuna bien. Lleva frutas, frutos secos o barras energéticas.</p></div></div>
+                <div class="tip-card"><div class="tip-icon">🩹</div><div class="tip-content"><h4>Botiquín Personal</h4><p>Medicamentos, tiritas y analgésicos por precaución.</p></div></div>
             </div>
         </section>
 
-        <div style="text-align: center; margin: 25px 0;">
+        <!-- CTA -->
+        <div style="text-align: center; margin: 30px 0;">
             <a href="reservar.html" class="btn-reservar-hero">🎯 ¡Reserva tu Aventura Ahora!</a>
         </div>
 
+        <!-- FOOTER -->
         <footer class="footer">
-            <p>© 2026 <strong>Aventura Total</strong> - Todos los derechos reservados</p>
-            <p style="margin-top: 5px;">
-                <a href="reservar.html">Reservar</a><span class="footer-separador">|</span>
-                <a id="linkPrivacidad">Privacidad</a><span class="footer-separador">|</span>
+            <p>© 2026 <strong>Aventura Total</strong> — Todos los derechos reservados</p>
+            <p style="margin-top: 8px;">
+                <a href="reservar.html">Reservar</a>
+                <span class="footer-separador">|</span>
+                <a id="linkPrivacidad">Privacidad</a>
+                <span class="footer-separador">|</span>
                 <a href="crm/index.html">Admin</a>
             </p>
         </footer>
     </div>
 
+    <!-- MODAL -->
     <div id="modalPrivacidad" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header"><h2>🔒 Política de Privacidad</h2><button class="modal-close" id="cerrarModal">&times;</button></div>
-            <div class="modal-body"><p>La agencia recopila únicamente los datos estrictamente necesarios.</p><h3>📋 Uso de los Datos</h3><ul><li>Gestionar reservas y procesar pagos.</li><li>Coordinar choferes y guías.</li><li>Enviar notificaciones.</li><li>Cumplir normativas legales.</li></ul><h3>✅ Derechos</h3><p>Acceder, Rectificar, Cancelar u Oponerse al uso de sus datos.</p></div>
+            <div class="modal-body">
+                <p>La agencia recopila únicamente los datos estrictamente necesarios para la prestación del servicio.</p>
+                <h3>📋 Uso de los Datos</h3>
+                <ul><li>Gestionar reservas, emitir vouchers y procesar pagos.</li><li>Coordinar la logística de choferes y guías.</li><li>Enviar notificaciones operativas urgentes.</li><li>Cumplir con normativas legales de transporte.</li></ul>
+                <h3>🔐 Confidencialidad</h3><p>Los datos no se venden ni se ceden comercialmente.</p>
+                <h3>✅ Derechos del Usuario</h3><p>Acceder, Rectificar, Cancelar u Oponerse al uso de sus datos personales.</p>
+            </div>
             <div class="modal-footer"><button class="btn-modal-cerrar" id="btnCerrarModal">Entendido</button></div>
         </div>
     </div>
@@ -128,29 +311,14 @@
         async function obtenerClima() {
             const tEl = document.getElementById('temperaturaValor'), iEl = document.getElementById('climaIcono');
             let lat, lon;
-            
-            // Intentar geolocalización por IP
-            try {
-                const r = await fetch('https://ipapi.co/json/');
-                const d = await r.json();
-                if (d.latitude && d.longitude) { lat = d.latitude; lon = d.longitude; }
-            } catch(e) {
-                // Si falla, usar Buenos Aires como ubicación por defecto
-                lat = -34.6037; lon = -58.3816;
-            }
-            
+            try { const r = await fetch('https://ipapi.co/json/'); const d = await r.json(); if (d.latitude && d.longitude) { lat = d.latitude; lon = d.longitude; } } catch(e) {}
             if (!lat || !lon) { lat = -34.6037; lon = -58.3816; }
-            
             try {
                 const rc = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
                 const dc = await rc.json();
                 if (dc.current_weather) {
-                    const t = Math.round(dc.current_weather.temperature);
-                    tEl.textContent = `${t}°`;
-                    if (t > 30) iEl.textContent = '🥵';
-                    else if (t > 20) iEl.textContent = '😎';
-                    else if (t > 10) iEl.textContent = '🌤️';
-                    else iEl.textContent = '🥶';
+                    const t = Math.round(dc.current_weather.temperature); tEl.textContent = `${t}°`;
+                    if (t > 30) iEl.textContent = '🥵'; else if (t > 20) iEl.textContent = '😎'; else if (t > 10) iEl.textContent = '🌤️'; else iEl.textContent = '🥶';
                 }
             } catch(e) { tEl.textContent = '--°'; }
         }
