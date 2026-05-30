@@ -16,7 +16,7 @@
         label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         input { width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px; }
         input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
-        .btn-login { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; margin-top: 10px; }
+        .btn-login { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; }
         .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102,126,234,0.4); }
         .btn-login:disabled { background: #95a5a6; cursor: not-allowed; transform: none; }
         .error-message { background: #ffe0e0; color: #c0392b; padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 15px; display: none; font-weight: 600; }
@@ -47,9 +47,8 @@
             const sesionActiva = localStorage.getItem('crm_sesion_activa');
             if (sesionActiva) {
                 const datos = JSON.parse(sesionActiva);
-                const ahora = Date.now();
-                if (ahora - datos.timestamp < 300000) {
-                    document.getElementById('errorMessage').textContent = '⚠️ Ya hay una sesión activa. Esperá que se cierre.';
+                if (Date.now() - datos.timestamp < 300000) {
+                    document.getElementById('errorMessage').textContent = '⚠️ Ya hay una sesión activa.';
                     document.getElementById('errorMessage').classList.add('show');
                     document.getElementById('btnLogin').disabled = true;
                     return true;
@@ -58,7 +57,28 @@
             document.getElementById('btnLogin').disabled = false;
             return false;
         }
-        verificarSesionExistente();
-        setInterval(verificarSesionExistente, 10000);
+        verificarSesionExistente(); setInterval(verificarSesionExistente, 10000);
         
-        document.getElementById('loginForm').addEventListener('
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('errorMessage');
+            
+            if (email === CREDENCIALES.email && password === CREDENCIALES.password) {
+                const sessionId = 'SESSION-' + Date.now();
+                localStorage.setItem('crm_sesion_activa', JSON.stringify({ id: sessionId, timestamp: Date.now(), user: email }));
+                sessionStorage.setItem('crm_logged', 'true');
+                sessionStorage.setItem('crm_user', email);
+                sessionStorage.setItem('crm_session_id', sessionId);
+                document.getElementById('btnLogin').textContent = '✅ Ingresando...';
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
+            } else {
+                errorMsg.textContent = '❌ Email o contraseña incorrectos';
+                errorMsg.classList.add('show');
+                setTimeout(() => errorMsg.classList.remove('show'), 3000);
+            }
+        });
+    </script>
+</body>
+</html>
