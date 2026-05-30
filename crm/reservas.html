@@ -108,12 +108,11 @@
                     
                     if (linea.startsWith('"RES-') || linea.startsWith('RES-')) {
                         if (actual && ultima) {
-                            // Extraer fecha, pax, pago de la última línea
                             const m = ultima.match(/"([^"]*)"/g);
-                            if (m && m.length >= 4) {
-                                actual.fecha = m[m.length-3].replace(/"/g,'').trim();
-                                actual.personas = m[m.length-2].replace(/"/g,'').trim();
-                                actual.formaPago = m[m.length-1].replace(/"/g,'').trim();
+                            if (m && m.length >= 5) {
+                                actual.fecha = m[m.length-4].replace(/"/g,'').trim();
+                                actual.personas = m[m.length-3].replace(/"/g,'').trim();
+                                actual.formaPago = m[m.length-2].replace(/"/g,'').trim();
                             }
                         }
                         if (actual) reservasData.push(actual);
@@ -137,10 +136,10 @@
                 if (actual) {
                     if (ultima) {
                         const m = ultima.match(/"([^"]*)"/g);
-                        if (m && m.length >= 4) {
-                            actual.fecha = m[m.length-3].replace(/"/g,'').trim();
-                            actual.personas = m[m.length-2].replace(/"/g,'').trim();
-                            actual.formaPago = m[m.length-1].replace(/"/g,'').trim();
+                        if (m && m.length >= 5) {
+                            actual.fecha = m[m.length-4].replace(/"/g,'').trim();
+                            actual.personas = m[m.length-3].replace(/"/g,'').trim();
+                            actual.formaPago = m[m.length-2].replace(/"/g,'').trim();
                         }
                     }
                     reservasData.push(actual);
