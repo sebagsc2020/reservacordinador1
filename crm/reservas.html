@@ -48,8 +48,8 @@
             cursor: pointer; font-weight: 600; font-size: 13px;
         }
         
-        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
         .header h1 { font-size: 26px; color: #1a1a2e; }
         
         .user-info {
@@ -66,44 +66,52 @@
         }
         .filter-input, .filter-select {
             padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px;
-            font-size: 13px; font-family: inherit;
+            font-size: 13px; font-family: inherit; min-width: 0;
         }
         .filter-input:focus, .filter-select:focus { outline: none; border-color: #667eea; }
-        .filter-input { flex: 1; min-width: 180px; }
+        .filter-input { flex: 1; min-width: 150px; }
         
-        .btn-filtrar { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        .btn-recargar { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        .btn-exportar { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .btn-filtrar { padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-recargar { padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-exportar { padding: 10px 15px; background: #3498db; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         
         /* ===== TABS ===== */
         .tabs {
-            display: flex; gap: 5px; margin-bottom: 20px; background: white;
+            display: flex; gap: 3px; margin-bottom: 20px; background: white;
             padding: 5px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            overflow-x: auto;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
         }
+        .tabs::-webkit-scrollbar { height: 0; }
         .tab {
-            padding: 10px 20px; border: none; background: transparent; border-radius: 8px;
-            cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap;
+            padding: 8px 14px; border: none; background: transparent; border-radius: 8px;
+            cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap;
             transition: all 0.3s ease; color: #666;
         }
         .tab:hover { background: #f0f0ff; color: #667eea; }
         .tab.active { background: #667eea; color: white; }
-        .tab .count { display: inline-block; background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px; }
+        .tab .count { display: inline-block; background: rgba(255,255,255,0.3); padding: 1px 6px; border-radius: 10px; font-size: 10px; margin-left: 3px; }
         
         /* ===== TABLA ===== */
-        .table-container { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
-        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .table-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow: hidden; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         .table-header h3 { font-size: 18px; color: #1a1a2e; }
         .table-header span { font-size: 13px; color: #999; }
         
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px 15px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-        td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #333; }
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -15px;
+            padding: 0 15px;
+        }
+        
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { text-align: left; padding: 10px 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; }
         tr:hover td { background: #f8f9ff; }
         
         .badge {
-            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
-            text-transform: uppercase; display: inline-block;
+            padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700;
+            text-transform: uppercase; display: inline-block; white-space: nowrap;
         }
         .badge-pendiente { background: #fff3cd; color: #856404; }
         .badge-confirmado { background: #d4edda; color: #155724; }
@@ -112,8 +120,8 @@
         .badge-cancelado { background: #f8d7da; color: #721c24; }
         
         .btn-accion {
-            padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer;
-            font-size: 11px; font-weight: 600; margin-right: 2px; transition: all 0.3s ease;
+            padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer;
+            font-size: 10px; font-weight: 600; margin-right: 2px; transition: all 0.3s ease;
         }
         .btn-ver { background: #667eea; color: white; }
         .btn-confirmar { background: #27ae60; color: white; }
@@ -122,8 +130,7 @@
         .btn-cancelar { background: #e74c3c; color: white; }
         .btn-email { background: #8e44ad; color: white; }
         .btn-whatsapp { background: #25D366; color: white; }
-        
-        .btn-accion:hover { opacity: 0.85; transform: scale(1.05); }
+        .btn-accion:hover { opacity: 0.85; }
         
         /* ===== MODAL ===== */
         .modal-overlay {
@@ -134,25 +141,52 @@
         .modal-overlay.show { display: flex; }
         
         .modal-content {
-            background: white; border-radius: 20px; padding: 35px; max-width: 600px;
+            background: white; border-radius: 20px; padding: 25px; max-width: 550px;
             width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);
             animation: slideUp 0.3s ease;
         }
         @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h2 { color: #667eea; }
-        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; }
-        .modal-info p { margin: 10px 0; font-size: 14px; color: #555; }
-        .modal-info strong { color: #333; display: inline-block; width: 120px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .modal-header h2 { color: #667eea; font-size: 18px; }
+        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
+        .modal-info p { margin: 8px 0; font-size: 13px; color: #555; }
+        .modal-info strong { color: #333; display: inline-block; width: 110px; }
         
-        .modal-acciones { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+        .modal-acciones { display: flex; gap: 6px; margin-top: 15px; flex-wrap: wrap; }
+        .modal-acciones .btn-accion { padding: 8px 14px; font-size: 12px; }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .main-content { padding: 20px; }
+            table { min-width: 800px; }
+        }
         
         @media (max-width: 768px) {
-            .sidebar { width: 70px; }
-            .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; }
-            .nav-menu a { justify-content: center; padding: 12px; }
-            .main-content { margin-left: 70px; padding: 15px; }
+            .sidebar { width: 60px; padding: 15px 0; }
+            .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon), .sidebar-footer span { display: none; }
+            .nav-menu a { justify-content: center; padding: 10px; }
+            .main-content { margin-left: 60px; padding: 15px; }
+            .header h1 { font-size: 20px; }
+            .filters-bar { padding: 10px 15px; gap: 8px; }
+            .filter-input { min-width: 120px; }
+            .tabs { gap: 2px; }
+            .tab { padding: 6px 10px; font-size: 11px; }
+            table { min-width: 700px; }
+            th, td { padding: 8px 10px; font-size: 11px; }
+            .badge { font-size: 9px; padding: 3px 8px; }
+            .btn-accion { padding: 4px 6px; font-size: 9px; }
+        }
+        
+        @media (max-width: 480px) {
+            .main-content { padding: 10px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .filters-bar { flex-direction: column; }
+            .filter-input, .filter-select { width: 100%; }
+            .btn-filtrar, .btn-recargar, .btn-exportar { width: 100%; text-align: center; }
+            table { min-width: 600px; }
+            th, td { padding: 6px 8px; font-size: 10px; }
+            .modal-content { padding: 15px; margin: 10px; }
         }
     </style>
 </head>
@@ -172,7 +206,7 @@
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
         </ul>
         <div class="sidebar-footer">
-            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar Sesión</button>
+            <button class="btn-logout-sidebar" onclick="logout()">🚪 <span>Cerrar Sesión</span></button>
         </div>
     </nav>
     
@@ -218,7 +252,7 @@
                 <h3>Lista de Reservas</h3>
                 <span id="totalReservasSpan">0 reservas</span>
             </div>
-            <div style="overflow-x:auto;">
+            <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
@@ -252,12 +286,12 @@
             </div>
             <div class="modal-info" id="modalInfo"></div>
             <div class="modal-acciones">
-                <button class="btn-accion btn-confirmar" onclick="cambiarEstado('confirmado')" style="padding:10px 18px;font-size:13px;">✅ Confirmar</button>
-                <button class="btn-accion btn-pagar" onclick="cambiarEstado('pagado')" style="padding:10px 18px;font-size:13px;">💰 Marcar Pagada</button>
-                <button class="btn-accion btn-realizar" onclick="cambiarEstado('realizado')" style="padding:10px 18px;font-size:13px;">🏁 Realizada</button>
-                <button class="btn-accion btn-cancelar" onclick="cambiarEstado('cancelado')" style="padding:10px 18px;font-size:13px;">❌ Cancelar</button>
-                <button class="btn-accion btn-email" onclick="enviarEmailCliente()" style="padding:10px 18px;font-size:13px;">📧 Email</button>
-                <button class="btn-accion btn-whatsapp" onclick="enviarWhatsAppCliente()" style="padding:10px 18px;font-size:13px;">💬 WhatsApp</button>
+                <button class="btn-accion btn-confirmar" onclick="cambiarEstado('confirmado')">✅ Confirmar</button>
+                <button class="btn-accion btn-pagar" onclick="cambiarEstado('pagado')">💰 Marcar Pagada</button>
+                <button class="btn-accion btn-realizar" onclick="cambiarEstado('realizado')">🏁 Realizada</button>
+                <button class="btn-accion btn-cancelar" onclick="cambiarEstado('cancelado')">❌ Cancelar</button>
+                <button class="btn-accion btn-email" onclick="enviarEmailCliente()">📧 Email</button>
+                <button class="btn-accion btn-whatsapp" onclick="enviarWhatsAppCliente()">💬 WhatsApp</button>
             </div>
         </div>
     </div>
@@ -266,7 +300,6 @@
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         
-        // ===== CONFIGURACIÓN =====
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
         
         let reservasData = [];
@@ -352,10 +385,10 @@
                 <tr>
                     <td><strong>${r.id}</strong></td>
                     <td>${r.nombre} ${r.apellido}</td>
-                    <td style="font-size:12px;">${r.email}</td>
+                    <td style="font-size:11px;">${r.email}</td>
                     <td>${r.pais}</td>
                     <td>${r.ciudad}</td>
-                    <td>${r.excursion.length > 22 ? r.excursion.substring(0,22)+'...' : r.excursion}</td>
+                    <td>${r.excursion.length > 20 ? r.excursion.substring(0,20)+'...' : r.excursion}</td>
                     <td>${r.fecha}</td>
                     <td>${r.personas}</td>
                     <td>${r.formaPago}</td>
@@ -374,7 +407,6 @@
             estadoFiltro = estado;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-            
             if (estado === 'todas') renderReservas(reservasData);
             else renderReservas(reservasData.filter(r => r.estado === estado));
         }
@@ -382,12 +414,10 @@
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva').value.toLowerCase();
             const pais = document.getElementById('filtroPais').value;
-            
             let filtradas = reservasData;
             if (estadoFiltro !== 'todas') filtradas = filtradas.filter(r => r.estado === estadoFiltro);
             if (busqueda) filtradas = filtradas.filter(r => r.id.toLowerCase().includes(busqueda) || r.nombre.toLowerCase().includes(busqueda) || r.email.toLowerCase().includes(busqueda));
             if (pais) filtradas = filtradas.filter(r => r.pais.includes(pais));
-            
             renderReservas(filtradas);
         }
         
@@ -431,12 +461,8 @@
             }
         }
         
-        function enviarEmailCliente() {
-            if (reservaSeleccionada) window.open('mailto:' + reservaSeleccionada.email);
-        }
-        function enviarWhatsAppCliente() {
-            if (reservaSeleccionada) window.open('https://wa.me/' + reservaSeleccionada.telefono.replace(/[^0-9]/g, ''));
-        }
+        function enviarEmailCliente() { if (reservaSeleccionada) window.open('mailto:' + reservaSeleccionada.email); }
+        function enviarWhatsAppCliente() { if (reservaSeleccionada) window.open('https://wa.me/' + reservaSeleccionada.telefono.replace(/[^0-9]/g, '')); }
         function exportarReservas() {
             let csv = 'ID,Cliente,Email,Teléfono,País,Ciudad,Excursión,Fecha,Personas,Forma Pago,Estado\n';
             reservasData.forEach(r => { csv += `"${r.id}","${r.nombre} ${r.apellido}","${r.email}","${r.telefono}","${r.pais}","${r.ciudad}","${r.excursion}","${r.fecha}","${r.personas}","${r.formaPago}","${r.estado}"\n`; });
