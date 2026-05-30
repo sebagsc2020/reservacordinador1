@@ -81,4 +81,37 @@
         let fechaActual = new Date(), mesActual = fechaActual.getMonth(), añoActual = fechaActual.getFullYear(), rangoSeleccionado = null;
         let eventosManuales = JSON.parse(localStorage.getItem('eventosManuales') || '[]');
         const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-        const diasSemana = ['Dom','Lun','Mar
+        const diasSemana = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+        
+        function guardarEventos() { localStorage.setItem('eventosManuales', JSON.stringify(eventosManuales)); }
+        function renderCalendar() {
+            document.getElementById('mesTitulo').textContent = `${meses[mesActual]} ${añoActual}`;
+            let html = ''; diasSemana.forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
+            const primerDia = new Date(añoActual, mesActual, 1).getDay(), diasEnMes = new Date(añoActual, mesActual + 1, 0).getDate(), diasMesAnterior = new Date(añoActual, mesActual, 0).getDate();
+            const hoy = new Date(), hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+            for (let i = primerDia - 1; i >= 0; i--) { const fuera = rangoSeleccionado ? 'fuera-rango' : ''; html += `<div class="calendar-day otro-mes ${fuera}"><div class="calendar-day-numero">${diasMesAnterior - i}</div></div>`; }
+            for (let dia = 1; dia <= diasEnMes; dia++) {
+                const fechaStr = `${añoActual}-${String(mesActual+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+                const esHoy = fechaStr === hoyStr, enRango = rangoSeleccionado && fechaStr >= rangoSeleccionado.desde && fechaStr <= rangoSeleccionado.hasta;
+                const fueraRango = rangoSeleccionado && !enRango, eventosDelDia = eventosManuales.filter(e => e.fecha === fechaStr);
+                html += `<div class="calendar-day ${esHoy ? 'today' : ''} ${enRango ? 'en-rango' : ''} ${fueraRango ? 'fuera-rango' : ''}"><div class="calendar-day-numero">${dia}</div>${eventosDelDia.map(e => `<div class="calendar-event">${e.titulo.substring(0,15)}</div>`).join('')}</div>`;
+            }
+            document.getElementById('calendarGrid').innerHTML = html;
+        }
+        function cambiarMes(dir) { mesActual += dir; if (mesActual > 11) { mesActual = 0; añoActual++; } if (mesActual < 0) { mesActual = 11; añoActual--; } renderCalendar(); }
+        function filtrarPorRango() { const desde = document.getElementById('fechaDesde').value, hasta = document.getElementById('fechaHasta').value; if (desde && hasta) { rangoSeleccionado = { desde, hasta }; renderCalendar(); } }
+        function limpiarFiltro() { rangoSeleccionado = null; document.getElementById('fechaDesde').value = ''; document.getElementById('fechaHasta').value = ''; renderCalendar(); }
+        function compartirPorWhatsApp() {
+            if (!rangoSeleccionado) { alert('⚠️ Seleccioná un rango'); return; }
+            const eventosRango = eventosManuales.filter(e => e.fecha >= rangoSeleccionado.desde && e.fecha <= rangoSeleccionado.hasta);
+            if (eventosRango.length === 0) { alert('⚠️ No hay eventos'); return; }
+            eventosRango.sort((a,b) => a.fecha.localeCompare(b.fecha));
+            let m = `🌟 *Bienvenidos!!!*\n*Nos espera una estadía maravillosa!!!*\n\n📅 *CRONOGRAMA*\n${eventosRango.length} actividades\n\n`;
+            eventosRango.forEach(e => { const ff = new Date(e.fecha+'T00:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}); m += `📅 *${ff}*\n   🕐 ${e.titulo}\n${e.horario?'   ⏰ '+e.horario+'\n':''}${e.descripcion?'   📝 '+e.descripcion+'\n':''}\n`; });
+            m += `😢 *A no ponerse triste, volvemos a casa!!*\n\n🎯 *Asegurá tu lugar, sé el primero en reservar!!*\n👉 *Hacé click y entrá a nuestro sistema de reservas!!*\nhttps://sebagsc2020.github.io/reservacordinador1/index.html\n\n🏔️ Aventura Total`;
+            window.open('https://wa.me/?text='+encodeURIComponent(m), '_blank');
+        }
+        renderCalendar();
+    </script>
+</body>
+</html>
