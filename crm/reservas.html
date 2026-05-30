@@ -176,7 +176,7 @@
         <div class="header">
             <div>
                 <h1>📋 Reservas</h1>
-                <p style="color:#999;font-size:13px;">Sistema de gestión de reservas</p>
+                <p style="color:#999;font-size:13px;">Datos desde Google Sheets</p>
             </div>
             <div class="user-info">
                 <div class="user-avatar">A</div>
@@ -258,94 +258,84 @@
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         
+        // ===== MISMA URL QUE FUNCIONA EN CLIENTES =====
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
+        
         let reservasData = [];
         let estadoFiltro = 'todas';
         let reservaSeleccionada = null;
         
-        // ===== CARGAR DATOS =====
         async function cargarReservas() {
-            // Primero intentar cargar desde Google Sheets
-            let cargadoDesdeSheets = false;
-            
             try {
-                const SPREADSHEET_ID = '1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q';
-                const urls = [
-                    `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=0`,
-                    `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=Hoja%201`
-                ];
+                console.log('🔄 Cargando reservas...');
                 
-                for (const url of urls) {
-                    try {
-                        const respuesta = await fetch(url, { cache: 'no-store' });
-                        if (respuesta.ok) {
-                            const csv = await respuesta.text();
-                            if (csv.includes('@') || csv.includes('Nombre')) {
-                                procesarCSV(csv);
-                                cargadoDesdeSheets = true;
-                                console.log('✅ Datos cargados desde Google Sheets');
-                                break;
-                            }
+                const respuesta = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                const csv = await respuesta.text();
+                
+                console.log('📄 CSV recibido, primeras líneas:', csv.substring(0, 300));
+                
+                const lineas = csv.split('\n');
+                reservasData = [];
+                
+                // Saltar la primera línea (encabezados)
+                for (let i = 1; i < lineas.length; i++) {
+                    const linea = lineas[i].trim();
+                    if (!linea || linea.startsWith('"ID')) continue;
+                    
+                    // Parsear CSV respetando comillas
+                    const valores = [];
+                    let actual = '';
+                    let entreComillas = false;
+                    
+                    for (let j = 0; j < linea.length; j++) {
+                        const char = linea[j];
+                        if (char === '"') {
+                            entreComillas = !entreComillas;
+                        } else if (char === ',' && !entreComillas) {
+                            valores.push(actual.trim());
+                            actual = '';
+                        } else {
+                            actual += char;
                         }
-                    } catch (e) {}
+                    }
+                    valores.push(actual.trim());
+                    
+                    // Limpiar valores
+                    const limpio = valores.map(v => v.replace(/^"|"$/g, '').trim());
+                    
+                    if (limpio.length >= 10 && limpio[2]) {
+                        reservasData.push({
+                            id: limpio[0] || 'SIN-ID',
+                            fechaReserva: limpio[1] || '',
+                            nombre: limpio[2] || '',
+                            apellido: limpio[3] || '',
+                            email: limpio[4] || '',
+                            telefono: limpio[5] || '',
+                            pais: limpio[6] || '',
+                            ciudad: limpio[7] || '',
+                            excursion: limpio[8] || '',
+                            fecha: limpio[9] || '',
+                            personas: limpio[10] || '0',
+                            formaPago: limpio[11] || 'No especificada',
+                            busqueda: limpio[12] || '',
+                            estado: 'confirmado'
+                        });
+                    }
                 }
-            } catch (e) {
-                console.log('No se pudo conectar con Google Sheets');
-            }
-            
-            // Si no se pudo cargar de Sheets, usar datos de prueba
-            if (!cargadoDesdeSheets) {
-                console.log('⚠️ Usando datos de prueba');
-                reservasData = [
-                    { id: 'RES-001', fechaReserva: '29/05/2026', nombre: 'Juan', apellido: 'Pérez', email: 'juan@email.com', telefono: '+543511234567', pais: 'Argentina', ciudad: 'Villa Carlos Paz', excursion: 'City Tour Local', fecha: '29-05-2026', personas: '4', formaPago: 'Efectivo', estado: 'confirmado' },
-                    { id: 'RES-002', fechaReserva: '30/05/2026', nombre: 'María', apellido: 'García', email: 'maria@email.com', telefono: '+543517654321', pais: 'Brasil', ciudad: 'Balneário Camboriú', excursion: 'Barco Pirata', fecha: '30-05-2026', personas: '2', formaPago: 'Débito/Crédito', estado: 'pendiente' },
-                    { id: 'RES-003', fechaReserva: '01/06/2026', nombre: 'Carlos', apellido: 'López', email: 'carlos@email.com', telefono: '+54112345678', pais: 'Chile', ciudad: 'Santiago de Chile', excursion: 'Valle Nevado', fecha: '01-06-2026', personas: '6', formaPago: 'Transferencia', estado: 'pagado' },
-                    { id: 'RES-004', fechaReserva: '02/06/2026', nombre: 'Ana', apellido: 'Martínez', email: 'ana@email.com', telefono: '+542613456789', pais: 'Argentina', ciudad: 'Bariloche', excursion: 'Circuito Chico', fecha: '02-06-2026', personas: '3', formaPago: 'Débito/Crédito', estado: 'realizado' },
-                    { id: 'RES-005', fechaReserva: '03/06/2026', nombre: 'Pedro', apellido: 'Sánchez', email: 'pedro@email.com', telefono: '+543414567890', pais: 'Brasil', ciudad: 'Florianópolis', excursion: 'City Tour Histórico', fecha: '03-06-2026', personas: '2', formaPago: 'Efectivo', estado: 'pendiente' },
-                    { id: 'RES-006', fechaReserva: '04/06/2026', nombre: 'Laura', apellido: 'Fernández', email: 'laura@email.com', telefono: '+543815678901', pais: 'Argentina', ciudad: 'Mendoza', excursion: 'Camino del Vino', fecha: '04-06-2026', personas: '5', formaPago: 'Transferencia', estado: 'confirmado' },
-                    { id: 'RES-007', fechaReserva: '05/06/2026', nombre: 'Diego', apellido: 'Torres', email: 'diego@email.com', telefono: '+543516789012', pais: 'Chile', ciudad: 'Santiago de Chile', excursion: 'Sky Costanera', fecha: '05-06-2026', personas: '4', formaPago: 'Débito/Crédito', estado: 'confirmado' },
-                    { id: 'RES-008', fechaReserva: '06/06/2026', nombre: 'Sofía', apellido: 'Rodríguez', email: 'sofia@email.com', telefono: '+54117890123', pais: 'Argentina', ciudad: 'Ushuaia', excursion: 'Tren del Fin del Mundo', fecha: '06-06-2026', personas: '2', formaPago: 'Efectivo', estado: 'pagado' }
-                ];
-            }
-            
-            renderReservas(reservasData);
-            actualizarContadores();
-        }
-        
-        function procesarCSV(csv) {
-            const lineas = csv.split('\n');
-            reservasData = [];
-            
-            for (let i = 1; i < lineas.length; i++) {
-                const linea = lineas[i].trim();
-                if (!linea) continue;
                 
-                const valores = [];
-                let actual = '', entreComillas = false;
-                for (let j = 0; j < linea.length; j++) {
-                    const char = linea[j];
-                    if (char === '"') entreComillas = !entreComillas;
-                    else if (char === ',' && !entreComillas) { valores.push(actual.trim()); actual = ''; }
-                    else actual += char;
-                }
-                valores.push(actual.trim());
+                console.log('✅ Reservas cargadas:', reservasData.length);
+                renderReservas(reservasData);
+                actualizarContadores();
                 
-                if (valores.length >= 10 && valores[2]) {
-                    reservasData.push({
-                        id: limpiar(valores[0]), fechaReserva: limpiar(valores[1]),
-                        nombre: limpiar(valores[2]), apellido: limpiar(valores[3]),
-                        email: limpiar(valores[4]), telefono: limpiar(valores[5]),
-                        pais: limpiar(valores[6]), ciudad: limpiar(valores[7]),
-                        excursion: limpiar(valores[8]), fecha: limpiar(valores[9]),
-                        personas: limpiar(valores[10]),
-                        formaPago: valores[11] ? limpiar(valores[11]) : 'No especificada',
-                        busqueda: valores[12] ? limpiar(valores[12]) : '',
-                        estado: 'confirmado'
-                    });
-                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                document.getElementById('tablaReservas').innerHTML = 
+                    `<tr><td colspan="11" style="text-align:center;color:#e74c3c;padding:30px;">
+                        ❌ Error: ${error.message}<br><br>
+                        <button class="btn-recargar" onclick="cargarReservas()">🔄 Reintentar</button>
+                    </td></tr>`;
             }
         }
-        
-        function limpiar(valor) { return valor ? valor.replace(/^"|"$/g, '').trim() : ''; }
         
         function actualizarContadores() {
             document.getElementById('countTodas').textContent = reservasData.length;
@@ -371,16 +361,16 @@
                     <td style="font-size:11px;">${r.email}</td>
                     <td>${r.pais}</td>
                     <td>${r.ciudad}</td>
-                    <td>${r.excursion.length > 20 ? r.excursion.substring(0,20)+'...' : r.excursion}</td>
+                    <td>${r.excursion.length > 22 ? r.excursion.substring(0,22)+'...' : r.excursion}</td>
                     <td>${r.fecha}</td>
                     <td>${r.personas}</td>
                     <td>${r.formaPago}</td>
                     <td><span class="badge badge-${r.estado}">${r.estado}</span></td>
                     <td style="white-space:nowrap;">
-                        <button class="btn-accion btn-ver" onclick="verReserva('${r.id}')" title="Ver">👁️</button>
-                        <button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')" title="Confirmar">✅</button>
-                        <button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')" title="Marcar Pagada">💰</button>
-                        <button class="btn-accion btn-cancelar" onclick="cambiarEstadoDirecto('${r.id}','cancelado')" title="Cancelar">❌</button>
+                        <button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button>
+                        <button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')">✅</button>
+                        <button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')">💰</button>
+                        <button class="btn-accion btn-cancelar" onclick="cambiarEstadoDirecto('${r.id}','cancelado')">❌</button>
                     </td>
                 </tr>
             `).join('');
@@ -457,7 +447,6 @@
         document.getElementById('modalReserva').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarModal(); });
         
-        // Cargar al iniciar
         cargarReservas();
     </script>
 </body>
