@@ -62,22 +62,12 @@
         .modal-content { background: white; border-radius: 20px; width: 90%; max-width: 600px; max-height: 80vh; box-shadow: 0 25px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; border-bottom: 1px solid #e0e0e0; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 20px 20px 0 0; }
         .modal-header h2 { color: white; font-size: 20px; margin: 0; } .modal-close { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 28px; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .modal-body { padding: 25px; overflow-y: auto; flex: 1; font-size: 15px; }
-        .modal-body h3 { color: #667eea; font-size: 17px; } .modal-body p { color: #555; line-height: 1.6; } .modal-body ul { padding-left: 20px; } .modal-body ul li { color: #555; line-height: 1.6; }
-        .modal-footer { padding: 15px 25px; border-top: 1px solid #e0e0e0; text-align: center; }
-        .btn-modal-cerrar { padding: 14px 40px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .modal-body { padding: 25px; overflow-y: auto; flex: 1; font-size: 15px; } .modal-body h3 { color: #667eea; font-size: 17px; } .modal-body p { color: #555; line-height: 1.6; } .modal-body ul { padding-left: 20px; } .modal-body ul li { color: #555; line-height: 1.6; }
+        .modal-footer { padding: 15px 25px; border-top: 1px solid #e0e0e0; text-align: center; } .btn-modal-cerrar { padding: 14px 40px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer; }
         body.modal-abierto { overflow: hidden; }
         
-        @media (max-width: 768px) { 
-            .hero-logo { font-size: 65px; } .hero-title { font-size: 34px; } .hero-bienvenida { font-size: 18px; } 
-            .tips-title { font-size: 26px; } .btn-reservar-hero { padding: 16px 40px; font-size: 18px; } 
-        }
-        @media (max-width: 480px) { 
-            .hero-logo { font-size: 55px; } .hero-title { font-size: 28px; } .hero-bienvenida { font-size: 17px; padding: 15px 18px; }
-            .hero-bienvenida strong { font-size: 19px; }
-            .tips-header { flex-direction: column; } .tips-title { font-size: 24px; } .tips-grid { grid-template-columns: 1fr; } 
-            .btn-reservar-hero { width: 100%; font-size: 17px; } .whatsapp-float { width: 52px; height: 52px; font-size: 26px; }
-        }
+        @media (max-width: 768px) { .hero-logo { font-size: 65px; } .hero-title { font-size: 34px; } .hero-bienvenida { font-size: 18px; } .tips-title { font-size: 26px; } .btn-reservar-hero { padding: 16px 40px; font-size: 18px; } }
+        @media (max-width: 480px) { .hero-logo { font-size: 55px; } .hero-title { font-size: 28px; } .hero-bienvenida { font-size: 17px; padding: 15px 18px; } .hero-bienvenida strong { font-size: 19px; } .tips-header { flex-direction: column; } .tips-title { font-size: 24px; } .tips-grid { grid-template-columns: 1fr; } .btn-reservar-hero { width: 100%; font-size: 17px; } .whatsapp-float { width: 52px; height: 52px; font-size: 26px; } }
     </style>
 </head>
 <body>
@@ -137,15 +127,30 @@
     <script>
         async function obtenerClima() {
             const tEl = document.getElementById('temperaturaValor'), iEl = document.getElementById('climaIcono');
+            let lat, lon;
+            
+            // Intentar geolocalización por IP
             try {
-                const r = await fetch('https://ipapi.co/json/'); const d = await r.json();
-                if (d.latitude && d.longitude) {
-                    const rc = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${d.latitude}&longitude=${d.longitude}&current_weather=true`);
-                    const dc = await rc.json();
-                    if (dc.current_weather) {
-                        const t = Math.round(dc.current_weather.temperature); tEl.textContent = `${t}°`;
-                        if (t > 30) iEl.textContent = '🥵'; else if (t > 20) iEl.textContent = '😎'; else if (t > 10) iEl.textContent = '🌤️'; else iEl.textContent = '🥶';
-                    }
+                const r = await fetch('https://ipapi.co/json/');
+                const d = await r.json();
+                if (d.latitude && d.longitude) { lat = d.latitude; lon = d.longitude; }
+            } catch(e) {
+                // Si falla, usar Buenos Aires como ubicación por defecto
+                lat = -34.6037; lon = -58.3816;
+            }
+            
+            if (!lat || !lon) { lat = -34.6037; lon = -58.3816; }
+            
+            try {
+                const rc = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                const dc = await rc.json();
+                if (dc.current_weather) {
+                    const t = Math.round(dc.current_weather.temperature);
+                    tEl.textContent = `${t}°`;
+                    if (t > 30) iEl.textContent = '🥵';
+                    else if (t > 20) iEl.textContent = '😎';
+                    else if (t > 10) iEl.textContent = '🌤️';
+                    else iEl.textContent = '🥶';
                 }
             } catch(e) { tEl.textContent = '--°'; }
         }
