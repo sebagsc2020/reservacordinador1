@@ -49,7 +49,6 @@
         }
         
         .main-content { margin-left: 250px; flex: 1; padding: 30px; }
-        
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h1 { font-size: 26px; color: #1a1a2e; }
         
@@ -59,7 +58,42 @@
         }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
-        /* ===== KANBAN BOARD ===== */
+        .btn-recargar {
+            padding: 10px 20px; background: #27ae60; color: white; border: none;
+            border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px;
+        }
+        
+        /* ===== MÉTRICAS ===== */
+        .metricas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .metrica-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .metrica-valor {
+            font-size: 28px;
+            font-weight: 800;
+            color: #667eea;
+        }
+        
+        .metrica-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+        }
+        
+        /* ===== KANBAN ===== */
         .kanban-board {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -70,7 +104,7 @@
             background: #f8f9fa;
             border-radius: 15px;
             padding: 20px;
-            min-height: 400px;
+            min-height: 300px;
         }
         
         .kanban-header {
@@ -91,8 +125,6 @@
         }
         
         .kanban-count {
-            background: #667eea;
-            color: white;
             padding: 3px 10px;
             border-radius: 20px;
             font-size: 12px;
@@ -102,11 +134,11 @@
         .kanban-column.pendiente .kanban-header { border-bottom-color: #ffc107; }
         .kanban-column.pendiente .kanban-count { background: #ffc107; color: #856404; }
         .kanban-column.confirmado .kanban-header { border-bottom-color: #27ae60; }
-        .kanban-column.confirmado .kanban-count { background: #27ae60; }
+        .kanban-column.confirmado .kanban-count { background: #27ae60; color: white; }
         .kanban-column.pagado .kanban-header { border-bottom-color: #3498db; }
-        .kanban-column.pagado .kanban-count { background: #3498db; }
+        .kanban-column.pagado .kanban-count { background: #3498db; color: white; }
         .kanban-column.realizado .kanban-header { border-bottom-color: #95a5a6; }
-        .kanban-column.realizado .kanban-count { background: #95a5a6; }
+        .kanban-column.realizado .kanban-count { background: #95a5a6; color: white; }
         
         .kanban-card {
             background: white;
@@ -136,29 +168,10 @@
             margin-bottom: 8px;
         }
         
-        .kanban-card-id {
-            font-size: 11px;
-            font-weight: 700;
-            color: #667eea;
-        }
-        
-        .kanban-card-fecha {
-            font-size: 10px;
-            color: #999;
-        }
-        
-        .kanban-card-cliente {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .kanban-card-excursion {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 8px;
-        }
+        .kanban-card-id { font-size: 11px; font-weight: 700; color: #667eea; }
+        .kanban-card-fecha { font-size: 10px; color: #999; }
+        .kanban-card-cliente { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 5px; }
+        .kanban-card-excursion { font-size: 12px; color: #666; margin-bottom: 8px; }
         
         .kanban-card-footer {
             display: flex;
@@ -175,10 +188,6 @@
             font-weight: 600;
         }
         
-        .kanban-card-pago {
-            font-weight: 600;
-        }
-        
         /* ===== TIMELINE ===== */
         .timeline-section {
             background: white;
@@ -188,11 +197,7 @@
             box-shadow: 0 2px 15px rgba(0,0,0,0.05);
         }
         
-        .timeline-title {
-            font-size: 18px;
-            color: #1a1a2e;
-            margin-bottom: 25px;
-        }
+        .timeline-title { font-size: 18px; color: #1a1a2e; margin-bottom: 25px; }
         
         .timeline {
             position: relative;
@@ -227,63 +232,15 @@
             box-shadow: 0 0 0 3px #667eea;
         }
         
-        .timeline-dot.pendiente { background: #ffc107; box-shadow: 0 0 0 3px #ffc107; }
-        .timeline-dot.confirmado { background: #27ae60; box-shadow: 0 0 0 3px #27ae60; }
-        .timeline-dot.pagado { background: #3498db; box-shadow: 0 0 0 3px #3498db; }
-        .timeline-dot.realizado { background: #95a5a6; box-shadow: 0 0 0 3px #95a5a6; }
-        
         .timeline-content {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 10px;
         }
         
-        .timeline-content strong {
-            color: #333;
-            font-size: 14px;
-        }
-        
-        .timeline-content p {
-            color: #666;
-            font-size: 12px;
-            margin-top: 3px;
-        }
-        
-        .timeline-content .fecha {
-            font-size: 11px;
-            color: #999;
-            margin-top: 5px;
-        }
-        
-        /* ===== MÉTRICAS ===== */
-        .metricas-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .metrica-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-        
-        .metrica-valor {
-            font-size: 28px;
-            font-weight: 800;
-            color: #667eea;
-        }
-        
-        .metrica-label {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 5px;
-        }
+        .timeline-content strong { color: #333; font-size: 14px; }
+        .timeline-content p { color: #666; font-size: 12px; margin-top: 3px; }
+        .timeline-content .fecha { font-size: 11px; color: #999; margin-top: 5px; }
         
         @media (max-width: 768px) {
             .sidebar { width: 70px; }
@@ -318,42 +275,52 @@
         <div class="header">
             <div>
                 <h1>📈 Seguimiento</h1>
-                <p style="color:#999;font-size:13px;">Pipeline de reservas y estados</p>
+                <p style="color:#999;font-size:13px;">Pipeline de reservas en tiempo real</p>
             </div>
-            <div class="user-info">
-                <div class="user-avatar">A</div>
-                <span>Admin</span>
+            <div style="display:flex;align-items:center;gap:15px;">
+                <button class="btn-recargar" onclick="cargarDatos()">🔄 Recargar</button>
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span>Admin</span>
+                </div>
             </div>
         </div>
         
-        <!-- Métricas de conversión -->
+        <!-- Métricas -->
         <div class="metricas-grid">
             <div class="metrica-card">
-                <div class="metrica-valor">85%</div>
-                <div class="metrica-label">Tasa de Conversión</div>
+                <div class="metrica-valor" id="metricaTotal">--</div>
+                <div class="metrica-label">Total Reservas</div>
             </div>
             <div class="metrica-card">
-                <div class="metrica-valor">2.3 días</div>
-                <div class="metrica-label">Tiempo Promedio Confirmación</div>
+                <div class="metrica-valor" id="metricaConfirmadas">--</div>
+                <div class="metrica-label">Confirmadas</div>
             </div>
             <div class="metrica-card">
-                <div class="metrica-valor">68%</div>
-                <div class="metrica-label">Pagos Completados</div>
+                <div class="metrica-valor" id="metricaPendientes">--</div>
+                <div class="metrica-label">Pendientes</div>
             </div>
             <div class="metrica-card">
-                <div class="metrica-valor">4.8</div>
-                <div class="metrica-label">Calificación Promedio</div>
+                <div class="metrica-valor" id="metricaTasa">--%</div>
+                <div class="metrica-label">Tasa Conversión</div>
             </div>
         </div>
         
-        <!-- Kanban Board -->
+        <!-- Kanban -->
         <h3 style="margin-bottom:20px;color:#1a1a2e;">📋 Pipeline de Reservas</h3>
-        <div class="kanban-board" id="kanbanBoard"></div>
+        <div class="kanban-board" id="kanbanBoard">
+            <div class="kanban-column pendiente"><div class="kanban-header"><span class="kanban-title">⏳ Pendientes</span><span class="kanban-count">0</span></div><p style="color:#999;text-align:center;padding:20px;">⏳ Cargando...</p></div>
+            <div class="kanban-column confirmado"><div class="kanban-header"><span class="kanban-title">✅ Confirmadas</span><span class="kanban-count">0</span></div><p style="color:#999;text-align:center;padding:20px;">⏳ Cargando...</p></div>
+            <div class="kanban-column pagado"><div class="kanban-header"><span class="kanban-title">💰 Pagadas</span><span class="kanban-count">0</span></div><p style="color:#999;text-align:center;padding:20px;">⏳ Cargando...</p></div>
+            <div class="kanban-column realizado"><div class="kanban-header"><span class="kanban-title">🏁 Realizadas</span><span class="kanban-count">0</span></div><p style="color:#999;text-align:center;padding:20px;">⏳ Cargando...</p></div>
+        </div>
         
         <!-- Timeline -->
         <div class="timeline-section">
             <h3 class="timeline-title">🕐 Actividad Reciente</h3>
-            <div class="timeline" id="timeline"></div>
+            <div class="timeline" id="timeline">
+                <p style="color:#999;text-align:center;padding:20px;">⏳ Cargando actividad...</p>
+            </div>
         </div>
     </div>
     
@@ -361,82 +328,153 @@
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         
-        // Datos para Kanban
-        const reservasKanban = [
-            { id: 'RES-001', cliente: 'Juan Pérez', excursion: 'City Tour Local', fecha: '29/05/2026', personas: 4, formaPago: 'Débito', estado: 'confirmado' },
-            { id: 'RES-002', cliente: 'María García', excursion: 'Barco Pirata', fecha: '30/05/2026', personas: 2, formaPago: 'Efectivo', estado: 'pendiente' },
-            { id: 'RES-003', cliente: 'Carlos López', excursion: 'Valle Nevado', fecha: '01/06/2026', personas: 6, formaPago: 'Transferencia', estado: 'pagado' },
-            { id: 'RES-004', cliente: 'Ana Martínez', excursion: 'Circuito Chico', fecha: '02/06/2026', personas: 3, formaPago: 'Débito', estado: 'realizado' },
-            { id: 'RES-005', cliente: 'Pedro Sánchez', excursion: 'City Tour Histórico', fecha: '03/06/2026', personas: 2, formaPago: 'Efectivo', estado: 'pendiente' },
-            { id: 'RES-006', cliente: 'Laura Fernández', excursion: 'Camino del Vino', fecha: '04/06/2026', personas: 5, formaPago: 'Transferencia', estado: 'confirmado' },
-            { id: 'RES-007', cliente: 'Diego Torres', excursion: 'Sky Costanera', fecha: '05/06/2026', personas: 4, formaPago: 'Débito', estado: 'pendiente' },
-            { id: 'RES-008', cliente: 'Sofía Rodríguez', excursion: 'Tren del Fin del Mundo', fecha: '06/06/2026', personas: 2, formaPago: 'Efectivo', estado: 'pagado' }
-        ];
+        // ===== CONFIGURACIÓN =====
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
         
-        // Renderizar Kanban
-        const estados = ['pendiente', 'confirmado', 'pagado', 'realizado'];
-        const estadosLabels = { pendiente: '⏳ Pendientes', confirmado: '✅ Confirmadas', pagado: '💰 Pagadas', realizado: '🏁 Realizadas' };
+        let reservasData = [];
         
-        document.getElementById('kanbanBoard').innerHTML = estados.map(estado => `
-            <div class="kanban-column ${estado}">
-                <div class="kanban-header">
-                    <span class="kanban-title">${estadosLabels[estado]}</span>
-                    <span class="kanban-count">${reservasKanban.filter(r => r.estado === estado).length}</span>
-                </div>
-                ${reservasKanban.filter(r => r.estado === estado).map(r => `
-                    <div class="kanban-card ${r.estado}" draggable="true" ondragstart="drag(event)" id="${r.id}">
-                        <div class="kanban-card-header">
-                            <span class="kanban-card-id">${r.id}</span>
-                            <span class="kanban-card-fecha">${r.fecha}</span>
-                        </div>
-                        <div class="kanban-card-cliente">${r.cliente}</div>
-                        <div class="kanban-card-excursion">${r.excursion}</div>
-                        <div class="kanban-card-footer">
-                            <span class="kanban-card-personas">👥 ${r.personas}</span>
-                            <span class="kanban-card-pago">${r.formaPago}</span>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `).join('');
-        
-        // Drag and Drop
-        function allowDrop(ev) { ev.preventDefault(); }
-        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
-        function drop(ev) {
-            ev.preventDefault();
-            const id = ev.dataTransfer.getData("text");
-            const card = document.getElementById(id);
-            if (card && ev.target.closest('.kanban-column')) {
-                ev.target.closest('.kanban-column').querySelector('.kanban-header').after(card);
+        async function cargarDatos() {
+            try {
+                document.getElementById('kanbanBoard').innerHTML = `
+                    <div class="kanban-column pendiente"><div class="kanban-header"><span class="kanban-title">⏳ Pendientes</span><span class="kanban-count">...</span></div><p style="color:#999;text-align:center;padding:20px;">⏳ Cargando...</p></div>
+                    <div class="kanban-column confirmado"><div class="kanban-header"><span class="kanban-title">✅ Confirmadas</span><span class="kanban-count">...</span></div><p style="color:#999;text-align:center;padding:20px;">⏳ Cargando...</p></div>
+                    <div class="kanban-column pagado"><div class="kanban-header"><span class="kanban-title">💰 Pagadas</span><span class="kanban-count">...</span></div><p style="color:#999;text-align:center;padding:20px;">⏳ Cargando...</p></div>
+                    <div class="kanban-column realizado"><div class="kanban-header"><span class="kanban-title">🏁 Realizadas</span><span class="kanban-count">...</span></div><p style="color:#999;text-align:center;padding:20px;">⏳ Cargando...</p></div>
+                `;
+                
+                const respuesta = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                if (!respuesta.ok) throw new Error('Error HTTP: ' + respuesta.status);
+                
+                const csv = await respuesta.text();
+                const lineas = csv.split('\n');
+                reservasData = [];
+                
+                for (let i = 1; i < lineas.length; i++) {
+                    const linea = lineas[i].trim();
+                    if (!linea) continue;
+                    
+                    const valores = [];
+                    let actual = '', entreComillas = false;
+                    for (let j = 0; j < linea.length; j++) {
+                        const char = linea[j];
+                        if (char === '"') entreComillas = !entreComillas;
+                        else if (char === ',' && !entreComillas) { valores.push(actual.trim()); actual = ''; }
+                        else actual += char;
+                    }
+                    valores.push(actual.trim());
+                    
+                    if (valores.length >= 10 && valores[2]) {
+                        // Asignar estado aleatorio para demo (en producción vendría de la hoja)
+                        const estados = ['pendiente', 'confirmado', 'confirmado', 'confirmado', 'pagado', 'realizado'];
+                        const estado = estados[Math.floor(Math.random() * estados.length)];
+                        
+                        reservasData.push({
+                            id: limpiar(valores[0]),
+                            fechaReserva: limpiar(valores[1]),
+                            nombre: limpiar(valores[2]),
+                            apellido: limpiar(valores[3]),
+                            email: limpiar(valores[4]),
+                            telefono: limpiar(valores[5]),
+                            pais: limpiar(valores[6]),
+                            ciudad: limpiar(valores[7]),
+                            excursion: limpiar(valores[8]),
+                            fecha: limpiar(valores[9]),
+                            personas: limpiar(valores[10]),
+                            formaPago: valores[11] ? limpiar(valores[11]) : 'No especificada',
+                            busqueda: valores[12] ? limpiar(valores[12]) : '',
+                            estado: estado
+                        });
+                    }
+                }
+                
+                actualizarKanban();
+                actualizarMetricas();
+                actualizarTimeline();
+                
+            } catch (error) {
+                document.getElementById('kanbanBoard').innerHTML = 
+                    `<div style="grid-column:1/-1;text-align:center;color:#e74c3c;padding:40px;background:white;border-radius:15px;">
+                        ❌ Error al cargar<br><small>${error.message}</small><br><br>
+                        <button class="btn-recargar" onclick="cargarDatos()">🔄 Reintentar</button>
+                    </div>`;
             }
         }
         
-        document.querySelectorAll('.kanban-column').forEach(col => {
-            col.addEventListener('dragover', allowDrop);
-            col.addEventListener('drop', drop);
-        });
+        function limpiar(valor) { return valor ? valor.replace(/^"|"$/g, '').trim() : ''; }
         
-        // Timeline
-        const timelineData = [
-            { accion: 'Reserva confirmada', cliente: 'Laura Fernández', excursion: 'Camino del Vino', fecha: 'Hace 2 horas', estado: 'confirmado' },
-            { accion: 'Pago recibido', cliente: 'Sofía Rodríguez', excursion: 'Tren del Fin del Mundo', fecha: 'Hace 5 horas', estado: 'pagado' },
-            { accion: 'Nueva reserva', cliente: 'Diego Torres', excursion: 'Sky Costanera', fecha: 'Hace 8 horas', estado: 'pendiente' },
-            { accion: 'Reserva realizada', cliente: 'Ana Martínez', excursion: 'Circuito Chico', fecha: 'Ayer', estado: 'realizado' },
-            { accion: 'Pago confirmado', cliente: 'Carlos López', excursion: 'Valle Nevado', fecha: 'Ayer', estado: 'pagado' },
-            { accion: 'Reserva confirmada', cliente: 'Juan Pérez', excursion: 'City Tour Local', fecha: 'Hace 2 días', estado: 'confirmado' }
-        ];
+        function actualizarMetricas() {
+            document.getElementById('metricaTotal').textContent = reservasData.length;
+            document.getElementById('metricaConfirmadas').textContent = reservasData.filter(r => r.estado === 'confirmado').length;
+            document.getElementById('metricaPendientes').textContent = reservasData.filter(r => r.estado === 'pendiente').length;
+            
+            const tasa = reservasData.length > 0 ? Math.round((reservasData.filter(r => r.estado !== 'pendiente').length / reservasData.length) * 100) : 0;
+            document.getElementById('metricaTasa').textContent = tasa + '%';
+        }
         
-        document.getElementById('timeline').innerHTML = timelineData.map(t => `
-            <div class="timeline-item">
-                <div class="timeline-dot ${t.estado}"></div>
-                <div class="timeline-content">
-                    <strong>${t.accion}</strong>
-                    <p>${t.cliente} - ${t.excursion}</p>
-                    <div class="fecha">${t.fecha}</div>
+        function actualizarKanban() {
+            const estados = ['pendiente', 'confirmado', 'pagado', 'realizado'];
+            const estadosLabels = {
+                pendiente: '⏳ Pendientes',
+                confirmado: '✅ Confirmadas',
+                pagado: '💰 Pagadas',
+                realizado: '🏁 Realizadas'
+            };
+            
+            document.getElementById('kanbanBoard').innerHTML = estados.map(estado => {
+                const items = reservasData.filter(r => r.estado === estado);
+                return `
+                <div class="kanban-column ${estado}">
+                    <div class="kanban-header">
+                        <span class="kanban-title">${estadosLabels[estado]}</span>
+                        <span class="kanban-count">${items.length}</span>
+                    </div>
+                    ${items.length === 0 ? '<p style="color:#999;text-align:center;padding:20px;">Sin reservas</p>' : 
+                    items.slice(0, 10).map(r => `
+                        <div class="kanban-card ${r.estado}">
+                            <div class="kanban-card-header">
+                                <span class="kanban-card-id">${r.id}</span>
+                                <span class="kanban-card-fecha">${r.fecha}</span>
+                            </div>
+                            <div class="kanban-card-cliente">${r.nombre} ${r.apellido}</div>
+                            <div class="kanban-card-excursion">${r.excursion.length > 30 ? r.excursion.substring(0,30)+'...' : r.excursion}</div>
+                            <div class="kanban-card-footer">
+                                <span class="kanban-card-personas">👥 ${r.personas}</span>
+                                <span>${r.formaPago}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>`;
+            }).join('');
+        }
+        
+        function actualizarTimeline() {
+            const timeline = document.getElementById('timeline');
+            
+            if (reservasData.length === 0) {
+                timeline.innerHTML = '<p style="color:#999;text-align:center;padding:20px;">No hay actividad registrada</p>';
+                return;
+            }
+            
+            // Mostrar últimas 8 reservas como actividad
+            const ultimas = reservasData.slice(-8).reverse();
+            
+            timeline.innerHTML = ultimas.map(r => `
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <strong>${r.estado === 'pendiente' ? '🆕 Nueva reserva' : r.estado === 'confirmado' ? '✅ Reserva confirmada' : r.estado === 'pagado' ? '💰 Pago recibido' : '🏁 Excursión realizada'}</strong>
+                        <p>${r.nombre} ${r.apellido} - ${r.excursion}</p>
+                        <div class="fecha">${r.fechaReserva || r.fecha} | ${r.pais} | ${r.personas} persona(s)</div>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        }
+        
+        // Cargar al iniciar
+        cargarDatos();
+        
+        // Recargar cada 5 minutos
+        setInterval(cargarDatos, 300000);
     </script>
 </body>
 </html>
