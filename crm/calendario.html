@@ -310,7 +310,6 @@
         }
         
         function cambiarMes(dir) { mesActual += dir; if (mesActual > 11) { mesActual = 0; añoActual++; } if (mesActual < 0) { mesActual = 11; añoActual--; } renderCalendar(); }
-        function irAHoy() { const h = new Date(); mesActual = h.getMonth(); añoActual = h.getFullYear(); renderCalendar(); }
         
         function abrirModalAgregar(fecha) {
             document.getElementById('modalTitulo').textContent = '➕ Agregar Evento';
@@ -448,7 +447,11 @@
                 mensaje += '\n';
             });
             
-            mensaje += `😢 *A no ponerse triste, volvemos a casa!!*\n\n🏔️ Aventura Total`;
+            mensaje += `😢 *A no ponerse triste, volvemos a casa!!*\n\n`;
+            mensaje += `🎯 *Asegurá tu lugar, sé el primero en reservar!!*\n`;
+            mensaje += `👉 *Hacé click y entrá a nuestro sistema de reservas!!*\n`;
+            mensaje += `https://sebagsc2020.github.io/reservacordinador1/index.html\n\n`;
+            mensaje += `🏔️ Aventura Total`;
             
             window.open('https://wa.me/?text=' + encodeURIComponent(mensaje), '_blank');
         }
