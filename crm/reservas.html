@@ -27,7 +27,7 @@
         .btn-recargar { padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .table-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow: hidden; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .table-wrapper { overflow-x: auto; margin: 0 -15px; padding: 0 15px; }
+        .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
         td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; vertical-align: top; } 
@@ -63,7 +63,10 @@
     </nav>
 
     <div class="main-content">
-        <div class="header"><div><h1>📋 Reservas</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
+        <div class="header">
+            <div><h1>📋 Reservas</h1></div>
+            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+        </div>
 
         <div class="filters-bar">
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o ciudad..." id="busquedaReserva">
@@ -72,23 +75,28 @@
         </div>
 
         <div class="table-container">
-            <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0 reservas</span></div>
+            <div class="table-header">
+                <h3>Lista de Reservas</h3>
+                <span id="totalReservasSpan">0 reservas</span>
+            </div>
             <div class="table-wrapper">
-                 <div class="excursiones-lista" style="display:none"></div>
-                 <tr>
+                <table id="reservasTable">
                     <thead>
                         <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursión</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
                     <tbody id="tablaReservas">
-                        <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>
+                        <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>
                     </tbody>
-                20
+                </table>
             </div>
         </div>
     </div>
 
     <script>
-        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
+        // Verificar sesión
+        if (sessionStorage.getItem('crm_logged') !== 'true') { 
+            window.location.href = 'index.html'; 
+        }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
@@ -125,30 +133,15 @@
             return fechaStr;
         }
 
-        // Función para dividir excursiones (separador " | " o coma)
         function dividirExcursiones(texto) {
             if (!texto) return [];
-            
             let partes = [];
-            
-            // Probar diferentes separadores
-            if (texto.includes(' | ')) {
-                partes = texto.split(' | ');
-            } else if (texto.includes(', ')) {
-                partes = texto.split(', ');
-            } else if (texto.includes(',')) {
-                partes = texto.split(',');
-            } else if (texto.includes('|')) {
-                partes = texto.split('|');
-            } else if (texto.includes('\n')) {
-                partes = texto.split('\n');
-            } else {
-                partes = [texto];
-            }
-            
-            // Limpiar cada parte (eliminar números como "1. ")
-            partes = partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
-            return partes;
+            if (texto.includes(' | ')) partes = texto.split(' | ');
+            else if (texto.includes(', ')) partes = texto.split(', ');
+            else if (texto.includes(',')) partes = texto.split(',');
+            else if (texto.includes('|')) partes = texto.split('|');
+            else partes = [texto];
+            return partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
         }
 
         function cargarEstadosGuardados() {
@@ -163,8 +156,11 @@
         }
 
         async function cargarReservas() {
+            const tbody = document.getElementById('tablaReservas');
+            if (!tbody) return;
+            
             try {
-                document.getElementById('tablaReservas').innerHTML = '<td><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 const csvText = await response.text();
                 const filas = parseCSV(csvText);
@@ -183,18 +179,9 @@
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
-                    // ✅ CORRECCIÓN: La columna de excursión está en el ÍNDICE 6 (no en el 8)
-                    // Según tus encabezados: ID(0), Fecha Reserva(1), Nombre(2), Apellido(3), Email(4), 
-                    // Teléfono(5), Excursión(6), Ciudad(7), Excursion(8), Fecha(9), Personas(10), Forma de pago(11), Lugar(12)
-                    const excursionesRaw = fila[6] || fila[8] || '';
+                    // Columna Excursión está en índice 6
+                    const excursionesRaw = fila[6] || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
-                    
-                    // Depuración
-                    if (i === 1) {
-                        console.log('🔍 Columna Excursión (índice 6):', fila[6]);
-                        console.log('🔍 Columna Excursion (índice 8):', fila[8]);
-                        console.log('🔍 Excursiones parseadas:', listaExcursiones);
-                    }
                     
                     const reserva = {
                         id: id,
@@ -214,21 +201,31 @@
                 }
                 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
-                reservasData.sort((a, b) => { const numA = parseInt(a.id.replace(/\D/g, '')) || 0; const numB = parseInt(b.id.replace(/\D/g, '')) || 0; return numB - numA; });
+                
+                reservasData.sort((a, b) => { 
+                    const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
+                    const numB = parseInt(b.id.replace(/\D/g, '')) || 0; 
+                    return numB - numA; 
+                });
+                
                 reservasFiltradas = [...reservasData];
                 renderizarTabla();
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('tablaReservas').innerHTML = `<td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error al cargar datos: ${error.message}</td>`;
+                if (tbody) tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
 
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
-            document.getElementById('totalReservasSpan').textContent = `${reservasFiltradas.length} reservas`;
+            const totalSpan = document.getElementById('totalReservasSpan');
+            
+            if (!tbody) return;
+            
+            if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td></tr>';
                 return;
             }
             
@@ -241,7 +238,6 @@
                     default: estadoClass = 'badge-confirmado'; estadoText = 'Confirmado';
                 }
                 
-                // Lista de excursiones (una debajo de la otra)
                 let excursionesHtml = '<ul class="excursiones-lista">';
                 if (!r.excursionesLista || r.excursionesLista.length === 0) {
                     excursionesHtml += '<li>Sin excursiones</li>';
@@ -253,16 +249,16 @@
                 return `
                     <tr>
                         <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td>${escapeHtml(r.fecha)}</td
-                        <td>${escapeHtml(r.nombre)}</td
-                        <td style="font-size:11px">${escapeHtml(r.email)}</td
-                        <td>${escapeHtml(r.telefono)}</td
-                        <td>${excursionesHtml}</td
-                        <td>${escapeHtml(r.ciudad)}</td
-                        <td>${escapeHtml(r.personas)}</td
-                        <td>${escapeHtml(r.formaPago)}</td
-                        <td>${escapeHtml(r.lugar)}</td
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
+                        <td>${escapeHtml(r.fecha)}</td>
+                        <td>${escapeHtml(r.nombre)}</td>
+                        <td style="font-size:11px">${escapeHtml(r.email)}</td>
+                        <td>${escapeHtml(r.telefono)}</td>
+                        <td>${excursionesHtml}</td>
+                        <td>${escapeHtml(r.ciudad)}</td>
+                        <td>${escapeHtml(r.personas)}</td>
+                        <td>${escapeHtml(r.formaPago)}</td>
+                        <td>${escapeHtml(r.lugar)}</td>
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
                         <td>
                             <div class="acciones-container">
                                 <div class="acciones-fila">
@@ -273,16 +269,22 @@
                                     <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰</button>
                                 </div>
                             </div>
-                        </td
+                        </td>
                     </tr>
                 `;
             }).join('');
         }
 
         function filtrarReservas() {
-            const busqueda = document.getElementById('busquedaReserva').value.toLowerCase().trim();
-            if (!busqueda) reservasFiltradas = [...reservasData];
-            else reservasFiltradas = reservasData.filter(r => r.nombre.toLowerCase().includes(busqueda) || r.ciudad.toLowerCase().includes(busqueda));
+            const busqueda = document.getElementById('busquedaReserva');
+            if (!busqueda) return;
+            
+            const texto = busqueda.value.toLowerCase().trim();
+            if (!texto) reservasFiltradas = [...reservasData];
+            else reservasFiltradas = reservasData.filter(r => 
+                r.nombre.toLowerCase().includes(texto) || 
+                r.ciudad.toLowerCase().includes(texto)
+            );
             renderizarTabla();
         }
 
@@ -295,10 +297,20 @@
             }
         }
 
-        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function escapeHtml(text) { 
+            if (!text) return ''; 
+            const div = document.createElement('div'); 
+            div.textContent = text; 
+            return div.innerHTML; 
+        }
 
-        document.getElementById('busquedaReserva').addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
+        // Eventos
+        const busquedaInput = document.getElementById('busquedaReserva');
+        if (busquedaInput) {
+            busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
+        }
         
+        // Inicializar
         cargarReservas();
         setInterval(cargarReservas, 60000);
     </script>
