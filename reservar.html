@@ -13,9 +13,9 @@
         .form-header p { font-size: 16px; opacity: 0.85; }
         form { padding: 40px; }
         .form-row { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
-        .form-group { flex: 1; min-width: 200px; }
+        .form-group { flex: 1; min-width: 200px; margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a2e; font-size: 14px; }
-        label.required::after { content: " *"; color: #e74c3c; }
+        label.required span { color: #e74c3c; margin-left: 3px; }
         input, select { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 16px; font-size: 14px; transition: all 0.3s; background: white; }
         input:focus, select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102,126,234,0.1); }
         .checkbox-group { display: grid; gap: 12px; margin-top: 8px; }
@@ -33,6 +33,8 @@
         .checkbox-privacidad label { margin: 0; cursor: pointer; font-weight: 500; }
         .checkbox-privacidad a { color: #667eea; text-decoration: none; font-weight: 600; }
         .checkbox-privacidad a:hover { text-decoration: underline; }
+        .titulo-seccion { font-weight: 700; color: #1a1a2e; font-size: 14px; margin-bottom: 12px; display: block; }
+        .titulo-seccion span { color: #e74c3c; margin-left: 3px; }
         #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s; }
         #preloader.oculto { opacity: 0; visibility: hidden; }
         .cronometro { width: 75px; height: 75px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid white; border-radius: 50%; animation: girar 1s linear infinite; margin: 0 auto 20px; }
@@ -61,29 +63,29 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="nombre" class="required">Nombre</label>
+                    <label for="nombre" class="required">Nombre <span>*</span></label>
                     <input type="text" id="nombre" name="nombre" required autocomplete="given-name">
                 </div>
                 <div class="form-group">
-                    <label for="apellido" class="required">Apellido</label>
+                    <label for="apellido" class="required">Apellido <span>*</span></label>
                     <input type="text" id="apellido" name="apellido" required autocomplete="family-name">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="email" class="required">Email</label>
+                    <label for="email" class="required">Email <span>*</span></label>
                     <input type="email" id="email" name="email" required autocomplete="email">
                 </div>
                 <div class="form-group">
-                    <label for="telefono" class="required">Teléfono</label>
+                    <label for="telefono" class="required">Teléfono <span>*</span></label>
                     <input type="tel" id="telefono" name="telefono" required autocomplete="tel">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="pais" class="required">País</label>
+                    <label for="pais" class="required">País <span>*</span></label>
                     <select id="pais" name="pais" required>
                         <option value="">Selecciona un país</option>
                         <option value="Argentina">📌 Argentina</option>
@@ -92,13 +94,14 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="ciudad" class="required">Ciudad</label>
+                    <label for="ciudad" class="required">Ciudad <span>*</span></label>
                     <input type="text" id="ciudad" name="ciudad" required autocomplete="address-level2">
                 </div>
             </div>
 
+            <!-- Sección de excursiones - SIN label suelto -->
             <div class="form-group">
-                <label class="required">Excursiones de interés</label>
+                <div class="titulo-seccion">Excursiones de interés <span>*</span></div>
                 <div class="checkbox-group" id="excursionesGroup">
                     <div class="checkbox-item" data-val="Trekking Cerro">
                         <input type="checkbox" id="excursion1" value="Trekking Cerro">
@@ -129,18 +132,18 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="fecha" class="required">Fecha deseada</label>
+                    <label for="fecha" class="required">Fecha deseada <span>*</span></label>
                     <input type="date" id="fecha" name="fecha" required>
                 </div>
                 <div class="form-group">
-                    <label for="personas" class="required">Nº de personas</label>
+                    <label for="personas" class="required">Nº de personas <span>*</span></label>
                     <input type="number" id="personas" name="personas" min="1" max="20" value="1" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="formaPago" class="required">Forma de pago</label>
+                    <label for="formaPago" class="required">Forma de pago <span>*</span></label>
                     <select id="formaPago" name="formaPago" required>
                         <option value="">Selecciona una forma de pago</option>
                         <option value="💵 Efectivo">💵 Efectivo</option>
@@ -244,7 +247,6 @@
             submitBtn.textContent = '⏳ Enviando...';
             
             try {
-                // Enviar a Google Sheets
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -252,7 +254,6 @@
                     body: new URLSearchParams(formData)
                 });
                 
-                // Guardar copia local
                 const reservas = JSON.parse(localStorage.getItem('reservasOffline') || '[]');
                 reservas.push(formData);
                 localStorage.setItem('reservasOffline', JSON.stringify(reservas));
@@ -263,7 +264,6 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                // Guardar localmente igual
                 const reservas = JSON.parse(localStorage.getItem('reservasOffline') || '[]');
                 reservas.push(formData);
                 localStorage.setItem('reservasOffline', JSON.stringify(reservas));
@@ -278,7 +278,7 @@
             }
         });
         
-        // Modal de privacidad simple
+        // Política de privacidad
         document.getElementById('linkPrivacidad').addEventListener('click', (e) => {
             e.preventDefault();
             alert("🔒 La agencia recopila únicamente los datos estrictamente necesarios para la prestación del servicio.\n\n📋 Uso: Gestión de reservas, coordinación logística, notificaciones.\n\n🔐 Los datos no se venden ni se ceden comercialmente.\n\n✅ Derechos: Acceder, Rectificar, Cancelar u Oponerse al uso de sus datos.");
