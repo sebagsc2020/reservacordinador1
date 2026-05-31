@@ -22,11 +22,6 @@
             border-radius: 32px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        
-        .form-container:hover {
-            transform: translateY(-5px);
         }
         
         .form-header {
@@ -36,45 +31,15 @@
             text-align: center;
         }
         
-        .form-header h1 {
-            font-size: 32px;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
-        }
+        .form-header h1 { font-size: 32px; margin-bottom: 12px; }
+        .form-header p { font-size: 16px; opacity: 0.85; }
         
-        .form-header p {
-            font-size: 16px;
-            opacity: 0.85;
-        }
+        form { padding: 40px; }
+        .form-row { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; }
         
-        form {
-            padding: 40px;
-        }
-        
-        .form-row {
-            display: flex;
-            gap: 24px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-        
-        .form-group {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #1a1a2e;
-            font-size: 14px;
-        }
-        
-        label.required::after {
-            content: " *";
-            color: #e74c3c;
-        }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a2e; font-size: 14px; }
+        label.required::after { content: " *"; color: #e74c3c; }
         
         input, select {
             width: 100%;
@@ -82,7 +47,6 @@
             border: 2px solid #e2e8f0;
             border-radius: 16px;
             font-size: 14px;
-            font-family: inherit;
             transition: all 0.3s ease;
             background: white;
         }
@@ -90,26 +54,13 @@
         input:focus, select:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
         }
         
-        input:read-only {
-            background-color: #f8fafc;
-            cursor: not-allowed;
-            border-color: #cbd5e1;
-        }
+        input:read-only { background-color: #f8fafc; cursor: not-allowed; }
+        select:disabled { opacity: 0.6; cursor: not-allowed; background-color: #f1f5f9; }
         
-        select:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background-color: #f1f5f9;
-        }
-        
-        .checkbox-excursiones {
-            display: grid;
-            gap: 12px;
-            margin-top: 8px;
-        }
+        .checkbox-excursiones { display: grid; gap: 12px; margin-top: 8px; }
         
         .checkbox-item {
             display: flex;
@@ -122,33 +73,10 @@
             transition: all 0.2s ease;
         }
         
-        .checkbox-item:hover {
-            background: #f1f5f9;
-            border-color: #667eea;
-            transform: translateX(4px);
-        }
-        
-        .checkbox-item.seleccionado {
-            background: #eef2ff;
-            border-color: #667eea;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
-        }
-        
-        .checkbox-item input {
-            width: 20px;
-            height: 20px;
-            margin-right: 12px;
-            cursor: pointer;
-            accent-color: #667eea;
-        }
-        
-        .checkbox-item label {
-            margin: 0;
-            cursor: pointer;
-            flex: 1;
-            font-weight: 500;
-            color: #1e293b;
-        }
+        .checkbox-item:hover { background: #f1f5f9; border-color: #667eea; transform: translateX(4px); }
+        .checkbox-item.seleccionado { background: #eef2ff; border-color: #667eea; box-shadow: 0 2px 8px rgba(102,126,234,0.15); }
+        .checkbox-item input { width: 20px; height: 20px; margin-right: 12px; cursor: pointer; accent-color: #667eea; }
+        .checkbox-item label { margin: 0; cursor: pointer; flex: 1; font-weight: 500; color: #1e293b; }
         
         .seleccionados-contador {
             text-align: center;
@@ -172,29 +100,10 @@
             border: 1px solid #e2e8f0;
         }
         
-        .checkbox-privacidad input {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: #667eea;
-        }
-        
-        .checkbox-privacidad label {
-            margin: 0;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .checkbox-privacidad a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .checkbox-privacidad a:hover {
-            text-decoration: underline;
-        }
+        .checkbox-privacidad input { width: 20px; height: 20px; cursor: pointer; accent-color: #667eea; }
+        .checkbox-privacidad label { margin: 0; cursor: pointer; font-weight: 500; }
+        .checkbox-privacidad a { color: #667eea; text-decoration: none; font-weight: 600; }
+        .checkbox-privacidad a:hover { text-decoration: underline; }
         
         .submit-btn {
             width: 100%;
@@ -208,33 +117,14 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 10px;
-            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+            box-shadow: 0 8px 25px rgba(39,174,96,0.3);
         }
         
-        .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(39, 174, 96, 0.4);
-        }
+        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(39,174,96,0.4); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .status-message {
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 500;
-        }
-        
-        .status-message.error {
-            background: #fee;
-            color: #c0392b;
-            border-left: 4px solid #e74c3c;
-        }
+        .status-message { padding: 12px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: 500; }
+        .status-message.error { background: #fee; color: #c0392b; border-left: 4px solid #e74c3c; }
         
         #preloader {
             position: fixed;
@@ -249,85 +139,24 @@
             z-index: 9999;
             transition: opacity 0.5s;
         }
+        #preloader.oculto { opacity: 0; visibility: hidden; }
+        .cronometro { width: 75px; height: 75px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid white; border-radius: 50%; animation: girar 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes girar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .preloader-texto { color: white; font-size: 20px; font-weight: 700; text-align: center; }
         
-        #preloader.oculto {
-            opacity: 0;
-            visibility: hidden;
-        }
-        
-        .preloader-content {
-            text-align: center;
-        }
-        
-        .cronometro {
-            width: 75px;
-            height: 75px;
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            animation: girar 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes girar {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .preloader-texto {
-            color: white;
-            font-size: 20px;
-            font-weight: 700;
-            text-align: center;
-        }
-        
-        .categoria-group, .excursion-group {
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .categoria-group, .excursion-group { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
         @media (max-width: 768px) {
-            body {
-                padding: 20px;
-            }
-            form {
-                padding: 24px;
-            }
-            .form-header h1 {
-                font-size: 24px;
-            }
-            .form-row {
-                gap: 16px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .form-container {
-                margin: 0 10px;
-            }
-            .form-header {
-                padding: 25px 20px;
-            }
-            form {
-                padding: 20px;
-            }
-            .checkbox-item {
-                padding: 10px 12px;
-            }
+            body { padding: 20px; }
+            form { padding: 24px; }
+            .form-header h1 { font-size: 24px; }
+            .form-row { gap: 16px; }
         }
     </style>
 </head>
 <body>
-    <div id="preloader">
-        <div class="preloader-content">
-            <div class="cronometro"></div>
-            <div class="preloader-texto">CARGANDO<span class="puntos">...</span></div>
-        </div>
-    </div>
+    <div id="preloader"><div class="preloader-content"><div class="cronometro"></div><div class="preloader-texto">CARGANDO<span class="puntos">...</span></div></div></div>
 
     <div class="form-container">
         <div class="form-header">
@@ -396,7 +225,6 @@
                 </div>
             </div>
 
-            <!-- 🔥 CORREGIDO: Agregado name="formaPago" -->
             <div class="form-group">
                 <label for="formaPago" class="required">Forma de Pago</label>
                 <select id="formaPago" name="formaPago" required>
@@ -407,7 +235,6 @@
                 </select>
             </div>
 
-            <!-- 🔥 CORREGIDO: Agregado name="lugar" -->
             <div class="form-group">
                 <label for="mensaje">📍 ¿Dónde te buscamos?</label>
                 <input type="text" id="mensaje" name="lugar" placeholder="Hotel, dirección, etc.">
@@ -436,9 +263,8 @@
             const año = hoy.getFullYear();
             const mes = String(hoy.getMonth() + 1).padStart(2, '0');
             const dia = String(hoy.getDate()).padStart(2, '0');
-            const fechaFormateada = `${dia}-${mes}-${año}`;
-            document.getElementById('fecha').value = fechaFormateada;
-            document.getElementById('fecha_mostrar').value = fechaFormateada;
+            document.getElementById('fecha').value = `${dia}-${mes}-${año}`;
+            document.getElementById('fecha_mostrar').value = `${dia}/${mes}/${año}`;
         }
         establecerFechaSistema();
 
@@ -504,10 +330,7 @@
                     const div = document.createElement('div');
                     div.className = 'checkbox-item';
                     const id = `exc_${Date.now()}_${index}`;
-                    div.innerHTML = `
-                        <input type="checkbox" id="${id}" value="${excursion}">
-                        <label for="${id}">${excursion}</label>
-                    `;
+                    div.innerHTML = `<input type="checkbox" id="${id}" value="${excursion}"><label for="${id}">${excursion}</label>`;
                     const checkbox = div.querySelector('input');
                     checkbox.addEventListener('change', function() {
                         if (this.checked) div.classList.add('seleccionado');
@@ -534,8 +357,8 @@
             else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
         }
 
-        // URL del Google Apps Script (verificar que sea la correcta)
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHVLm3FqVZpAOKPh7DW2mbaAWP2W_woI-9-1q7mjlcnEvqLEDccoPVyHBEBJwWNeaICQ/exec';
+        // 🔥 ACTUALIZÁ ESTA URL CON LA URL DE TU APPS SCRIPT
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxUyZ3e7EweEf-BR67EjbS6bWk-3PmeJXxONLQEW3dpkPRXa94Z95kUGPh4T1kQ1_s/exec';
         
         const form = document.getElementById('excursionForm');
         const statusMessage = document.getElementById('statusMessage');
@@ -567,8 +390,7 @@
                 return;
             }
             
-            // 🔥 CLAVE: formData con los nombres correctos
-            const formData = {
+            const formData = new URLSearchParams({
                 id: 'RES-' + Date.now(),
                 nombre: document.getElementById('nombre').value,
                 apellido: document.getElementById('apellido').value,
@@ -579,28 +401,27 @@
                 excursiones: excursionesSeleccionadas.join(' | '),
                 fecha: document.getElementById('fecha').value,
                 personas: document.getElementById('personas').value,
-                formaPago: formaPago,                          // ← Nombre correcto
-                lugar: document.getElementById('mensaje').value || 'No especificado'   // ← Nombre correcto
-            };
+                formaPago: formaPago,
+                lugar: document.getElementById('mensaje').value || 'No especificado'
+            });
             
-            console.log('📤 Enviando reserva:', formData);
+            console.log('📤 Enviando:', formData.toString());
             
             const submitBtn = document.querySelector('.submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = '⏳ Enviando...';
             
             try {
-                await fetch(GOOGLE_SCRIPT_URL, {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams(formData)
+                    body: formData
                 });
-                localStorage.setItem('ultimaReserva', JSON.stringify(formData));
+                localStorage.setItem('ultimaReserva', formData.toString());
                 window.location.href = 'gracias.html';
             } catch (error) {
                 console.error('Error:', error);
-                localStorage.setItem('ultimaReserva', JSON.stringify(formData));
+                localStorage.setItem('ultimaReserva', formData.toString());
                 window.location.href = 'gracias.html?status=local';
             } finally {
                 submitBtn.disabled = false;
@@ -610,7 +431,7 @@
 
         document.getElementById('linkPrivacidad').addEventListener('click', (e) => {
             e.preventDefault();
-            alert("🔒 La agencia recopila únicamente los datos estrictamente necesarios para la prestación del servicio.\n\n📋 Uso: Gestión de reservas, coordinación logística, notificaciones.\n\n🔐 Los datos no se venden ni se ceden comercialmente.\n\n✅ Derechos: Acceder, Rectificar, Cancelar u Oponerse al uso de sus datos.");
+            alert("🔒 La agencia recopila únicamente los datos estrictamente necesarios para la prestación del servicio.\n\n📋 Uso: Gestión de reservas, coordinación logística, notificaciones.\n\n🔐 Los datos no se venden ni se ceden comercialmente.");
         });
     </script>
 </body>
