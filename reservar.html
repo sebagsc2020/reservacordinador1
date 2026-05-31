@@ -186,7 +186,9 @@
             else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
         }
 
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDfnWspKv8KY8iQWip20iUUn6c9LHZvAlpKL3WaIaz74EAHbjrcWhxMC3OVGx1yv_w_A/exec';
+        // 🔥 ACTUALIZÁ ESTA URL CON LA NUEVA URL DE APPS SCRIPT
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/TU_NUEVA_URL_AQUI/exec';
+        
         const form = document.getElementById('excursionForm');
         const statusMessage = document.getElementById('statusMessage');
 
@@ -214,7 +216,7 @@
                 return;
             }
             
-            // 🔥 CLAVE: Unir excursiones con " | " para que el CRM las separe correctamente
+            // Las excursiones se envían separadas por " | "
             const formData = {
                 id: 'RES-' + Date.now(),
                 nombre: document.getElementById('nombre').value,
