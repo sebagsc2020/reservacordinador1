@@ -15,7 +15,6 @@
             padding: 40px 20px;
         }
         
-        /* Contenedor principal (mismo estilo que index.html) */
         .form-container {
             max-width: 900px;
             margin: 0 auto;
@@ -30,7 +29,6 @@
             transform: translateY(-5px);
         }
         
-        /* Header (gradiente igual al hero del index) */
         .form-header {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
@@ -49,7 +47,6 @@
             opacity: 0.85;
         }
         
-        /* Formulario */
         form {
             padding: 40px;
         }
@@ -108,7 +105,6 @@
             background-color: #f1f5f9;
         }
         
-        /* Checkboxes de excursiones */
         .checkbox-excursiones {
             display: grid;
             gap: 12px;
@@ -165,7 +161,6 @@
             border-radius: 40px;
         }
         
-        /* Checkbox de privacidad (mismo estilo que el modal del index) */
         .checkbox-privacidad {
             display: flex;
             align-items: center;
@@ -201,7 +196,6 @@
             text-decoration: underline;
         }
         
-        /* Botón enviar (mismo estilo que btn-reservar-hero) */
         .submit-btn {
             width: 100%;
             padding: 16px;
@@ -228,7 +222,6 @@
             transform: none;
         }
         
-        /* Mensajes de estado */
         .status-message {
             padding: 12px;
             border-radius: 12px;
@@ -243,7 +236,6 @@
             border-left: 4px solid #e74c3c;
         }
         
-        /* Preloader */
         #preloader {
             position: fixed;
             top: 0;
@@ -289,7 +281,6 @@
             text-align: center;
         }
         
-        /* Animaciones */
         .categoria-group, .excursion-group {
             animation: fadeIn 0.3s ease;
         }
@@ -299,7 +290,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Responsive (mismo breakpoint que index) */
         @media (max-width: 768px) {
             body {
                 padding: 20px;
@@ -349,28 +339,28 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="nombre" class="required">Nombre</label>
-                    <input type="text" id="nombre" required autocomplete="given-name" placeholder="Tu nombre">
+                    <input type="text" id="nombre" name="nombre" required autocomplete="given-name" placeholder="Tu nombre">
                 </div>
                 <div class="form-group">
                     <label for="apellido" class="required">Apellido</label>
-                    <input type="text" id="apellido" required autocomplete="family-name" placeholder="Tu apellido">
+                    <input type="text" id="apellido" name="apellido" required autocomplete="family-name" placeholder="Tu apellido">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="email" class="required">Email</label>
-                    <input type="email" id="email" required autocomplete="email" placeholder="correo@ejemplo.com">
+                    <input type="email" id="email" name="email" required autocomplete="email" placeholder="correo@ejemplo.com">
                 </div>
                 <div class="form-group">
                     <label for="telefono" class="required">Teléfono</label>
-                    <input type="tel" id="telefono" required autocomplete="tel" placeholder="+54 900 000 000">
+                    <input type="tel" id="telefono" name="telefono" required autocomplete="tel" placeholder="+54 900 000 000">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="pais" class="required">País</label>
-                <select id="pais" required>
+                <select id="pais" name="pais" required>
                     <option value="">Selecciona un país</option>
                     <option value="argentina">📌 Argentina</option>
                     <option value="brasil">📌 Brasil</option>
@@ -380,7 +370,7 @@
 
             <div class="form-group categoria-group" id="categoriaGroup" style="display: none;">
                 <label for="categoria" class="required">Ciudad</label>
-                <select id="categoria" disabled>
+                <select id="categoria" name="categoria" disabled>
                     <option value="">Selecciona una ciudad</option>
                 </select>
             </div>
@@ -402,27 +392,29 @@
                 </div>
                 <div class="form-group">
                     <label for="personas" class="required">Nº de personas</label>
-                    <input type="number" id="personas" min="1" max="20" value="1" required>
+                    <input type="number" id="personas" name="personas" min="1" max="20" value="1" required>
                 </div>
             </div>
 
+            <!-- 🔥 CORREGIDO: Agregado name="formaPago" -->
             <div class="form-group">
                 <label for="formaPago" class="required">Forma de Pago</label>
-                <select id="formaPago" required>
+                <select id="formaPago" name="formaPago" required>
                     <option value="">Selecciona una forma de pago</option>
-                    <option value="Efectivo">💵 Efectivo</option>
-                    <option value="Débito/Crédito">💳 Débito/Crédito</option>
-                    <option value="Transferencia">🏦 Transferencia</option>
+                    <option value="💵 Efectivo">💵 Efectivo</option>
+                    <option value="💳 Débito/Crédito">💳 Débito/Crédito</option>
+                    <option value="🏦 Transferencia">🏦 Transferencia</option>
                 </select>
             </div>
 
+            <!-- 🔥 CORREGIDO: Agregado name="lugar" -->
             <div class="form-group">
                 <label for="mensaje">📍 ¿Dónde te buscamos?</label>
-                <input type="text" id="mensaje" placeholder="Hotel, dirección, etc.">
+                <input type="text" id="mensaje" name="lugar" placeholder="Hotel, dirección, etc.">
             </div>
 
             <div class="checkbox-privacidad">
-                <input type="checkbox" id="privacidad" required>
+                <input type="checkbox" id="privacidad" name="privacidad" required>
                 <label for="privacidad">He leído y acepto la <a href="#" id="linkPrivacidad">política de privacidad</a></label>
             </div>
 
@@ -433,14 +425,12 @@
     </div>
 
     <script>
-        // Preloader
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('preloader').classList.add('oculto');
             }, 1000);
         });
 
-        // Fecha automática del sistema
         function establecerFechaSistema() {
             const hoy = new Date();
             const año = hoy.getFullYear();
@@ -452,7 +442,6 @@
         }
         establecerFechaSistema();
 
-        // DATOS DE EXCURSIONES (sin cambios)
         const excursionesData = {
             argentina: {
                 "🎭 Villa Carlos Paz": ["✔️ Aerosilla", "✔️ Capilla del Monte", "✔️ Circuito de la Cerveza", "✔️ City Tour Local", "✔️ Mina Clavero", "✔️ Noche de Teatros", "✔️ Paseo de Catamarán", "✔️ Pekos Multiparque"],
@@ -472,7 +461,6 @@
             }
         };
 
-        // Elementos DOM
         const paisSelect = document.getElementById('pais');
         const categoriaSelect = document.getElementById('categoria');
         const categoriaGroup = document.getElementById('categoriaGroup');
@@ -480,7 +468,6 @@
         const checkboxExcursiones = document.getElementById('checkboxExcursiones');
         const contadorSeleccionados = document.getElementById('contadorSeleccionados');
 
-        // País → Ciudad
         paisSelect.addEventListener('change', function() {
             const pais = this.value;
             categoriaSelect.innerHTML = '<option value="">Selecciona una ciudad</option>';
@@ -504,7 +491,6 @@
             }
         });
 
-        // Ciudad → Excursiones
         categoriaSelect.addEventListener('change', function() {
             const pais = paisSelect.value;
             const ciudad = this.value;
@@ -548,8 +534,9 @@
             else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
         }
 
-        // Envío a Google Sheets
+        // URL del Google Apps Script (verificar que sea la correcta)
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHVLm3FqVZpAOKPh7DW2mbaAWP2W_woI-9-1q7mjlcnEvqLEDccoPVyHBEBJwWNeaICQ/exec';
+        
         const form = document.getElementById('excursionForm');
         const statusMessage = document.getElementById('statusMessage');
 
@@ -580,6 +567,7 @@
                 return;
             }
             
+            // 🔥 CLAVE: formData con los nombres correctos
             const formData = {
                 id: 'RES-' + Date.now(),
                 nombre: document.getElementById('nombre').value,
@@ -591,8 +579,8 @@
                 excursiones: excursionesSeleccionadas.join(' | '),
                 fecha: document.getElementById('fecha').value,
                 personas: document.getElementById('personas').value,
-                formaPago: formaPago,
-                lugar: document.getElementById('mensaje').value || 'No especificado'
+                formaPago: formaPago,                          // ← Nombre correcto
+                lugar: document.getElementById('mensaje').value || 'No especificado'   // ← Nombre correcto
             };
             
             console.log('📤 Enviando reserva:', formData);
@@ -620,7 +608,6 @@
             }
         });
 
-        // Modal de privacidad
         document.getElementById('linkPrivacidad').addEventListener('click', (e) => {
             e.preventDefault();
             alert("🔒 La agencia recopila únicamente los datos estrictamente necesarios para la prestación del servicio.\n\n📋 Uso: Gestión de reservas, coordinación logística, notificaciones.\n\n🔐 Los datos no se venden ni se ceden comercialmente.\n\n✅ Derechos: Acceder, Rectificar, Cancelar u Oponerse al uso de sus datos.");
