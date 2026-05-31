@@ -44,8 +44,9 @@
         .acciones-container { display: flex; flex-direction: column; gap: 3px; }
         .acciones-fila { display: flex; gap: 3px; justify-content: flex-start; }
         .excursiones-lista { margin: 0; padding-left: 15px; list-style: none; }
-        .excursiones-lista li { padding: 3px 0; font-size: 11px; }
+        .excursiones-lista li { padding: 3px 0; font-size: 11px; white-space: normal; word-break: break-word; }
         .total-reservas { font-size: 12px; color: #666; }
+        .id-reserva { font-family: monospace; font-weight: bold; font-size: 11px; }
         @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } }
     </style>
 </head>
@@ -131,7 +132,31 @@
             } else {
                 partes = [texto];
             }
-            return partes.map(p => p.trim().replace(/^\\d+\\.\\s*/, '')).filter(p => p);
+            return partes.map(p => p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(p => p);
+        }
+        
+        // ==================================================
+        // FORMATEAR FECHA
+        // ==================================================
+        function formatearFecha(fechaStr) {
+            if (!fechaStr) return '';
+            // Si es un objeto Date o string largo
+            if (fechaStr.includes('GMT') || fechaStr.includes(' ')) {
+                try {
+                    const fecha = new Date(fechaStr);
+                    if (!isNaN(fecha.getTime())) {
+                        return `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
+                    }
+                } catch(e) {}
+            }
+            // Si ya tiene formato DD/MM/YYYY
+            if (fechaStr.includes('/')) return fechaStr;
+            // Si tiene formato YYYY-MM-DD
+            const partes = fechaStr.split('-');
+            if (partes.length === 3 && partes[0].length === 4) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            return fechaStr;
         }
         
         // ==================================================
@@ -158,21 +183,25 @@
             if (!tbody) return;
             
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos desde la API...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos desde la API...</td</td';
                 
+                console.log('📡 Llamando a la API:', API_URL);
                 const response = await fetch(API_URL);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const resultado = await response.json();
+                console.log('📦 Respuesta de la API:', resultado);
                 
                 if (resultado.error) throw new Error(resultado.error);
-                if (!resultado.success || !resultado.data) throw new Error('Formato de respuesta inválido');
+                if (!resultado.data) throw new Error('No se recibieron datos');
                 
                 const datos = resultado.data;
                 
-                if (datos.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📭 No hay reservas en la planilla</td></tr>';
+                if (!datos || datos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📭 No hay reservas en la planilla</td</td';
                     if (totalSpan) totalSpan.textContent = '0 reservas';
+                    reservasData = [];
+                    reservasFiltradas = [];
                     return;
                 }
                 
@@ -182,7 +211,8 @@
                 for (let i = 0; i < datos.length; i++) {
                     const fila = datos[i];
                     
-                    const id = fila.id || `R-${i+1}`;
+                    // Extraer ID correctamente
+                    const id = fila.id || fila.ID || `R-${i+1}`;
                     const nombre = fila.nombre || '';
                     const apellido = fila.apellido || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
@@ -190,10 +220,16 @@
                     let excursionesRaw = fila.excursiones || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     
+                    // Formatear fecha del timestamp
+                    let fechaRegistro = '';
+                    if (fila.timestamp) {
+                        fechaRegistro = formatearFecha(fila.timestamp);
+                    }
+                    
                     const reserva = {
                         id: id,
-                        fechaRegistro: fila.timestamp ? fila.timestamp.split(' ')[0] : '',
-                        fechaViaje: fila.fecha || '',
+                        fechaRegistro: fechaRegistro,
+                        fechaViaje: fila.fecha ? formatearFecha(fila.fecha) : '',
                         nombre: nombreCompleto,
                         email: fila.email || '',
                         telefono: fila.telefono || '',
@@ -208,9 +244,9 @@
                     reservasData.push(reserva);
                 }
                 
-                console.log(`📊 Cargadas ${reservasData.length} reservas desde la API`);
+                console.log(`📊 Cargadas ${reservasData.length} reservas`);
                 
-                // Ordenar por ID descendente
+                // Ordenar por ID descendente (más reciente primero)
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
                     const numB = parseInt(b.id.replace(/\D/g, '')) || 0; 
@@ -219,12 +255,13 @@
                 
                 reservasFiltradas = [...reservasData];
                 renderizarTabla();
+                if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
                 
             } catch (error) {
-                console.error('Error al cargar:', error);
+                console.error('❌ Error al cargar:', error);
                 tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">
                     ❌ Error al cargar datos: ${error.message}<br><br>
-                    Verifica que la API esté desplegada correctamente y que la planilla sea pública
+                    Verifica que la API esté desplegada correctamente
                 </td</td`;
             }
         }
@@ -237,7 +274,7 @@
             const totalSpan = document.getElementById('totalReservasSpan');
             
             if (!tbody) return;
-            if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} reservas`;
+            if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas que coincidan con la búsqueda</td</td';
@@ -267,17 +304,17 @@
                 
                 return `
                     <tr>
-                        <td><strong>${escapeHtml(r.id)}</strong></td
-                        <td style="font-size:11px">${escapeHtml(fechaMostrar)}</td
-                        <td>${escapeHtml(r.nombre)}</td
-                        <td style="font-size:11px">${escapeHtml(r.email)}</td
-                        <td>${escapeHtml(r.telefono)}</td
-                        <td>${excursionesHtml}</td
-                        <td>${escapeHtml(r.ciudad)}</td
-                        <td>${escapeHtml(r.personas)}</td
-                        <td style="font-size:11px">${escapeHtml(r.formaPago)}</td
-                        <td style="font-size:11px">${escapeHtml(r.lugar)}</td
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
+                        <td class="id-reserva">${escapeHtml(r.id)}</td>
+                        <td style="font-size:11px">${escapeHtml(fechaMostrar)}</td>
+                        <td>${escapeHtml(r.nombre)}</td>
+                        <td style="font-size:11px">${escapeHtml(r.email)}</td>
+                        <td>${escapeHtml(r.telefono)}</td>
+                        <td>${excursionesHtml}</td>
+                        <td>${escapeHtml(r.ciudad)}</td>
+                        <td>${escapeHtml(r.personas)}</td>
+                        <td style="font-size:11px">${escapeHtml(r.formaPago)}</td>
+                        <td style="font-size:11px">${escapeHtml(r.lugar)}</td>
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
                         <td>
                             <div class="acciones-container">
                                 <div class="acciones-fila">
@@ -288,7 +325,7 @@
                                     <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰</button>
                                 </div>
                             </div>
-                        </td
+                        </td>
                     </tr>
                 `;
             }).join('');
@@ -306,10 +343,10 @@
                 reservasFiltradas = [...reservasData];
             } else {
                 reservasFiltradas = reservasData.filter(r => 
-                    r.nombre.toLowerCase().includes(texto) || 
-                    r.email.toLowerCase().includes(texto) ||
-                    r.ciudad.toLowerCase().includes(texto) ||
-                    r.id.toLowerCase().includes(texto)
+                    (r.nombre && r.nombre.toLowerCase().includes(texto)) || 
+                    (r.email && r.email.toLowerCase().includes(texto)) ||
+                    (r.ciudad && r.ciudad.toLowerCase().includes(texto)) ||
+                    (r.id && r.id.toLowerCase().includes(texto))
                 );
             }
             renderizarTabla();
@@ -344,6 +381,9 @@
         // ==================================================
         const busquedaInput = document.getElementById('busquedaReserva');
         if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
+        
+        // Reemplazar la URL antes de cargar
+        console.log('🔧 Configuración actual - Reemplaza TU_URL_AQUI por la URL real de tu Web App');
         
         cargarReservas();
         setInterval(cargarReservas, 60000);
