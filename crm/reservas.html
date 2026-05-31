@@ -63,10 +63,7 @@
     </nav>
 
     <div class="main-content">
-        <div class="header">
-            <div><h1>📋 Reservas</h1></div>
-            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
-        </div>
+        <div class="header"><div><h1>📋 Reservas</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
 
         <div class="filters-bar">
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o ciudad..." id="busquedaReserva">
@@ -75,28 +72,22 @@
         </div>
 
         <div class="table-container">
-            <div class="table-header">
-                <h3>Lista de Reservas</h3>
-                <span id="totalReservasSpan">0 reservas</span>
-            </div>
+            <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0 reservas</span></div>
             <div class="table-wrapper">
                 <table id="reservasTable">
                     <thead>
                         <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursión</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
                     <tbody id="tablaReservas">
-                        <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>
+                        <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td
                     </tbody>
-                </table>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Verificar sesión
-        if (sessionStorage.getItem('crm_logged') !== 'true') { 
-            window.location.href = 'index.html'; 
-        }
+        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
@@ -160,12 +151,17 @@
             if (!tbody) return;
             
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 const csvText = await response.text();
                 const filas = parseCSV(csvText);
                 
                 if (filas.length === 0) throw new Error('No se encontraron datos');
+                
+                // Mostrar encabezados para depuración
+                if (filas.length > 0) {
+                    console.log('📋 Encabezados:', filas[0]);
+                }
                 
                 reservasData = [];
                 const estadosGuardados = cargarEstadosGuardados();
@@ -179,9 +175,19 @@
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
-                    // Columna Excursión está en índice 6
-                    const excursionesRaw = fila[6] || '';
+                    // 🔥 CORRECCIÓN: Las excursiones están en el índice 8 (columna "Excursion")
+                    const pais = fila[6] || '';      // Índice 6 = "Excursión" (pero tiene País)
+                    const ciudad = fila[7] || '';     // Índice 7 = "Ciudad"
+                    const excursionesRaw = fila[8] || '';  // Índice 8 = "Excursion" (acá están las excursiones reales)
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
+                    
+                    // Depuración para la primera reserva
+                    if (i === 1) {
+                        console.log('🔍 País (índice 6):', fila[6]);
+                        console.log('🔍 Ciudad (índice 7):', fila[7]);
+                        console.log('🔍 Excursiones RAW (índice 8):', excursionesRaw);
+                        console.log('🔍 Excursiones parseadas:', listaExcursiones);
+                    }
                     
                     const reserva = {
                         id: id,
@@ -189,8 +195,8 @@
                         nombre: nombreCompleto || nombre,
                         email: fila[4] || '',
                         telefono: fila[5] || '',
-                        pais: fila[6] || '',
-                        ciudad: fila[7] || '',
+                        pais: pais,
+                        ciudad: ciudad,
                         excursionesLista: listaExcursiones,
                         personas: fila[10] || '1',
                         formaPago: fila[11] || 'No especificado',
@@ -212,7 +218,7 @@
                 renderizarTabla();
             } catch (error) {
                 console.error('Error:', error);
-                if (tbody) tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
+                if (tbody) tbody.innerHTML = `</table><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</td`;
             }
         }
 
@@ -225,7 +231,7 @@
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</td';
                 return;
             }
             
@@ -249,16 +255,16 @@
                 return `
                     <tr>
                         <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td>${escapeHtml(r.fecha)}</td>
-                        <td>${escapeHtml(r.nombre)}</td>
-                        <td style="font-size:11px">${escapeHtml(r.email)}</td>
-                        <td>${escapeHtml(r.telefono)}</td>
-                        <td>${excursionesHtml}</td>
-                        <td>${escapeHtml(r.ciudad)}</td>
-                        <td>${escapeHtml(r.personas)}</td>
-                        <td>${escapeHtml(r.formaPago)}</td>
-                        <td>${escapeHtml(r.lugar)}</td>
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
+                        <td>${escapeHtml(r.fecha)}</td
+                        <td>${escapeHtml(r.nombre)}</td
+                        <td style="font-size:11px">${escapeHtml(r.email)}</td
+                        <td>${escapeHtml(r.telefono)}</td
+                        <td>${excursionesHtml}</td
+                        <td>${escapeHtml(r.ciudad)}</td
+                        <td>${escapeHtml(r.personas)}</td
+                        <td>${escapeHtml(r.formaPago)}</td
+                        <td>${escapeHtml(r.lugar)}</td
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
                         <td>
                             <div class="acciones-container">
                                 <div class="acciones-fila">
@@ -269,7 +275,7 @@
                                     <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰</button>
                                 </div>
                             </div>
-                        </td>
+                        </td
                     </tr>
                 `;
             }).join('');
@@ -304,13 +310,11 @@
             return div.innerHTML; 
         }
 
-        // Eventos
         const busquedaInput = document.getElementById('busquedaReserva');
         if (busquedaInput) {
             busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
         }
         
-        // Inicializar
         cargarReservas();
         setInterval(cargarReservas, 60000);
     </script>
