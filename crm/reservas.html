@@ -34,24 +34,23 @@
         .table-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow: hidden; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .table-wrapper { overflow-x: auto; margin: 0 -15px; padding: 0 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 850px; }
-        th { text-align: left; padding: 10px 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
-        td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; } tr:hover td { background: #f8f9ff; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
+        td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; } 
+        tr:hover td { background: #f8f9ff; }
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; }
         .badge-pendiente { background: #fff3cd; color: #856404; } .badge-confirmado { background: #d4edda; color: #155724; }
-        .badge-pagado { background: #d1ecf1; color: #0c5460; } .badge-realizado { background: #e2e3e5; color: #383d41; }
+        .badge-pagado { background: #d1ecf1; color: #0c5460; }
         .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin-right: 2px; }
-        .btn-ver { background: #667eea; color: white; } .btn-confirmar { background: #27ae60; color: white; } .btn-pagar { background: #3498db; color: white; }
-        .btn-pendiente { background: #ffc107; color: #856404; }
+        .btn-ver { background: #667eea; color: white; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.show { display: flex; }
-        .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto; }
+        .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .modal-header h2 { color: #667eea; font-size: 18px; } .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
-        .modal-info p { margin: 8px 0; font-size: 13px; color: #555; } .modal-info strong { color: #333; display: inline-block; width: 110px; }
-        .excursion-tag-modal { display: block; background: #f0f0ff; color: #667eea; padding: 6px 12px; margin: 4px 0; border-radius: 8px; font-size: 13px; border-left: 3px solid #667eea; }
-        .modal-acciones { display: flex; gap: 6px; margin-top: 15px; flex-wrap: wrap; } .modal-acciones .btn-accion { padding: 8px 14px; font-size: 12px; }
-        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } table { min-width: 600px; } }
+        .modal-info p { margin: 8px 0; font-size: 13px; color: #555; } .modal-info strong { color: #333; display: inline-block; width: 100px; }
+        .btn-cerrar-modal { background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 15px; width: 100%; }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } }
     </style>
 </head>
 <body>
@@ -66,220 +65,247 @@
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
             <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
         </ul>
-        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪</button></div>
+        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button></div>
     </nav>
+
     <div class="main-content">
         <div class="header"><div><h1>📋 Reservas</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
-        <div class="tabs">
-            <button class="tab active" onclick="filtrarPorEstado('todas')">Todas <span class="count" id="countTodas">0</span></button>
-            <button class="tab" onclick="filtrarPorEstado('pendiente')">⏳ Pendientes <span class="count" id="countPendiente">0</span></button>
-            <button class="tab" onclick="filtrarPorEstado('confirmado')">✅ Confirmadas <span class="count" id="countConfirmado">0</span></button>
-            <button class="tab" onclick="filtrarPorEstado('pagado')">💰 Pagadas <span class="count" id="countPagado">0</span></button>
-        </div>
+
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por ID, cliente, email o excursión..." id="busquedaReserva">
-            <select class="filter-select" id="filtroCiudad"><option value="">🏙️ Todas las ciudades</option></select>
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por ID, nombre, email o excursión..." id="busquedaReserva">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
         </div>
+
         <div class="table-container">
-            <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0</span></div>
+            <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0 reservas</span></div>
             <div class="table-wrapper">
                 <table>
                     <thead>
-                        <tr><th>ID</th><th>Cliente</th><th>Email</th><th>Ciudad</th><th>Excursión</th><th>Fecha</th><th>Pax</th><th>Pago</th><th>Estado</th><th>Acciones</th>
+                        <tr><th>ID</th><th>Fecha Reserva</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Excursión</th><th>Ciudad</th><th>Personas</th><th>Forma de Pago</th><th>Lugar</th><th>Acciones</th>
                     </thead>
-                    <tbody id="tablaReservas"><tr><td colspan="10" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>
-                </tbody>
+                    <tbody id="tablaReservas">
+                        <tr><td colspan="11" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
-    <div class="modal-overlay" id="modalReserva"><div class="modal-content"><div class="modal-header"><h2>📋 Detalle</h2><button class="modal-close" onclick="cerrarModal()">✕</button></div><div class="modal-info" id="modalInfo"></div><div class="modal-acciones">
-        <button class="btn-accion btn-pendiente" onclick="cambiarEstado('pendiente')">⏳ Pendiente</button>
-        <button class="btn-accion btn-confirmar" onclick="cambiarEstado('confirmado')">✅ Confirmar</button>
-        <button class="btn-accion btn-pagar" onclick="cambiarEstado('pagado')">💰 Pagada</button>
-    </div></div></div>
+
+    <!-- Modal de detalle -->
+    <div class="modal-overlay" id="modalReserva">
+        <div class="modal-content">
+            <div class="modal-header"><h2>📋 Detalle de Reserva</h2><button class="modal-close" onclick="cerrarModal()">✕</button></div>
+            <div class="modal-info" id="modalInfo"></div>
+            <button class="btn-cerrar-modal" onclick="cerrarModal()">Cerrar</button>
+        </div>
+    </div>
+
     <script>
-        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
+        // Verificar sesión
+        if (sessionStorage.getItem('crm_logged') !== 'true') { 
+            window.location.href = 'index.html'; 
+        }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
-        function verificarSesionUnica() { const s = sessionStorage.getItem('crm_session_id'); const a = JSON.parse(localStorage.getItem('crm_sesion_activa')||'{}'); if (!s || a.id !== s) { sessionStorage.clear(); window.location.href = 'index.html'; return false; } localStorage.setItem('crm_sesion_activa', JSON.stringify({...a, timestamp: Date.now()})); return true; }
-        if (!verificarSesionUnica()) throw new Error('Sesión inválida'); setInterval(verificarSesionUnica, 10000);
-        
+
+        // URL de Google Sheets (formato CSV)
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
-        let reservasData = [], estadoFiltro = 'todas', reservaSeleccionada = null;
-        function cargarEstadosGuardados() { try { return JSON.parse(localStorage.getItem('estadosReservas')||'{}'); } catch(e) { return {}; } }
-        function guardarEstado(id, estado) { const e = cargarEstadosGuardados(); e[id] = estado; localStorage.setItem('estadosReservas', JSON.stringify(e)); }
         
-        async function cargarReservas() {
-            try {
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
-                const r = await fetch(SHEET_CSV_URL, { cache: 'no-store' }); 
-                const csv = await r.text(); 
-                const lineas = csv.split('\n');
-                reservasData = [];
+        let reservasData = [];
+        let reservasFiltradas = [];
+
+        // Función para parsear CSV correctamente
+        function parseCSV(csvText) {
+            const lineas = csvText.split('\n');
+            const resultados = [];
+            
+            for (let i = 0; i < lineas.length; i++) {
+                const linea = lineas[i].trim();
+                if (!linea) continue;
                 
-                for (let i = 1; i < lineas.length; i++) { 
-                    const linea = lineas[i].trim(); 
-                    if (!linea) continue;
-                    
-                    const fila = [];
-                    let campo = '';
-                    let enComillas = false;
-                    
-                    for (let j = 0; j < linea.length; j++) {
-                        const char = linea[j];
-                        if (char === '"') {
-                            enComillas = !enComillas;
-                        } else if (char === ',' && !enComillas) {
-                            fila.push(campo.trim());
-                            campo = '';
-                        } else {
-                            campo += char;
-                        }
-                    }
-                    fila.push(campo.trim());
-                    
-                    const limpiado = fila.map(c => c.replace(/^"|"$/g, '').trim());
-                    
-                    // Mapeo CORREGIDO de columnas según Google Sheets:
-                    // Columna 0: ID, 1: Fecha Reserva, 2: Nombre, 3: Apellido, 4: Email, 5: Teléfono, 
-                    // 6: País, 7: Ciudad, 8: Excursión, 9: Fecha, 10: Personas, 11: Forma de pago, 12: Lugar
-                    if (limpiado.length >= 11) {
-                        const reserva = {
-                            id: limpiado[0] || `R${i}`,
-                            nombre: limpiado[2] || '',
-                            apellido: limpiado[3] || '',
-                            email: limpiado[4] || '',
-                            telefono: limpiado[5] || '',
-                            pais: limpiado[6] || '',
-                            ciudad: limpiado[7] || '',
-                            excursion: limpiado[8] || '',
-                            fecha: limpiado[9] || '',
-                            personas: limpiado[10] || '0',
-                            formaPago: (limpiado[11] && limpiado[11] !== '') ? limpiado[11] : 'No especificado',  // ← CORREGIDO: columna 11 = Forma de pago
-                            lugar: (limpiado[12] && limpiado[12] !== '') ? limpiado[12] : 'No especificado',      // ← CORREGIDO: columna 12 = Lugar
-                            estado: 'confirmado'
-                        };
-                        reservasData.push(reserva);
+                const fila = [];
+                let campo = '';
+                let enComillas = false;
+                
+                for (let j = 0; j < linea.length; j++) {
+                    const char = linea[j];
+                    if (char === '"') {
+                        enComillas = !enComillas;
+                    } else if (char === ',' && !enComillas) {
+                        fila.push(campo);
+                        campo = '';
+                    } else {
+                        campo += char;
                     }
                 }
+                fila.push(campo);
                 
-                console.log('Reservas cargadas:', reservasData.length);
-                console.log('Primera reserva (verificar Pago y Lugar):', reservasData[0]);
+                // Limpiar comillas de cada campo
+                const filaLimpia = fila.map(c => c.replace(/^"|"$/g, '').trim());
+                resultados.push(filaLimpia);
+            }
+            return resultados;
+        }
+
+        async function cargarReservas() {
+            try {
+                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
                 
-                reservasData.sort((a, b) => { 
-                    const na = parseInt(a.id.replace(/\D/g,''))||0; 
-                    const nb = parseInt(b.id.replace(/\D/g,''))||0; 
-                    return nb - na; 
+                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                const csvText = await response.text();
+                const filas = parseCSV(csvText);
+                
+                if (filas.length === 0) {
+                    throw new Error('No se encontraron datos');
+                }
+                
+                // La primera fila son los encabezados
+                const encabezados = filas[0];
+                console.log('Encabezados encontrados:', encabezados);
+                
+                reservasData = [];
+                
+                // Procesar desde la fila 1 (saltar encabezados)
+                for (let i = 1; i < filas.length; i++) {
+                    const fila = filas[i];
+                    if (fila.length < 5) continue;
+                    
+                    // Mapeo de columnas según tu estructura
+                    // Columna 0: ID, 1: Fecha Reserva, 2: Nombre, 3: Apellido (opcional), 4: Email, 
+                    // 5: Teléfono, 6: Excursión, 7: Ciudad, 8: Excursion (detalle), 9: Personas, 10: Forma de pago, 11: Lugar
+                    
+                    const nombreCompleto = fila[2] || '';
+                    const apellido = fila[3] || '';
+                    const nombre = `${nombreCompleto} ${apellido}`.trim();
+                    
+                    const reserva = {
+                        id: fila[0] || `R-${i}`,
+                        fechaReserva: fila[1] || '',
+                        nombre: nombre || nombreCompleto,
+                        email: fila[4] || '',
+                        telefono: fila[5] || '',
+                        excursion: fila[6] || fila[8] || '',
+                        ciudad: fila[7] || '',
+                        personas: fila[9] || '1',
+                        formaPago: fila[10] || 'No especificado',
+                        lugar: fila[11] || 'No especificado'
+                    };
+                    
+                    reservasData.push(reserva);
+                }
+                
+                console.log(`Cargadas ${reservasData.length} reservas`);
+                
+                // Ordenar por fecha (más reciente primero)
+                reservasData.sort((a, b) => {
+                    const fechaA = a.fechaReserva.split('/').reverse().join('-');
+                    const fechaB = b.fechaReserva.split('/').reverse().join('-');
+                    return fechaB.localeCompare(fechaA);
                 });
                 
-                const eg = cargarEstadosGuardados(); 
-                reservasData.forEach(r => { 
-                    if (eg[r.id]) r.estado = eg[r.id]; 
-                });
+                reservasFiltradas = [...reservasData];
+                renderizarTabla();
                 
-                const ciudades = [...new Set(reservasData.map(r => r.ciudad).filter(Boolean))].sort();
-                const sel = document.getElementById('filtroCiudad');
-                if (sel) sel.innerHTML = '<option value="">🏙️ Todas las ciudades</option>' + ciudades.map(c => `<option value="${c}">${c}</option>`).join('');
-                
-                renderReservas(reservasData); 
-                actualizarContadores();
-            } catch(e) { 
-                console.error('Error:', e);
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;color:red;padding:30px;">Error: '+e.message+'</td></tr>'; 
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('tablaReservas').innerHTML = `<tr><td colspan="11" style="text-align:center;color:red;padding:30px;">❌ Error al cargar datos: ${error.message}</td></tr>`;
             }
         }
-        
-        function actualizarContadores() { 
-            document.getElementById('countTodas').textContent = reservasData.length; 
-            document.getElementById('countPendiente').textContent = reservasData.filter(r => r.estado === 'pendiente').length; 
-            document.getElementById('countConfirmado').textContent = reservasData.filter(r => r.estado === 'confirmado').length; 
-            document.getElementById('countPagado').textContent = reservasData.filter(r => r.estado === 'pagado').length; 
+
+        function renderizarTabla() {
+            const tbody = document.getElementById('tablaReservas');
+            document.getElementById('totalReservasSpan').textContent = `${reservasFiltradas.length} reservas`;
+            
+            if (reservasFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;">📋 No hay reservas</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = reservasFiltradas.map(r => `
+                <tr>
+                    <td><strong>${escapeHtml(r.id)}</strong></td>
+                    <td>${escapeHtml(r.fechaReserva)}</td>
+                    <td>${escapeHtml(r.nombre)}</td>
+                    <td style="font-size:11px">${escapeHtml(r.email)}</td>
+                    <td>${escapeHtml(r.telefono)}</td>
+                    <td>${escapeHtml(r.excursion.substring(0, 40))}${r.excursion.length > 40 ? '...' : ''}</td>
+                    <td>${escapeHtml(r.ciudad)}</td>
+                    <td>${escapeHtml(r.personas)}</td>
+                    <td>${escapeHtml(r.formaPago)}</td>
+                    <td>${escapeHtml(r.lugar)}</td>
+                    <td><button class="btn-accion btn-ver" onclick="verDetalle('${escapeHtml(r.id)}')">👁️ Ver</button></td>
+                </tr>
+            `).join('');
         }
-        
-        function renderReservas(data) { 
-            document.getElementById('totalReservasSpan').textContent = data.length + ' reservas'; 
-            if (!data.length) { 
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;">📋 Sin reservas</td></tr>'; 
-                return; 
-            } 
-            document.getElementById('tablaReservas').innerHTML = data.map(r => { 
-                let e = r.excursion || ''; 
-                if (e.includes('\n')) { 
-                    const l = e.split('\n').filter(x => x.trim()); 
-                    e = l[0].trim().replace(/^\d+\.\s*/,'').substring(0,20) + (l.length>1?` (+${l.length-1})`:''); 
-                } else e = e.substring(0,20); 
-                return `<tr>
-                    <td><strong>${r.id}</strong></td>
-                    <td>${r.nombre} ${r.apellido}</td>
-                    <td style="font-size:11px">${r.email}</td>
-                    <td>${r.ciudad}</td>
-                    <td>${e}</td>
-                    <td>${r.fecha}</td>
-                    <td>${r.personas}</td>
-                    <td>${r.formaPago}</td>
-                    <td><span class="badge badge-${r.estado}">${r.estado}</span></td>
-                    <td style="white-space:nowrap;">
-                        <button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button>
-                        <button class="btn-accion btn-pendiente" onclick="cambiarEstadoDirecto('${r.id}','pendiente')" title="Marcar Pendiente">⏳</button>
-                        <button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')" title="Confirmar">✅</button>
-                        <button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')" title="Marcar Pagada">💰</button>
-                    </td>
-                </tr>`;
-            }).join(''); 
+
+        function filtrarReservas() {
+            const busqueda = document.getElementById('busquedaReserva').value.toLowerCase();
+            
+            if (!busqueda) {
+                reservasFiltradas = [...reservasData];
+            } else {
+                reservasFiltradas = reservasData.filter(r => 
+                    r.id.toLowerCase().includes(busqueda) ||
+                    r.nombre.toLowerCase().includes(busqueda) ||
+                    r.email.toLowerCase().includes(busqueda) ||
+                    r.excursion.toLowerCase().includes(busqueda) ||
+                    r.ciudad.toLowerCase().includes(busqueda)
+                );
+            }
+            
+            renderizarTabla();
         }
-        
-        function filtrarPorEstado(e) { 
-            estadoFiltro = e; 
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); 
-            event.target.classList.add('active'); 
-            const filtradas = e === 'todas' ? reservasData : reservasData.filter(r => r.estado === e);
-            renderReservas(filtradas); 
+
+        function verDetalle(id) {
+            const reserva = reservasData.find(r => r.id === id);
+            if (!reserva) return;
+            
+            const modalInfo = document.getElementById('modalInfo');
+            modalInfo.innerHTML = `
+                <p><strong>ID:</strong> ${escapeHtml(reserva.id)}</p>
+                <p><strong>Fecha Reserva:</strong> ${escapeHtml(reserva.fechaReserva)}</p>
+                <p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p>
+                <p><strong>Email:</strong> ${escapeHtml(reserva.email)}</p>
+                <p><strong>Teléfono:</strong> ${escapeHtml(reserva.telefono)}</p>
+                <p><strong>Excursión:</strong> ${escapeHtml(reserva.excursion)}</p>
+                <p><strong>Ciudad:</strong> ${escapeHtml(reserva.ciudad)}</p>
+                <p><strong>Personas:</strong> ${escapeHtml(reserva.personas)}</p>
+                <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
+                <p><strong>Lugar:</strong> ${escapeHtml(reserva.lugar)}</p>
+            `;
+            
+            document.getElementById('modalReserva').classList.add('show');
         }
-        
-        function filtrarReservas() { 
-            const b = document.getElementById('busquedaReserva').value.toLowerCase(); 
-            const ciudad = document.getElementById('filtroCiudad').value; 
-            let f = estadoFiltro === 'todas' ? reservasData : reservasData.filter(r => r.estado === estadoFiltro);
-            if (b) f = f.filter(r => r.id.toLowerCase().includes(b) || (r.nombre+' '+r.apellido).toLowerCase().includes(b) || r.email.toLowerCase().includes(b) || (r.excursion||'').toLowerCase().includes(b)); 
-            if (ciudad) f = f.filter(r => r.ciudad === ciudad); 
-            renderReservas(f); 
+
+        function cerrarModal() {
+            document.getElementById('modalReserva').classList.remove('show');
         }
-        
-        function verReserva(id) { 
-            reservaSeleccionada = reservasData.find(r => r.id === id); 
-            if (reservaSeleccionada) { 
-                let ex = ''; 
-                const er = reservaSeleccionada.excursion || ''; 
-                if (er.includes('\n')) ex = er.split('\n').filter(e => e.trim()).map(e => `<div class="excursion-tag-modal">${e.trim()}</div>`).join(''); 
-                document.getElementById('modalInfo').innerHTML = `
-                    <p><strong>ID:</strong> ${reservaSeleccionada.id}</p>
-                    <p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p>
-                    <p><strong>Email:</strong> ${reservaSeleccionada.email}</p>
-                    <p><strong>Tel:</strong> ${reservaSeleccionada.telefono}</p>
-                    <p><strong>País:</strong> ${reservaSeleccionada.pais}</p>
-                    <p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p>
-                    <p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p>
-                    <p><strong>Pax:</strong> ${reservaSeleccionada.personas}</p>
-                    <p><strong>Forma de Pago:</strong> ${reservaSeleccionada.formaPago}</p>
-                    <p><strong>Lugar:</strong> ${reservaSeleccionada.lugar}</p>
-                    <p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p>
-                    <div style="margin-top:12px"><strong>🕐 Excursiones:</strong><div>${ex || reservaSeleccionada.excursion || 'No especificado'}</div></div>
-                `; 
-                document.getElementById('modalReserva').classList.add('show'); 
-            } 
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
+
+        // Eventos
+        document.getElementById('busquedaReserva').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') filtrarReservas();
+        });
         
-        function cerrarModal() { document.getElementById('modalReserva').classList.remove('show'); }
-        function cambiarEstado(nuevo) { if (reservaSeleccionada) { reservaSeleccionada.estado = nuevo; guardarEstado(reservaSeleccionada.id, nuevo); renderReservas(reservasData); actualizarContadores(); cerrarModal(); } }
-        function cambiarEstadoDirecto(id, nuevo) { const r = reservasData.find(r => r.id === id); if (r) { r.estado = nuevo; guardarEstado(id, nuevo); renderReservas(reservasData); actualizarContadores(); } }
+        document.getElementById('modalReserva').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
         
-        document.getElementById('busquedaReserva').addEventListener('keypress', function(e) { if (e.key === 'Enter') filtrarReservas(); });
-        document.getElementById('filtroCiudad').addEventListener('change', function() { filtrarReservas(); });
-        document.getElementById('modalReserva').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarModal(); });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') cerrarModal();
+        });
+        
+        // Cargar datos al iniciar
         cargarReservas();
+        
+        // Recargar cada 60 segundos
+        setInterval(cargarReservas, 60000);
     </script>
 </body>
 </html>
