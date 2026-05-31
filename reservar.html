@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🕐 Reserva tu Excursión | Aventura Total</title>
+    <title>Reserva de Excursiones - Aventura Total</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕐</text></svg>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -74,7 +74,7 @@
                 <div class="form-group"><label for="personas" class="required">Nº de personas</label><input type="number" id="personas" min="1" max="20" value="1" required></div>
             </div>
 
-            <div class="form-group"><label for="formaPago" class="required">Forma de Pago</label><select id="formaPago" required><option value="">Selecciona una forma de pago</option><option value="💵 Efectivo">💵 Efectivo</option><option value="💳 Débito/Crédito">💳 Débito/Crédito</option><option value="🏦 Transferencia">🏦 Transferencia</option></select></div>
+            <div class="form-group"><label for="formaPago" class="required">Forma de Pago</label><select id="formaPago" required><option value="">Selecciona una forma de pago</option><option value="Efectivo">💵 Efectivo</option><option value="Débito/Crédito">💳 Débito/Crédito</option><option value="Transferencia">🏦 Transferencia</option></select></div>
 
             <div class="form-group"><label for="mensaje">📍 ¿Dónde te buscamos?</label><input type="text" id="mensaje" placeholder="Hotel, dirección, etc."></div>
 
@@ -86,10 +86,8 @@
     </div>
 
     <script>
-        // Preloader
         window.addEventListener('load', () => { setTimeout(() => { document.getElementById('preloader').classList.add('oculto'); }, 1000); });
 
-        // Fecha fija
         function establecerFechaSistema() {
             const hoy = new Date();
             const año = hoy.getFullYear();
@@ -101,7 +99,6 @@
         }
         establecerFechaSistema();
 
-        // DATOS DE EXCURSIONES
         const excursionesData = {
             argentina: {
                 "🎭 Villa Carlos Paz": ["✔️ Aerosilla", "✔️ Capilla del Monte", "✔️ Circuito de la Cerveza", "✔️ City Tour Local", "✔️ Mina Clavero", "✔️ Noche de Teatros", "✔️ Paseo de Catamarán", "✔️ Pekos Multiparque"],
@@ -121,7 +118,6 @@
             }
         };
 
-        // Elementos DOM
         const paisSelect = document.getElementById('pais');
         const categoriaSelect = document.getElementById('categoria');
         const categoriaGroup = document.getElementById('categoriaGroup');
@@ -129,7 +125,6 @@
         const checkboxExcursiones = document.getElementById('checkboxExcursiones');
         const contadorSeleccionados = document.getElementById('contadorSeleccionados');
 
-        // PAÍS → CIUDAD
         paisSelect.addEventListener('change', function() {
             const pais = this.value;
             categoriaSelect.innerHTML = '<option value="">Selecciona una ciudad</option>';
@@ -153,7 +148,6 @@
             }
         });
 
-        // CIUDAD → EXCURSIONES
         categoriaSelect.addEventListener('change', function() {
             const pais = paisSelect.value;
             const ciudad = this.value;
@@ -194,7 +188,6 @@
             else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
         }
 
-        // Envío del formulario
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDfnWspKv8KY8iQWip20iUUn6c9LHZvAlpKL3WaIaz74EAHbjrcWhxMC3OVGx1yv_w_A/exec';
         const form = document.getElementById('excursionForm');
         const statusMessage = document.getElementById('statusMessage');
@@ -203,7 +196,6 @@
             e.preventDefault();
             statusMessage.style.display = 'none';
             
-            // Validaciones
             if (!document.getElementById('privacidad').checked) {
                 statusMessage.textContent = '⚠️ Debes aceptar la política de privacidad';
                 statusMessage.className = 'status-message error';
@@ -227,7 +219,7 @@
                 return;
             }
             
-            // 🔥 CLAVE: Las excursiones se separan con " | " para que el CRM las reconozca
+            // 🔥 LAS EXCURSIONES SE ENVÍAN SEPARADAS POR " | " (ESPACIO + PIPE + ESPACIO)
             const formData = {
                 id: 'RES-' + Date.now(),
                 nombre: document.getElementById('nombre').value,
@@ -235,12 +227,12 @@
                 email: document.getElementById('email').value,
                 telefono: document.getElementById('telefono').value,
                 pais: paisSelect.options[paisSelect.selectedIndex].text,
-                categoria: categoriaSelect.value,
+                ciudad: categoriaSelect.value,
                 excursiones: excursionesSeleccionadas.join(' | '),
                 fecha: document.getElementById('fecha').value,
                 personas: document.getElementById('personas').value,
                 formaPago: formaPago,
-                mensaje: document.getElementById('mensaje').value || 'Sin mensaje'
+                lugar: document.getElementById('mensaje').value || 'No especificado'
             };
             
             console.log('📤 Enviando excursiones:', formData.excursiones);
