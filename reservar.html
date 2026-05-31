@@ -860,4 +860,86 @@
             const excursionesSeleccionadas = getExcursionesSeleccionadas();
             if (excursionesSeleccionadas.length === 0) {
                 statusMessage.textContent = '⚠️ Debes seleccionar al menos una excursión';
-                status
+                statusMessage.className = 'status-message error';
+                statusMessage.style.display = 'block';
+                return;
+            }
+            
+            // Validar forma de pago seleccionada
+            const formaPagoSelect = document.getElementById('formaPago');
+            if (!formaPagoSelect.value) {
+                statusMessage.textContent = '⚠️ Debes seleccionar una forma de pago';
+                statusMessage.className = 'status-message error';
+                statusMessage.style.display = 'block';
+                return;
+            }
+            
+            statusMessage.style.display = 'none';
+            mostrarPreloader('ENVIANDO', 'Procesando tu reserva...');
+            
+            const formData = {
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                pais: paisSelect.options[paisSelect.selectedIndex].text,
+                categoria: categoriaSelect.value,
+                excursiones: excursionesSeleccionadas.join(' | '),
+                fecha: document.getElementById('fecha').value,
+                personas: document.getElementById('personas').value,
+                formaPago: formaPagoSelect.value,
+                mensaje: document.getElementById('mensaje').value || 'Sin mensaje'
+            };
+            
+            try {
+                await enviarAGoogleSheets(formData);
+                guardarLocalmente(formData);
+                sessionStorage.setItem('ultimaReserva', JSON.stringify(formData));
+                preloaderTitulo.innerHTML = '¡LISTO!<span class="puntos"></span>';
+                preloaderSubtitulo.textContent = 'Redirigiendo a tu confirmación...';
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                window.location.href = 'gracias.html';
+            } catch (error) {
+                guardarLocalmente(formData);
+                sessionStorage.setItem('ultimaReserva', JSON.stringify(formData));
+                preloaderTitulo.innerHTML = 'ERROR<span class="puntos"></span>';
+                preloaderSubtitulo.textContent = 'Pero tu reserva se guardó. Redirigiendo...';
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                window.location.href = 'gracias.html?status=parcial';
+            }
+        });
+
+        // ===== MODAL POLÍTICA DE PRIVACIDAD =====
+        const modalPrivacidad = document.getElementById('modalPrivacidad');
+        const linkPrivacidad = document.getElementById('linkPrivacidad');
+        const cerrarModal = document.getElementById('cerrarModal');
+        const btnCerrarModal = document.getElementById('btnCerrarModal');
+        
+        linkPrivacidad.addEventListener('click', function(e) {
+            e.preventDefault();
+            modalPrivacidad.style.display = 'flex';
+            document.body.classList.add('modal-abierto');
+        });
+        cerrarModal.addEventListener('click', function() {
+            modalPrivacidad.style.display = 'none';
+            document.body.classList.remove('modal-abierto');
+        });
+        btnCerrarModal.addEventListener('click', function() {
+            modalPrivacidad.style.display = 'none';
+            document.body.classList.remove('modal-abierto');
+        });
+        modalPrivacidad.addEventListener('click', function(e) {
+            if (e.target === modalPrivacidad) {
+                modalPrivacidad.style.display = 'none';
+                document.body.classList.remove('modal-abierto');
+            }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modalPrivacidad.style.display === 'flex') {
+                modalPrivacidad.style.display = 'none';
+                document.body.classList.remove('modal-abierto');
+            }
+        });
+    </script>
+</body>
+</html>
