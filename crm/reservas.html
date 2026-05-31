@@ -22,33 +22,33 @@
         .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 150px; }
-        .filter-select { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; min-width: 180px; background: white; }
-        .filter-input:focus, .filter-select:focus { outline: none; border-color: #667eea; }
+        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
         .btn-filtrar { padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-recargar { padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
-        .tabs { display: flex; gap: 3px; margin-bottom: 20px; background: white; padding: 5px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
-        .tab { padding: 8px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; color: #666; }
-        .tab:hover { background: #f0f0ff; color: #667eea; } .tab.active { background: #667eea; color: white; }
-        .tab .count { display: inline-block; background: rgba(255,255,255,0.3); padding: 1px 6px; border-radius: 10px; font-size: 10px; margin-left: 3px; }
         .table-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow: hidden; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .table-wrapper { overflow-x: auto; margin: 0 -15px; padding: 0 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
         td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; } 
         tr:hover td { background: #f8f9ff; }
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; }
-        .badge-pendiente { background: #fff3cd; color: #856404; } .badge-confirmado { background: #d4edda; color: #155724; }
+        .badge-pendiente { background: #fff3cd; color: #856404; }
+        .badge-confirmado { background: #d4edda; color: #155724; }
         .badge-pagado { background: #d1ecf1; color: #0c5460; }
-        .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin-right: 2px; }
+        .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin-right: 3px; }
+        .btn-pendiente { background: #ffc107; color: #856404; }
+        .btn-confirmar { background: #27ae60; color: white; }
+        .btn-pagar { background: #3498db; color: white; }
         .btn-ver { background: #667eea; color: white; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.show { display: flex; }
         .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .modal-header h2 { color: #667eea; font-size: 18px; } .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
-        .modal-info p { margin: 8px 0; font-size: 13px; color: #555; } .modal-info strong { color: #333; display: inline-block; width: 100px; }
+        .modal-header h2 { color: #667eea; font-size: 18px; } 
+        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
+        .modal-info p { margin: 8px 0; font-size: 13px; color: #555; } 
+        .modal-info strong { color: #333; display: inline-block; width: 100px; }
         .btn-cerrar-modal { background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 15px; width: 100%; }
         @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } }
     </style>
@@ -72,7 +72,7 @@
         <div class="header"><div><h1>📋 Reservas</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
 
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por ID, nombre, email o excursión..." id="busquedaReserva">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o ciudad..." id="busquedaReserva">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
         </div>
@@ -82,10 +82,10 @@
             <div class="table-wrapper">
                 <table>
                     <thead>
-                        <tr><th>ID</th><th>Fecha Reserva</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Excursión</th><th>Ciudad</th><th>Personas</th><th>Forma de Pago</th><th>Lugar</th><th>Acciones</th>
+                        <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursión</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th>
                     </thead>
                     <tbody id="tablaReservas">
-                        <tr><td colspan="11" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>
+                        <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>
                     </tbody>
                 </table>
             </div>
@@ -108,7 +108,7 @@
         }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
-        // URL de Google Sheets (formato CSV)
+        // URL de Google Sheets
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
         
         let reservasData = [];
@@ -140,16 +140,32 @@
                 }
                 fila.push(campo);
                 
-                // Limpiar comillas de cada campo
+                // Limpiar comillas
                 const filaLimpia = fila.map(c => c.replace(/^"|"$/g, '').trim());
                 resultados.push(filaLimpia);
             }
             return resultados;
         }
 
+        // Cargar estados guardados
+        function cargarEstadosGuardados() {
+            try {
+                return JSON.parse(localStorage.getItem('estadosReservas') || '{}');
+            } catch(e) {
+                return {};
+            }
+        }
+
+        // Guardar estado
+        function guardarEstado(id, estado) {
+            const estados = cargarEstadosGuardados();
+            estados[id] = estado;
+            localStorage.setItem('estadosReservas', JSON.stringify(estados));
+        }
+
         async function cargarReservas() {
             try {
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
+                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>';
                 
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 const csvText = await response.text();
@@ -159,47 +175,48 @@
                     throw new Error('No se encontraron datos');
                 }
                 
-                // La primera fila son los encabezados
-                const encabezados = filas[0];
-                console.log('Encabezados encontrados:', encabezados);
-                
                 reservasData = [];
+                const estadosGuardados = cargarEstadosGuardados();
                 
                 // Procesar desde la fila 1 (saltar encabezados)
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
                     if (fila.length < 5) continue;
                     
-                    // Mapeo de columnas según tu estructura
-                    // Columna 0: ID, 1: Fecha Reserva, 2: Nombre, 3: Apellido (opcional), 4: Email, 
-                    // 5: Teléfono, 6: Excursión, 7: Ciudad, 8: Excursion (detalle), 9: Personas, 10: Forma de pago, 11: Lugar
+                    // Mapeo de columnas:
+                    // 0: ID, 1: Fecha Reserva, 2: Nombre, 3: Apellido, 4: Email, 
+                    // 5: Teléfono, 6: Excursión, 7: Ciudad, 8: Excursion detalle, 
+                    // 9: Personas, 10: Forma de pago, 11: Lugar
                     
-                    const nombreCompleto = fila[2] || '';
+                    const id = fila[0] || `R-${i}`;
+                    const nombre = fila[2] || '';
                     const apellido = fila[3] || '';
-                    const nombre = `${nombreCompleto} ${apellido}`.trim();
+                    const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
                     const reserva = {
-                        id: fila[0] || `R-${i}`,
-                        fechaReserva: fila[1] || '',
-                        nombre: nombre || nombreCompleto,
+                        id: id,
+                        fecha: fila[1] || '',
+                        nombre: nombreCompleto || nombre,
                         email: fila[4] || '',
                         telefono: fila[5] || '',
-                        excursion: fila[6] || fila[8] || '',
+                        excursion: (fila[6] || fila[8] || '').substring(0, 50),
                         ciudad: fila[7] || '',
                         personas: fila[9] || '1',
                         formaPago: fila[10] || 'No especificado',
-                        lugar: fila[11] || 'No especificado'
+                        lugar: fila[11] || 'No especificado',
+                        estado: estadosGuardados[id] || 'confirmado'
                     };
                     
                     reservasData.push(reserva);
                 }
                 
                 console.log(`Cargadas ${reservasData.length} reservas`);
+                console.log('Primera reserva:', reservasData[0]);
                 
                 // Ordenar por fecha (más reciente primero)
                 reservasData.sort((a, b) => {
-                    const fechaA = a.fechaReserva.split('/').reverse().join('-');
-                    const fechaB = b.fechaReserva.split('/').reverse().join('-');
+                    const fechaA = a.fecha.split('/').reverse().join('-');
+                    const fechaB = b.fecha.split('/').reverse().join('-');
                     return fechaB.localeCompare(fechaA);
                 });
                 
@@ -208,7 +225,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('tablaReservas').innerHTML = `<tr><td colspan="11" style="text-align:center;color:red;padding:30px;">❌ Error al cargar datos: ${error.message}</td></tr>`;
+                document.getElementById('tablaReservas').innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error al cargar datos: ${error.message}</td</tr>`;
             }
         }
 
@@ -217,38 +234,52 @@
             document.getElementById('totalReservasSpan').textContent = `${reservasFiltradas.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;">📋 No hay reservas</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</tr>';
                 return;
             }
             
-            tbody.innerHTML = reservasFiltradas.map(r => `
-                <tr>
-                    <td><strong>${escapeHtml(r.id)}</strong></td>
-                    <td>${escapeHtml(r.fechaReserva)}</td>
-                    <td>${escapeHtml(r.nombre)}</td>
-                    <td style="font-size:11px">${escapeHtml(r.email)}</td>
-                    <td>${escapeHtml(r.telefono)}</td>
-                    <td>${escapeHtml(r.excursion.substring(0, 40))}${r.excursion.length > 40 ? '...' : ''}</td>
-                    <td>${escapeHtml(r.ciudad)}</td>
-                    <td>${escapeHtml(r.personas)}</td>
-                    <td>${escapeHtml(r.formaPago)}</td>
-                    <td>${escapeHtml(r.lugar)}</td>
-                    <td><button class="btn-accion btn-ver" onclick="verDetalle('${escapeHtml(r.id)}')">👁️ Ver</button></td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = reservasFiltradas.map(r => {
+                let estadoClass = '';
+                let estadoText = '';
+                switch(r.estado) {
+                    case 'pendiente': estadoClass = 'badge-pendiente'; estadoText = 'Pendiente'; break;
+                    case 'confirmado': estadoClass = 'badge-confirmado'; estadoText = 'Confirmado'; break;
+                    case 'pagado': estadoClass = 'badge-pagado'; estadoText = 'Pagado'; break;
+                    default: estadoClass = 'badge-confirmado'; estadoText = 'Confirmado';
+                }
+                
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(r.id)}</strong></td>
+                        <td>${escapeHtml(r.fecha)}</td>
+                        <td>${escapeHtml(r.nombre)}</td>
+                        <td style="font-size:11px">${escapeHtml(r.email)}</td>
+                        <td>${escapeHtml(r.telefono)}</td>
+                        <td>${escapeHtml(r.excursion)}</td>
+                        <td>${escapeHtml(r.ciudad)}</td>
+                        <td>${escapeHtml(r.personas)}</td>
+                        <td>${escapeHtml(r.formaPago)}</td>
+                        <td>${escapeHtml(r.lugar)}</td>
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
+                        <td style="white-space: nowrap;">
+                            <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Marcar Pendiente">⏳ Pendiente</button>
+                            <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅ Confirmar</button>
+                            <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰 Pagada</button>
+                            <button class="btn-accion btn-ver" onclick="verDetalle('${escapeHtml(r.id)}')">👁️ Ver</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function filtrarReservas() {
-            const busqueda = document.getElementById('busquedaReserva').value.toLowerCase();
+            const busqueda = document.getElementById('busquedaReserva').value.toLowerCase().trim();
             
             if (!busqueda) {
                 reservasFiltradas = [...reservasData];
             } else {
                 reservasFiltradas = reservasData.filter(r => 
-                    r.id.toLowerCase().includes(busqueda) ||
                     r.nombre.toLowerCase().includes(busqueda) ||
-                    r.email.toLowerCase().includes(busqueda) ||
-                    r.excursion.toLowerCase().includes(busqueda) ||
                     r.ciudad.toLowerCase().includes(busqueda)
                 );
             }
@@ -256,14 +287,31 @@
             renderizarTabla();
         }
 
+        function cambiarEstado(id, nuevoEstado) {
+            const reserva = reservasData.find(r => r.id === id);
+            if (reserva) {
+                reserva.estado = nuevoEstado;
+                guardarEstado(id, nuevoEstado);
+                renderizarTabla();
+            }
+        }
+
         function verDetalle(id) {
             const reserva = reservasData.find(r => r.id === id);
             if (!reserva) return;
             
+            let estadoText = '';
+            switch(reserva.estado) {
+                case 'pendiente': estadoText = 'Pendiente'; break;
+                case 'confirmado': estadoText = 'Confirmado'; break;
+                case 'pagado': estadoText = 'Pagado'; break;
+                default: estadoText = 'Confirmado';
+            }
+            
             const modalInfo = document.getElementById('modalInfo');
             modalInfo.innerHTML = `
                 <p><strong>ID:</strong> ${escapeHtml(reserva.id)}</p>
-                <p><strong>Fecha Reserva:</strong> ${escapeHtml(reserva.fechaReserva)}</p>
+                <p><strong>Fecha Reserva:</strong> ${escapeHtml(reserva.fecha)}</p>
                 <p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p>
                 <p><strong>Email:</strong> ${escapeHtml(reserva.email)}</p>
                 <p><strong>Teléfono:</strong> ${escapeHtml(reserva.telefono)}</p>
@@ -272,6 +320,7 @@
                 <p><strong>Personas:</strong> ${escapeHtml(reserva.personas)}</p>
                 <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
                 <p><strong>Lugar:</strong> ${escapeHtml(reserva.lugar)}</p>
+                <p><strong>Estado:</strong> <span class="badge badge-${reserva.estado}">${estadoText}</span></p>
             `;
             
             document.getElementById('modalReserva').classList.add('show');
@@ -301,11 +350,8 @@
             if (e.key === 'Escape') cerrarModal();
         });
         
-        // Cargar datos al iniciar
+        // Inicializar
         cargarReservas();
-        
-        // Recargar cada 60 segundos
-        setInterval(cargarReservas, 60000);
     </script>
 </body>
 </html>
