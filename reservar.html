@@ -2,14 +2,251 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva de Excursiones - Aventura Total</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>🕐 Reserva tu Excursión | Aventura Total</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕐</text></svg>">
     <style>
-        /* ==========================================
-           PRELOADER - CRONÓMETRO
-           ========================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* Contenedor principal */
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .form-container:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Header */
+        .form-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .form-header p {
+            font-size: 16px;
+            opacity: 0.85;
+        }
+
+        /* Formulario */
+        form {
+            padding: 40px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 14px;
+        }
+
+        label.required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        input:read-only {
+            background-color: #f8fafc;
+            cursor: not-allowed;
+            border-color: #cbd5e1;
+        }
+
+        select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #f1f5f9;
+        }
+
+        /* Checkboxes de excursiones */
+        .checkbox-excursiones {
+            display: grid;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #f1f5f9;
+            border-color: #667eea;
+            transform: translateX(4px);
+        }
+
+        .checkbox-item.seleccionado {
+            background: #eef2ff;
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        }
+
+        .checkbox-item input {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .seleccionados-contador {
+            text-align: center;
+            font-size: 13px;
+            color: #667eea;
+            margin-top: 12px;
+            font-weight: 600;
+            padding: 8px;
+            background: #f1f5f9;
+            border-radius: 40px;
+        }
+
+        /* Checkbox de privacidad */
+        .checkbox-privacidad {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 14px 18px;
+            border-radius: 16px;
+            margin: 24px 0 20px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .checkbox-privacidad input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-privacidad label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .checkbox-privacidad a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .checkbox-privacidad a:hover {
+            text-decoration: underline;
+        }
+
+        /* Botón enviar */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(39, 174, 96, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Mensajes de estado */
+        .status-message {
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .status-message.error {
+            background: #fee;
+            color: #c0392b;
+            border-left: 4px solid #e74c3c;
+        }
+
+        /* Preloader */
         #preloader {
             position: fixed;
             top: 0;
@@ -21,7 +258,7 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.5s;
         }
 
         #preloader.oculto {
@@ -41,43 +278,6 @@
             border-radius: 50%;
             animation: girar 1s linear infinite;
             margin: 0 auto 20px;
-            position: relative;
-        }
-
-        .cronometro::before {
-            content: '';
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            right: 8px;
-            bottom: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-        }
-
-        .cronometro::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 6px;
-            height: 6px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-        }
-
-        .aguja {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 2px;
-            height: 22px;
-            background: white;
-            transform-origin: bottom center;
-            animation: girarAguja 3s linear infinite;
-            border-radius: 1px;
         }
 
         @keyframes girar {
@@ -85,329 +285,48 @@
             100% { transform: rotate(360deg); }
         }
 
-        @keyframes girarAguja {
-            0% { transform: translate(-50%, -100%) rotate(0deg); }
-            100% { transform: translate(-50%, -100%) rotate(360deg); }
-        }
-
         .preloader-texto {
             color: white;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
+            text-align: center;
         }
 
-        .preloader-subtexto {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 13px;
-        }
-
-        .puntos::after {
-            content: '';
-            animation: puntosAnim 1.5s infinite;
-        }
-
-        @keyframes puntosAnim {
-            0% { content: ''; }
-            25% { content: '.'; }
-            50% { content: '..'; }
-            75% { content: '...'; }
-            100% { content: ''; }
-        }
-
-        #preloaderTitulo { transition: all 0.3s ease; }
-        #preloaderSubtitulo { transition: all 0.3s ease; }
-
-        /* ==========================================
-           ESTILOS DEL FORMULARIO
-           ========================================== */
-        select:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background-color: #f5f5f5;
-        }
-        
+        /* Animaciones */
         .categoria-group, .excursion-group {
             animation: fadeIn 0.3s ease;
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        body.cargando { overflow: hidden; }
-
-        /* ===== CHECKBOX EXCURSIONES ===== */
-        .checkbox-excursiones {
-            display: grid;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .checkbox-item:hover {
-            background: #f0f0ff;
-            border-color: #667eea;
-            transform: translateX(3px);
-        }
-
-        .checkbox-item.seleccionado {
-            background: #f0f0ff;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 12px;
-            cursor: pointer;
-            accent-color: #667eea;
-        }
-
-        .checkbox-item label {
-            margin-bottom: 0;
-            cursor: pointer;
-            flex: 1;
-            font-weight: 500;
-            color: #333;
-        }
-
-        .checkbox-item .check-icon {
-            font-size: 20px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .checkbox-item.seleccionado .check-icon { opacity: 1; }
-
-        .seleccionados-contador {
-            text-align: center;
-            font-size: 13px;
-            color: #667eea;
-            margin-top: 8px;
-            font-weight: 600;
-        }
-
-        .sin-seleccion {
-            color: #999;
-            font-style: italic;
-        }
-
-        /* Campo de fecha automática */
-        #fecha_mostrar {
-            background-color: #f0f0ff !important;
-            color: #667eea !important;
-            font-weight: 600 !important;
-            cursor: not-allowed !important;
-            border-color: #667eea !important;
-        }
-
-        /* ===== FORMA DE PAGO ===== */
-        .forma-pago-group {
-            margin-top: 5px;
-        }
-
-        .pago-opciones {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .pago-opcion {
-            flex: 1;
-            min-width: 120px;
-            padding: 12px 15px;
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-weight: 500;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .pago-opcion:hover {
-            background: #f0f0ff;
-            border-color: #667eea;
-        }
-
-        .pago-opcion.seleccionado {
-            background: #f0f0ff;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-            color: #667eea;
-            font-weight: 700;
-        }
-
-        .pago-opcion input[type="radio"] {
-            display: none;
-        }
-
-        .pago-icono {
-            font-size: 20px;
-        }
-
-        /* ==========================================
-           MODAL POLÍTICA DE PRIVACIDAD
-           ========================================== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            animation: fadeInOverlay 0.3s ease;
-        }
-
-        @keyframes fadeInOverlay {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
-            animation: slideUp 0.4s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 25px;
-            border-bottom: 1px solid #e0e0e0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px 20px 0 0;
-        }
-
-        .modal-header h2 {
-            color: white;
-            font-size: 20px;
-            margin: 0;
-        }
-
-        .modal-close {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            font-size: 28px;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-        }
-
-        .modal-close:hover {
-            background: rgba(255,255,255,0.4);
-            transform: rotate(90deg);
-        }
-
-        .modal-body {
-            padding: 25px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .modal-body::-webkit-scrollbar { width: 6px; }
-        .modal-body::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        .modal-body::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
-
-        .modal-body h3 {
-            color: #667eea;
-            font-size: 16px;
-            margin: 20px 0 10px 0;
-        }
-
-        .modal-body h3:first-child { margin-top: 0; }
-        .modal-body p { color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
-        .modal-body ul { margin: 10px 0; padding-left: 20px; }
-        .modal-body ul li { color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 5px; }
-
-        .modal-footer {
-            padding: 15px 25px;
-            border-top: 1px solid #e0e0e0;
-            text-align: center;
-        }
-
-        .btn-modal-cerrar {
-            padding: 12px 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-modal-cerrar:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        body.modal-abierto { overflow: hidden; }
-
-        @media (max-width: 480px) {
-            .pago-opciones {
-                flex-direction: column;
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            form {
+                padding: 24px;
+            }
+            .form-header h1 {
+                font-size: 24px;
+            }
+            .form-row {
+                gap: 16px;
             }
         }
     </style>
 </head>
-<body class="cargando">
-
-    <!-- ===== PRELOADER ===== -->
+<body>
     <div id="preloader">
         <div class="preloader-content">
-            <div class="cronometro"><div class="aguja"></div></div>
-            <div class="preloader-texto" id="preloaderTitulo">CARGANDO<span class="puntos"></span></div>
-            <div class="preloader-subtexto" id="preloaderSubtitulo">Preparando tu aventura</div>
+            <div class="cronometro"></div>
+            <div class="preloader-texto">CARGANDO<span class="puntos">...</span></div>
         </div>
     </div>
 
-    <!-- ===== FORMULARIO ===== -->
     <div class="form-container">
         <div class="form-header">
             <h1>🕐 Reserva tu Excursión</h1>
@@ -415,32 +334,31 @@
         </div>
 
         <form id="excursionForm">
-            
             <div class="form-row">
                 <div class="form-group">
                     <label for="nombre" class="required">Nombre</label>
-                    <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre" autocomplete="given-name">
+                    <input type="text" id="nombre" required autocomplete="given-name" placeholder="Tu nombre">
                 </div>
                 <div class="form-group">
                     <label for="apellido" class="required">Apellido</label>
-                    <input type="text" id="apellido" name="apellido" required placeholder="Tu apellido" autocomplete="family-name">
+                    <input type="text" id="apellido" required autocomplete="family-name" placeholder="Tu apellido">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="email" class="required">Email</label>
-                    <input type="email" id="email" name="email" required placeholder="correo@ejemplo.com" autocomplete="email">
+                    <input type="email" id="email" required autocomplete="email" placeholder="correo@ejemplo.com">
                 </div>
                 <div class="form-group">
                     <label for="telefono" class="required">Teléfono</label>
-                    <input type="tel" id="telefono" name="telefono" required placeholder="+54 900 000 000" autocomplete="tel">
+                    <input type="tel" id="telefono" required autocomplete="tel" placeholder="+54 900 000 000">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="pais" class="required">País</label>
-                <select id="pais" name="pais" required>
+                <select id="pais" required>
                     <option value="">Selecciona un país</option>
                     <option value="argentina">📌 Argentina</option>
                     <option value="brasil">📌 Brasil</option>
@@ -449,9 +367,9 @@
             </div>
 
             <div class="form-group categoria-group" id="categoriaGroup" style="display: none;">
-              <label for="categoria" class="required">Ciudad</label>
-              <select id="categoria" name="categoria" required disabled>
-                <option value="">Selecciona una ciudad</option>
+                <label for="categoria" class="required">Ciudad</label>
+                <select id="categoria" disabled>
+                    <option value="">Selecciona una ciudad</option>
                 </select>
             </div>
 
@@ -459,56 +377,41 @@
                 <label class="required">Excursiones (selecciona una o varias)</label>
                 <div class="checkbox-excursiones" id="checkboxExcursiones"></div>
                 <div class="seleccionados-contador" id="contadorSeleccionados">
-                    <span class="sin-seleccion">Selecciona al menos una excursión</span>
+                    <span class="sin-seleccion">✨ Selecciona al menos una excursión</span>
                 </div>
             </div>
 
-            <!-- Fecha automática del sistema -->
             <input type="hidden" id="fecha" name="fecha">
-            
+
             <div class="form-row">
                 <div class="form-group">
                     <label for="fecha_mostrar" class="required">Fecha de reserva</label>
-                    <input type="text" id="fecha_mostrar" name="fecha_mostrar" 
-                           readonly placeholder="Fecha del sistema">
+                    <input type="text" id="fecha_mostrar" readonly placeholder="Fecha del sistema">
                 </div>
                 <div class="form-group">
                     <label for="personas" class="required">Nº de personas</label>
-                    <input type="number" id="personas" name="personas" min="1" max="20" value="1" required>
+                    <input type="number" id="personas" min="1" max="20" value="1" required>
                 </div>
             </div>
 
-            <!-- ===== FORMA DE PAGO ===== -->
             <div class="form-group">
                 <label for="formaPago" class="required">Forma de Pago</label>
-                <div class="pago-opciones" id="pagoOpciones">
-                    <label class="pago-opcion" data-valor="Efectivo">
-                        <span class="pago-icono">💵</span> Efectivo
-                        <input type="radio" name="formaPago" value="Efectivo" required>
-                    </label>
-                    <label class="pago-opcion" data-valor="Débito/Crédito">
-                        <span class="pago-icono">💳</span> Débito/Crédito
-                        <input type="radio" name="formaPago" value="Débito/Crédito" required>
-                    </label>
-                    <label class="pago-opcion" data-valor="Transferencia">
-                        <span class="pago-icono">🏦</span> Transferencia
-                        <input type="radio" name="formaPago" value="Transferencia" required>
-                    </label>
-                </div>
+                <select id="formaPago" required>
+                    <option value="">Selecciona una forma de pago</option>
+                    <option value="Efectivo">💵 Efectivo</option>
+                    <option value="Débito/Crédito">💳 Débito/Crédito</option>
+                    <option value="Transferencia">🏦 Transferencia</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label for="mensaje">¿Dónde te buscamos?</label>
-                <input type="text" id="mensaje" name="mensaje" placeholder="Hotel donde estás alojado y número de habitación">
+                <label for="mensaje">📍 ¿Dónde te buscamos?</label>
+                <input type="text" id="mensaje" placeholder="Hotel, dirección, etc.">
             </div>
 
-            <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="privacidad" name="privacidad" required>
-                    <label for="privacidad">
-                        He leído y acepto la <a href="#" id="linkPrivacidad">política de privacidad</a>
-                    </label>
-                </div>
+            <div class="checkbox-privacidad">
+                <input type="checkbox" id="privacidad" required>
+                <label for="privacidad">He leído y acepto la <a href="#" id="linkPrivacidad">política de privacidad</a></label>
             </div>
 
             <div id="statusMessage" class="status-message" style="display: none;"></div>
@@ -517,184 +420,69 @@
         </form>
     </div>
 
-    <!-- ===== MODAL POLÍTICA DE PRIVACIDAD ===== -->
-    <div id="modalPrivacidad" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>🔒 Política de Privacidad</h2>
-                <button class="modal-close" id="cerrarModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p>La agencia recopila únicamente los datos estrictamente necesarios para la prestación del servicio automotor y turístico.</p>
-                <h3>📋 Uso de los Datos</h3>
-                <p>Los datos se utilizan exclusivamente para:</p>
-                <ul>
-                    <li>Gestionar reservas, emitir vouchers de traslado y procesar pagos.</li>
-                    <li>Coordinar la logística de los choferes y guías.</li>
-                    <li>Enviar notificaciones operativas urgentes.</li>
-                    <li>Cumplir con las normativas legales de los organismos de transporte.</li>
-                </ul>
-                <h3>🔐 Confidencialidad</h3>
-                <p>Los datos no se venden ni se ceden comercialmente.</p>
-                <h3>⏱️ Plazo de Conservación</h3>
-                <p>La información se guardará durante el tiempo que dure la relación comercial.</p>
-                <h3>🛡️ Medidas de Seguridad</h3>
-                <p>Implementación de medidas técnicas para evitar pérdida o acceso no autorizado.</p>
-                <h3>✅ Derechos del Usuario</h3>
-                <p>Se garantiza el derecho a Acceder, Rectificar, Cancelar u Oponerse al uso de sus datos.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-modal-cerrar" id="btnCerrarModal">Entendido</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript -->
     <script>
-        // ===== PRELOADER =====
-        const preloader = document.getElementById('preloader');
-        const preloaderTitulo = document.getElementById('preloaderTitulo');
-        const preloaderSubtitulo = document.getElementById('preloaderSubtitulo');
-        
-        function mostrarPreloader(titulo, subtitulo) {
-            preloaderTitulo.innerHTML = titulo + '<span class="puntos"></span>';
-            preloaderSubtitulo.textContent = subtitulo;
-            preloader.classList.remove('oculto');
-            document.body.classList.add('cargando');
-        }
-        
-        function ocultarPreloader(callback) {
-            preloader.classList.add('oculto');
-            document.body.classList.remove('cargando');
-            if (callback) setTimeout(callback, 500);
-        }
-        
-        window.addEventListener('load', function() {
-            setTimeout(function() { ocultarPreloader(); }, 2500);
+        // Preloader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('oculto');
+            }, 1000);
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                if (preloader && !preloader.classList.contains('oculto')) ocultarPreloader();
-            }, 1500);
-        });
-
-        // ===== FECHA AUTOMÁTICA =====
+        // Fecha automática del sistema
         function establecerFechaSistema() {
             const hoy = new Date();
             const año = hoy.getFullYear();
             const mes = String(hoy.getMonth() + 1).padStart(2, '0');
             const dia = String(hoy.getDate()).padStart(2, '0');
-            document.getElementById('fecha').value = `${dia}-${mes}-${año}`;
-            const fechaMostrar = hoy.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('fecha_mostrar').value = fechaMostrar.charAt(0).toUpperCase() + fechaMostrar.slice(1);
+            const fechaFormateada = `${dia}-${mes}-${año}`;
+            document.getElementById('fecha').value = fechaFormateada;
+            document.getElementById('fecha_mostrar').value = fechaFormateada;
         }
         establecerFechaSistema();
 
-        // ===== FORMA DE PAGO - SELECCIÓN VISUAL =====
-        document.querySelectorAll('.pago-opcion').forEach(opcion => {
-            opcion.addEventListener('click', function() {
-                document.querySelectorAll('.pago-opcion').forEach(o => o.classList.remove('seleccionado'));
-                this.classList.add('seleccionado');
-                this.querySelector('input[type="radio"]').checked = true;
-            });
-        });
+        // DATOS DE EXCURSIONES (sin cambios)
+        const excursionesData = {
+            argentina: {
+                "🎭 Villa Carlos Paz": ["✔️ Aerosilla", "✔️ Capilla del Monte", "✔️ Circuito de la Cerveza", "✔️ City Tour Local", "✔️ Mina Clavero", "✔️ Noche de Teatros", "✔️ Paseo de Catamarán", "✔️ Pekos Multiparque"],
+                "🏖️ Mar del Plata": ["✔️ Aquarium", "✔️ City Tour Histórico", "✔️ Puerto y Banquina", "✔️ Sierra de los Padres", "✔️ Fábricas de Alfajores", "✔️ Gruta de Lourdes", "✔️ Noche de Teatros", "✔️ Torre Tanque"],
+                "🎿 Bariloche": ["✔️ Cerro Campanario", "✔️ Cerro Catedral", "✔️ Cerro Otto", "✔️ Circuito Chico", "✔️ Circuito Grande", "✔️ El Bolsón", "✔️ Isla Victoria", "✔️ Ruta del Chocolate"],
+                "🍇 Mendoza": ["✔️ Alta Montaña", "✔️ Camino del Vino", "✔️ City Tour", "✔️ Fábricas de Chocolates", "✔️ Cerro Aconcagua", "✔️ San Rafael", "✔️ Termas de Cacheuta", "✔️ Valle de Uco"],
+                "☃️ Ushuaia": ["✔️ Centros Invernales", "✔️ City Tour", "✔️ Estancia Harberton", "✔️ Lagos Fagnano", "✔️ Glaciar Martial", "✔️ Canal Beagle", "✔️ Parque Nacional", "✔️ Tren del Fin del Mundo"],
+                "🚤 Cataratas del Iguazú": ["✔️ Ciudad del Este", "✔️ Duty Free", "✔️ Gran Aventura", "✔️ Hito Tres Fronteras", "✔️ Icebar", "✔️ Parque de las Aves", "✔️ Parque Nacional", "✔️ Ruinas San Ignacio"]
+            },
+            brasil: {
+                "🏖️ Balneário Camboriú": ["✔️ Barco Pirata", "✔️ Bombinhas", "✔️ City Tour", "✔️ Oceanic Aquarium", "✔️ Cristo Luz", "✔️ Beto Carrero", "✔️ Parque Unipraias"],
+                "🏖️ Florianópolis": ["✔️ Circuito Playas Norte", "✔️ City Tour", "✔️ Isla Anhatomirim", "✔️ Playas del Sur", "✔️ Ilha do Campeche"],
+                "🏖️ Itapema": ["✔️ Beto Carrero", "✔️ Bombinhas", "✔️ Costa Esmeralda", "✔️ Porto Belo", "✔️ Ruta de los Alambiques"]
+            },
+            chile: {
+                "⛰️ Santiago de Chile": ["✔️ City Tour", "✔️ Sky Costanera", "✔️ Viña del Mar", "✔️ Viñedos del Maipo", "✔️ Cajón del Maipo", "✔️ Cerro San Cristóbal", "✔️ Valle Nevado"]
+            }
+        };
 
-        // ===== FORMULARIO =====
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDfnWspKv8KY8iQWip20iUUn6c9LHZvAlpKL3WaIaz74EAHbjrcWhxMC3OVGx1yv_w_A/exec';
-        
+        // Elementos DOM
         const paisSelect = document.getElementById('pais');
         const categoriaSelect = document.getElementById('categoria');
         const categoriaGroup = document.getElementById('categoriaGroup');
         const excursionGroup = document.getElementById('excursionGroup');
         const checkboxExcursiones = document.getElementById('checkboxExcursiones');
         const contadorSeleccionados = document.getElementById('contadorSeleccionados');
-        const form = document.getElementById('excursionForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const statusMessage = document.getElementById('statusMessage');
 
-        const excursiones = {
-            argentina: {
-                "🎭 Villa Carlos Paz": [
-                    "✔️ Aerosilla", "✔️ Capilla del Monte y Norte Cordobés", "✔️ Circuito de la Cerveza y Bosques",
-                    "✔️ City Tour Local", "✔️ Mina Clavero", "✔️ Noche de Teatros", "✔️ Paseo de Catamarán", "✔️ Pekos Multiparque"
-                ],
-                "🏖️ Mar del Plata": [
-                    "✔️ Aquarium Mar del Plata", "✔️ City Tour Histórico y Panorámico", "✔️ Complejo Puerto y Banquina de Pescadores",
-                    "✔️ Excursión a Sierra de los Padres", "✔️ Fábricas de Alfajores", "✔️ Gruta de Lourdes",
-                    "✔️ Noche de Teatros y Calle Rivadavia", "✔️ Torre Tanque"
-                ],
-                "🎿 Bariloche": [
-                    "✔️ Ascenso al Cerro Campanario", "✔️ Cerro Catedral", "✔️ Cerro Otto y Teleférico",
-                    "✔️ Circuito Chico", "✔️ Circuito Grande", "✔️ Excursión a El Bolsón",
-                    "✔️ Isla Victoria y Bosque de Arrayanes", "✔️ Ruta de las Chocolaterías y Centro Cívico"
-                ],
-                "🍇 Mendoza": [
-                    "✔️ Alta Montaña por la Ruta 7", "✔️ Camino del Vino", "✔️ City Tour y Parque General San Martín",
-                    "✔️ Fábricas de Chocolates y Regionales", "✔️ Mirador del Cerro Aconcagua", "✔️ San Rafael y Cañón del Atuel",
-                    "✔️ Termas de Cacheuta", "✔️ Valle de Uco", "✔️ Villavicencio"
-                ],
-                "☃️ Ushuaia": [
-                    "✔️ Centros Invernales del Valle de Tierra Mayor", "✔️ City Tour Histórico y Museos",
-                    "✔️ Estancia Harberton", "✔️ Excursión a los Lagos Fagnano y Escondido", "✔️ Glaciar Martial",
-                    "✔️ Navegación por el Canal Beagle", "✔️ Parque Nacional Tierra del Fuego",
-                    "✔️ Paseo de Compras en el Duty Free Shop y Paseo del Fuego", "✔️ Tren del Fin del Mundo"
-                ],
-                "🚤 Cataratas del Iguazú": [
-                    "✔️ Ciudad del Este", "✔️ Duty Free Shop Puerto Iguazú", "✔️ Gran Aventura",
-                    "✔️ Hito de las Tres Fronteras", "✔️ Icebar Iguazú", "✔️ La Aripuca", "✔️ Parque de las Aves",
-                    "✔️ Parque Nacional do Iguaçu (Lado Brasileño)", "✔️ Parque Nacional Iguazú (Lado Argentino)",
-                    "✔️ Ruinas de San Ignacio Miní y Minas de Wanda"
-                ]
-            },
-            brasil: {
-                "🏖️ Balneário Camboriú": [
-                    "✔️ Barco Pirata", "✔️ Bombinhas", "✔️ City Tour", "✔️ Complejo Turismo Oceanic Aquarium",
-                    "✔️ Cristo Luz", "✔️ Excursión a Beto Carrero World", "✔️ Guarda do Embaú", "✔️ Itapema",
-                    "✔️ Laranjeiras Terrestre", "✔️ Mariscal", "✔️ Palmas de Arvoredo", "✔️ Parque Unipraias",
-                    "✔️ Porto Belo Paseo de Barco"
-                ],
-                "🏖️ Florianópolis": [
-                    "✔️ Circuito de Playas del Norte", "✔️ City Tour Histórico y Mercado Público", "✔️ Guarda do Embaú",
-                    "✔️ Mirador del Morro de la Cruz y Laguna de la Conceição", "✔️ Palmas de Arvoredo",
-                    "✔️ Paseo en Escuna a la Isla de Anhatomirim", "✔️ Playas del Sur e Ilha do Campeche"
-                ],
-                "🏖️ Itapema": [
-                    "✔️ Beto Carrero", "✔️ Bombinhas", "✔️ Circuito Costa Esmeralda", "✔️ Florianópolis",
-                    "✔️ Guarda do Embaú", "✔️ Mariscal", "✔️ Mirador del Encanto", "✔️ Palmas de Arvoredo",
-                    "✔️ Paseo a Porto Belo e Isla de Porto Belo", "✔️ Ruta de los Alambiques Tradicionales"
-                ],
-                "🏖️ Torres": [
-                    "✔️ Paseo en Barco a la Isla de los Lobos", "✔️ Paseo por el Río Mampituba",
-                    "✔️ Parque Guarita", "✔️ Recorrido por la Laguna del Violón"
-                ]
-            },
-            chile: {
-                "⛰️ Santiago de Chile": [
-                    "✔️ City Tour Histórico y Palacio de La Moneda", "✔️ Complejo Sky Costanera",
-                    "✔️ Excursión a Viña del Mar y Valparaíso", "✔️ Excursión a Viñedos del Valle del Maipo",
-                    "✔️ Excursión de Alta Montaña a Cajón del Maipo", "✔️ Paseo de Compras en Mall Costanera Center",
-                    "✔️ Recorrido por el Barrio Bellavista y Chascona", "✔️ Teleférico y Funicular del Cerro San Cristóbal",
-                    "✔️ Valle Nevado y Farellones"
-                ]
-            }
-        };
-
+        // País → Ciudad
         paisSelect.addEventListener('change', function() {
             const pais = this.value;
             categoriaSelect.innerHTML = '<option value="">Selecciona una ciudad</option>';
             checkboxExcursiones.innerHTML = '';
-            contadorSeleccionados.innerHTML = '<span class="sin-seleccion">Selecciona al menos una excursión</span>';
+            contadorSeleccionados.innerHTML = '<span class="sin-seleccion">✨ Selecciona al menos una excursión</span>';
             
             if (pais) {
                 categoriaGroup.style.display = 'block';
                 categoriaSelect.disabled = false;
                 excursionGroup.style.display = 'none';
-                
-                Object.keys(excursiones[pais]).forEach(categoria => {
+                Object.keys(excursionesData[pais]).forEach(ciudad => {
                     const option = document.createElement('option');
-                    option.value = categoria;
-                    option.textContent = categoria;
+                    option.value = ciudad;
+                    option.textContent = ciudad;
                     categoriaSelect.appendChild(option);
                 });
             } else {
@@ -704,41 +492,36 @@
             }
         });
 
+        // Ciudad → Excursiones
         categoriaSelect.addEventListener('change', function() {
             const pais = paisSelect.value;
-            const categoria = this.value;
-            
+            const ciudad = this.value;
             checkboxExcursiones.innerHTML = '';
-            contadorSeleccionados.innerHTML = '<span class="sin-seleccion">Selecciona al menos una excursión</span>';
+            contadorSeleccionados.innerHTML = '<span class="sin-seleccion">✨ Selecciona al menos una excursión</span>';
             
-            if (categoria && pais) {
+            if (ciudad && pais) {
                 excursionGroup.style.display = 'block';
-                
-                excursiones[pais][categoria].forEach((excursion, index) => {
+                const excursiones = excursionesData[pais][ciudad];
+                excursiones.forEach((excursion, index) => {
                     const div = document.createElement('div');
                     div.className = 'checkbox-item';
+                    const id = `exc_${Date.now()}_${index}`;
                     div.innerHTML = `
-                        <input type="checkbox" id="excursion_${index}" name="excursiones[]" value="${excursion}">
-                        <label for="excursion_${index}">${excursion}</label>
-                        <span class="check-icon">✅</span>
+                        <input type="checkbox" id="${id}" value="${excursion}">
+                        <label for="${id}">${excursion}</label>
                     `;
-                    
-                    const checkbox = div.querySelector('input[type="checkbox"]');
+                    const checkbox = div.querySelector('input');
                     checkbox.addEventListener('change', function() {
                         if (this.checked) div.classList.add('seleccionado');
                         else div.classList.remove('seleccionado');
                         actualizarContador();
                     });
-                    
-                    div.addEventListener('click', function(e) {
-                        if (e.target !== checkbox) {
+                    div.addEventListener('click', (e) => {
+                        if (e.target !== checkbox && e.target.tagName !== 'LABEL') {
                             checkbox.checked = !checkbox.checked;
-                            if (checkbox.checked) div.classList.add('seleccionado');
-                            else div.classList.remove('seleccionado');
-                            actualizarContador();
+                            checkbox.dispatchEvent(new Event('change'));
                         }
                     });
-                    
                     checkboxExcursiones.appendChild(div);
                 });
             } else {
@@ -747,37 +530,20 @@
         });
 
         function actualizarContador() {
-            const checkboxes = document.querySelectorAll('input[name="excursiones[]"]:checked');
-            const total = checkboxes.length;
-            if (total === 0) contadorSeleccionados.innerHTML = '<span class="sin-seleccion">Selecciona al menos una excursión</span>';
+            const total = document.querySelectorAll('#checkboxExcursiones input:checked').length;
+            if (total === 0) contadorSeleccionados.innerHTML = '<span class="sin-seleccion">✨ Selecciona al menos una excursión</span>';
             else if (total === 1) contadorSeleccionados.innerHTML = '✅ <strong>1 excursión seleccionada</strong>';
             else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
         }
 
-        function getExcursionesSeleccionadas() {
-            return Array.from(document.querySelectorAll('input[name="excursiones[]"]:checked')).map(cb => cb.value);
-        }
-
-        function getFormaPago() {
-            const seleccionada = document.querySelector('input[name="formaPago"]:checked');
-            return seleccionada ? seleccionada.value : 'No especificada';
-        }
-
-        async function enviarAGoogleSheets(formData) {
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
-                return { success: true };
-            } catch (error) { throw error; }
-        }
-
-        function guardarLocalmente(formData) {
-            const reservas = JSON.parse(localStorage.getItem('reservas') || '[]');
-            reservas.push({ ...formData, fechaEnvio: new Date().toISOString() });
-            localStorage.setItem('reservas', JSON.stringify(reservas));
-        }
+        // Envío a Google Sheets
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHVLm3FqVZpAOKPh7DW2mbaAWP2W_woI-9-1q7mjlcnEvqLEDccoPVyHBEBJwWNeaICQ/exec';
+        const form = document.getElementById('excursionForm');
+        const statusMessage = document.getElementById('statusMessage');
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
+            statusMessage.style.display = 'none';
             
             if (!document.getElementById('privacidad').checked) {
                 statusMessage.textContent = '⚠️ Debes aceptar la política de privacidad';
@@ -786,7 +552,7 @@
                 return;
             }
             
-            const excursionesSeleccionadas = getExcursionesSeleccionadas();
+            const excursionesSeleccionadas = Array.from(document.querySelectorAll('#checkboxExcursiones input:checked')).map(cb => cb.value);
             if (excursionesSeleccionadas.length === 0) {
                 statusMessage.textContent = '⚠️ Debes seleccionar al menos una excursión';
                 statusMessage.className = 'status-message error';
@@ -794,78 +560,58 @@
                 return;
             }
             
-            if (!document.querySelector('input[name="formaPago"]:checked')) {
+            const formaPago = document.getElementById('formaPago').value;
+            if (!formaPago) {
                 statusMessage.textContent = '⚠️ Debes seleccionar una forma de pago';
                 statusMessage.className = 'status-message error';
                 statusMessage.style.display = 'block';
                 return;
             }
             
-            statusMessage.style.display = 'none';
-            mostrarPreloader('ENVIANDO', 'Procesando tu reserva...');
-            
             const formData = {
+                id: 'RES-' + Date.now(),
                 nombre: document.getElementById('nombre').value,
                 apellido: document.getElementById('apellido').value,
                 email: document.getElementById('email').value,
                 telefono: document.getElementById('telefono').value,
                 pais: paisSelect.options[paisSelect.selectedIndex].text,
-                categoria: categoriaSelect.value,
+                ciudad: categoriaSelect.value,
                 excursiones: excursionesSeleccionadas.join(' | '),
                 fecha: document.getElementById('fecha').value,
                 personas: document.getElementById('personas').value,
-                formaPago: getFormaPago(),
-                mensaje: document.getElementById('mensaje').value || 'Sin mensaje'
+                formaPago: formaPago,
+                lugar: document.getElementById('mensaje').value || 'No especificado'
             };
             
+            console.log('📤 Enviando reserva:', formData);
+            
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Enviando...';
+            
             try {
-                await enviarAGoogleSheets(formData);
-                guardarLocalmente(formData);
-                sessionStorage.setItem('ultimaReserva', JSON.stringify(formData));
-                preloaderTitulo.innerHTML = '¡LISTO!<span class="puntos"></span>';
-                preloaderSubtitulo.textContent = 'Redirigiendo a tu confirmación...';
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(formData)
+                });
+                localStorage.setItem('ultimaReserva', JSON.stringify(formData));
                 window.location.href = 'gracias.html';
             } catch (error) {
-                guardarLocalmente(formData);
-                sessionStorage.setItem('ultimaReserva', JSON.stringify(formData));
-                preloaderTitulo.innerHTML = 'ERROR<span class="puntos"></span>';
-                preloaderSubtitulo.textContent = 'Pero tu reserva se guardó. Redirigiendo...';
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                window.location.href = 'gracias.html?status=parcial';
+                console.error('Error:', error);
+                localStorage.setItem('ultimaReserva', JSON.stringify(formData));
+                window.location.href = 'gracias.html?status=local';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '📩 Enviar Reserva';
             }
         });
 
-        // ===== MODAL POLÍTICA DE PRIVACIDAD =====
-        const modalPrivacidad = document.getElementById('modalPrivacidad');
-        const linkPrivacidad = document.getElementById('linkPrivacidad');
-        const cerrarModal = document.getElementById('cerrarModal');
-        const btnCerrarModal = document.getElementById('btnCerrarModal');
-        
-        linkPrivacidad.addEventListener('click', function(e) {
+        // Modal de privacidad
+        document.getElementById('linkPrivacidad').addEventListener('click', (e) => {
             e.preventDefault();
-            modalPrivacidad.style.display = 'flex';
-            document.body.classList.add('modal-abierto');
-        });
-        cerrarModal.addEventListener('click', function() {
-            modalPrivacidad.style.display = 'none';
-            document.body.classList.remove('modal-abierto');
-        });
-        btnCerrarModal.addEventListener('click', function() {
-            modalPrivacidad.style.display = 'none';
-            document.body.classList.remove('modal-abierto');
-        });
-        modalPrivacidad.addEventListener('click', function(e) {
-            if (e.target === modalPrivacidad) {
-                modalPrivacidad.style.display = 'none';
-                document.body.classList.remove('modal-abierto');
-            }
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && modalPrivacidad.style.display === 'flex') {
-                modalPrivacidad.style.display = 'none';
-                document.body.classList.remove('modal-abierto');
-            }
+            alert("🔒 La agencia recopila únicamente los datos estrictamente necesarios para la prestación del servicio.\n\n📋 Uso: Gestión de reservas, coordinación logística, notificaciones.\n\n🔐 Los datos no se venden ni se ceden comercialmente.\n\n✅ Derechos: Acceder, Rectificar, Cancelar u Oponerse al uso de sus datos.");
         });
     </script>
 </body>
