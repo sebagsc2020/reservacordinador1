@@ -2,123 +2,362 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>🕐 Reserva tu Excursión | Aventura Total</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 40px 20px; }
-        .form-container { max-width: 900px; margin: 0 auto; background: white; border-radius: 32px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; }
-        .form-header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 40px 30px; text-align: center; }
-        .form-header h1 { font-size: 32px; margin-bottom: 12px; }
-        form { padding: 40px; }
-        .form-row { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
-        .form-group { flex: 1; min-width: 200px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a2e; font-size: 14px; }
-        label.required::after { content: " *"; color: #e74c3c; }
-        input, select { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 16px; font-size: 14px; transition: all 0.3s; }
-        input:focus, select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102,126,234,0.1); }
-        .checkbox-group { display: grid; gap: 12px; margin-top: 8px; }
-        .checkbox-item { display: flex; align-items: center; padding: 12px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; cursor: pointer; }
-        .checkbox-item.seleccionado { background: #eef2ff; border-color: #667eea; }
-        .checkbox-item input { width: 20px; margin-right: 12px; }
-        .checkbox-item label { margin: 0; cursor: pointer; flex: 1; }
-        .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; border: none; border-radius: 40px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 20px; }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(39,174,96,0.4); }
-        .error-message { background: #fee; color: #c0392b; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; }
-        .success-message { background: #d4edda; color: #155724; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; }
-        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s; }
-        #preloader.oculto { opacity: 0; visibility: hidden; }
-        .cronometro { width: 75px; height: 75px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid white; border-radius: 50%; animation: girar 1s linear infinite; margin-bottom: 20px; }
-        @keyframes girar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .preloader-texto { color: white; font-size: 20px; font-weight: 700; }
-        @media (max-width: 768px) { form { padding: 24px; } .form-header h1 { font-size: 24px; } }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
+        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; border: none; }
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 26px; color: #1a1a2e; }
+        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
+        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
+        .btn-filtrar { padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-recargar { padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .table-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow: hidden; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .table-wrapper { overflow-x: auto; margin: 0 -15px; padding: 0 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
+        td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; } 
+        tr:hover td { background: #f8f9ff; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        .badge-pendiente { background: #fff3cd; color: #856404; }
+        .badge-confirmado { background: #d4edda; color: #155724; }
+        .badge-pagado { background: #d1ecf1; color: #0c5460; }
+        .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin: 2px; width: 28px; text-align: center; }
+        .btn-pendiente { background: #ffc107; color: #856404; }
+        .btn-confirmar { background: #27ae60; color: white; }
+        .btn-pagar { background: #3498db; color: white; }
+        .btn-ver { background: #667eea; color: white; }
+        .acciones-container { display: flex; flex-direction: column; gap: 3px; }
+        .acciones-fila { display: flex; gap: 3px; justify-content: flex-start; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 550px; width: 90%; max-height: 85vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .modal-header h2 { color: #667eea; font-size: 18px; } 
+        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
+        .modal-info p { margin: 8px 0; font-size: 13px; color: #555; } 
+        .modal-info strong { color: #333; display: inline-block; width: 110px; }
+        .excursiones-lista { background: #f8f9fa; border-radius: 8px; padding: 10px; margin-top: 8px; }
+        .excursion-item { padding: 5px 0; border-bottom: 1px solid #e0e0e0; font-size: 12px; }
+        .excursion-item:last-child { border-bottom: none; }
+        .btn-cerrar-modal { background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 15px; width: 100%; }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } }
     </style>
 </head>
 <body>
-    <div id="preloader"><div class="preloader-content"><div class="cronometro"></div><div class="preloader-texto">CARGANDO<span class="puntos">...</span></div></div></div>
+    <nav class="sidebar">
+        <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2></div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+            <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
+            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
+            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
+        </ul>
+        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button></div>
+    </nav>
 
-    <div class="form-container">
-        <div class="form-header"><h1>🕐 Reserva tu Excursión</h1><p>Completa el formulario y obtén el mejor precio</p></div>
-        <form id="excursionForm">
-            <div id="errorMsg" class="error-message"></div>
-            <div id="successMsg" class="success-message">✅ ¡Reserva enviada con éxito!</div>
-            
-            <div class="form-row">
-                <div class="form-group"><label class="required">Nombre</label><input type="text" id="nombre" required autocomplete="given-name"></div>
-                <div class="form-group"><label class="required">Apellido</label><input type="text" id="apellido" required autocomplete="family-name"></div>
+    <div class="main-content">
+        <div class="header"><div><h1>📋 Reservas</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
+
+        <div class="filters-bar">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o ciudad..." id="busquedaReserva">
+            <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
+            <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0 reservas</span></div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursión</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="tablaReservas">
+                        <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="form-row">
-                <div class="form-group"><label class="required">Email</label><input type="email" id="email" required autocomplete="email"></div>
-                <div class="form-group"><label class="required">Teléfono</label><input type="tel" id="telefono" required autocomplete="tel"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label class="required">País</label><select id="pais" required><option value="">Selecciona</option><option value="Argentina">📌 Argentina</option><option value="Brasil">📌 Brasil</option><option value="Chile">📌 Chile</option></select></div>
-                <div class="form-group"><label class="required">Ciudad</label><input type="text" id="ciudad" required autocomplete="address-level2"></div>
-            </div>
-            
-            <div class="form-group"><label class="required">Excursiones</label><div class="checkbox-group" id="excursionesGroup"><div class="checkbox-item" data-val="Trekking"><input type="checkbox" id="exc1"><label for="exc1">🥾 Trekking</label></div><div class="checkbox-item" data-val="Rafting"><input type="checkbox" id="exc2"><label for="exc2">🛶 Rafting</label></div><div class="checkbox-item" data-val="Cabalgata"><input type="checkbox" id="exc3"><label for="exc3">🐎 Cabalgata</label></div><div class="checkbox-item" data-val="Avistaje"><input type="checkbox" id="exc4"><label for="exc4">🦜 Avistaje de Aves</label></div></div></div>
-            
-            <div class="form-row">
-                <div class="form-group"><label class="required">Fecha</label><input type="date" id="fecha" required></div>
-                <div class="form-group"><label class="required">Personas</label><input type="number" id="personas" min="1" max="20" value="1" required></div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group"><label class="required">Forma de Pago</label><select id="formaPago" required><option value="">Selecciona</option><option value="💵 Efectivo">💵 Efectivo</option><option value="💳 Débito/Crédito">💳 Débito/Crédito</option><option value="🏦 Transferencia">🏦 Transferencia</option></select></div>
-                <div class="form-group"><label>Lugar de recogida</label><input type="text" id="lugar" placeholder="Hotel, dirección, etc."></div>
-            </div>
-            
-            <div class="checkbox-privacidad" style="display: flex; gap: 10px; margin: 20px 0;"><input type="checkbox" id="privacidad" required><label>Acepto la <a href="#" id="linkPrivacidad">política de privacidad</a></label></div>
-            <button type="submit" class="submit-btn">📩 Enviar Reserva</button>
-        </form>
+        </div>
+    </div>
+
+    <!-- Modal de detalle -->
+    <div class="modal-overlay" id="modalReserva">
+        <div class="modal-content">
+            <div class="modal-header"><h2>📋 Detalle de Reserva</h2><button class="modal-close" onclick="cerrarModal()">✕</button></div>
+            <div class="modal-info" id="modalInfo"></div>
+            <button class="btn-cerrar-modal" onclick="cerrarModal()">Cerrar</button>
+        </div>
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDfnWspKv8KY8iQWip20iUUn6c9LHZvAlpKL3WaIaz74EAHbjrcWhxMC3OVGx1yv_w_A/exec';
+        // Verificar sesión
+        if (sessionStorage.getItem('crm_logged') !== 'true') { 
+            window.location.href = 'index.html'; 
+        }
+        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1NZCvbVp5durfrzeRGjerb3t25oWuMF822N7sLpKCQ5Q/gviz/tq?tqx=out:csv&sheet=Hoja%201';
         
-        // Preloader
-        window.addEventListener('load', () => { setTimeout(() => { document.getElementById('preloader').classList.add('oculto'); }, 1000); });
-        
-        // Checkboxes
-        document.querySelectorAll('.checkbox-item').forEach(item => {
-            const checkbox = item.querySelector('input');
-            checkbox.addEventListener('change', () => { if (checkbox.checked) item.classList.add('seleccionado'); else item.classList.remove('seleccionado'); });
-            item.addEventListener('click', (e) => { if (e.target !== checkbox) { checkbox.checked = !checkbox.checked; checkbox.dispatchEvent(new Event('change')); } });
-        });
-        
-        document.getElementById('excursionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const errorDiv = document.getElementById('errorMsg'), successDiv = document.getElementById('successMsg');
-            errorDiv.style.display = 'none'; successDiv.style.display = 'none';
-            
-            const excursiones = Array.from(document.querySelectorAll('#excursionesGroup input:checked')).map(cb => cb.parentElement.dataset.val);
-            if (excursiones.length === 0) { errorDiv.textContent = '❌ Selecciona al menos una excursión'; errorDiv.style.display = 'block'; return; }
-            if (!document.getElementById('privacidad').checked) { errorDiv.textContent = '❌ Acepta la política de privacidad'; errorDiv.style.display = 'block'; return; }
-            
-            const formData = {
-                id: 'RES-' + Date.now(),
-                nombre: document.getElementById('nombre').value,
-                apellido: document.getElementById('apellido').value,
-                email: document.getElementById('email').value,
-                telefono: document.getElementById('telefono').value,
-                pais: document.getElementById('pais').value,
-                ciudad: document.getElementById('ciudad').value,
-                excursiones: excursiones.join(', '),
-                fecha: document.getElementById('fecha').value,
-                personas: document.getElementById('personas').value,
-                formaPago: document.getElementById('formaPago').value,
-                lugar: document.getElementById('lugar').value || 'No especificado'
-            };
-            
+        let reservasData = [];
+        let reservasFiltradas = [];
+
+        function parseCSV(csvText) {
+            const lineas = csvText.split('\n');
+            const resultados = [];
+            for (let i = 0; i < lineas.length; i++) {
+                const linea = lineas[i].trim();
+                if (!linea) continue;
+                const fila = [];
+                let campo = '';
+                let enComillas = false;
+                for (let j = 0; j < linea.length; j++) {
+                    const char = linea[j];
+                    if (char === '"') { enComillas = !enComillas; } 
+                    else if (char === ',' && !enComillas) { fila.push(campo); campo = ''; } 
+                    else { campo += char; }
+                }
+                fila.push(campo);
+                resultados.push(fila.map(c => c.replace(/^"|"$/g, '').trim()));
+            }
+            return resultados;
+        }
+
+        function formatearFecha(fechaStr) {
+            if (!fechaStr) return '';
+            if (fechaStr.includes('/')) return fechaStr;
+            const partes = fechaStr.split('-');
+            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            return fechaStr;
+        }
+
+        function cargarEstadosGuardados() {
+            try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } 
+            catch(e) { return {}; }
+        }
+
+        function guardarEstado(id, estado) {
+            const estados = cargarEstadosGuardados();
+            estados[id] = estado;
+            localStorage.setItem('estadosReservas', JSON.stringify(estados));
+        }
+
+        async function cargarReservas() {
             try {
-                await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(formData) });
-                localStorage.setItem('ultimaReserva', JSON.stringify(formData));
-                successDiv.style.display = 'block';
-                setTimeout(() => { window.location.href = 'gracias.html'; }, 2000);
-            } catch(err) { errorDiv.textContent = '❌ Error, pero tu reserva se guardó localmente'; errorDiv.style.display = 'block'; }
-        });
+                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
+                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                const csvText = await response.text();
+                const filas = parseCSV(csvText);
+                
+                if (filas.length === 0) throw new Error('No se encontraron datos');
+                
+                reservasData = [];
+                const estadosGuardados = cargarEstadosGuardados();
+                
+                for (let i = 1; i < filas.length; i++) {
+                    const fila = filas[i];
+                    if (fila.length < 5) continue;
+                    
+                    // MAPEO CORRECTO DE COLUMNAS
+                    // Según tu Google Sheets: 
+                    // 0:ID, 1:Fecha Reserva, 2:Nombre, 3:Apellido, 4:Email, 
+                    // 5:Teléfono, 6:País, 7:Ciudad, 8:Excursión, 9:Fecha Excursión, 
+                    // 10:Personas, 11:Forma de pago, 12:Lugar
+                    
+                    const id = fila[0] || `R-${i}`;
+                    const nombre = fila[2] || '';
+                    const apellido = fila[3] || '';
+                    
+                    // Procesar excursiones (pueden venir con números: "1. ✔️ Excursión, 2. ✔️ Otra")
+                    let excursionRaw = fila[8] || fila[6] || '';
+                    let excursionesLista = [];
+                    if (excursionRaw) {
+                        // Separar por comas o por números
+                        excursionesLista = excursionRaw.split(',').map(e => e.trim().replace(/^\d+\.\s*/, '')).filter(e => e);
+                        if (excursionesLista.length === 0 && excursionRaw) {
+                            excursionesLista = [excursionRaw.replace(/^\d+\.\s*/, '')];
+                        }
+                    }
+                    
+                    const reserva = {
+                        id: id,
+                        fecha: formatearFecha(fila[1] || ''),
+                        nombre: `${nombre} ${apellido}`.trim() || nombre,
+                        email: fila[4] || '',
+                        telefono: fila[5] || '',
+                        pais: fila[6] || '',
+                        ciudad: fila[7] || '',
+                        excursion: excursionRaw.substring(0, 50),
+                        excursionesLista: excursionesLista,
+                        fechaExcursion: fila[9] || '',
+                        personas: fila[10] || '1',
+                        formaPago: fila[11] || 'No especificado',  // ← Columna K (índice 11)
+                        lugar: fila[12] || 'No especificado',       // ← Columna L (índice 12)
+                        estado: estadosGuardados[id] || 'confirmado'
+                    };
+                    
+                    reservasData.push(reserva);
+                }
+                
+                console.log(`Cargadas ${reservasData.length} reservas`);
+                if (reservasData.length > 0) console.log('Primera reserva:', reservasData[0]);
+                
+                reservasData.sort((a, b) => {
+                    const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
+                    const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
+                    return numB - numA;
+                });
+                
+                reservasFiltradas = [...reservasData];
+                renderizarTabla();
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('tablaReservas').innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error al cargar datos: ${error.message}</td></tr>`;
+            }
+        }
+
+        function renderizarTabla() {
+            const tbody = document.getElementById('tablaReservas');
+            document.getElementById('totalReservasSpan').textContent = `${reservasFiltradas.length} reservas`;
+            
+            if (reservasFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = reservasFiltradas.map(r => {
+                let estadoClass = '', estadoText = '';
+                switch(r.estado) {
+                    case 'pendiente': estadoClass = 'badge-pendiente'; estadoText = 'Pendiente'; break;
+                    case 'confirmado': estadoClass = 'badge-confirmado'; estadoText = 'Confirmado'; break;
+                    case 'pagado': estadoClass = 'badge-pagado'; estadoText = 'Pagado'; break;
+                    default: estadoClass = 'badge-confirmado'; estadoText = 'Confirmado';
+                }
+                
+                const excursionCorta = r.excursionesLista.length > 0 ? r.excursionesLista[0] : (r.excursion || '');
+                
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(r.id)}</strong></td>
+                        <td>${escapeHtml(r.fecha)}</td>
+                        <td>${escapeHtml(r.nombre)}</td>
+                        <td style="font-size:11px">${escapeHtml(r.email)}</td>
+                        <td>${escapeHtml(r.telefono)}</td>
+                        <td>${escapeHtml(excursionCorta)}${r.excursionesLista.length > 1 ? ` (+${r.excursionesLista.length-1})` : ''}</td>
+                        <td>${escapeHtml(r.ciudad)}</td>
+                        <td>${escapeHtml(r.personas)}</td>
+                        <td>${escapeHtml(r.formaPago)}</td>
+                        <td>${escapeHtml(r.lugar)}</td>
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
+                        <td>
+                            <div class="acciones-container">
+                                <div class="acciones-fila">
+                                    <button class="btn-accion btn-ver" onclick="verDetalle('${escapeHtml(r.id)}')" title="Ver detalle">👁️</button>
+                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
+                                </div>
+                                <div class="acciones-fila">
+                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Marcar Pendiente">⏳</button>
+                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰</button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filtrarReservas() {
+            const busqueda = document.getElementById('busquedaReserva').value.toLowerCase().trim();
+            if (!busqueda) {
+                reservasFiltradas = [...reservasData];
+            } else {
+                reservasFiltradas = reservasData.filter(r => 
+                    r.nombre.toLowerCase().includes(busqueda) ||
+                    r.ciudad.toLowerCase().includes(busqueda)
+                );
+            }
+            renderizarTabla();
+        }
+
+        function cambiarEstado(id, nuevoEstado) {
+            const reserva = reservasData.find(r => r.id === id);
+            if (reserva) {
+                reserva.estado = nuevoEstado;
+                guardarEstado(id, nuevoEstado);
+                renderizarTabla();
+            }
+        }
+
+        function verDetalle(id) {
+            const reserva = reservasData.find(r => r.id === id);
+            if (!reserva) return;
+            
+            let estadoText = '';
+            switch(reserva.estado) {
+                case 'pendiente': estadoText = 'Pendiente'; break;
+                case 'confirmado': estadoText = 'Confirmado'; break;
+                case 'pagado': estadoText = 'Pagado'; break;
+                default: estadoText = 'Confirmado';
+            }
+            
+            let excursionesHtml = '';
+            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
+                excursionesHtml = '<div class="excursiones-lista">';
+                reserva.excursionesLista.forEach(exc => {
+                    excursionesHtml += `<div class="excursion-item">${escapeHtml(exc)}</div>`;
+                });
+                excursionesHtml += '</div>';
+            } else if (reserva.excursion) {
+                excursionesHtml = `<div class="excursiones-lista"><div class="excursion-item">${escapeHtml(reserva.excursion)}</div></div>`;
+            } else {
+                excursionesHtml = '<div class="excursiones-lista"><div class="excursion-item">No especificado</div></div>';
+            }
+            
+            const modalInfo = document.getElementById('modalInfo');
+            modalInfo.innerHTML = `
+                <p><strong>ID:</strong> ${escapeHtml(reserva.id)}</p>
+                <p><strong>Fecha Reserva:</strong> ${escapeHtml(reserva.fecha)}</p>
+                <p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p>
+                <p><strong>Email:</strong> ${escapeHtml(reserva.email)}</p>
+                <p><strong>Teléfono:</strong> ${escapeHtml(reserva.telefono)}</p>
+                <p><strong>País:</strong> ${escapeHtml(reserva.pais)}</p>
+                <p><strong>Ciudad:</strong> ${escapeHtml(reserva.ciudad)}</p>
+                <p><strong>Fecha Excursión:</strong> ${escapeHtml(reserva.fechaExcursion)}</p>
+                <p><strong>Personas:</strong> ${escapeHtml(reserva.personas)}</p>
+                <p><strong>Excursiones seleccionadas:</strong></p>
+                ${excursionesHtml}
+                <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
+                <p><strong>Lugar:</strong> ${escapeHtml(reserva.lugar)}</p>
+                <p><strong>Estado:</strong> <span class="badge badge-${reserva.estado}">${estadoText}</span></p>
+            `;
+            document.getElementById('modalReserva').classList.add('show');
+        }
+
+        function cerrarModal() { document.getElementById('modalReserva').classList.remove('show'); }
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+        document.getElementById('busquedaReserva').addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
+        document.getElementById('modalReserva').addEventListener('click', e => { if (e.target === this) cerrarModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
         
-        document.getElementById('fecha').min = new Date().toISOString().split('T')[0];
+        cargarReservas();
+        setInterval(cargarReservas, 60000);
     </script>
 </body>
 </html>
