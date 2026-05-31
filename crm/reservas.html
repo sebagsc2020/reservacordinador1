@@ -90,13 +90,9 @@
 
     <script>
         // ==================================================
-        // CONFIGURACIÓN - TU PLANILLA CORRECTA
+        // CONFIGURACIÓN - 👇 PON AQUÍ LA URL DE TU WEB APP
         // ==================================================
-        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const SHEET_NAME = 'Hoja 1'; // Si tu hoja tiene otro nombre, cámbialo
-        
-        // URL para obtener datos como CSV
-        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwqcab0xv3hXgyIc1vE9VvlFMRTrROnpFe-T48Auod-K7UTdSQj60Ts3sTWCPlCtJcSLg/exec';
         
         // ==================================================
         // VERIFICAR AUTENTICACIÓN
@@ -117,79 +113,25 @@
         let reservasFiltradas = [];
         
         // ==================================================
-        // PARSEAR CSV (maneja comillas y saltos de línea)
-        // ==================================================
-        function parseCSV(csvText) {
-            const filas = [];
-            let filaActual = [];
-            let celdaActual = '';
-            let dentroComillas = false;
-            
-            for (let i = 0; i < csvText.length; i++) {
-                const char = csvText[i];
-                const nextChar = csvText[i + 1];
-                
-                if (dentroComillas) {
-                    if (char === '"') {
-                        if (nextChar === '"') {
-                            celdaActual += '"';
-                            i++;
-                        } else {
-                            dentroComillas = false;
-                        }
-                    } else {
-                        celdaActual += char;
-                    }
-                } else {
-                    if (char === '"') {
-                        dentroComillas = true;
-                    } else if (char === ',') {
-                        filaActual.push(celdaActual.trim());
-                        celdaActual = '';
-                    } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
-                        filaActual.push(celdaActual.trim());
-                        filas.push(filaActual);
-                        filaActual = [];
-                        celdaActual = '';
-                        if (char === '\r') i++;
-                    } else {
-                        celdaActual += char;
-                    }
-                }
-            }
-            
-            if (celdaActual.trim() || filaActual.length > 0) {
-                filaActual.push(celdaActual.trim());
-                filas.push(filaActual);
-            }
-            
-            return filas.filter(fila => fila.some(celda => celda !== ''));
-        }
-        
-        // ==================================================
-        // FORMATEAR FECHA (DD-MM-YYYY a DD/MM/YYYY)
-        // ==================================================
-        function formatearFecha(fechaStr) {
-            if (!fechaStr) return '';
-            if (fechaStr.includes('/')) return fechaStr;
-            const partes = fechaStr.split('-');
-            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            return fechaStr;
-        }
-        
-        // ==================================================
-        // DIVIDIR EXCURSIONES (saltos de línea, | o ,)
+        // DIVIDIR EXCURSIONES (mantiene saltos de línea)
         // ==================================================
         function dividirExcursiones(texto) {
             if (!texto) return [];
+            if (typeof texto !== 'string') texto = String(texto);
+            
             let partes = [];
-            if (texto.includes('\n')) partes = texto.split('\n');
-            else if (texto.includes(' | ')) partes = texto.split(' | ');
-            else if (texto.includes(', ')) partes = texto.split(', ');
-            else if (texto.includes(',')) partes = texto.split(',');
-            else if (texto.includes('|')) partes = texto.split('|');
-            else partes = [texto];
-            return partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
+            if (texto.includes('\n')) {
+                partes = texto.split('\n');
+            } else if (texto.includes(' | ')) {
+                partes = texto.split(' | ');
+            } else if (texto.includes(', ')) {
+                partes = texto.split(', ');
+            } else if (texto.includes(',')) {
+                partes = texto.split(',');
+            } else {
+                partes = [texto];
+            }
+            return partes.map(p => p.trim().replace(/^\\d+\\.\\s*/, '')).filter(p => p);
         }
         
         // ==================================================
@@ -207,7 +149,7 @@
         }
         
         // ==================================================
-        // CARGAR RESERVAS DESDE GOOGLE SHEETS
+        // CARGAR RESERVAS DESDE LA API
         // ==================================================
         async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
@@ -216,75 +158,59 @@
             if (!tbody) return;
             
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos desde Google Sheets...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos desde la API...</td></tr>';
                 
-                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
-                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
-                const csvText = await response.text();
-                const filas = parseCSV(csvText);
+                const resultado = await response.json();
                 
-                if (filas.length < 2) {
+                if (resultado.error) throw new Error(resultado.error);
+                if (!resultado.success || !resultado.data) throw new Error('Formato de respuesta inválido');
+                
+                const datos = resultado.data;
+                
+                if (datos.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📭 No hay reservas en la planilla</td></tr>';
                     if (totalSpan) totalSpan.textContent = '0 reservas';
                     return;
                 }
-                
-                // Los encabezados son la primera fila
-                const encabezados = filas[0];
-                const datos = filas.slice(1);
-                
-                // Mapear índices según encabezados
-                const idxTimestamp = encabezados.findIndex(h => h.toLowerCase().includes('timestamp'));
-                const idxId = encabezados.findIndex(h => h.toLowerCase() === 'id');
-                const idxNombre = encabezados.findIndex(h => h.toLowerCase() === 'nombre');
-                const idxApellido = encabezados.findIndex(h => h.toLowerCase() === 'apellido');
-                const idxEmail = encabezados.findIndex(h => h.toLowerCase() === 'email');
-                const idxTelefono = encabezados.findIndex(h => h.toLowerCase() === 'telefono');
-                const idxPais = encabezados.findIndex(h => h.toLowerCase() === 'pais');
-                const idxCiudad = encabezados.findIndex(h => h.toLowerCase() === 'ciudad');
-                const idxExcursiones = encabezados.findIndex(h => h.toLowerCase() === 'excursiones');
-                const idxFecha = encabezados.findIndex(h => h.toLowerCase() === 'fecha');
-                const idxPersonas = encabezados.findIndex(h => h.toLowerCase() === 'personas');
-                const idxFormaPago = encabezados.findIndex(h => h.toLowerCase() === 'formapago');
-                const idxLugar = encabezados.findIndex(h => h.toLowerCase() === 'lugar');
                 
                 reservasData = [];
                 const estadosGuardados = cargarEstadosGuardados();
                 
                 for (let i = 0; i < datos.length; i++) {
                     const fila = datos[i];
-                    if (fila.length < 3) continue;
                     
-                    const id = (idxId >= 0 && fila[idxId]) ? fila[idxId] : `R-${i+1}`;
-                    const nombre = (idxNombre >= 0) ? (fila[idxNombre] || '') : '';
-                    const apellido = (idxApellido >= 0) ? (fila[idxApellido] || '') : '';
+                    const id = fila.id || `R-${i+1}`;
+                    const nombre = fila.nombre || '';
+                    const apellido = fila.apellido || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
                     
-                    let excursionesRaw = (idxExcursiones >= 0 && fila[idxExcursiones]) ? fila[idxExcursiones] : '';
+                    let excursionesRaw = fila.excursiones || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     
                     const reserva = {
                         id: id,
-                        fechaRegistro: (idxTimestamp >= 0 && fila[idxTimestamp]) ? formatearFecha(fila[idxTimestamp].split(' ')[0]) : '',
-                        fechaViaje: (idxFecha >= 0 && fila[idxFecha]) ? fila[idxFecha] : '',
+                        fechaRegistro: fila.timestamp ? fila.timestamp.split(' ')[0] : '',
+                        fechaViaje: fila.fecha || '',
                         nombre: nombreCompleto,
-                        email: (idxEmail >= 0 && fila[idxEmail]) ? fila[idxEmail] : '',
-                        telefono: (idxTelefono >= 0 && fila[idxTelefono]) ? fila[idxTelefono] : '',
-                        pais: (idxPais >= 0 && fila[idxPais]) ? fila[idxPais] : '',
-                        ciudad: (idxCiudad >= 0 && fila[idxCiudad]) ? fila[idxCiudad] : '',
+                        email: fila.email || '',
+                        telefono: fila.telefono || '',
+                        pais: fila.pais || '',
+                        ciudad: fila.ciudad || '',
                         excursionesLista: listaExcursiones,
-                        personas: (idxPersonas >= 0 && fila[idxPersonas]) ? fila[idxPersonas] : '1',
-                        formaPago: (idxFormaPago >= 0 && fila[idxFormaPago]) ? fila[idxFormaPago] : 'No especificado',
-                        lugar: (idxLugar >= 0 && fila[idxLugar]) ? fila[idxLugar] : 'No especificado',
+                        personas: fila.personas || '1',
+                        formaPago: fila.formapago || fila.formaPago || 'No especificado',
+                        lugar: fila.lugar || 'No especificado',
                         estado: estadosGuardados[id] || 'confirmado'
                     };
                     reservasData.push(reserva);
                 }
                 
-                console.log(`📊 Cargadas ${reservasData.length} reservas desde la planilla`);
+                console.log(`📊 Cargadas ${reservasData.length} reservas desde la API`);
                 
-                // Ordenar por ID descendente (más reciente primero)
+                // Ordenar por ID descendente
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
                     const numB = parseInt(b.id.replace(/\D/g, '')) || 0; 
@@ -296,7 +222,10 @@
                 
             } catch (error) {
                 console.error('Error al cargar:', error);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error al cargar datos: ${error.message}<br><br>Verifica que la planilla sea pública (Compartir → "Cualquier persona con el enlace")</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">
+                    ❌ Error al cargar datos: ${error.message}<br><br>
+                    Verifica que la API esté desplegada correctamente y que la planilla sea pública
+                </td</td`;
             }
         }
         
@@ -311,7 +240,7 @@
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas que coincidan con la búsqueda</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas que coincidan con la búsqueda</td</td';
                 return;
             }
             
@@ -334,22 +263,21 @@
                 }
                 excursionesHtml += '</ul>';
                 
-                // Mostrar fecha de registro o fecha de viaje
                 const fechaMostrar = r.fechaRegistro || r.fechaViaje || '';
                 
                 return `
                     <tr>
-                        <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td style="font-size:11px">${escapeHtml(fechaMostrar)}</td>
-                        <td>${escapeHtml(r.nombre)}</td>
-                        <td style="font-size:11px">${escapeHtml(r.email)}</td>
-                        <td>${escapeHtml(r.telefono)}</td>
-                        <td>${excursionesHtml}</td>
-                        <td>${escapeHtml(r.ciudad)}</td>
-                        <td>${escapeHtml(r.personas)}</td>
-                        <td style="font-size:11px">${escapeHtml(r.formaPago)}</td>
-                        <td style="font-size:11px">${escapeHtml(r.lugar)}</td>
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
+                        <td><strong>${escapeHtml(r.id)}</strong></td
+                        <td style="font-size:11px">${escapeHtml(fechaMostrar)}</td
+                        <td>${escapeHtml(r.nombre)}</td
+                        <td style="font-size:11px">${escapeHtml(r.email)}</td
+                        <td>${escapeHtml(r.telefono)}</td
+                        <td>${excursionesHtml}</td
+                        <td>${escapeHtml(r.ciudad)}</td
+                        <td>${escapeHtml(r.personas)}</td
+                        <td style="font-size:11px">${escapeHtml(r.formaPago)}</td
+                        <td style="font-size:11px">${escapeHtml(r.lugar)}</td
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
                         <td>
                             <div class="acciones-container">
                                 <div class="acciones-fila">
@@ -360,7 +288,7 @@
                                     <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰</button>
                                 </div>
                             </div>
-                        </td>
+                        </td
                     </tr>
                 `;
             }).join('');
@@ -418,7 +346,7 @@
         if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
         
         cargarReservas();
-        setInterval(cargarReservas, 60000); // Actualizar cada minuto
+        setInterval(cargarReservas, 60000);
     </script>
 </body>
 </html>
