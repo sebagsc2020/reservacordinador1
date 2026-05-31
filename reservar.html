@@ -2,638 +2,871 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>🕐 Reserva tu Excursión | Aventura Total</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva de Excursiones - Aventura Total</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕐</text></svg>">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #2c3e50;
-            line-height: 1.6;
-        }
-
-        /* --- Estilos del Header y Navegación (desde index.html) --- */
-        .main-header {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
-            padding: 1rem 0;
-            position: sticky;
+        /* ==========================================
+           PRELOADER - CRONÓMETRO
+           ========================================== */
+        #preloader {
+            position: fixed;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .logo-icon {
-            font-size: 2rem;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            transition: color 0.3s;
-            font-weight: 500;
-        }
-
-        .nav-links a:hover, .nav-links a.active {
-            color: #f39c12;
-        }
-
-        /* --- Estilos del Hero (desde index.html) --- */
-        .hero {
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
-        /* --- Sección Tips (desde index.html) --- */
-        .tips-section {
-            padding: 60px 0;
-            background: white;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 40px;
-            font-size: 2rem;
-            color: #1a1a2e;
-        }
-
-        .tips-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-        }
-
-        .tip-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        .tip-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-
-        .tip-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .tip-card h3 {
-            margin-bottom: 10px;
-            color: #1a1a2e;
-        }
-
-        .tip-card p {
-            font-size: 0.9rem;
-            color: #555;
-        }
-
-        /* --- Estilos del Formulario (combinados y mejorados) --- */
-        .form-section {
-            padding: 60px 0;
-            background: #f0f2f5;
-        }
-
-        .form-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 25px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .form-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .form-header h2 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
-
-        .form-header p {
-            opacity: 0.9;
-        }
-
-        form {
-            padding: 30px;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .form-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-
-        label .required {
-            color: #e74c3c;
-            margin-left: 3px;
-        }
-
-        input, select, textarea {
+            left: 0;
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.3s;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        #preloader.oculto {
+            opacity: 0;
+            visibility: hidden;
         }
 
-        .excursiones-group {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
+        .preloader-content {
+            text-align: center;
         }
 
-        .excursiones-group label {
+        .cronometro {
+            width: 75px;
+            height: 75px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: girar 1s linear infinite;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .cronometro::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        .cronometro::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+
+        .aguja {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 22px;
+            background: white;
+            transform-origin: bottom center;
+            animation: girarAguja 3s linear infinite;
+            border-radius: 1px;
+        }
+
+        @keyframes girar {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes girarAguja {
+            0% { transform: translate(-50%, -100%) rotate(0deg); }
+            100% { transform: translate(-50%, -100%) rotate(360deg); }
+        }
+
+        .preloader-texto {
+            color: white;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 12px;
-            color: #1a1a2e;
-            font-size: 1rem;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
         }
 
-        .checkbox-group {
+        .preloader-subtexto {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+        }
+
+        .puntos::after {
+            content: '';
+            animation: puntosAnim 1.5s infinite;
+        }
+
+        @keyframes puntosAnim {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+        }
+
+        #preloaderTitulo { transition: all 0.3s ease; }
+        #preloaderSubtitulo { transition: all 0.3s ease; }
+
+        /* ==========================================
+           ESTILOS DEL FORMULARIO
+           ========================================== */
+        select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+        }
+        
+        .categoria-group, .excursion-group {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body.cargando { overflow: hidden; }
+
+        /* ===== CHECKBOX EXCURSIONES ===== */
+        .checkbox-excursiones {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 5px;
         }
 
         .checkbox-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 14px;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .checkbox-item input {
-            width: auto;
-            margin: 0;
-            transform: scale(1.1);
+        .checkbox-item:hover {
+            background: #f0f0ff;
+            border-color: #667eea;
+            transform: translateX(3px);
         }
 
-        button {
+        .checkbox-item.seleccionado {
+            background: #f0f0ff;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-item label {
+            margin-bottom: 0;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .checkbox-item .check-icon {
+            font-size: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .checkbox-item.seleccionado .check-icon { opacity: 1; }
+
+        .seleccionados-contador {
+            text-align: center;
+            font-size: 13px;
+            color: #667eea;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .sin-seleccion {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Campo de fecha automática */
+        #fecha_mostrar {
+            background-color: #f0f0ff !important;
+            color: #667eea !important;
+            font-weight: 600 !important;
+            cursor: not-allowed !important;
+            border-color: #667eea !important;
+        }
+
+        /* ===== FORMA DE PAGO ===== */
+        .forma-pago-group {
+            margin-top: 5px;
+        }
+
+        .pago-opciones {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pago-opcion {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .pago-opcion:hover {
+            background: #f0f0ff;
+            border-color: #667eea;
+        }
+
+        .pago-opcion.seleccionado {
+            background: #f0f0ff;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .pago-opcion input[type="radio"] {
+            display: none;
+        }
+
+        .pago-icono {
+            font-size: 20px;
+        }
+
+        /* ==========================================
+           MODAL POLÍTICA DE PRIVACIDAD
+           ========================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeInOverlay 0.3s ease;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.4s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-header h2 {
+            color: white;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 28px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.4);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-body::-webkit-scrollbar { width: 6px; }
+        .modal-body::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .modal-body::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
+
+        .modal-body h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin: 20px 0 10px 0;
+        }
+
+        .modal-body h3:first-child { margin-top: 0; }
+        .modal-body p { color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
+        .modal-body ul { margin: 10px 0; padding-left: 20px; }
+        .modal-body ul li { color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 5px; }
+
+        .modal-footer {
+            padding: 15px 25px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .btn-modal-cerrar {
+            padding: 12px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 30px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
+            transition: all 0.3s ease;
         }
 
-        button:hover {
+        .btn-modal-cerrar:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(39,174,96,0.4);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
         }
 
-        button:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
-            transform: none;
-        }
+        body.modal-abierto { overflow: hidden; }
 
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 15px;
-            color: #667eea;
-            font-size: 13px;
-        }
-
-        .error-message {
-            background: #fee;
-            color: #c0392b;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            display: none;
-            border-left: 4px solid #e74c3c;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 13px;
-            border-left: 4px solid #27ae60;
-        }
-
-        .legal-note {
-            font-size: 11px;
-            color: #7f8c8d;
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #ecf0f1;
-        }
-
-        footer {
-            background: #1a1a2e;
-            color: white;
-            text-align: center;
-            padding: 20px 0;
-            margin-top: 0;
-        }
-
-        @media (max-width: 768px) {
-            .nav-container {
+        @media (max-width: 480px) {
+            .pago-opciones {
                 flex-direction: column;
-                gap: 1rem;
-            }
-            .nav-links {
-                gap: 1rem;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .hero h1 {
-                font-size: 2rem;
-            }
-            .form-container {
-                margin: 0 15px;
-            }
-            form {
-                padding: 20px;
-            }
-            .checkbox-group {
-                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
-<body>
-    <!-- Header y Navegación (estilo index.html) -->
-    <header class="main-header">
-        <div class="container nav-container">
-            <div class="logo">
-                <span class="logo-icon">🏔️</span>
-                <span>Aventura Total</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="reservar.html" class="active">Reservar</a></li>
-                <li><a href="excursiones.html">Excursiones</a></li>
-                <li><a href="contacto.html">Contacto</a></li>
-            </ul>
-        </div>
-    </header>
+<body class="cargando">
 
-    <!-- Hero (estilo index.html) -->
-    <section class="hero">
-        <div class="container">
+    <!-- ===== PRELOADER ===== -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <div class="cronometro"><div class="aguja"></div></div>
+            <div class="preloader-texto" id="preloaderTitulo">CARGANDO<span class="puntos"></span></div>
+            <div class="preloader-subtexto" id="preloaderSubtitulo">Preparando tu aventura</div>
+        </div>
+    </div>
+
+    <!-- ===== FORMULARIO ===== -->
+    <div class="form-container">
+        <div class="form-header">
             <h1>🕐 Reserva tu Excursión</h1>
-            <p>Completa el formulario y obtén el mejor precio para tu próxima aventura.</p>
+            <p>Completa el formulario y obtén el mejor precio</p>
         </div>
-    </section>
 
-    <!-- Sección del Formulario -->
-    <section class="form-section">
-        <div class="form-container">
-            <div class="form-header">
-                <h2>🗺️ Solicitud de Reserva</h2>
-                <p>Completá todos los datos para confirmar tu lugar</p>
+        <form id="excursionForm">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre" class="required">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre" autocomplete="given-name">
+                </div>
+                <div class="form-group">
+                    <label for="apellido" class="required">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" required placeholder="Tu apellido" autocomplete="family-name">
+                </div>
             </div>
 
-            <form id="reservaForm">
-                <div id="formError" class="error-message"></div>
-                <div id="formSuccess" class="success-message">✅ ¡Reserva enviada con éxito! En breve recibirás la confirmación.</div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nombre <span class="required">*</span></label>
-                        <input type="text" id="nombre" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Apellido <span class="required">*</span></label>
-                        <input type="text" id="apellido" required>
-                    </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email" class="required">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="correo@ejemplo.com" autocomplete="email">
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Email <span class="required">*</span></label>
-                        <input type="email" id="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Teléfono <span class="required">*</span></label>
-                        <input type="tel" id="telefono" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>País <span class="required">*</span></label>
-                        <input type="text" id="pais" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Ciudad <span class="required">*</span></label>
-                        <input type="text" id="ciudad" required>
-                    </div>
-                </div>
-
-                <div class="excursiones-group">
-                    <label>🗺️ Excursiones de interés <span class="required">*</span></label>
-                    <div class="checkbox-group" id="excursiones">
-                        <label class="checkbox-item"><input type="checkbox" value="Trekking Cerro"> 🥾 Trekking Cerro</label>
-                        <label class="checkbox-item"><input type="checkbox" value="Rafting"> 🛶 Rafting</label>
-                        <label class="checkbox-item"><input type="checkbox" value="Cabalgata"> 🐎 Cabalgata</label>
-                        <label class="checkbox-item"><input type="checkbox" value="Avistaje de Aves"> 🦜 Avistaje de Aves</label>
-                        <label class="checkbox-item"><input type="checkbox" value="Escalada"> 🧗 Escalada</label>
-                        <label class="checkbox-item"><input type="checkbox" value="Tour Cultural"> 🏛️ Tour Cultural</label>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Fecha deseada <span class="required">*</span></label>
-                        <input type="date" id="fecha" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Cantidad de personas <span class="required">*</span></label>
-                        <input type="number" id="personas" min="1" max="50" value="1" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Forma de pago <span class="required">*</span></label>
-                        <!-- Menú desplegable con las 3 opciones -->
-                        <select id="formaPago" required>
-                            <option value="">Seleccionar...</option>
-                            <option value="💵 Efectivo">💵 Efectivo</option>
-                            <option value="💳 Débito/Crédito">💳 Débito/Crédito</option>
-                            <option value="🏦 Transferencia">🏦 Transferencia</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>¿Cómo nos encontraste?</label>
-                        <select id="busqueda">
-                            <option value="">Seleccionar...</option>
-                            <option value="Google">Google</option>
-                            <option value="Instagram">Instagram</option>
-                            <option value="Facebook">Facebook</option>
-                            <option value="Recomendación">Recomendación</option>
-                            <option value="Otro">Otro</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="submit" id="submitBtn">📨 Enviar Reserva</button>
-                <div class="loading" id="loading">⏳ Enviando tu reserva...</div>
-
-                <div class="legal-note">
-                    <p>La agencia recopila únicamente los datos estrictamente necesarios para la prestación del servicio automotor y turístico.</p>
-                    <p>Los datos se utilizan exclusivamente para: gestión de reservas, comunicación comercial y mejora del servicio.</p>
-                    <p>Los datos no se venden ni se ceden comercialmente.</p>
-                    <p>La información se guardará durante el tiempo que dure la relación comercial.</p>
-                    <p>Implementación de medidas técnicas para evitar pérdida o acceso no autorizado.</p>
-                    <p>Se garantiza el derecho a Acceder, Rectificar, Cancelar u Oponerse al uso de sus datos.</p>
-                </div>
-            </form>
-        </div>
-    </section>
-
-    <!-- Sección Tips (estilo index.html) -->
-    <section class="tips-section">
-        <div class="container">
-            <h2 class="section-title">💡 Tips para Nuevos Pasajeros</h2>
-            <div class="tips-grid">
-                <div class="tip-card">
-                    <div class="tip-icon">👟</div>
-                    <h3>Ropa y Calzado</h3>
-                    <p>Usa ropa cómoda y calzado apropiado para caminar. Zapatillas de trekking o deportivas.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-icon">🎒</div>
-                    <h3>Mochila de Día</h3>
-                    <p>Lleva agua, snacks, protector solar, repelente y una chaqueta ligera.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-icon">📸</div>
-                    <h3>Cámara y Batería</h3>
-                    <p>Captura cada momento. Lleva batería extra y espacio en la memoria.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-icon">🧴</div>
-                    <h3>Protección Solar</h3>
-                    <p>Aplica protector solar antes de salir y reaplica cada 2 horas.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-icon">💧</div>
-                    <h3>Hidratación</h3>
-                    <p>Lleva al menos 1 litro de agua. Mantenerte hidratado es clave.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-icon">🤝</div>
-                    <h3>Sigue Instrucciones</h3>
-                    <p>Nuestros guías son expertos. Sigue sus indicaciones para tu seguridad.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-icon">🍎</div>
-                    <h3>Alimentación</h3>
-                    <p>Desayuna bien. Lleva frutas, frutos secos o barras energéticas.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-icon">🩹</div>
-                    <h3>Botiquín Personal</h3>
-                    <p>Medicamentos, tiritas y analgésicos por precaución.</p>
+                <div class="form-group">
+                    <label for="telefono" class="required">Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono" required placeholder="+54 900 000 000" autocomplete="tel">
                 </div>
             </div>
-        </div>
-    </section>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 Aventura Total. Todos los derechos reservados.</p>
-            <p>🏔️ Explorando juntos cada rincón</p>
-        </div>
-    </footer>
+            <div class="form-group">
+                <label for="pais" class="required">País</label>
+                <select id="pais" name="pais" required>
+                    <option value="">Selecciona un país</option>
+                    <option value="argentina">📌 Argentina</option>
+                    <option value="brasil">📌 Brasil</option>
+                    <option value="chile">📌 Chile</option>
+                </select>
+            </div>
 
+            <div class="form-group categoria-group" id="categoriaGroup" style="display: none;">
+              <label for="categoria" class="required">Ciudad</label>
+              <select id="categoria" name="categoria" required disabled>
+                <option value="">Selecciona una ciudad</option>
+                </select>
+            </div>
+
+            <div class="form-group excursion-group" id="excursionGroup" style="display: none;">
+                <label class="required">Excursiones (selecciona una o varias)</label>
+                <div class="checkbox-excursiones" id="checkboxExcursiones"></div>
+                <div class="seleccionados-contador" id="contadorSeleccionados">
+                    <span class="sin-seleccion">Selecciona al menos una excursión</span>
+                </div>
+            </div>
+
+            <!-- Fecha automática del sistema -->
+            <input type="hidden" id="fecha" name="fecha">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fecha_mostrar" class="required">Fecha de reserva</label>
+                    <input type="text" id="fecha_mostrar" name="fecha_mostrar" 
+                           readonly placeholder="Fecha del sistema">
+                </div>
+                <div class="form-group">
+                    <label for="personas" class="required">Nº de personas</label>
+                    <input type="number" id="personas" name="personas" min="1" max="20" value="1" required>
+                </div>
+            </div>
+
+            <!-- ===== FORMA DE PAGO ===== -->
+            <div class="form-group">
+                <label for="formaPago" class="required">Forma de Pago</label>
+                <div class="pago-opciones" id="pagoOpciones">
+                    <label class="pago-opcion" data-valor="Efectivo">
+                        <span class="pago-icono">💵</span> Efectivo
+                        <input type="radio" name="formaPago" value="Efectivo" required>
+                    </label>
+                    <label class="pago-opcion" data-valor="Débito/Crédito">
+                        <span class="pago-icono">💳</span> Débito/Crédito
+                        <input type="radio" name="formaPago" value="Débito/Crédito" required>
+                    </label>
+                    <label class="pago-opcion" data-valor="Transferencia">
+                        <span class="pago-icono">🏦</span> Transferencia
+                        <input type="radio" name="formaPago" value="Transferencia" required>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="mensaje">¿Dónde te buscamos?</label>
+                <input type="text" id="mensaje" name="mensaje" placeholder="Hotel donde estás alojado y número de habitación">
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="privacidad" name="privacidad" required>
+                    <label for="privacidad">
+                        He leído y acepto la <a href="#" id="linkPrivacidad">política de privacidad</a>
+                    </label>
+                </div>
+            </div>
+
+            <div id="statusMessage" class="status-message" style="display: none;"></div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">📩 Enviar Reserva</button>
+        </form>
+    </div>
+
+    <!-- ===== MODAL POLÍTICA DE PRIVACIDAD ===== -->
+    <div id="modalPrivacidad" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔒 Política de Privacidad</h2>
+                <button class="modal-close" id="cerrarModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>La agencia recopila únicamente los datos estrictamente necesarios para la prestación del servicio automotor y turístico.</p>
+                <h3>📋 Uso de los Datos</h3>
+                <p>Los datos se utilizan exclusivamente para:</p>
+                <ul>
+                    <li>Gestionar reservas, emitir vouchers de traslado y procesar pagos.</li>
+                    <li>Coordinar la logística de los choferes y guías.</li>
+                    <li>Enviar notificaciones operativas urgentes.</li>
+                    <li>Cumplir con las normativas legales de los organismos de transporte.</li>
+                </ul>
+                <h3>🔐 Confidencialidad</h3>
+                <p>Los datos no se venden ni se ceden comercialmente.</p>
+                <h3>⏱️ Plazo de Conservación</h3>
+                <p>La información se guardará durante el tiempo que dure la relación comercial.</p>
+                <h3>🛡️ Medidas de Seguridad</h3>
+                <p>Implementación de medidas técnicas para evitar pérdida o acceso no autorizado.</p>
+                <h3>✅ Derechos del Usuario</h3>
+                <p>Se garantiza el derecho a Acceder, Rectificar, Cancelar u Oponerse al uso de sus datos.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-cerrar" id="btnCerrarModal">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
     <script>
-        // Script único y funcional (sin errores)
-        document.getElementById('reservaForm').addEventListener('submit', function(e) {
+        // ===== PRELOADER =====
+        const preloader = document.getElementById('preloader');
+        const preloaderTitulo = document.getElementById('preloaderTitulo');
+        const preloaderSubtitulo = document.getElementById('preloaderSubtitulo');
+        
+        function mostrarPreloader(titulo, subtitulo) {
+            preloaderTitulo.innerHTML = titulo + '<span class="puntos"></span>';
+            preloaderSubtitulo.textContent = subtitulo;
+            preloader.classList.remove('oculto');
+            document.body.classList.add('cargando');
+        }
+        
+        function ocultarPreloader(callback) {
+            preloader.classList.add('oculto');
+            document.body.classList.remove('cargando');
+            if (callback) setTimeout(callback, 500);
+        }
+        
+        window.addEventListener('load', function() {
+            setTimeout(function() { ocultarPreloader(); }, 2500);
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (preloader && !preloader.classList.contains('oculto')) ocultarPreloader();
+            }, 1500);
+        });
+
+        // ===== FECHA AUTOMÁTICA =====
+        function establecerFechaSistema() {
+            const hoy = new Date();
+            const año = hoy.getFullYear();
+            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoy.getDate()).padStart(2, '0');
+            document.getElementById('fecha').value = `${dia}-${mes}-${año}`;
+            const fechaMostrar = hoy.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('fecha_mostrar').value = fechaMostrar.charAt(0).toUpperCase() + fechaMostrar.slice(1);
+        }
+        establecerFechaSistema();
+
+        // ===== FORMA DE PAGO - SELECCIÓN VISUAL =====
+        document.querySelectorAll('.pago-opcion').forEach(opcion => {
+            opcion.addEventListener('click', function() {
+                document.querySelectorAll('.pago-opcion').forEach(o => o.classList.remove('seleccionado'));
+                this.classList.add('seleccionado');
+                this.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
+        // ===== FORMULARIO =====
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDfnWspKv8KY8iQWip20iUUn6c9LHZvAlpKL3WaIaz74EAHbjrcWhxMC3OVGx1yv_w_A/exec';
+        
+        const paisSelect = document.getElementById('pais');
+        const categoriaSelect = document.getElementById('categoria');
+        const categoriaGroup = document.getElementById('categoriaGroup');
+        const excursionGroup = document.getElementById('excursionGroup');
+        const checkboxExcursiones = document.getElementById('checkboxExcursiones');
+        const contadorSeleccionados = document.getElementById('contadorSeleccionados');
+        const form = document.getElementById('excursionForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        const excursiones = {
+            argentina: {
+                "🎭 Villa Carlos Paz": [
+                    "✔️ Aerosilla", "✔️ Capilla del Monte y Norte Cordobés", "✔️ Circuito de la Cerveza y Bosques",
+                    "✔️ City Tour Local", "✔️ Mina Clavero", "✔️ Noche de Teatros", "✔️ Paseo de Catamarán", "✔️ Pekos Multiparque"
+                ],
+                "🏖️ Mar del Plata": [
+                    "✔️ Aquarium Mar del Plata", "✔️ City Tour Histórico y Panorámico", "✔️ Complejo Puerto y Banquina de Pescadores",
+                    "✔️ Excursión a Sierra de los Padres", "✔️ Fábricas de Alfajores", "✔️ Gruta de Lourdes",
+                    "✔️ Noche de Teatros y Calle Rivadavia", "✔️ Torre Tanque"
+                ],
+                "🎿 Bariloche": [
+                    "✔️ Ascenso al Cerro Campanario", "✔️ Cerro Catedral", "✔️ Cerro Otto y Teleférico",
+                    "✔️ Circuito Chico", "✔️ Circuito Grande", "✔️ Excursión a El Bolsón",
+                    "✔️ Isla Victoria y Bosque de Arrayanes", "✔️ Ruta de las Chocolaterías y Centro Cívico"
+                ],
+                "🍇 Mendoza": [
+                    "✔️ Alta Montaña por la Ruta 7", "✔️ Camino del Vino", "✔️ City Tour y Parque General San Martín",
+                    "✔️ Fábricas de Chocolates y Regionales", "✔️ Mirador del Cerro Aconcagua", "✔️ San Rafael y Cañón del Atuel",
+                    "✔️ Termas de Cacheuta", "✔️ Valle de Uco", "✔️ Villavicencio"
+                ],
+                "☃️ Ushuaia": [
+                    "✔️ Centros Invernales del Valle de Tierra Mayor", "✔️ City Tour Histórico y Museos",
+                    "✔️ Estancia Harberton", "✔️ Excursión a los Lagos Fagnano y Escondido", "✔️ Glaciar Martial",
+                    "✔️ Navegación por el Canal Beagle", "✔️ Parque Nacional Tierra del Fuego",
+                    "✔️ Paseo de Compras en el Duty Free Shop y Paseo del Fuego", "✔️ Tren del Fin del Mundo"
+                ],
+                "🚤 Cataratas del Iguazú": [
+                    "✔️ Ciudad del Este", "✔️ Duty Free Shop Puerto Iguazú", "✔️ Gran Aventura",
+                    "✔️ Hito de las Tres Fronteras", "✔️ Icebar Iguazú", "✔️ La Aripuca", "✔️ Parque de las Aves",
+                    "✔️ Parque Nacional do Iguaçu (Lado Brasileño)", "✔️ Parque Nacional Iguazú (Lado Argentino)",
+                    "✔️ Ruinas de San Ignacio Miní y Minas de Wanda"
+                ]
+            },
+            brasil: {
+                "🏖️ Balneário Camboriú": [
+                    "✔️ Barco Pirata", "✔️ Bombinhas", "✔️ City Tour", "✔️ Complejo Turismo Oceanic Aquarium",
+                    "✔️ Cristo Luz", "✔️ Excursión a Beto Carrero World", "✔️ Guarda do Embaú", "✔️ Itapema",
+                    "✔️ Laranjeiras Terrestre", "✔️ Mariscal", "✔️ Palmas de Arvoredo", "✔️ Parque Unipraias",
+                    "✔️ Porto Belo Paseo de Barco"
+                ],
+                "🏖️ Florianópolis": [
+                    "✔️ Circuito de Playas del Norte", "✔️ City Tour Histórico y Mercado Público", "✔️ Guarda do Embaú",
+                    "✔️ Mirador del Morro de la Cruz y Laguna de la Conceição", "✔️ Palmas de Arvoredo",
+                    "✔️ Paseo en Escuna a la Isla de Anhatomirim", "✔️ Playas del Sur e Ilha do Campeche"
+                ],
+                "🏖️ Itapema": [
+                    "✔️ Beto Carrero", "✔️ Bombinhas", "✔️ Circuito Costa Esmeralda", "✔️ Florianópolis",
+                    "✔️ Guarda do Embaú", "✔️ Mariscal", "✔️ Mirador del Encanto", "✔️ Palmas de Arvoredo",
+                    "✔️ Paseo a Porto Belo e Isla de Porto Belo", "✔️ Ruta de los Alambiques Tradicionales"
+                ],
+                "🏖️ Torres": [
+                    "✔️ Paseo en Barco a la Isla de los Lobos", "✔️ Paseo por el Río Mampituba",
+                    "✔️ Parque Guarita", "✔️ Recorrido por la Laguna del Violón"
+                ]
+            },
+            chile: {
+                "⛰️ Santiago de Chile": [
+                    "✔️ City Tour Histórico y Palacio de La Moneda", "✔️ Complejo Sky Costanera",
+                    "✔️ Excursión a Viña del Mar y Valparaíso", "✔️ Excursión a Viñedos del Valle del Maipo",
+                    "✔️ Excursión de Alta Montaña a Cajón del Maipo", "✔️ Paseo de Compras en Mall Costanera Center",
+                    "✔️ Recorrido por el Barrio Bellavista y Chascona", "✔️ Teleférico y Funicular del Cerro San Cristóbal",
+                    "✔️ Valle Nevado y Farellones"
+                ]
+            }
+        };
+
+        paisSelect.addEventListener('change', function() {
+            const pais = this.value;
+            categoriaSelect.innerHTML = '<option value="">Selecciona una ciudad</option>';
+            checkboxExcursiones.innerHTML = '';
+            contadorSeleccionados.innerHTML = '<span class="sin-seleccion">Selecciona al menos una excursión</span>';
+            
+            if (pais) {
+                categoriaGroup.style.display = 'block';
+                categoriaSelect.disabled = false;
+                excursionGroup.style.display = 'none';
+                
+                Object.keys(excursiones[pais]).forEach(categoria => {
+                    const option = document.createElement('option');
+                    option.value = categoria;
+                    option.textContent = categoria;
+                    categoriaSelect.appendChild(option);
+                });
+            } else {
+                categoriaGroup.style.display = 'none';
+                excursionGroup.style.display = 'none';
+                categoriaSelect.disabled = true;
+            }
+        });
+
+        categoriaSelect.addEventListener('change', function() {
+            const pais = paisSelect.value;
+            const categoria = this.value;
+            
+            checkboxExcursiones.innerHTML = '';
+            contadorSeleccionados.innerHTML = '<span class="sin-seleccion">Selecciona al menos una excursión</span>';
+            
+            if (categoria && pais) {
+                excursionGroup.style.display = 'block';
+                
+                excursiones[pais][categoria].forEach((excursion, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-item';
+                    div.innerHTML = `
+                        <input type="checkbox" id="excursion_${index}" name="excursiones[]" value="${excursion}">
+                        <label for="excursion_${index}">${excursion}</label>
+                        <span class="check-icon">✅</span>
+                    `;
+                    
+                    const checkbox = div.querySelector('input[type="checkbox"]');
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked) div.classList.add('seleccionado');
+                        else div.classList.remove('seleccionado');
+                        actualizarContador();
+                    });
+                    
+                    div.addEventListener('click', function(e) {
+                        if (e.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            if (checkbox.checked) div.classList.add('seleccionado');
+                            else div.classList.remove('seleccionado');
+                            actualizarContador();
+                        }
+                    });
+                    
+                    checkboxExcursiones.appendChild(div);
+                });
+            } else {
+                excursionGroup.style.display = 'none';
+            }
+        });
+
+        function actualizarContador() {
+            const checkboxes = document.querySelectorAll('input[name="excursiones[]"]:checked');
+            const total = checkboxes.length;
+            if (total === 0) contadorSeleccionados.innerHTML = '<span class="sin-seleccion">Selecciona al menos una excursión</span>';
+            else if (total === 1) contadorSeleccionados.innerHTML = '✅ <strong>1 excursión seleccionada</strong>';
+            else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
+        }
+
+        function getExcursionesSeleccionadas() {
+            return Array.from(document.querySelectorAll('input[name="excursiones[]"]:checked')).map(cb => cb.value);
+        }
+
+        function getFormaPago() {
+            const seleccionada = document.querySelector('input[name="formaPago"]:checked');
+            return seleccionada ? seleccionada.value : 'No especificada';
+        }
+
+        async function enviarAGoogleSheets(formData) {
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
+                return { success: true };
+            } catch (error) { throw error; }
+        }
+
+        function guardarLocalmente(formData) {
+            const reservas = JSON.parse(localStorage.getItem('reservas') || '[]');
+            reservas.push({ ...formData, fechaEnvio: new Date().toISOString() });
+            localStorage.setItem('reservas', JSON.stringify(reservas));
+        }
+
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
-            const errorDiv = document.getElementById('formError');
-            const successDiv = document.getElementById('formSuccess');
+            if (!document.getElementById('privacidad').checked) {
+                statusMessage.textContent = '⚠️ Debes aceptar la política de privacidad';
+                statusMessage.className = 'status-message error';
+                statusMessage.style.display = 'block';
+                return;
+            }
             
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-            
-            // Validar excursiones
-            const excursionesSeleccionadas = [];
-            document.querySelectorAll('#excursiones input[type="checkbox"]:checked').forEach(cb => {
-                excursionesSeleccionadas.push(cb.value);
-            });
-            
+            const excursionesSeleccionadas = getExcursionesSeleccionadas();
             if (excursionesSeleccionadas.length === 0) {
-                errorDiv.textContent = '❌ Por favor, selecciona al menos una excursión.';
-                errorDiv.style.display = 'block';
+                statusMessage.textContent = '⚠️ Debes seleccionar al menos una excursión';
+                statusMessage.className = 'status-message error';
+                statusMessage.style.display = 'block';
                 return;
             }
             
-            // Validar fecha
-            const fechaInput = document.getElementById('fecha').value;
-            if (!fechaInput) {
-                errorDiv.textContent = '❌ Por favor, selecciona una fecha.';
-                errorDiv.style.display = 'block';
+            if (!document.querySelector('input[name="formaPago"]:checked')) {
+                statusMessage.textContent = '⚠️ Debes seleccionar una forma de pago';
+                statusMessage.className = 'status-message error';
+                statusMessage.style.display = 'block';
                 return;
             }
             
-            // Obtener valores
+            statusMessage.style.display = 'none';
+            mostrarPreloader('ENVIANDO', 'Procesando tu reserva...');
+            
             const formData = {
-                id: 'RES-' + Date.now(),
-                timestamp: new Date().toLocaleString('es-AR'),
-                nombre: document.getElementById('nombre').value.trim(),
-                apellido: document.getElementById('apellido').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                telefono: document.getElementById('telefono').value.trim(),
-                pais: document.getElementById('pais').value.trim(),
-                ciudad: document.getElementById('ciudad').value.trim(),
-                excursiones: excursionesSeleccionadas.join(', '),
-                fecha: fechaInput,
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                pais: paisSelect.options[paisSelect.selectedIndex].text,
+                categoria: categoriaSelect.value,
+                excursiones: excursionesSeleccionadas.join(' | '),
+                fecha: document.getElementById('fecha').value,
                 personas: document.getElementById('personas').value,
-                formaPago: document.getElementById('formaPago').value,
-                busqueda: document.getElementById('busqueda').value || 'No especificado'
+                formaPago: getFormaPago(),
+                mensaje: document.getElementById('mensaje').value || 'Sin mensaje'
             };
             
-            // Validaciones básicas
-            if (!formData.nombre || !formData.apellido || !formData.email || !formData.telefono || !formData.pais || !formData.ciudad) {
-                errorDiv.textContent = '❌ Por favor, completá todos los campos obligatorios.';
-                errorDiv.style.display = 'block';
-                return;
+            try {
+                await enviarAGoogleSheets(formData);
+                guardarLocalmente(formData);
+                sessionStorage.setItem('ultimaReserva', JSON.stringify(formData));
+                preloaderTitulo.innerHTML = '¡LISTO!<span class="puntos"></span>';
+                preloaderSubtitulo.textContent = 'Redirigiendo a tu confirmación...';
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                window.location.href = 'gracias.html';
+            } catch (error) {
+                guardarLocalmente(formData);
+                sessionStorage.setItem('ultimaReserva', JSON.stringify(formData));
+                preloaderTitulo.innerHTML = 'ERROR<span class="puntos"></span>';
+                preloaderSubtitulo.textContent = 'Pero tu reserva se guardó. Redirigiendo...';
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                window.location.href = 'gracias.html?status=parcial';
             }
-            
-            if (!formData.email.includes('@')) {
-                errorDiv.textContent = '❌ Ingresá un email válido.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            if (!formData.formaPago) {
-                errorDiv.textContent = '❌ Por favor, selecciona una forma de pago.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            // Mostrar loading
-            submitBtn.disabled = true;
-            loading.style.display = 'block';
-            
-            // Guardar en localStorage
-            setTimeout(() => {
-                const reservas = JSON.parse(localStorage.getItem('reservasOffline') || '[]');
-                reservas.push(formData);
-                localStorage.setItem('reservasOffline', JSON.stringify(reservas));
-                
-                console.log('Reserva guardada:', formData);
-                
-                successDiv.style.display = 'block';
-                document.getElementById('reservaForm').reset();
-                
-                setTimeout(() => {
-                    window.location.href = 'gracias.html';
-                }, 2500);
-                
-                submitBtn.disabled = false;
-                loading.style.display = 'none';
-            }, 1000);
         });
+
+        // ===== MODAL POLÍTICA DE PRIVACIDAD =====
+        const modalPrivacidad = document.getElementById('modalPrivacidad');
+        const linkPrivacidad = document.getElementById('linkPrivacidad');
+        const cerrarModal = document.getElementById('cerrarModal');
+        const btnCerrarModal = document.getElementById('btnCerrarModal');
         
-        // Fecha mínima = hoy
-        const hoy = new Date().toISOString().split('T')[0];
-        document.getElementById('fecha').min = hoy;
+        linkPrivacidad.addEventListener('click', function(e) {
+            e.preventDefault();
+            modalPrivacidad.style.display = 'flex';
+            document.body.classList.add('modal-abierto');
+        });
+        cerrarModal.addEventListener('click', function() {
+            modalPrivacidad.style.display = 'none';
+            document.body.classList.remove('modal-abierto');
+        });
+        btnCerrarModal.addEventListener('click', function() {
+            modalPrivacidad.style.display = 'none';
+            document.body.classList.remove('modal-abierto');
+        });
+        modalPrivacidad.addEventListener('click', function(e) {
+            if (e.target === modalPrivacidad) {
+                modalPrivacidad.style.display = 'none';
+                document.body.classList.remove('modal-abierto');
+            }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modalPrivacidad.style.display === 'flex') {
+                modalPrivacidad.style.display = 'none';
+                document.body.classList.remove('modal-abierto');
+            }
+        });
     </script>
 </body>
 </html>
