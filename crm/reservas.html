@@ -124,15 +124,33 @@
             return fechaStr;
         }
 
+        // 🔥 FUNCIÓN CORREGIDA: divide por saltos de línea (\n) y también por otros separadores
         function dividirExcursiones(texto) {
             if (!texto) return [];
             let partes = [];
-            if (texto.includes(' | ')) partes = texto.split(' | ');
-            else if (texto.includes(', ')) partes = texto.split(', ');
-            else if (texto.includes(',')) partes = texto.split(',');
-            else if (texto.includes('|')) partes = texto.split('|');
-            else partes = [texto];
-            return partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
+            // Primero separar por saltos de línea (el separador que tenés en Google Sheets)
+            if (texto.includes('\n')) {
+                partes = texto.split('\n');
+            }
+            // Si no, probar con separadores comunes
+            else if (texto.includes(' | ')) {
+                partes = texto.split(' | ');
+            }
+            else if (texto.includes(', ')) {
+                partes = texto.split(', ');
+            }
+            else if (texto.includes(',')) {
+                partes = texto.split(',');
+            }
+            else if (texto.includes('|')) {
+                partes = texto.split('|');
+            }
+            else {
+                partes = [texto];
+            }
+            // Limpiar números al inicio (ej: "1. ✔️ City Tour" -> "✔️ City Tour")
+            partes = partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
+            return partes;
         }
 
         function cargarEstadosGuardados() {
@@ -170,7 +188,7 @@
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
-                    // Columnas: 6=País, 7=Ciudad, 8=Excursiones
+                    // Columna de excursiones está en índice 8 (columna I)
                     const excursionesRaw = fila[8] || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     
@@ -232,7 +250,7 @@
                 
                 return `
                     <tr>
-                        <td><strong>${escapeHtml(r.id)}</strong></td>
+                        <td><strong>${escapeHtml(r.id)}</strong></td
                         <td>${escapeHtml(r.fecha)}</td
                         <td>${escapeHtml(r.nombre)}</td
                         <td style="font-size:11px">${escapeHtml(r.email)}</td
