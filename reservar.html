@@ -38,6 +38,8 @@
         .status-message.error { background: #fee; color: #c0392b; border-left: 4px solid #e74c3c; }
         .categoria-group, .excursion-group { animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .titulo-seccion { font-weight: 700; color: #1a1a2e; font-size: 14px; margin-bottom: 12px; display: block; }
+        .titulo-seccion span { color: #e74c3c; margin-left: 3px; }
         #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s; }
         #preloader.oculto { opacity: 0; visibility: hidden; }
         .cronometro { width: 75px; height: 75px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid white; border-radius: 50%; animation: girar 1s linear infinite; margin: 0 auto 20px; }
@@ -66,7 +68,12 @@
 
             <div class="form-group categoria-group" id="categoriaGroup" style="display: none;"><label for="categoria" class="required">Ciudad</label><select id="categoria" disabled><option value="">Selecciona una ciudad</option></select></div>
 
-            <div class="form-group excursion-group" id="excursionGroup" style="display: none;"><label class="required">Excursiones (selecciona una o varias)</label><div class="checkbox-excursiones" id="checkboxExcursiones"></div><div class="seleccionados-contador" id="contadorSeleccionados"><span class="sin-seleccion">Selecciona al menos una excursión</span></div></div>
+            <!-- 🔥 CORREGIDO: Eliminado el label huérfano, ahora usa un div como título -->
+            <div class="form-group excursion-group" id="excursionGroup" style="display: none;">
+                <div class="titulo-seccion">Excursiones (selecciona una o varias) <span>*</span></div>
+                <div class="checkbox-excursiones" id="checkboxExcursiones"></div>
+                <div class="seleccionados-contador" id="contadorSeleccionados"><span class="sin-seleccion">Selecciona al menos una excursión</span></div>
+            </div>
 
             <input type="hidden" id="fecha" name="fecha">
             <div class="form-row">
@@ -186,7 +193,6 @@
             else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
         }
 
-        // 🔥 URL DE GOOGLE APPS SCRIPT (actualizada)
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHVLm3FqVZpAOKPh7DW2mbaAWP2W_woI-9-1q7mjlcnEvqLEDccoPVyHBEBJwWNeaICQ/exec';
         
         const form = document.getElementById('excursionForm');
@@ -219,7 +225,6 @@
                 return;
             }
             
-            // Las excursiones se envían separadas por " | "
             const formData = {
                 id: 'RES-' + Date.now(),
                 nombre: document.getElementById('nombre').value,
@@ -242,14 +247,12 @@
             submitBtn.textContent = '⏳ Enviando...';
             
             try {
-                // 🔥 CAMBIO CLAVE: enviar como form-urlencoded en lugar de JSON
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: new URLSearchParams(formData)
                 });
-                
                 localStorage.setItem('ultimaReserva', JSON.stringify(formData));
                 window.location.href = 'gracias.html';
             } catch (error) {
