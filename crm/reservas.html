@@ -43,12 +43,15 @@
         .btn-ver { background: #667eea; color: white; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.show { display: flex; }
-        .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto; }
+        .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 550px; width: 90%; max-height: 85vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .modal-header h2 { color: #667eea; font-size: 18px; } 
         .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
         .modal-info p { margin: 8px 0; font-size: 13px; color: #555; } 
-        .modal-info strong { color: #333; display: inline-block; width: 100px; }
+        .modal-info strong { color: #333; display: inline-block; width: 110px; }
+        .excursiones-lista { background: #f8f9fa; border-radius: 8px; padding: 10px; margin-top: 8px; }
+        .excursion-item { padding: 5px 0; border-bottom: 1px solid #e0e0e0; font-size: 12px; }
+        .excursion-item:last-child { border-bottom: none; }
         .btn-cerrar-modal { background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 15px; width: 100%; }
         @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } }
     </style>
@@ -147,6 +150,19 @@
             return resultados;
         }
 
+        // Función para formatear fecha de DD/MM/YYYY a DD/MM/YYYY
+        function formatearFecha(fechaStr) {
+            if (!fechaStr) return '';
+            // Si ya viene en formato DD/MM/YYYY
+            if (fechaStr.includes('/')) return fechaStr;
+            // Si viene en formato YYYY-MM-DD
+            const partes = fechaStr.split('-');
+            if (partes.length === 3) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            return fechaStr;
+        }
+
         // Cargar estados guardados
         function cargarEstadosGuardados() {
             try {
@@ -178,32 +194,40 @@
                 reservasData = [];
                 const estadosGuardados = cargarEstadosGuardados();
                 
-                // Procesar desde la fila 1 (saltar encabezados)
+                // La primera fila son los encabezados, procesamos desde la fila 1
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
                     if (fila.length < 5) continue;
                     
-                    // Mapeo de columnas:
+                    // Mapeo CORRECTO de columnas según tu Google Sheets:
                     // 0: ID, 1: Fecha Reserva, 2: Nombre, 3: Apellido, 4: Email, 
-                    // 5: Teléfono, 6: Excursión, 7: Ciudad, 8: Excursion detalle, 
-                    // 9: Personas, 10: Forma de pago, 11: Lugar
+                    // 5: Teléfono, 6: País, 7: Ciudad, 8: Excursión, 9: Fecha, 
+                    // 10: Personas, 11: Forma de pago, 12: Lugar
                     
                     const id = fila[0] || `R-${i}`;
                     const nombre = fila[2] || '';
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
+                    // Excursiones: pueden venir con formato "✔️ Aerosilla, ✔️ Capilla del Monte"
+                    const excursionRaw = fila[8] || '';
+                    // Dividir por comas para mostrar lista
+                    const excursionesLista = excursionRaw.split(',').map(e => e.trim()).filter(e => e);
+                    
                     const reserva = {
                         id: id,
-                        fecha: fila[1] || '',
+                        fecha: formatearFecha(fila[1] || ''),
                         nombre: nombreCompleto || nombre,
                         email: fila[4] || '',
                         telefono: fila[5] || '',
-                        excursion: (fila[6] || fila[8] || '').substring(0, 50),
+                        pais: fila[6] || '',
                         ciudad: fila[7] || '',
-                        personas: fila[9] || '1',
-                        formaPago: fila[10] || 'No especificado',
-                        lugar: fila[11] || 'No especificado',
+                        excursion: excursionRaw.substring(0, 50),
+                        excursionesLista: excursionesLista,
+                        fechaExcursion: fila[9] || '',
+                        personas: fila[10] || '1',
+                        formaPago: fila[11] || 'No especificado',
+                        lugar: fila[12] || 'No especificado',
                         estado: estadosGuardados[id] || 'confirmado'
                     };
                     
@@ -211,13 +235,15 @@
                 }
                 
                 console.log(`Cargadas ${reservasData.length} reservas`);
-                console.log('Primera reserva:', reservasData[0]);
+                if (reservasData.length > 0) {
+                    console.log('Primera reserva (verificar datos):', reservasData[0]);
+                }
                 
-                // Ordenar por fecha (más reciente primero)
+                // Ordenar por ID descendente
                 reservasData.sort((a, b) => {
-                    const fechaA = a.fecha.split('/').reverse().join('-');
-                    const fechaB = b.fecha.split('/').reverse().join('-');
-                    return fechaB.localeCompare(fechaA);
+                    const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
+                    const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
+                    return numB - numA;
                 });
                 
                 reservasFiltradas = [...reservasData];
@@ -248,26 +274,29 @@
                     default: estadoClass = 'badge-confirmado'; estadoText = 'Confirmado';
                 }
                 
+                // Mostrar solo la primera excursión en la tabla (para no saturar)
+                const excursionCorta = r.excursionesLista.length > 0 ? r.excursionesLista[0] : (r.excursion || '');
+                
                 return `
                     <tr>
                         <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td>${escapeHtml(r.fecha)}</td>
-                        <td>${escapeHtml(r.nombre)}</td>
-                        <td style="font-size:11px">${escapeHtml(r.email)}</td>
-                        <td>${escapeHtml(r.telefono)}</td>
-                        <td>${escapeHtml(r.excursion)}</td>
-                        <td>${escapeHtml(r.ciudad)}</td>
-                        <td>${escapeHtml(r.personas)}</td>
-                        <td>${escapeHtml(r.formaPago)}</td>
-                        <td>${escapeHtml(r.lugar)}</td>
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
+                        <td>${escapeHtml(r.fecha)}</td
+                        <td>${escapeHtml(r.nombre)}</td
+                        <td style="font-size:11px">${escapeHtml(r.email)}</td
+                        <td>${escapeHtml(r.telefono)}</td
+                        <td>${escapeHtml(excursionCorta)}${r.excursionesLista.length > 1 ? ` (+${r.excursionesLista.length-1})` : ''}</td
+                        <td>${escapeHtml(r.ciudad)}</td
+                        <td>${escapeHtml(r.personas)}</td
+                        <td>${escapeHtml(r.formaPago)}</td
+                        <td>${escapeHtml(r.lugar)}</td
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
                         <td style="white-space: nowrap;">
-                            <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Marcar Pendiente">⏳ Pendiente</button>
-                            <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅ Confirmar</button>
-                            <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰 Pagada</button>
-                            <button class="btn-accion btn-ver" onclick="verDetalle('${escapeHtml(r.id)}')">👁️ Ver</button>
-                        </td>
-                    </tr>
+                            <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Marcar Pendiente">⏳</button>
+                            <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
+                            <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰</button>
+                            <button class="btn-accion btn-ver" onclick="verDetalle('${escapeHtml(r.id)}')">👁️</button>
+                        </td
+                    </td
                 `;
             }).join('');
         }
@@ -308,6 +337,20 @@
                 default: estadoText = 'Confirmado';
             }
             
+            // Generar HTML para lista de excursiones
+            let excursionesHtml = '';
+            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
+                excursionesHtml = '<div class="excursiones-lista">';
+                reserva.excursionesLista.forEach(exc => {
+                    excursionesHtml += `<div class="excursion-item">${escapeHtml(exc)}</div>`;
+                });
+                excursionesHtml += '</div>';
+            } else if (reserva.excursion) {
+                excursionesHtml = `<div class="excursiones-lista"><div class="excursion-item">${escapeHtml(reserva.excursion)}</div></div>`;
+            } else {
+                excursionesHtml = '<div class="excursiones-lista"><div class="excursion-item">No especificado</div></div>';
+            }
+            
             const modalInfo = document.getElementById('modalInfo');
             modalInfo.innerHTML = `
                 <p><strong>ID:</strong> ${escapeHtml(reserva.id)}</p>
@@ -315,9 +358,12 @@
                 <p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p>
                 <p><strong>Email:</strong> ${escapeHtml(reserva.email)}</p>
                 <p><strong>Teléfono:</strong> ${escapeHtml(reserva.telefono)}</p>
-                <p><strong>Excursión:</strong> ${escapeHtml(reserva.excursion)}</p>
+                <p><strong>País:</strong> ${escapeHtml(reserva.pais)}</p>
                 <p><strong>Ciudad:</strong> ${escapeHtml(reserva.ciudad)}</p>
+                <p><strong>Fecha Excursión:</strong> ${escapeHtml(reserva.fechaExcursion)}</p>
                 <p><strong>Personas:</strong> ${escapeHtml(reserva.personas)}</p>
+                <p><strong>Excursiones seleccionadas:</strong></p>
+                ${excursionesHtml}
                 <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
                 <p><strong>Lugar:</strong> ${escapeHtml(reserva.lugar)}</p>
                 <p><strong>Estado:</strong> <span class="badge badge-${reserva.estado}">${estadoText}</span></p>
@@ -352,6 +398,9 @@
         
         // Inicializar
         cargarReservas();
+        
+        // Recargar cada 60 segundos
+        setInterval(cargarReservas, 60000);
     </script>
 </body>
 </html>
