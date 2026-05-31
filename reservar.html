@@ -186,7 +186,7 @@
             else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
         }
 
-        // 🔥 ACTUALIZÁ ESTA URL CON LA NUEVA URL DE APPS SCRIPT
+        // 🔥 URL DE GOOGLE APPS SCRIPT (actualizada)
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHVLm3FqVZpAOKPh7DW2mbaAWP2W_woI-9-1q7mjlcnEvqLEDccoPVyHBEBJwWNeaICQ/exec';
         
         const form = document.getElementById('excursionForm');
@@ -195,12 +195,14 @@
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             statusMessage.style.display = 'none';
+            
             if (!document.getElementById('privacidad').checked) {
                 statusMessage.textContent = '⚠️ Debes aceptar la política de privacidad';
                 statusMessage.className = 'status-message error';
                 statusMessage.style.display = 'block';
                 return;
             }
+            
             const excursionesSeleccionadas = Array.from(document.querySelectorAll('#checkboxExcursiones input:checked')).map(cb => cb.value);
             if (excursionesSeleccionadas.length === 0) {
                 statusMessage.textContent = '⚠️ Debes seleccionar al menos una excursión';
@@ -208,6 +210,7 @@
                 statusMessage.style.display = 'block';
                 return;
             }
+            
             const formaPago = document.getElementById('formaPago').value;
             if (!formaPago) {
                 statusMessage.textContent = '⚠️ Debes seleccionar una forma de pago';
@@ -232,24 +235,30 @@
                 lugar: document.getElementById('mensaje').value || 'No especificado'
             };
             
-            console.log('📤 Enviando excursiones:', formData.excursiones);
+            console.log('📤 Enviando datos:', formData);
             
             const submitBtn = document.querySelector('.submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = '⏳ Enviando...';
+            
             try {
-                await fetch(GOOGLE_SCRIPT_URL, {
+                // 🔥 CAMBIO CLAVE: enviar como form-urlencoded en lugar de JSON
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(formData)
                 });
+                
                 localStorage.setItem('ultimaReserva', JSON.stringify(formData));
                 window.location.href = 'gracias.html';
             } catch (error) {
-                console.error(error);
+                console.error('Error:', error);
                 localStorage.setItem('ultimaReserva', JSON.stringify(formData));
                 window.location.href = 'gracias.html?status=local';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '📩 Enviar Reserva';
             }
         });
         
