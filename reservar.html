@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+,<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>🕐 Reserva tu Excursión | Aventura Total</title>
-    <!-- Favicon eliminado para evitar duplicación en la pestaña -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕐</text></svg>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 40px 20px; }
@@ -174,8 +174,8 @@
             else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
         }
 
-        // ⚠️ IMPORTANTE: Reemplaza esta URL con la de tu propio Google Apps Script
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGyRhu5A1KvmA0W3bulCbxmtPtdWU5oZOB0TmvokwvcYU9ILop5HJAK-J09HYN9nulWg/exec';
+        // NUEVA URL DEL APPS SCRIPT (actualizada y funcionando)
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9P1Zg1ruh-8vAzMaa9DwpGjCdhUPVJqRkgX2_0Q9o01nKDs9bUY4i7gHfySQWwnrM/exec';
         
         const form = document.getElementById('excursionForm');
         const statusMessage = document.getElementById('statusMessage');
@@ -216,8 +216,7 @@
             formData.append('telefono', document.getElementById('telefono').value);
             formData.append('pais', paisSelect.options[paisSelect.selectedIndex].text);
             formData.append('ciudad', categoriaSelect.value);
-            // ✅ MEJORA: Las excursiones se guardan con saltos de línea para mejor legibilidad en Sheets
-            formData.append('excursiones', excursionesSeleccionadas.join('\n'));
+            formData.append('excursiones', excursionesSeleccionadas.join(' | '));
             formData.append('fecha', document.getElementById('fecha').value);
             formData.append('personas', document.getElementById('personas').value);
             formData.append('formaPago', formaPago);
