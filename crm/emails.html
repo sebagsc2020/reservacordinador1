@@ -40,7 +40,7 @@
         .form-group { margin-bottom: 15px; } 
         .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 5px; text-transform: uppercase; }
         .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 13px; }
-        .form-group textarea { min-height: 120px; resize: vertical; }
+        .form-group textarea { min-height: 180px; resize: vertical; font-family: monospace; font-size: 12px; }
         .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #25D366; }
         .form-row { display: flex; gap: 12px; flex-wrap: wrap; } 
         .form-row .form-group { flex: 1; min-width: 150px; }
@@ -50,12 +50,14 @@
         .mensaje-exito { background: #d4edda; color: #155724; padding: 10px; border-radius: 8px; margin-top: 12px; display: none; font-weight: 600; text-align: center; font-size: 13px; }
         .mensaje-exito.show { display: block; }
         .cliente-badge { display: inline-block; background: #e8f5e9; color: #25D366; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 11px; margin-top: 5px; }
+        .cliente-detalle { background: #f0f7ff; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 12px; border-left: 3px solid #25D366; }
+        .cliente-detalle strong { color: #1a1a2e; }
         
         .template-section { margin-bottom: 20px; } 
         .template-section h3 { margin-bottom: 12px; color: #1a1a2e; font-size: 16px; }
         .template-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
-        .template-card { background: white; padding: 12px; border-radius: 10px; box-shadow: 0 1px 5px rgba(0,0,0,0.05); cursor: pointer; border-left: 3px solid #25D366; }
-        .template-card:hover { transform: translateY(-2px); } 
+        .template-card { background: white; padding: 12px; border-radius: 10px; box-shadow: 0 1px 5px rgba(0,0,0,0.05); cursor: pointer; border-left: 3px solid #25D366; transition: 0.2s; }
+        .template-card:hover { transform: translateY(-2px); background: #e8f5e9; } 
         .template-card h4 { font-size: 13px; } 
         .template-card p { font-size: 10px; color: #666; }
         .template-card .template-icon { font-size: 24px; margin-bottom: 5px; }
@@ -96,21 +98,22 @@
         
         <div class="template-section"><h3>📝 Plantillas</h3>
             <div class="template-grid">
-                <div class="template-card" onclick="usarPlantilla('confirmacion')"><div class="template-icon">✅</div><h4>Confirmación</h4><p>Confirmar reserva</p></div>
-                <div class="template-card" onclick="usarPlantilla('recordatorio')"><div class="template-icon">🔔</div><h4>Recordatorio</h4><p>Pagos pendientes</p></div>
-                <div class="template-card" onclick="usarPlantilla('salida')"><div class="template-icon">🚌</div><h4>Día Antes</h4><p>24hs antes</p></div>
-                <div class="template-card" onclick="usarPlantilla('agradecimiento')"><div class="template-icon">🙏</div><h4>Post-Excursión</h4><p>Agradecimiento</p></div>
-                <div class="template-card" onclick="usarPlantilla('promocion')"><div class="template-icon">🎉</div><h4>Promoción</h4><p>Ofertas</p></div>
-                <div class="template-card" onclick="usarPlantilla('personalizado')"><div class="template-icon">✏️</div><h4>Personalizado</h4><p>Tu mensaje</p></div>
+                <div class="template-card" onclick="aplicarPlantilla('confirmacion')"><div class="template-icon">✅</div><h4>Confirmación</h4><p>Confirmar reserva</p></div>
+                <div class="template-card" onclick="aplicarPlantilla('recordatorio')"><div class="template-icon">🔔</div><h4>Recordatorio</h4><p>Pagos pendientes</p></div>
+                <div class="template-card" onclick="aplicarPlantilla('salida')"><div class="template-icon">🚌</div><h4>Día Antes</h4><p>24hs antes</p></div>
+                <div class="template-card" onclick="aplicarPlantilla('agradecimiento')"><div class="template-icon">🙏</div><h4>Post-Excursión</h4><p>Agradecimiento</p></div>
+                <div class="template-card" onclick="aplicarPlantilla('promocion')"><div class="template-icon">🎉</div><h4>Promoción</h4><p>Ofertas</p></div>
+                <div class="template-card" onclick="aplicarPlantilla('personalizado')"><div class="template-icon">✏️</div><h4>Personalizado</h4><p>Tu mensaje</p></div>
             </div>
         </div>
         
-        <div class="whatsapp-composer"><h3>💬 Enviar Mensaje</h3>
+        <div class="whatsapp-composer">
+            <h3>💬 Enviar Mensaje</h3>
             <div class="form-row">
                 <div class="form-group"><label>📞 WhatsApp:</label><input type="text" id="whatsappNumero" placeholder="Ej: 5493518692251"></div>
                 <div class="form-group"><label>👤 Cliente:</label><input type="text" id="whatsappCliente" readonly placeholder="Seleccionar cliente"></div>
             </div>
-            <div id="clienteInfoBadge" style="display:none;"></div>
+            <div id="clienteDetalleDiv" class="cliente-detalle" style="display:none;"></div>
             <div class="form-group"><label>💬 Mensaje:</label><textarea id="whatsappMensaje" placeholder="Escribe tu mensaje..."></textarea></div>
             <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
                 <button class="btn-enviar" onclick="enviarWhatsApp()">💬 Enviar</button>
@@ -128,7 +131,7 @@
         // ==================================================
         // CONFIGURACIÓN - USA LA MISMA API QUE RESERVAS
         // ==================================================
-        const API_URL = 'https://script.google.com/macros/s/TU_URL_AQUI/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwqcab0xv3hXgyIc1vE9VvlFMRTrROnpFe-T48Auod-K7UTdSQj60Ts3sTWCPlCtJcSLg/exec';
         
         // ==================================================
         // VERIFICAR AUTENTICACIÓN
@@ -147,6 +150,86 @@
         // ==================================================
         let clientesData = [];
         let reservasData = [];
+        let clienteSeleccionadoActual = null;
+        let reservaSeleccionadaActual = null;
+        
+        // ==================================================
+        // PLANTILLAS
+        // ==================================================
+        const plantillasTexto = {
+            confirmacion: `✅ ¡Hola [NOMBRE]!\n\nTu reserva en Aventura Total ha sido CONFIRMADA.\n\n📍 Detalles:\n• Excursión: [EXCURSION]\n• Fecha: [FECHA]\n• Personas: [PERSONAS]\n• Forma de Pago: [PAGO]\n• Lugar: [LUGAR]\n\n🏔️ ¡Gracias por confiar en nosotros!`,
+            recordatorio: `🔔 ¡Hola [NOMBRE]!\n\nTenés un pago pendiente por tu reserva.\n\n💳 Podés abonar por:\n• Efectivo\n• Débito/Crédito\n• Transferencia\n\n🏔️ Aventura Total`,
+            salida: `🚌 ¡Hola [NOMBRE]!\n\n¡Mañana es tu excursión! 🌟\n\n🎒 Llevá:\n• Ropa cómoda\n• Protector solar\n• Agua\n• Cámara\n\n📍 Punto de encuentro: [LUGAR]\n\n🏔️ Aventura Total`,
+            agradecimiento: `🙏 ¡Hola [NOMBRE]!\n\n¿Disfrutaste la excursión?\n\n⭐ ¡Dejanos una reseña!\n\n🎉 10% OFF en tu próxima reserva.\n\n🏔️ Aventura Total`,
+            promocion: `🎉 ¡Hola [NOMBRE]!\n\nBeneficios exclusivos para vos:\n🔥 15% OFF en próxima reserva\n👥 2x1 en excursiones seleccionadas\n\n🏔️ Aventura Total`,
+            personalizado: ``
+        };
+        
+        // ==================================================
+        // REEMPLAZAR PLACEHOLDERS EN MENSAJE
+        // ==================================================
+        function reemplazarPlaceholders(mensaje, nombre, reserva) {
+            if (!mensaje) return '';
+            
+            let resultado = mensaje;
+            
+            // Reemplazar [NOMBRE]
+            resultado = resultado.replace(/\[NOMBRE\]/g, nombre || '[CLIENTE]');
+            
+            if (reserva) {
+                // Obtener primera excursión de la lista
+                let excursionesTexto = reserva.excursiones || '';
+                let primeraExcursion = excursionesTexto.split('\n')[0] || excursionesTexto.split(' | ')[0] || '[EXCURSION]';
+                primeraExcursion = primeraExcursion.replace(/^✔️\s*/, '').trim();
+                
+                resultado = resultado.replace(/\[EXCURSION\]/g, primeraExcursion);
+                resultado = resultado.replace(/\[FECHA\]/g, reserva.fecha || '[FECHA]');
+                resultado = resultado.replace(/\[PERSONAS\]/g, reserva.personas || '[PERSONAS]');
+                resultado = resultado.replace(/\[PAGO\]/g, reserva.formaPago || '[PAGO]');
+                resultado = resultado.replace(/\[LUGAR\]/g, reserva.lugar || '[LUGAR]');
+            } else {
+                resultado = resultado.replace(/\[EXCURSION\]/g, '[EXCURSION]');
+                resultado = resultado.replace(/\[FECHA\]/g, '[FECHA]');
+                resultado = resultado.replace(/\[PERSONAS\]/g, '[PERSONAS]');
+                resultado = resultado.replace(/\[PAGO\]/g, '[PAGO]');
+                resultado = resultado.replace(/\[LUGAR\]/g, '[LUGAR]');
+            }
+            
+            return resultado;
+        }
+        
+        // ==================================================
+        // ACTUALIZAR MENSAJE ACTUAL CON DATOS DEL CLIENTE
+        // ==================================================
+        function actualizarMensajeConCliente() {
+            const msgTextarea = document.getElementById('whatsappMensaje');
+            if (!msgTextarea) return;
+            
+            const mensajeActual = msgTextarea.value;
+            const cliente = clienteSeleccionadoActual;
+            const reserva = reservaSeleccionadaActual;
+            const nombre = cliente ? cliente.nombre : '';
+            
+            const nuevoMensaje = reemplazarPlaceholders(mensajeActual, nombre, reserva);
+            msgTextarea.value = nuevoMensaje;
+        }
+        
+        // ==================================================
+        // APLICAR PLANTILLA (reemplaza todo el mensaje)
+        // ==================================================
+        function aplicarPlantilla(tipo) {
+            let plantilla = plantillasTexto[tipo] || '';
+            const cliente = clienteSeleccionadoActual;
+            const reserva = reservaSeleccionadaActual;
+            const nombre = cliente ? cliente.nombre : '';
+            
+            const mensajeCompleto = reemplazarPlaceholders(plantilla, nombre, reserva);
+            
+            const msgTextarea = document.getElementById('whatsappMensaje');
+            if (msgTextarea) {
+                msgTextarea.value = mensajeCompleto;
+            }
+        }
         
         // ==================================================
         // CARGAR DATOS DESDE LA API
@@ -208,13 +291,12 @@
                 clientesData = Object.values(clientesMap);
                 console.log(`✅ Clientes únicos: ${clientesData.length}, Reservas: ${reservasData.length}`);
                 
-                // Actualizar historial visual
                 mostrarHistorial();
                 
             } catch (error) {
                 console.error('❌ Error al cargar:', error);
                 const histEl = document.getElementById('historialWhatsApp');
-                if (histEl) histEl.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Error: ${error.message}</td></tr>`;
+                if (histEl) histEl.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Error: ${error.message}</td</td`;
             }
         }
         
@@ -237,26 +319,33 @@
         function seleccionarCliente(telefono, nombre, email) {
             console.log('👤 Seleccionado:', nombre, email);
             
+            // Buscar cliente en datos
+            clienteSeleccionadoActual = clientesData.find(c => c.email === email);
+            reservaSeleccionadaActual = buscarUltimaReserva(email);
+            
             const numeroInput = document.getElementById('whatsappNumero');
             const nombreInput = document.getElementById('whatsappCliente');
-            const badge = document.getElementById('clienteInfoBadge');
+            const detalleDiv = document.getElementById('clienteDetalleDiv');
             
             if (numeroInput) numeroInput.value = telefono.replace(/[^0-9]/g, '');
             if (nombreInput) nombreInput.value = nombre;
             
-            const reserva = buscarUltimaReserva(email);
-            
-            if (badge) {
-                badge.style.display = 'block';
-                badge.className = 'cliente-badge';
-                
-                let info = `✅ ${nombre} | ${email}`;
-                if (reserva) {
-                    const excursiones = (reserva.excursiones || '').split('\n')[0];
-                    info += ` | 🕐 ${excursiones.substring(0, 30)} | 📅 ${reserva.fecha || 'N/A'} | 👥 ${reserva.personas}`;
-                }
-                badge.innerHTML = info;
+            // Mostrar detalles del cliente y reserva
+            if (detalleDiv && reservaSeleccionadaActual) {
+                const excursionesPreview = (reservaSeleccionadaActual.excursiones || '').split('\n')[0].replace(/^✔️\s*/, '');
+                detalleDiv.style.display = 'block';
+                detalleDiv.innerHTML = `
+                    <strong>📋 Última reserva:</strong><br>
+                    🕐 Excursión: ${excursionesPreview || 'No especificada'}<br>
+                    📅 Fecha: ${reservaSeleccionadaActual.fecha || 'No especificada'} | 👥 Pax: ${reservaSeleccionadaActual.personas}<br>
+                    💳 Pago: ${reservaSeleccionadaActual.formaPago} | 📍 Lugar: ${reservaSeleccionadaActual.lugar}
+                `;
+            } else if (detalleDiv) {
+                detalleDiv.style.display = 'none';
             }
+            
+            // Actualizar el mensaje actual con los datos del cliente
+            actualizarMensajeConCliente();
             
             // Cerrar resultados
             const resultadosDiv = document.getElementById('resultadosBusqueda');
@@ -264,43 +353,6 @@
             
             // Guardar último cliente
             localStorage.setItem('ultimoClienteWhatsApp', JSON.stringify({ telefono, nombre, email }));
-        }
-        
-        // ==================================================
-        // USAR PLANTILLA
-        // ==================================================
-        const plantillas = {
-            confirmacion: `✅ ¡Hola [NOMBRE]!\n\nTu reserva en Aventura Total ha sido CONFIRMADA.\n\n📍 Detalles:\n• Excursión: [EXCURSION]\n• Fecha: [FECHA]\n• Personas: [PERSONAS]\n• Forma de Pago: [PAGO]\n• Lugar: [LUGAR]\n\n🏔️ ¡Gracias por confiar en nosotros!`,
-            recordatorio: `🔔 ¡Hola [NOMBRE]!\n\nTenés un pago pendiente por tu reserva.\n\n💳 Podés abonar por:\n• Efectivo\n• Débito/Crédito\n• Transferencia\n\n🏔️ Aventura Total`,
-            salida: `🚌 ¡Hola [NOMBRE]!\n\n¡Mañana es tu excursión! 🌟\n\n🎒 Llevá:\n• Ropa cómoda\n• Protector solar\n• Agua\n• Cámara\n\n📍 Punto de encuentro: [LUGAR]\n\n🏔️ Aventura Total`,
-            agradecimiento: `🙏 ¡Hola [NOMBRE]!\n\n¿Disfrutaste la excursión?\n\n⭐ ¡Dejanos una reseña!\n\n🎉 10% OFF en tu próxima reserva.\n\n🏔️ Aventura Total`,
-            promocion: `🎉 ¡Hola [NOMBRE]!\n\nBeneficios exclusivos para vos:\n🔥 15% OFF en próxima reserva\n👥 2x1 en excursiones seleccionadas\n\n🏔️ Aventura Total`,
-            personalizado: ``
-        };
-        
-        function usarPlantilla(tipo) {
-            let msg = plantillas[tipo] || '';
-            const nombreInput = document.getElementById('whatsappCliente');
-            const nombre = nombreInput ? nombreInput.value : '';
-            
-            msg = msg.replace(/\[NOMBRE\]/g, nombre || '[CLIENTE]');
-            
-            // Obtener datos del último cliente seleccionado
-            const ultimo = JSON.parse(localStorage.getItem('ultimoClienteWhatsApp') || 'null');
-            if (ultimo && ultimo.email) {
-                const reserva = buscarUltimaReserva(ultimo.email);
-                if (reserva) {
-                    const excursiones = (reserva.excursiones || '').split('\n')[0];
-                    msg = msg.replace(/\[EXCURSION\]/g, excursiones || '[EXCURSION]');
-                    msg = msg.replace(/\[FECHA\]/g, reserva.fecha || '[FECHA]');
-                    msg = msg.replace(/\[PERSONAS\]/g, reserva.personas || '[PERSONAS]');
-                    msg = msg.replace(/\[PAGO\]/g, reserva.formaPago || '[PAGO]');
-                    msg = msg.replace(/\[LUGAR\]/g, reserva.lugar || '[LUGAR]');
-                }
-            }
-            
-            const msgEl = document.getElementById('whatsappMensaje');
-            if (msgEl) msgEl.value = msg;
         }
         
         // ==================================================
@@ -364,17 +416,17 @@
             if (!histEl) return;
             
             if (historial.length === 0) {
-                histEl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;">Sin envíos</td></tr>';
+                histEl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;">Sin envíos</td</td';
                 return;
             }
             
             histEl.innerHTML = historial.map(h => `
                 <tr>
                     <td>${h.fecha}</td>
-                    <td>${h.cliente}</td>
-                    <td>${h.numero}</td>
-                    <td><span class="badge-enviado">${h.estado}</span></td>
-                    <td><button class="btn-reenviar" onclick="reenviar('${h.numero}','${h.cliente}')">💬</button></td>
+                    <td>${h.cliente}</td
+                    <td>${h.numero}</td
+                    <td><span class="badge-enviado">${h.estado}</span></td
+                    <td><button class="btn-reenviar" onclick="reenviar('${h.numero}','${h.cliente}')">💬</button></td
                 </tr>
             `).join('');
         }
@@ -382,6 +434,11 @@
         function reenviar(numero, cliente) {
             document.getElementById('whatsappNumero').value = numero;
             document.getElementById('whatsappCliente').value = cliente;
+            // Buscar el email del cliente para cargar sus datos
+            const clienteData = clientesData.find(c => c.telefono === numero || c.nombre === cliente);
+            if (clienteData) {
+                seleccionarCliente(numero, clienteData.nombre, clienteData.email);
+            }
         }
         
         // ==================================================
@@ -424,7 +481,6 @@
                 resultadosDiv.classList.add('show');
             });
             
-            // Cerrar al hacer clic fuera
             document.addEventListener('click', function(e) {
                 if (!e.target.closest('.buscador-container') && resultadosDiv) {
                     resultadosDiv.classList.remove('show');
@@ -436,24 +492,23 @@
         // INICIALIZAR
         // ==================================================
         window.seleccionarCliente = seleccionarCliente;
-        window.usarPlantilla = usarPlantilla;
+        window.aplicarPlantilla = aplicarPlantilla;
         window.enviarWhatsApp = enviarWhatsApp;
         window.abrirWhatsAppWeb = abrirWhatsAppWeb;
         window.reenviar = reenviar;
         
         // Cargar último cliente guardado
         const ultimo = JSON.parse(localStorage.getItem('ultimoClienteWhatsApp') || 'null');
-        if (ultimo) {
-            const numEl = document.getElementById('whatsappNumero');
-            const nomEl = document.getElementById('whatsappCliente');
-            if (numEl) numEl.value = ultimo.telefono?.replace(/[^0-9]/g, '') || '';
-            if (nomEl) nomEl.value = ultimo.nombre || '';
+        if (ultimo && ultimo.email) {
+            setTimeout(() => {
+                seleccionarCliente(ultimo.telefono || '', ultimo.nombre || '', ultimo.email || '');
+            }, 1000);
         }
         
         // Iniciar
         cargarDatos();
         initBuscador();
-        setInterval(cargarDatos, 60000); // Actualizar cada minuto
+        setInterval(cargarDatos, 60000);
     </script>
 </body>
 </html>
