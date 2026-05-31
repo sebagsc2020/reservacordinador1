@@ -130,7 +130,6 @@
             categoriaSelect.innerHTML = '<option value="">Selecciona una ciudad</option>';
             checkboxExcursiones.innerHTML = '';
             contadorSeleccionados.innerHTML = '<span class="sin-seleccion">Selecciona al menos una excursión</span>';
-            
             if (pais) {
                 categoriaGroup.style.display = 'block';
                 categoriaSelect.disabled = false;
@@ -153,7 +152,6 @@
             const ciudad = this.value;
             checkboxExcursiones.innerHTML = '';
             contadorSeleccionados.innerHTML = '<span class="sin-seleccion">Selecciona al menos una excursión</span>';
-            
             if (ciudad && pais) {
                 excursionGroup.style.display = 'block';
                 const excursiones = excursionesData[pais][ciudad];
@@ -195,14 +193,12 @@
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             statusMessage.style.display = 'none';
-            
             if (!document.getElementById('privacidad').checked) {
                 statusMessage.textContent = '⚠️ Debes aceptar la política de privacidad';
                 statusMessage.className = 'status-message error';
                 statusMessage.style.display = 'block';
                 return;
             }
-            
             const excursionesSeleccionadas = Array.from(document.querySelectorAll('#checkboxExcursiones input:checked')).map(cb => cb.value);
             if (excursionesSeleccionadas.length === 0) {
                 statusMessage.textContent = '⚠️ Debes seleccionar al menos una excursión';
@@ -210,7 +206,6 @@
                 statusMessage.style.display = 'block';
                 return;
             }
-            
             const formaPago = document.getElementById('formaPago').value;
             if (!formaPago) {
                 statusMessage.textContent = '⚠️ Debes seleccionar una forma de pago';
@@ -219,7 +214,7 @@
                 return;
             }
             
-            // 🔥 LAS EXCURSIONES SE ENVÍAN SEPARADAS POR " | " (ESPACIO + PIPE + ESPACIO)
+            // 🔥 CLAVE: Unir excursiones con " | " para que el CRM las separe correctamente
             const formData = {
                 id: 'RES-' + Date.now(),
                 nombre: document.getElementById('nombre').value,
@@ -240,7 +235,6 @@
             const submitBtn = document.querySelector('.submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = '⏳ Enviando...';
-            
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
