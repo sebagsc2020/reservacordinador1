@@ -17,43 +17,34 @@
         .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
         .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; border: none; }
         .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h1 { font-size: 26px; color: #1a1a2e; }
         .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
-        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
         .btn-filtrar { padding: 10px 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-recargar { padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
-        
-        /* Grid de tarjetas */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px; margin-top: 20px; }
-        .card { background: white; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .card-header .id { font-weight: bold; font-size: 14px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 20px; }
-        .card-header .estado { font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; }
-        .card-body { padding: 20px; flex: 1; }
-        .info-row { display: flex; margin-bottom: 12px; flex-wrap: wrap; }
-        .info-label { font-weight: 600; width: 100px; color: #555; font-size: 13px; }
-        .info-value { flex: 1; color: #333; font-size: 13px; word-break: break-word; }
-        .excursiones-lista { margin: 5px 0 0 0; padding-left: 20px; }
-        .excursiones-lista li { margin-bottom: 4px; font-size: 12px; color: #555; }
-        .card-actions { display: flex; gap: 8px; padding: 15px 20px; background: #f8f9fa; border-top: 1px solid #e0e0e0; justify-content: center; }
-        .btn-accion { padding: 6px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; }
-        .btn-confirmar { background: #27ae60; color: white; }
+        .table-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow: hidden; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
+        td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; vertical-align: top; } 
+        tr:hover td { background: #f8f9ff; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        .badge-pendiente { background: #fff3cd; color: #856404; }
+        .badge-confirmado { background: #d4edda; color: #155724; }
+        .badge-pagado { background: #d1ecf1; color: #0c5460; }
+        .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin: 2px; width: 28px; text-align: center; }
         .btn-pendiente { background: #ffc107; color: #856404; }
+        .btn-confirmar { background: #27ae60; color: white; }
         .btn-pagar { background: #3498db; color: white; }
-        .btn-accion:hover { transform: scale(1.05); opacity: 0.9; }
-        .sin-resultados { text-align: center; padding: 50px; color: #666; font-size: 16px; }
-        @media (max-width: 768px) { 
-            .sidebar { width: 60px; } 
-            .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
-            .nav-menu a { justify-content: center; } 
-            .main-content { margin-left: 60px; padding: 15px; }
-            .cards-grid { grid-template-columns: 1fr; }
-            .info-label { width: 80px; }
-        }
+        .acciones-container { display: flex; flex-direction: column; gap: 3px; }
+        .acciones-fila { display: flex; gap: 3px; justify-content: flex-start; }
+        .excursiones-lista { margin: 0; padding-left: 15px; list-style: none; }
+        .excursiones-lista li { padding: 4px 0; font-size: 11px; }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } }
     </style>
 </head>
 <body>
@@ -72,21 +63,27 @@
     </nav>
 
     <div class="main-content">
-        <div class="header">
-            <div><h1>📋 Reservas</h1></div>
-            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
-        </div>
+        <div class="header"><div><h1>📋 Reservas</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
 
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o ciudad..." id="busquedaReserva">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
         </div>
 
-        <div id="cardsContainer" class="cards-grid">
-            <div class="sin-resultados">⏳ Cargando datos...</div>
+        <div class="table-container">
+            <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0 reservas</span></div>
+            <div class="table-wrapper">
+                <table id="reservasTable">
+                    <thead>
+                        <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="tablaReservas">
+                        <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td
+                    </tbody>
+                </div>
+            </div>
         </div>
-        <div id="totalReservasSpan" style="text-align: center; margin-top: 20px; font-size: 13px; color: #666;"></div>
     </div>
 
     <script>
@@ -127,7 +124,7 @@
             return fechaStr;
         }
 
-        // Función para dividir excursiones (saltos de línea, pipes, comas, etc.)
+        // 🔥 FUNCIÓN CLAVE: Divide excursiones y elimina números existentes
         function dividirExcursiones(texto) {
             if (!texto) return [];
             let partes = [];
@@ -152,7 +149,7 @@
             else {
                 partes = [texto];
             }
-            // Limpiar números iniciales y espacios
+            // Limpiar números iniciales y espacios (elimina "1. ", "2. ", etc.)
             partes = partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             return partes;
         }
@@ -169,11 +166,11 @@
         }
 
         async function cargarReservas() {
-            const container = document.getElementById('cardsContainer');
-            if (!container) return;
-            container.innerHTML = '<div class="sin-resultados">⏳ Cargando datos...</div>';
+            const tbody = document.getElementById('tablaReservas');
+            if (!tbody) return;
             
             try {
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 const csvText = await response.text();
                 const filas = parseCSV(csvText);
@@ -219,34 +216,34 @@
                     return numB - numA; 
                 });
                 reservasFiltradas = [...reservasData];
-                renderizarTarjetas();
+                renderizarTabla();
             } catch (error) {
                 console.error('Error:', error);
-                container.innerHTML = `<div class="sin-resultados">❌ Error al cargar datos: ${error.message}</div>`;
+                if (tbody) tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</td`;
             }
         }
 
-        function renderizarTarjetas() {
-            const container = document.getElementById('cardsContainer');
+        function renderizarTabla() {
+            const tbody = document.getElementById('tablaReservas');
             const totalSpan = document.getElementById('totalReservasSpan');
-            if (!container) return;
-            if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} reservas encontradas`;
+            if (!tbody) return;
+            if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                container.innerHTML = '<div class="sin-resultados">📋 No hay reservas que coincidan con la búsqueda</div>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</td';
                 return;
             }
             
-            container.innerHTML = reservasFiltradas.map(r => {
-                let estadoText = '';
+            tbody.innerHTML = reservasFiltradas.map(r => {
+                let estadoClass = '', estadoText = '';
                 switch(r.estado) {
-                    case 'pendiente': estadoText = 'Pendiente'; break;
-                    case 'confirmado': estadoText = 'Confirmado'; break;
-                    case 'pagado': estadoText = 'Pagado'; break;
-                    default: estadoText = 'Confirmado';
+                    case 'pendiente': estadoClass = 'badge-pendiente'; estadoText = 'Pendiente'; break;
+                    case 'confirmado': estadoClass = 'badge-confirmado'; estadoText = 'Confirmado'; break;
+                    case 'pagado': estadoClass = 'badge-pagado'; estadoText = 'Pagado'; break;
+                    default: estadoClass = 'badge-confirmado'; estadoText = 'Confirmado';
                 }
                 
-                // Lista de excursiones numerada
+                // 🔥 LISTA NUMERADA DE EXCURSIONES (1., 2., 3., etc.)
                 let excursionesHtml = '<ul class="excursiones-lista">';
                 if (!r.excursionesLista || r.excursionesLista.length === 0) {
                     excursionesHtml += '<li>Sin excursiones</li>';
@@ -258,29 +255,30 @@
                 excursionesHtml += '</ul>';
                 
                 return `
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="id">ID: ${escapeHtml(r.id)}</span>
-                            <span class="estado">${estadoText}</span>
-                        </div>
-                        <div class="card-body">
-                            <div class="info-row"><div class="info-label">👤 Cliente</div><div class="info-value">${escapeHtml(r.nombre)}</div></div>
-                            <div class="info-row"><div class="info-label">📧 Email</div><div class="info-value">${escapeHtml(r.email)}</div></div>
-                            <div class="info-row"><div class="info-label">📞 Teléfono</div><div class="info-value">${escapeHtml(r.telefono)}</div></div>
-                            <div class="info-row"><div class="info-label">🌎 País</div><div class="info-value">${escapeHtml(r.pais)}</div></div>
-                            <div class="info-row"><div class="info-label">📂 Ciudad</div><div class="info-value">${escapeHtml(r.ciudad)}</div></div>
-                            <div class="info-row"><div class="info-label">🕐 Excursiones</div><div class="info-value">${excursionesHtml}</div></div>
-                            <div class="info-row"><div class="info-label">🗓️ Fecha</div><div class="info-value">${escapeHtml(r.fecha)}</div></div>
-                            <div class="info-row"><div class="info-label">👥 Personas</div><div class="info-value">${escapeHtml(r.personas)}</div></div>
-                            <div class="info-row"><div class="info-label">💳 Forma de Pago</div><div class="info-value">${escapeHtml(r.formaPago)}</div></div>
-                            <div class="info-row"><div class="info-label">📍 Lugar</div><div class="info-value">${escapeHtml(r.lugar)}</div></div>
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')">✅ Confirmar</button>
-                            <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')">⏳ Pendiente</button>
-                            <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')">💰 Pagada</button>
-                        </div>
-                    </div>
+                    <tr>
+                        <td><strong>${escapeHtml(r.id)}</strong></td>
+                        <td>${escapeHtml(r.fecha)}</td
+                        <td>${escapeHtml(r.nombre)}</td
+                        <td style="font-size:11px">${escapeHtml(r.email)}</td
+                        <td>${escapeHtml(r.telefono)}</td
+                        <td>${excursionesHtml}</td
+                        <td>${escapeHtml(r.ciudad)}</td
+                        <td>${escapeHtml(r.personas)}</td
+                        <td>${escapeHtml(r.formaPago)}</td
+                        <td>${escapeHtml(r.lugar)}</td
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
+                        <td>
+                            <div class="acciones-container">
+                                <div class="acciones-fila">
+                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
+                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Marcar Pendiente">⏳</button>
+                                </div>
+                                <div class="acciones-fila">
+                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰</button>
+                                </div>
+                            </div>
+                        </td
+                    </tr>
                 `;
             }).join('');
         }
@@ -289,15 +287,12 @@
             const busqueda = document.getElementById('busquedaReserva');
             if (!busqueda) return;
             const texto = busqueda.value.toLowerCase().trim();
-            if (!texto) {
-                reservasFiltradas = [...reservasData];
-            } else {
-                reservasFiltradas = reservasData.filter(r => 
-                    r.nombre.toLowerCase().includes(texto) || 
-                    r.excursionesLista.some(exc => exc.toLowerCase().includes(texto))
-                );
-            }
-            renderizarTarjetas();
+            if (!texto) reservasFiltradas = [...reservasData];
+            else reservasFiltradas = reservasData.filter(r => 
+                r.nombre.toLowerCase().includes(texto) || 
+                r.ciudad.toLowerCase().includes(texto)
+            );
+            renderizarTabla();
         }
 
         function cambiarEstado(id, nuevoEstado) {
@@ -307,7 +302,7 @@
                 guardarEstado(id, nuevoEstado);
                 const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
                 if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
-                renderizarTarjetas();
+                renderizarTabla();
             }
         }
 
