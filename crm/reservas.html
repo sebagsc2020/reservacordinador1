@@ -43,7 +43,7 @@
         .acciones-container { display: flex; flex-direction: column; gap: 3px; }
         .acciones-fila { display: flex; gap: 3px; justify-content: flex-start; }
         .excursiones-lista { margin: 0; padding-left: 15px; list-style: none; }
-        .excursiones-lista li { padding: 4px 0; font-size: 11px; }
+        .excursiones-lista li { padding: 3px 0; font-size: 11px; }
         @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } }
     </style>
 </head>
@@ -124,34 +124,16 @@
             return fechaStr;
         }
 
-        // 🔥 FUNCIÓN CLAVE: Divide excursiones y elimina números existentes
         function dividirExcursiones(texto) {
             if (!texto) return [];
             let partes = [];
-            // Si contiene saltos de línea
-            if (texto.includes('\n')) {
-                partes = texto.split('\n');
-            }
-            // Si contiene " | "
-            else if (texto.includes(' | ')) {
-                partes = texto.split(' | ');
-            }
-            // Si contiene ", "
-            else if (texto.includes(', ')) {
-                partes = texto.split(', ');
-            }
-            else if (texto.includes(',')) {
-                partes = texto.split(',');
-            }
-            else if (texto.includes('|')) {
-                partes = texto.split('|');
-            }
-            else {
-                partes = [texto];
-            }
-            // Limpiar números iniciales y espacios (elimina "1. ", "2. ", etc.)
-            partes = partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
-            return partes;
+            if (texto.includes('\n')) partes = texto.split('\n');
+            else if (texto.includes(' | ')) partes = texto.split(' | ');
+            else if (texto.includes(', ')) partes = texto.split(', ');
+            else if (texto.includes(',')) partes = texto.split(',');
+            else if (texto.includes('|')) partes = texto.split('|');
+            else partes = [texto];
+            return partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
         }
 
         function cargarEstadosGuardados() {
@@ -186,16 +168,14 @@
                     const id = fila[0] || `R-${i}`;
                     const nombre = fila[2] || '';
                     const apellido = fila[3] || '';
-                    const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
-                    // Leer de columna 8 (Excursion) o 6 (Excursión)
                     let excursionesRaw = fila[8] || fila[6] || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     
                     const reserva = {
                         id: id,
                         fecha: formatearFecha(fila[1] || ''),
-                        nombre: nombreCompleto || nombre,
+                        nombre: `${nombre} ${apellido}`.trim(),
                         email: fila[4] || '',
                         telefono: fila[5] || '',
                         pais: fila[6] || '',
@@ -243,7 +223,6 @@
                     default: estadoClass = 'badge-confirmado'; estadoText = 'Confirmado';
                 }
                 
-                // 🔥 LISTA NUMERADA DE EXCURSIONES (1., 2., 3., etc.)
                 let excursionesHtml = '<ul class="excursiones-lista">';
                 if (!r.excursionesLista || r.excursionesLista.length === 0) {
                     excursionesHtml += '<li>Sin excursiones</li>';
