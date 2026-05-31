@@ -125,37 +125,17 @@
             return fechaStr;
         }
 
-        // Función mejorada para dividir excursiones
+        // Dividir excursiones (separador " | " o coma)
         function dividirExcursiones(texto) {
             if (!texto) return [];
-            
-            // Probar diferentes separadores
-            let partes = [];
-            
-            // Separador " | "
-            if (texto.includes(' | ')) {
-                partes = texto.split(' | ');
+            let partes = texto.split(' | ').map(p => p.trim()).filter(p => p);
+            if (partes.length === 0 && texto.includes(',')) {
+                partes = texto.split(',').map(p => p.trim()).filter(p => p);
             }
-            // Separador ", "
-            else if (texto.includes(', ')) {
-                partes = texto.split(', ');
-            }
-            // Separador ","
-            else if (texto.includes(',')) {
-                partes = texto.split(',');
-            }
-            // Separador " | " sin espacios
-            else if (texto.includes('|')) {
-                partes = texto.split('|');
-            }
-            // Si no hay separador, es una sola excursión
-            else if (texto.length > 0) {
+            if (partes.length === 0 && texto.length > 0) {
                 partes = [texto];
             }
-            
-            // Limpiar cada parte
-            partes = partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
-            
+            partes = partes.map(p => p.replace(/^\d+\.\s*/, ''));
             return partes;
         }
 
@@ -172,45 +152,26 @@
 
         async function cargarReservas() {
             try {
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td>';
+                document.getElementById('tablaReservas').innerHTML = '<td><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 const csvText = await response.text();
                 const filas = parseCSV(csvText);
                 
                 if (filas.length === 0) throw new Error('No se encontraron datos');
                 
-                // Mostrar encabezados para depuración
-                if (filas.length > 0) {
-                    console.log('📋 Encabezados encontrados:', filas[0]);
-                }
-                
                 reservasData = [];
                 const estadosGuardados = cargarEstadosGuardados();
                 
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
-                    if (fila.length < 3) continue;
+                    if (fila.length < 5) continue;
                     
                     const id = fila[0] || `R-${i}`;
                     const nombre = fila[2] || '';
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
-                    
-                    // BUSCAR EXCURSIONES EN MÚLTIPLES POSIBLES COLUMNAS
-                    let excursionesRaw = '';
-                    // Probar diferentes índices donde pueden estar las excursiones
-                    if (fila[8]) excursionesRaw = fila[8];      // Columna I (índice 8)
-                    else if (fila[6]) excursionesRaw = fila[6]; // Columna G
-                    else if (fila[7]) excursionesRaw = fila[7]; // Columna H
-                    
+                    const excursionesRaw = fila[8] || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
-                    
-                    // Mostrar depuración para la primera reserva
-                    if (i === 1) {
-                        console.log('🔍 Primera reserva - Excursiones raw:', excursionesRaw);
-                        console.log('🔍 Excursiones parseadas:', listaExcursiones);
-                        console.log('🔍 Fila completa:', fila);
-                    }
                     
                     const reserva = {
                         id: id,
@@ -221,15 +182,15 @@
                         pais: fila[6] || '',
                         ciudad: fila[7] || '',
                         excursionesLista: listaExcursiones,
-                        personas: fila[10] || fila[9] || '1',
-                        formaPago: fila[11] || fila[10] || 'No especificado',
-                        lugar: fila[12] || fila[11] || 'No especificado',
+                        personas: fila[10] || '1',
+                        formaPago: fila[11] || 'No especificado',
+                        lugar: fila[12] || 'No especificado',
                         estado: estadosGuardados[id] || 'confirmado'
                     };
                     reservasData.push(reserva);
                 }
                 
-                console.log(`📊 Cargadas ${reservasData.length} reservas`);
+                console.log(`Cargadas ${reservasData.length} reservas`);
                 reservasData.sort((a, b) => { const numA = parseInt(a.id.replace(/\D/g, '')) || 0; const numB = parseInt(b.id.replace(/\D/g, '')) || 0; return numB - numA; });
                 reservasFiltradas = [...reservasData];
                 renderizarTabla();
@@ -244,7 +205,7 @@
             document.getElementById('totalReservasSpan').textContent = `${reservasFiltradas.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td>';
+                tbody.innerHTML = '<td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td>';
                 return;
             }
             
@@ -259,7 +220,7 @@
                 
                 // Lista de excursiones (una debajo de la otra)
                 let excursionesHtml = '<ul class="excursiones-lista">';
-                if (!r.excursionesLista || r.excursionesLista.length === 0) {
+                if (r.excursionesLista.length === 0) {
                     excursionesHtml += '<li>Sin excursiones</li>';
                 } else {
                     r.excursionesLista.forEach(exc => { excursionesHtml += `<li>${escapeHtml(exc)}</li>`; });
@@ -269,16 +230,16 @@
                 return `
                     <tr>
                         <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td>${escapeHtml(r.fecha)}</td
-                        <td>${escapeHtml(r.nombre)}</td
-                        <td style="font-size:11px">${escapeHtml(r.email)}</td
-                        <td>${escapeHtml(r.telefono)}</td
-                        <td>${excursionesHtml}</td
-                        <td>${escapeHtml(r.ciudad)}</td
-                        <td>${escapeHtml(r.personas)}</td
-                        <td>${escapeHtml(r.formaPago)}</td
-                        <td>${escapeHtml(r.lugar)}</td
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
+                        <td>${escapeHtml(r.fecha)}</td>
+                        <td>${escapeHtml(r.nombre)}</td>
+                        <td style="font-size:11px">${escapeHtml(r.email)}</td>
+                        <td>${escapeHtml(r.telefono)}</td>
+                        <td>${excursionesHtml}</td>
+                        <td>${escapeHtml(r.ciudad)}</td>
+                        <td>${escapeHtml(r.personas)}</td>
+                        <td>${escapeHtml(r.formaPago)}</td>
+                        <td>${escapeHtml(r.lugar)}</td>
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
                         <td>
                             <div class="acciones-container">
                                 <div class="acciones-fila">
@@ -289,7 +250,7 @@
                                     <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰</button>
                                 </div>
                             </div>
-                        </td
+                        </td>
                     </tr>
                 `;
             }).join('');
