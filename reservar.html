@@ -70,6 +70,7 @@
         .form-group {
             flex: 1;
             min-width: 200px;
+            margin-bottom: 0;
         }
 
         label {
@@ -184,7 +185,7 @@
         }
 
         /* Checkbox de privacidad */
-        .checkbox-group {
+        .checkbox-privacidad {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -192,25 +193,26 @@
             padding: 14px 18px;
             border-radius: 16px;
             border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
         }
 
-        .checkbox-group input {
+        .checkbox-privacidad input {
             width: auto;
             margin: 0;
         }
 
-        .checkbox-group label {
+        .checkbox-privacidad label {
             margin: 0;
             font-weight: 500;
         }
 
-        .checkbox-group a {
+        .checkbox-privacidad a {
             color: #667eea;
             text-decoration: none;
             font-weight: 600;
         }
 
-        .checkbox-group a:hover {
+        .checkbox-privacidad a:hover {
             text-decoration: underline;
         }
 
@@ -226,7 +228,6 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 16px;
             letter-spacing: 0.5px;
         }
 
@@ -449,28 +450,28 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="nombre" class="required">Nombre</label>
-                    <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre">
+                    <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre" autocomplete="given-name">
                 </div>
                 <div class="form-group">
                     <label for="apellido" class="required">Apellido</label>
-                    <input type="text" id="apellido" name="apellido" required placeholder="Tu apellido">
+                    <input type="text" id="apellido" name="apellido" required placeholder="Tu apellido" autocomplete="family-name">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="email" class="required">Email</label>
-                    <input type="email" id="email" name="email" required placeholder="correo@ejemplo.com">
+                    <input type="email" id="email" name="email" required placeholder="correo@ejemplo.com" autocomplete="email">
                 </div>
                 <div class="form-group">
                     <label for="telefono" class="required">Teléfono</label>
-                    <input type="tel" id="telefono" name="telefono" required placeholder="+54 900 000 000">
+                    <input type="tel" id="telefono" name="telefono" required placeholder="+54 900 000 000" autocomplete="tel">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="pais" class="required">País</label>
-                <select id="pais" name="pais" required>
+                <select id="pais" name="pais" required autocomplete="country">
                     <option value="">Selecciona un país</option>
                     <option value="argentina">📌 Argentina</option>
                     <option value="brasil">📌 Brasil</option>
@@ -480,7 +481,7 @@
 
             <div class="form-group categoria-group" id="categoriaGroup" style="display: none;">
                 <label for="categoria" class="required">Ciudad</label>
-                <select id="categoria" name="categoria" required disabled>
+                <select id="categoria" name="categoria" required disabled autocomplete="address-level2">
                     <option value="">Selecciona una ciudad</option>
                 </select>
             </div>
@@ -493,22 +494,22 @@
                 </div>
             </div>
 
-            <input type="hidden" id="fecha" name="fecha">
+            <input type="hidden" id="fecha" name="fecha" autocomplete="off">
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="fecha_mostrar" class="required">Fecha de reserva</label>
-                    <input type="text" id="fecha_mostrar" readonly placeholder="Fecha del sistema">
+                    <input type="text" id="fecha_mostrar" readonly placeholder="Fecha del sistema" autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label for="personas" class="required">Nº de personas</label>
-                    <input type="number" id="personas" name="personas" min="1" max="20" value="1" required>
+                    <input type="number" id="personas" name="personas" min="1" max="20" value="1" required autocomplete="off">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="formaPago" class="required">Forma de Pago</label>
-                <select id="formaPago" name="formaPago" required>
+                <select id="formaPago" name="formaPago" required autocomplete="off">
                     <option value="">Selecciona una forma de pago</option>
                     <option value="Efectivo">💵 Efectivo</option>
                     <option value="Débito/Crédito">💳 Débito/Crédito</option>
@@ -518,10 +519,10 @@
 
             <div class="form-group">
                 <label for="mensaje">📍 ¿Dónde te buscamos?</label>
-                <input type="text" id="mensaje" name="mensaje" placeholder="Hotel donde estás alojado y número de habitación">
+                <input type="text" id="mensaje" name="mensaje" placeholder="Hotel donde estás alojado y número de habitación" autocomplete="off">
             </div>
 
-            <div class="checkbox-group">
+            <div class="checkbox-privacidad">
                 <input type="checkbox" id="privacidad" name="privacidad" required>
                 <label for="privacidad">
                     He leído y acepto la <a href="#" id="linkPrivacidad">política de privacidad</a>
@@ -589,7 +590,7 @@
         }
         establecerFechaSistema();
 
-        // ========== LÓGICA DE EXCURSIONES (EXACTAMENTE IGUAL) ==========
+        // ========== LÓGICA DE EXCURSIONES ==========
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDfnWspKv8KY8iQWip20iUUn6c9LHZvAlpKL3WaIaz74EAHbjrcWhxMC3OVGx1yv_w_A/exec';
         
         const paisSelect = document.getElementById('pais');
@@ -599,25 +600,24 @@
         const checkboxExcursiones = document.getElementById('checkboxExcursiones');
         const contadorSeleccionados = document.getElementById('contadorSeleccionados');
         const form = document.getElementById('excursionForm');
-        const submitBtn = document.getElementById('submitBtn');
         const statusMessage = document.getElementById('statusMessage');
 
         const excursiones = {
             argentina: {
-                "🎭 Villa Carlos Paz": ["✔️ Aerosilla", "✔️ Capilla del Monte y Norte Cordobés", "✔️ Circuito de la Cerveza y Bosques", "✔️ City Tour Local", "✔️ Mina Clavero", "✔️ Noche de Teatros", "✔️ Paseo de Catamarán", "✔️ Pekos Multiparque"],
-                "🏖️ Mar del Plata": ["✔️ Aquarium Mar del Plata", "✔️ City Tour Histórico y Panorámico", "✔️ Complejo Puerto y Banquina de Pescadores", "✔️ Excursión a Sierra de los Padres", "✔️ Fábricas de Alfajores", "✔️ Gruta de Lourdes", "✔️ Noche de Teatros", "✔️ Torre Tanque"],
-                "🎿 Bariloche": ["✔️ Ascenso al Cerro Campanario", "✔️ Cerro Catedral", "✔️ Cerro Otto y Teleférico", "✔️ Circuito Chico", "✔️ Circuito Grande", "✔️ Excursión a El Bolsón", "✔️ Isla Victoria", "✔️ Ruta de las Chocolaterías"],
-                "🍇 Mendoza": ["✔️ Alta Montaña por la Ruta 7", "✔️ Camino del Vino", "✔️ City Tour y Parque General San Martín", "✔️ Fábricas de Chocolates", "✔️ Mirador del Cerro Aconcagua", "✔️ San Rafael", "✔️ Termas de Cacheuta", "✔️ Valle de Uco"],
-                "☃️ Ushuaia": ["✔️ Centros Invernales", "✔️ City Tour Histórico", "✔️ Estancia Harberton", "✔️ Lagos Fagnano", "✔️ Glaciar Martial", "✔️ Canal Beagle", "✔️ Parque Nacional", "✔️ Tren del Fin del Mundo"],
-                "🚤 Cataratas del Iguazú": ["✔️ Ciudad del Este", "✔️ Duty Free Shop", "✔️ Gran Aventura", "✔️ Hito de las Tres Fronteras", "✔️ Icebar Iguazú", "✔️ Parque de las Aves", "✔️ Parque Nacional Iguazú", "✔️ Ruinas de San Ignacio"]
+                "🎭 Villa Carlos Paz": ["✔️ Aerosilla", "✔️ Capilla del Monte", "✔️ Circuito de la Cerveza", "✔️ City Tour Local", "✔️ Mina Clavero", "✔️ Noche de Teatros", "✔️ Paseo de Catamarán", "✔️ Pekos Multiparque"],
+                "🏖️ Mar del Plata": ["✔️ Aquarium", "✔️ City Tour Histórico", "✔️ Puerto y Banquina", "✔️ Sierra de los Padres", "✔️ Fábricas de Alfajores", "✔️ Gruta de Lourdes", "✔️ Noche de Teatros", "✔️ Torre Tanque"],
+                "🎿 Bariloche": ["✔️ Cerro Campanario", "✔️ Cerro Catedral", "✔️ Cerro Otto", "✔️ Circuito Chico", "✔️ Circuito Grande", "✔️ El Bolsón", "✔️ Isla Victoria", "✔️ Ruta de las Chocolaterías"],
+                "🍇 Mendoza": ["✔️ Alta Montaña", "✔️ Camino del Vino", "✔️ City Tour", "✔️ Fábricas de Chocolates", "✔️ Cerro Aconcagua", "✔️ San Rafael", "✔️ Termas de Cacheuta", "✔️ Valle de Uco"],
+                "☃️ Ushuaia": ["✔️ Centros Invernales", "✔️ City Tour", "✔️ Estancia Harberton", "✔️ Lagos Fagnano", "✔️ Glaciar Martial", "✔️ Canal Beagle", "✔️ Parque Nacional", "✔️ Tren del Fin del Mundo"],
+                "🚤 Cataratas del Iguazú": ["✔️ Ciudad del Este", "✔️ Duty Free Shop", "✔️ Gran Aventura", "✔️ Hito de las Tres Fronteras", "✔️ Icebar", "✔️ Parque de las Aves", "✔️ Parque Nacional", "✔️ Ruinas de San Ignacio"]
             },
             brasil: {
                 "🏖️ Balneário Camboriú": ["✔️ Barco Pirata", "✔️ Bombinhas", "✔️ City Tour", "✔️ Oceanic Aquarium", "✔️ Cristo Luz", "✔️ Beto Carrero World", "✔️ Parque Unipraias"],
-                "🏖️ Florianópolis": ["✔️ Circuito de Playas del Norte", "✔️ City Tour Histórico", "✔️ Isla de Anhatomirim", "✔️ Playas del Sur", "✔️ Ilha do Campeche"],
+                "🏖️ Florianópolis": ["✔️ Circuito de Playas del Norte", "✔️ City Tour", "✔️ Isla de Anhatomirim", "✔️ Playas del Sur", "✔️ Ilha do Campeche"],
                 "🏖️ Itapema": ["✔️ Beto Carrero", "✔️ Bombinhas", "✔️ Costa Esmeralda", "✔️ Porto Belo", "✔️ Ruta de los Alambiques"]
             },
             chile: {
-                "⛰️ Santiago de Chile": ["✔️ City Tour Histórico", "✔️ Sky Costanera", "✔️ Viña del Mar y Valparaíso", "✔️ Viñedos del Maipo", "✔️ Cajón del Maipo", "✔️ Cerro San Cristóbal", "✔️ Valle Nevado"]
+                "⛰️ Santiago de Chile": ["✔️ City Tour", "✔️ Sky Costanera", "✔️ Viña del Mar", "✔️ Viñedos del Maipo", "✔️ Cajón del Maipo", "✔️ Cerro San Cristóbal", "✔️ Valle Nevado"]
             }
         };
 
