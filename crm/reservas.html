@@ -15,7 +15,7 @@
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
         .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
-        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; border: none; }
         .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h1 { font-size: 26px; color: #1a1a2e; }
@@ -84,7 +84,15 @@
         </div>
         <div class="table-container">
             <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0</span></div>
-            <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Cliente</th><th>Email</th><th>Ciudad</th><th>Excursión</th><th>Fecha</th><th>Pax</th><th>Pago</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tablaReservas"><tr><td colspan="10" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr></tbody>}</div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Cliente</th><th>Email</th><th>Ciudad</th><th>Excursión</th><th>Fecha</th><th>Pax</th><th>Pago</th><th>Estado</th><th>Acciones</th>
+                    </thead>
+                    <tbody id="tablaReservas"><tr><td colspan="10" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>
+                </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <div class="modal-overlay" id="modalReserva"><div class="modal-content"><div class="modal-header"><h2>📋 Detalle</h2><button class="modal-close" onclick="cerrarModal()">✕</button></div><div class="modal-info" id="modalInfo"></div><div class="modal-acciones">
@@ -134,7 +142,10 @@
                     
                     const limpiado = fila.map(c => c.replace(/^"|"$/g, '').trim());
                     
-                    if (limpiado.length >= 13) {
+                    // Mapeo CORREGIDO de columnas según Google Sheets:
+                    // Columna 0: ID, 1: Fecha Reserva, 2: Nombre, 3: Apellido, 4: Email, 5: Teléfono, 
+                    // 6: País, 7: Ciudad, 8: Excursión, 9: Fecha, 10: Personas, 11: Forma de pago, 12: Lugar
+                    if (limpiado.length >= 11) {
                         const reserva = {
                             id: limpiado[0] || `R${i}`,
                             nombre: limpiado[2] || '',
@@ -146,13 +157,16 @@
                             excursion: limpiado[8] || '',
                             fecha: limpiado[9] || '',
                             personas: limpiado[10] || '0',
-                            formaPago: limpiado[12] || 'No especificada',  // ← Toma LUGAR (columna 12)
-                            busqueda: limpiado[11] || 'No especificado',   // ← Toma FORMA DE PAGO (columna 11)
+                            formaPago: (limpiado[11] && limpiado[11] !== '') ? limpiado[11] : 'No especificado',  // ← CORREGIDO: columna 11 = Forma de pago
+                            lugar: (limpiado[12] && limpiado[12] !== '') ? limpiado[12] : 'No especificado',      // ← CORREGIDO: columna 12 = Lugar
                             estado: 'confirmado'
                         };
                         reservasData.push(reserva);
                     }
                 }
+                
+                console.log('Reservas cargadas:', reservasData.length);
+                console.log('Primera reserva (verificar Pago y Lugar):', reservasData[0]);
                 
                 reservasData.sort((a, b) => { 
                     const na = parseInt(a.id.replace(/\D/g,''))||0; 
@@ -172,6 +186,7 @@
                 renderReservas(reservasData); 
                 actualizarContadores();
             } catch(e) { 
+                console.error('Error:', e);
                 document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="10" style="text-align:center;color:red;padding:30px;">Error: '+e.message+'</td></tr>'; 
             }
         }
@@ -195,7 +210,23 @@
                     const l = e.split('\n').filter(x => x.trim()); 
                     e = l[0].trim().replace(/^\d+\.\s*/,'').substring(0,20) + (l.length>1?` (+${l.length-1})`:''); 
                 } else e = e.substring(0,20); 
-                return `<tr><td><strong>${r.id}</strong></td><td>${r.nombre} ${r.apellido}</td><td style="font-size:11px">${r.email}</td><td>${r.ciudad}</td><td>${e}</td><td>${r.fecha}</td><td>${r.personas}</td><td>${r.formaPago}</td><td><span class="badge badge-${r.estado}">${r.estado}</span></td><td style="white-space:nowrap;"><button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button><button class="btn-accion btn-pendiente" onclick="cambiarEstadoDirecto('${r.id}','pendiente')" title="Marcar Pendiente">⏳</button><button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')" title="Confirmar">✅</button><button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')" title="Marcar Pagada">💰</button></td></tr>`; 
+                return `<tr>
+                    <td><strong>${r.id}</strong></td>
+                    <td>${r.nombre} ${r.apellido}</td>
+                    <td style="font-size:11px">${r.email}</td>
+                    <td>${r.ciudad}</td>
+                    <td>${e}</td>
+                    <td>${r.fecha}</td>
+                    <td>${r.personas}</td>
+                    <td>${r.formaPago}</td>
+                    <td><span class="badge badge-${r.estado}">${r.estado}</span></td>
+                    <td style="white-space:nowrap;">
+                        <button class="btn-accion btn-ver" onclick="verReserva('${r.id}')">👁️</button>
+                        <button class="btn-accion btn-pendiente" onclick="cambiarEstadoDirecto('${r.id}','pendiente')" title="Marcar Pendiente">⏳</button>
+                        <button class="btn-accion btn-confirmar" onclick="cambiarEstadoDirecto('${r.id}','confirmado')" title="Confirmar">✅</button>
+                        <button class="btn-accion btn-pagar" onclick="cambiarEstadoDirecto('${r.id}','pagado')" title="Marcar Pagada">💰</button>
+                    </td>
+                </tr>`;
             }).join(''); 
         }
         
@@ -203,15 +234,15 @@
             estadoFiltro = e; 
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); 
             event.target.classList.add('active'); 
-            renderReservas(e === 'todas' ? reservasData : reservasData.filter(r => r.estado === e)); 
+            const filtradas = e === 'todas' ? reservasData : reservasData.filter(r => r.estado === e);
+            renderReservas(filtradas); 
         }
         
         function filtrarReservas() { 
             const b = document.getElementById('busquedaReserva').value.toLowerCase(); 
             const ciudad = document.getElementById('filtroCiudad').value; 
-            let f = reservasData; 
-            if (estadoFiltro !== 'todas') f = f.filter(r => r.estado === estadoFiltro); 
-            if (b) f = f.filter(r => r.id.toLowerCase().includes(b) || r.nombre.toLowerCase().includes(b) || r.email.toLowerCase().includes(b) || (r.excursion||'').toLowerCase().includes(b)); 
+            let f = estadoFiltro === 'todas' ? reservasData : reservasData.filter(r => r.estado === estadoFiltro);
+            if (b) f = f.filter(r => r.id.toLowerCase().includes(b) || (r.nombre+' '+r.apellido).toLowerCase().includes(b) || r.email.toLowerCase().includes(b) || (r.excursion||'').toLowerCase().includes(b)); 
             if (ciudad) f = f.filter(r => r.ciudad === ciudad); 
             renderReservas(f); 
         }
@@ -222,7 +253,20 @@
                 let ex = ''; 
                 const er = reservaSeleccionada.excursion || ''; 
                 if (er.includes('\n')) ex = er.split('\n').filter(e => e.trim()).map(e => `<div class="excursion-tag-modal">${e.trim()}</div>`).join(''); 
-                document.getElementById('modalInfo').innerHTML = `<p><strong>ID:</strong> ${reservaSeleccionada.id}</p><p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p><p><strong>Email:</strong> ${reservaSeleccionada.email}</p><p><strong>Tel:</strong> ${reservaSeleccionada.telefono}</p><p><strong>País:</strong> ${reservaSeleccionada.pais}</p><p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p><p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p><p><strong>Pax:</strong> ${reservaSeleccionada.personas}</p><p><strong>Pago:</strong> ${reservaSeleccionada.formaPago}</p><p><strong>Lugar:</strong> ${reservaSeleccionada.busqueda}</p><p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p><div style="margin-top:12px"><strong>🕐 Excursiones:</strong><div>${ex || reservaSeleccionada.excursion || 'No especificado'}</div></div>`; 
+                document.getElementById('modalInfo').innerHTML = `
+                    <p><strong>ID:</strong> ${reservaSeleccionada.id}</p>
+                    <p><strong>Cliente:</strong> ${reservaSeleccionada.nombre} ${reservaSeleccionada.apellido}</p>
+                    <p><strong>Email:</strong> ${reservaSeleccionada.email}</p>
+                    <p><strong>Tel:</strong> ${reservaSeleccionada.telefono}</p>
+                    <p><strong>País:</strong> ${reservaSeleccionada.pais}</p>
+                    <p><strong>Ciudad:</strong> ${reservaSeleccionada.ciudad}</p>
+                    <p><strong>Fecha:</strong> ${reservaSeleccionada.fecha}</p>
+                    <p><strong>Pax:</strong> ${reservaSeleccionada.personas}</p>
+                    <p><strong>Forma de Pago:</strong> ${reservaSeleccionada.formaPago}</p>
+                    <p><strong>Lugar:</strong> ${reservaSeleccionada.lugar}</p>
+                    <p><strong>Estado:</strong> <span class="badge badge-${reservaSeleccionada.estado}">${reservaSeleccionada.estado}</span></p>
+                    <div style="margin-top:12px"><strong>🕐 Excursiones:</strong><div>${ex || reservaSeleccionada.excursion || 'No especificado'}</div></div>
+                `; 
                 document.getElementById('modalReserva').classList.add('show'); 
             } 
         }
