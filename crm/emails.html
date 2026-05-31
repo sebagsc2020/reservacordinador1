@@ -33,7 +33,7 @@
         .resultado-item:hover { background: #e8f5e9; } 
         .resultado-nombre { font-weight: 600; font-size: 13px; } 
         .resultado-telefono { color: #25D366; font-weight: 600; font-size: 12px; }
-        .resultado-email { font-size: 10px; color: #999; } 
+        .resultado-email { font-size: 10px; color: #666; } 
         .resultado-info { flex: 1; }
         
         .whatsapp-composer { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
@@ -49,7 +49,6 @@
         .btn-enviar:hover { background: #1da851; }
         .mensaje-exito { background: #d4edda; color: #155724; padding: 10px; border-radius: 8px; margin-top: 12px; display: none; font-weight: 600; text-align: center; font-size: 13px; }
         .mensaje-exito.show { display: block; }
-        .cliente-badge { display: inline-block; background: #e8f5e9; color: #25D366; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 11px; margin-top: 5px; }
         .cliente-detalle { background: #f0f7ff; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 12px; border-left: 3px solid #25D366; }
         .cliente-detalle strong { color: #1a1a2e; }
         
@@ -69,6 +68,9 @@
         td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; } 
         .badge-enviado { background: #d4edda; color: #155724; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
         .btn-reenviar { padding: 4px 10px; background: #25D366; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 10px; }
+        
+        .cargando { text-align: center; padding: 20px; color: #666; }
+        .error-carga { text-align: center; padding: 20px; color: red; background: #fee; border-radius: 8px; }
         
         @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 12px; } .form-row { flex-direction: column; } }
     </style>
@@ -98,12 +100,12 @@
         
         <div class="template-section"><h3>📝 Plantillas</h3>
             <div class="template-grid">
-                <div class="template-card" onclick="aplicarPlantilla('confirmacion')"><div class="template-icon">✅</div><h4>Confirmación</h4><p>Confirmar reserva</p></div>
-                <div class="template-card" onclick="aplicarPlantilla('recordatorio')"><div class="template-icon">🔔</div><h4>Recordatorio</h4><p>Pagos pendientes</p></div>
-                <div class="template-card" onclick="aplicarPlantilla('salida')"><div class="template-icon">🚌</div><h4>Día Antes</h4><p>24hs antes</p></div>
-                <div class="template-card" onclick="aplicarPlantilla('agradecimiento')"><div class="template-icon">🙏</div><h4>Post-Excursión</h4><p>Agradecimiento</p></div>
-                <div class="template-card" onclick="aplicarPlantilla('promocion')"><div class="template-icon">🎉</div><h4>Promoción</h4><p>Ofertas</p></div>
-                <div class="template-card" onclick="aplicarPlantilla('personalizado')"><div class="template-icon">✏️</div><h4>Personalizado</h4><p>Tu mensaje</p></div>
+                <div class="template-card" onclick="cargarPlantilla('confirmacion')"><div class="template-icon">✅</div><h4>Confirmación</h4><p>Confirmar reserva</p></div>
+                <div class="template-card" onclick="cargarPlantilla('recordatorio')"><div class="template-icon">🔔</div><h4>Recordatorio</h4><p>Pagos pendientes</p></div>
+                <div class="template-card" onclick="cargarPlantilla('salida')"><div class="template-icon">🚌</div><h4>Día Antes</h4><p>24hs antes</p></div>
+                <div class="template-card" onclick="cargarPlantilla('agradecimiento')"><div class="template-icon">🙏</div><h4>Post-Excursión</h4><p>Agradecimiento</p></div>
+                <div class="template-card" onclick="cargarPlantilla('promocion')"><div class="template-icon">🎉</div><h4>Promoción</h4><p>Ofertas</p></div>
+                <div class="template-card" onclick="cargarPlantilla('personalizado')"><div class="template-icon">✏️</div><h4>Personalizado</h4><p>Tu mensaje</p></div>
             </div>
         </div>
         
@@ -113,13 +115,13 @@
                 <div class="form-group"><label>📞 WhatsApp:</label><input type="text" id="whatsappNumero" placeholder="Ej: 5493518692251"></div>
                 <div class="form-group"><label>👤 Cliente:</label><input type="text" id="whatsappCliente" readonly placeholder="Seleccionar cliente"></div>
             </div>
-            <div id="clienteDetalleDiv" class="cliente-detalle" style="display:none;"></div>
-            <div class="form-group"><label>💬 Mensaje:</label><textarea id="whatsappMensaje" placeholder="Escribe tu mensaje..."></textarea></div>
+            <div id="clienteDetalleDiv" style="display:none;"></div>
+            <div class="form-group"><label>💬 Mensaje:</label><textarea id="whatsappMensaje" placeholder="Escribe tu mensaje...&#10;&#10;Puedes usar:&#10;[NOMBRE] - Nombre del cliente&#10;[EXCURSION] - Excursión seleccionada&#10;[FECHA] - Fecha de la reserva&#10;[PERSONAS] - Cantidad de personas&#10;[PAGO] - Forma de pago&#10;[LUGAR] - Punto de encuentro"></textarea></div>
             <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
                 <button class="btn-enviar" onclick="enviarWhatsApp()">💬 Enviar</button>
                 <button class="btn-enviar" style="background:#128C7E;" onclick="abrirWhatsAppWeb()">🌐 Web</button>
             </div>
-            <div class="mensaje-exito" id="mensajeExito">✅ Mensaje enviado</div>
+            <div class="mensaje-exito" id="mensajeExito">✅ Mensaje listo para enviar</div>
         </div>
         
         <div class="historial-table"><h3>📋 Historial</h3>
@@ -129,63 +131,50 @@
     
     <script>
         // ==================================================
-        // CONFIGURACIÓN - USA LA MISMA API QUE RESERVAS
+        // CONFIGURACIÓN - PON AQUÍ LA URL DE TU WEB APP
         // ==================================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbwqcab0xv3hXgyIc1vE9VvlFMRTrROnpFe-T48Auod-K7UTdSQj60Ts3sTWCPlCtJcSLg/exec';
         
         // ==================================================
-        // VERIFICAR AUTENTICACIÓN
-        // ==================================================
-        if (sessionStorage.getItem('crm_logged') !== 'true') { 
-            window.location.href = 'index.html'; 
-        }
-        
-        function logout() { 
-            sessionStorage.clear(); 
-            window.location.href = 'index.html'; 
-        }
-        
-        // ==================================================
         // VARIABLES GLOBALES
         // ==================================================
-        let clientesData = [];
-        let reservasData = [];
-        let clienteSeleccionadoActual = null;
-        let reservaSeleccionadaActual = null;
+        let listaClientes = [];
+        let listaReservas = [];
+        let clienteActual = null;
+        let reservaActual = null;
         
         // ==================================================
         // PLANTILLAS
         // ==================================================
-        const plantillasTexto = {
+        const PLANTILLAS = {
             confirmacion: `✅ ¡Hola [NOMBRE]!\n\nTu reserva en Aventura Total ha sido CONFIRMADA.\n\n📍 Detalles:\n• Excursión: [EXCURSION]\n• Fecha: [FECHA]\n• Personas: [PERSONAS]\n• Forma de Pago: [PAGO]\n• Lugar: [LUGAR]\n\n🏔️ ¡Gracias por confiar en nosotros!`,
             recordatorio: `🔔 ¡Hola [NOMBRE]!\n\nTenés un pago pendiente por tu reserva.\n\n💳 Podés abonar por:\n• Efectivo\n• Débito/Crédito\n• Transferencia\n\n🏔️ Aventura Total`,
             salida: `🚌 ¡Hola [NOMBRE]!\n\n¡Mañana es tu excursión! 🌟\n\n🎒 Llevá:\n• Ropa cómoda\n• Protector solar\n• Agua\n• Cámara\n\n📍 Punto de encuentro: [LUGAR]\n\n🏔️ Aventura Total`,
             agradecimiento: `🙏 ¡Hola [NOMBRE]!\n\n¿Disfrutaste la excursión?\n\n⭐ ¡Dejanos una reseña!\n\n🎉 10% OFF en tu próxima reserva.\n\n🏔️ Aventura Total`,
             promocion: `🎉 ¡Hola [NOMBRE]!\n\nBeneficios exclusivos para vos:\n🔥 15% OFF en próxima reserva\n👥 2x1 en excursiones seleccionadas\n\n🏔️ Aventura Total`,
-            personalizado: ``
+            personalizado: `Hola [NOMBRE], escribí tu mensaje personalizado aquí.`
         };
         
         // ==================================================
-        // REEMPLAZAR PLACEHOLDERS EN MENSAJE
+        // FUNCIÓN PARA REEMPLAZAR PLACEHOLDERS
         // ==================================================
-        function reemplazarPlaceholders(mensaje, nombre, reserva) {
-            if (!mensaje) return '';
+        function reemplazarVariables(texto, nombre, reserva) {
+            if (!texto) return '';
+            let resultado = texto;
             
-            let resultado = mensaje;
-            
-            // Reemplazar [NOMBRE]
+            // Reemplazar nombre
             resultado = resultado.replace(/\[NOMBRE\]/g, nombre || '[CLIENTE]');
             
             if (reserva) {
-                // Obtener primera excursión de la lista
-                let excursionesTexto = reserva.excursiones || '';
-                let primeraExcursion = excursionesTexto.split('\n')[0] || excursionesTexto.split(' | ')[0] || '[EXCURSION]';
+                // Obtener primera excursión (sin el ✔️)
+                let excursionesRaw = reserva.excursiones || '';
+                let primeraExcursion = excursionesRaw.split('\n')[0] || excursionesRaw;
                 primeraExcursion = primeraExcursion.replace(/^✔️\s*/, '').trim();
                 
-                resultado = resultado.replace(/\[EXCURSION\]/g, primeraExcursion);
+                resultado = resultado.replace(/\[EXCURSION\]/g, primeraExcursion || '[EXCURSION]');
                 resultado = resultado.replace(/\[FECHA\]/g, reserva.fecha || '[FECHA]');
                 resultado = resultado.replace(/\[PERSONAS\]/g, reserva.personas || '[PERSONAS]');
-                resultado = resultado.replace(/\[PAGO\]/g, reserva.formaPago || '[PAGO]');
+                resultado = resultado.replace(/\[PAGO\]/g, reserva.formaPago || reserva.formapago || '[PAGO]');
                 resultado = resultado.replace(/\[LUGAR\]/g, reserva.lugar || '[LUGAR]');
             } else {
                 resultado = resultado.replace(/\[EXCURSION\]/g, '[EXCURSION]');
@@ -199,48 +188,108 @@
         }
         
         // ==================================================
-        // ACTUALIZAR MENSAJE ACTUAL CON DATOS DEL CLIENTE
+        // ACTUALIZAR MENSAJE ACTUAL
         // ==================================================
-        function actualizarMensajeConCliente() {
+        function actualizarMensajeActual() {
             const msgTextarea = document.getElementById('whatsappMensaje');
             if (!msgTextarea) return;
             
             const mensajeActual = msgTextarea.value;
-            const cliente = clienteSeleccionadoActual;
-            const reserva = reservaSeleccionadaActual;
-            const nombre = cliente ? cliente.nombre : '';
-            
-            const nuevoMensaje = reemplazarPlaceholders(mensajeActual, nombre, reserva);
-            msgTextarea.value = nuevoMensaje;
+            const nombre = clienteActual ? clienteActual.nombre : '';
+            const mensajeActualizado = reemplazarVariables(mensajeActual, nombre, reservaActual);
+            msgTextarea.value = mensajeActualizado;
         }
         
         // ==================================================
-        // APLICAR PLANTILLA (reemplaza todo el mensaje)
+        // CARGAR PLANTILLA
         // ==================================================
-        function aplicarPlantilla(tipo) {
-            let plantilla = plantillasTexto[tipo] || '';
-            const cliente = clienteSeleccionadoActual;
-            const reserva = reservaSeleccionadaActual;
-            const nombre = cliente ? cliente.nombre : '';
-            
-            const mensajeCompleto = reemplazarPlaceholders(plantilla, nombre, reserva);
+        function cargarPlantilla(tipo) {
+            let plantilla = PLANTILLAS[tipo] || '';
+            const nombre = clienteActual ? clienteActual.nombre : '';
+            const mensajeConDatos = reemplazarVariables(plantilla, nombre, reservaActual);
             
             const msgTextarea = document.getElementById('whatsappMensaje');
             if (msgTextarea) {
-                msgTextarea.value = mensajeCompleto;
+                msgTextarea.value = mensajeConDatos;
             }
+        }
+        
+        // ==================================================
+        // SELECCIONAR CLIENTE
+        // ==================================================
+        function seleccionarCliente(cliente) {
+            console.log('📌 Seleccionando cliente:', cliente);
+            clienteActual = cliente;
+            
+            // Buscar reserva más reciente de este cliente
+            const reservasCliente = listaReservas.filter(r => r.email && r.email.toLowerCase() === cliente.email.toLowerCase());
+            if (reservasCliente.length > 0) {
+                reservaActual = reservasCliente[reservasCliente.length - 1];
+            } else {
+                reservaActual = null;
+            }
+            
+            console.log('📌 Reserva encontrada:', reservaActual);
+            
+            // Actualizar campos
+            const numeroInput = document.getElementById('whatsappNumero');
+            const nombreInput = document.getElementById('whatsappCliente');
+            
+            if (numeroInput) numeroInput.value = cliente.telefono || '';
+            if (nombreInput) nombreInput.value = cliente.nombre || '';
+            
+            // Mostrar detalles
+            const detalleDiv = document.getElementById('clienteDetalleDiv');
+            if (detalleDiv && reservaActual) {
+                let excursionesPreview = (reservaActual.excursiones || '').split('\n')[0] || '';
+                excursionesPreview = excursionesPreview.replace(/^✔️\s*/, '').substring(0, 50);
+                
+                detalleDiv.style.display = 'block';
+                detalleDiv.className = 'cliente-detalle';
+                detalleDiv.innerHTML = `
+                    <strong>📋 Última reserva:</strong><br>
+                    🕐 ${excursionesPreview || 'No especificada'}<br>
+                    📅 ${reservaActual.fecha || 'No especificada'} | 👥 ${reservaActual.personas || '1'} pax<br>
+                    💳 ${reservaActual.formaPago || reservaActual.formapago || 'No especificada'} | 📍 ${reservaActual.lugar || 'No especificado'}
+                `;
+            } else if (detalleDiv) {
+                detalleDiv.style.display = 'none';
+            }
+            
+            // Actualizar mensaje actual con los datos del cliente
+            actualizarMensajeActual();
+            
+            // Guardar en localStorage
+            localStorage.setItem('ultimoClienteWhatsApp', JSON.stringify({
+                nombre: cliente.nombre,
+                email: cliente.email,
+                telefono: cliente.telefono
+            }));
+            
+            // Cerrar resultados
+            const resultadosDiv = document.getElementById('resultadosBusqueda');
+            if (resultadosDiv) resultadosDiv.classList.remove('show');
+            
+            // Limpiar buscador
+            const buscadorInput = document.getElementById('buscadorCliente');
+            if (buscadorInput) buscadorInput.value = '';
         }
         
         // ==================================================
         // CARGAR DATOS DESDE LA API
         // ==================================================
         async function cargarDatos() {
+            const buscadorContainer = document.querySelector('.buscador-container');
+            if (!buscadorContainer) return;
+            
             try {
                 console.log('📡 Cargando datos desde API...');
                 const response = await fetch(API_URL);
+                
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const resultado = await response.json();
+                console.log('📦 Respuesta API:', resultado);
                 
                 if (resultado.error) throw new Error(resultado.error);
                 if (!resultado.data) throw new Error('No se recibieron datos');
@@ -248,111 +297,124 @@
                 const datos = resultado.data;
                 console.log(`📊 Recibidos ${datos.length} registros`);
                 
-                // Procesar clientes únicos por email
-                const clientesMap = {};
-                reservasData = [];
+                // Limpiar listas
+                listaReservas = [];
+                const clientesMap = new Map();
                 
-                for (let i = 0; i < datos.length; i++) {
-                    const fila = datos[i];
-                    const email = fila.email || '';
-                    const telefono = fila.telefono || '';
-                    const nombre = fila.nombre || '';
-                    const apellido = fila.apellido || '';
-                    const nombreCompleto = `${nombre} ${apellido}`.trim() || 'Sin nombre';
-                    
-                    // Agregar a clientes únicos
-                    if (email && !clientesMap[email.toLowerCase()]) {
-                        clientesMap[email.toLowerCase()] = {
-                            nombre: nombreCompleto,
-                            email: email,
-                            telefono: telefono,
-                            pais: fila.pais || '',
-                            ciudad: fila.ciudad || ''
-                        };
-                    }
+                // Procesar cada registro
+                for (const item of datos) {
+                    const email = item.email || '';
+                    const telefono = item.telefono || '';
+                    const nombre = `${item.nombre || ''} ${item.apellido || ''}`.trim() || 'Sin nombre';
                     
                     // Guardar reserva
-                    reservasData.push({
-                        id: fila.id || `R-${i}`,
-                        nombre: nombreCompleto,
+                    listaReservas.push({
+                        id: item.id || '',
+                        nombre: nombre,
                         email: email,
                         telefono: telefono,
-                        pais: fila.pais || '',
-                        ciudad: fila.ciudad || '',
-                        excursiones: fila.excursiones || '',
-                        fecha: fila.fecha || '',
-                        personas: fila.personas || '1',
-                        formaPago: fila.formapago || fila.formaPago || 'No especificado',
-                        lugar: fila.lugar || 'No especificado',
-                        timestamp: fila.timestamp || ''
+                        pais: item.pais || '',
+                        ciudad: item.ciudad || '',
+                        excursiones: item.excursiones || '',
+                        fecha: item.fecha || '',
+                        personas: item.personas || '1',
+                        formaPago: item.formapago || item.formaPago || '',
+                        lugar: item.lugar || '',
+                        timestamp: item.timestamp || ''
                     });
+                    
+                    // Agregar a mapa de clientes (uno por email)
+                    if (email && !clientesMap.has(email.toLowerCase())) {
+                        clientesMap.set(email.toLowerCase(), {
+                            nombre: nombre,
+                            email: email,
+                            telefono: telefono
+                        });
+                    }
                 }
                 
-                clientesData = Object.values(clientesMap);
-                console.log(`✅ Clientes únicos: ${clientesData.length}, Reservas: ${reservasData.length}`);
+                listaClientes = Array.from(clientesMap.values());
+                console.log(`✅ Clientes únicos: ${listaClientes.length}, Reservas: ${listaReservas.length}`);
                 
-                mostrarHistorial();
+                // Si hay un último cliente guardado, seleccionarlo automáticamente
+                const ultimo = localStorage.getItem('ultimoClienteWhatsApp');
+                if (ultimo) {
+                    try {
+                        const ultimoCliente = JSON.parse(ultimo);
+                        const clienteEncontrado = listaClientes.find(c => c.email === ultimoCliente.email);
+                        if (clienteEncontrado) {
+                            seleccionarCliente(clienteEncontrado);
+                        }
+                    } catch(e) {}
+                }
+                
+                // Mostrar mensaje de éxito
+                const resultadosDiv = document.getElementById('resultadosBusqueda');
+                if (resultadosDiv && resultadosDiv.innerHTML === '') {
+                    resultadosDiv.innerHTML = '<div class="resultado-item" style="justify-content:center;">✅ Datos cargados correctamente</div>';
+                    setTimeout(() => {
+                        if (resultadosDiv.innerHTML.includes('Datos cargados')) {
+                            resultadosDiv.innerHTML = '';
+                        }
+                    }, 2000);
+                }
                 
             } catch (error) {
-                console.error('❌ Error al cargar:', error);
-                const histEl = document.getElementById('historialWhatsApp');
-                if (histEl) histEl.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Error: ${error.message}</td</td`;
+                console.error('❌ Error:', error);
+                const resultadosDiv = document.getElementById('resultadosBusqueda');
+                if (resultadosDiv) {
+                    resultadosDiv.innerHTML = `<div class="resultado-item" style="justify-content:center;color:red;">❌ Error: ${error.message}</div>`;
+                    resultadosDiv.classList.add('show');
+                    setTimeout(() => resultadosDiv.classList.remove('show'), 3000);
+                }
             }
         }
         
         // ==================================================
-        // BUSCAR ÚLTIMA RESERVA POR EMAIL
+        // BUSCADOR EN TIEMPO REAL
         // ==================================================
-        function buscarUltimaReserva(email) {
-            if (!reservasData || !reservasData.length) return null;
-            const emailBusqueda = email.toLowerCase().trim();
-            const reservas = reservasData.filter(r => r.email && r.email.toLowerCase().trim() === emailBusqueda);
-            if (reservas.length > 0) {
-                return reservas[reservas.length - 1];
-            }
-            return null;
-        }
-        
-        // ==================================================
-        // SELECCIONAR CLIENTE
-        // ==================================================
-        function seleccionarCliente(telefono, nombre, email) {
-            console.log('👤 Seleccionado:', nombre, email);
-            
-            // Buscar cliente en datos
-            clienteSeleccionadoActual = clientesData.find(c => c.email === email);
-            reservaSeleccionadaActual = buscarUltimaReserva(email);
-            
-            const numeroInput = document.getElementById('whatsappNumero');
-            const nombreInput = document.getElementById('whatsappCliente');
-            const detalleDiv = document.getElementById('clienteDetalleDiv');
-            
-            if (numeroInput) numeroInput.value = telefono.replace(/[^0-9]/g, '');
-            if (nombreInput) nombreInput.value = nombre;
-            
-            // Mostrar detalles del cliente y reserva
-            if (detalleDiv && reservaSeleccionadaActual) {
-                const excursionesPreview = (reservaSeleccionadaActual.excursiones || '').split('\n')[0].replace(/^✔️\s*/, '');
-                detalleDiv.style.display = 'block';
-                detalleDiv.innerHTML = `
-                    <strong>📋 Última reserva:</strong><br>
-                    🕐 Excursión: ${excursionesPreview || 'No especificada'}<br>
-                    📅 Fecha: ${reservaSeleccionadaActual.fecha || 'No especificada'} | 👥 Pax: ${reservaSeleccionadaActual.personas}<br>
-                    💳 Pago: ${reservaSeleccionadaActual.formaPago} | 📍 Lugar: ${reservaSeleccionadaActual.lugar}
-                `;
-            } else if (detalleDiv) {
-                detalleDiv.style.display = 'none';
-            }
-            
-            // Actualizar el mensaje actual con los datos del cliente
-            actualizarMensajeConCliente();
-            
-            // Cerrar resultados
+        function initBuscador() {
+            const buscadorInput = document.getElementById('buscadorCliente');
             const resultadosDiv = document.getElementById('resultadosBusqueda');
-            if (resultadosDiv) resultadosDiv.classList.remove('show');
             
-            // Guardar último cliente
-            localStorage.setItem('ultimoClienteWhatsApp', JSON.stringify({ telefono, nombre, email }));
+            if (!buscadorInput || !resultadosDiv) return;
+            
+            buscadorInput.addEventListener('input', function() {
+                const texto = this.value.toLowerCase().trim();
+                
+                if (texto.length < 2) {
+                    resultadosDiv.classList.remove('show');
+                    return;
+                }
+                
+                const filtrados = listaClientes.filter(cliente => 
+                    cliente.nombre.toLowerCase().includes(texto) || 
+                    cliente.email.toLowerCase().includes(texto) ||
+                    (cliente.telefono && cliente.telefono.includes(texto))
+                ).slice(0, 10);
+                
+                if (filtrados.length === 0) {
+                    resultadosDiv.innerHTML = '<div class="resultado-item" style="justify-content:center;">❌ No se encontraron clientes</div>';
+                } else {
+                    resultadosDiv.innerHTML = filtrados.map(cliente => `
+                        <div class="resultado-item" onclick="seleccionarCliente(${JSON.stringify(cliente).replace(/"/g, '&quot;')})">
+                            <div class="resultado-info">
+                                <div class="resultado-nombre">${escapeHtml(cliente.nombre)}</div>
+                                <div class="resultado-email">${escapeHtml(cliente.email)}</div>
+                            </div>
+                            <div class="resultado-telefono">📞 ${escapeHtml(cliente.telefono || 'Sin teléfono')}</div>
+                        </div>
+                    `).join('');
+                }
+                
+                resultadosDiv.classList.add('show');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.buscador-container') && resultadosDiv) {
+                    resultadosDiv.classList.remove('show');
+                }
+            });
         }
         
         // ==================================================
@@ -364,21 +426,26 @@
             const cliente = document.getElementById('whatsappCliente').value || 'Cliente';
             
             if (!numero) {
-                alert('⚠️ Completá el número de WhatsApp');
+                alert('⚠️ Completá el número de WhatsApp del cliente');
                 return;
             }
+            
             if (!mensaje) {
                 alert('⚠️ Escribí un mensaje');
                 return;
             }
             
+            // Abrir WhatsApp
             window.open('https://wa.me/' + numero + '?text=' + encodeURIComponent(mensaje), '_blank');
+            
+            // Guardar en historial
             agregarHistorial(cliente, numero);
             
+            // Mostrar mensaje de éxito
             const exitoDiv = document.getElementById('mensajeExito');
             if (exitoDiv) {
                 exitoDiv.classList.add('show');
-                setTimeout(() => exitoDiv.classList.remove('show'), 4000);
+                setTimeout(() => exitoDiv.classList.remove('show'), 3000);
             }
         }
         
@@ -400,7 +467,7 @@
         function agregarHistorial(cliente, numero) {
             const historial = JSON.parse(localStorage.getItem('historialWhatsApp') || '[]');
             historial.unshift({
-                fecha: new Date().toLocaleString('es-ES'),
+                fecha: new Date().toLocaleString('es-AR'),
                 cliente: cliente,
                 numero: numero,
                 estado: 'enviado'
@@ -416,98 +483,71 @@
             if (!histEl) return;
             
             if (historial.length === 0) {
-                histEl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;">Sin envíos</td</td';
+                histEl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;">No hay mensajes enviados</td</td';
                 return;
             }
             
             histEl.innerHTML = historial.map(h => `
                 <tr>
-                    <td>${h.fecha}</td>
-                    <td>${h.cliente}</td
+                    <td>${h.fecha}</td
+                    <td>${escapeHtml(h.cliente)}</td
                     <td>${h.numero}</td
                     <td><span class="badge-enviado">${h.estado}</span></td
-                    <td><button class="btn-reenviar" onclick="reenviar('${h.numero}','${h.cliente}')">💬</button></td
+                    <td><button class="btn-reenviar" onclick="reenviarMensaje('${h.numero}','${escapeHtml(h.cliente)}')">💬 Reenviar</button></td
                 </tr>
             `).join('');
         }
         
-        function reenviar(numero, cliente) {
+        function reenviarMensaje(numero, cliente) {
             document.getElementById('whatsappNumero').value = numero;
             document.getElementById('whatsappCliente').value = cliente;
-            // Buscar el email del cliente para cargar sus datos
-            const clienteData = clientesData.find(c => c.telefono === numero || c.nombre === cliente);
-            if (clienteData) {
-                seleccionarCliente(numero, clienteData.nombre, clienteData.email);
+            // Buscar el cliente completo
+            const clienteEncontrado = listaClientes.find(c => c.telefono === numero || c.nombre === cliente);
+            if (clienteEncontrado) {
+                seleccionarCliente(clienteEncontrado);
             }
         }
         
         // ==================================================
-        // BUSCADOR EN TIEMPO REAL
+        // ESCAPAR HTML
         // ==================================================
-        function initBuscador() {
-            const buscadorInput = document.getElementById('buscadorCliente');
-            const resultadosDiv = document.getElementById('resultadosBusqueda');
-            
-            if (!buscadorInput || !resultadosDiv) return;
-            
-            buscadorInput.addEventListener('input', function() {
-                const texto = this.value.toLowerCase().trim();
-                
-                if (texto.length < 2) {
-                    resultadosDiv.classList.remove('show');
-                    return;
-                }
-                
-                const filtrados = clientesData.filter(c => 
-                    c.nombre.toLowerCase().includes(texto) || 
-                    c.email.toLowerCase().includes(texto) ||
-                    (c.telefono && c.telefono.includes(texto))
-                ).slice(0, 10);
-                
-                if (filtrados.length === 0) {
-                    resultadosDiv.innerHTML = '<div class="resultado-item" style="justify-content:center;">No se encontraron clientes</div>';
-                } else {
-                    resultadosDiv.innerHTML = filtrados.map(c => `
-                        <div class="resultado-item" onclick="seleccionarCliente('${c.telefono || ''}', '${c.nombre.replace(/'/g, "\\'")}', '${c.email}')">
-                            <div class="resultado-info">
-                                <div class="resultado-nombre">${c.nombre}</div>
-                                <div class="resultado-email">${c.email}</div>
-                            </div>
-                            <div class="resultado-telefono">📞 ${c.telefono || 'Sin teléfono'}</div>
-                        </div>
-                    `).join('');
-                }
-                
-                resultadosDiv.classList.add('show');
-            });
-            
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.buscador-container') && resultadosDiv) {
-                    resultadosDiv.classList.remove('show');
-                }
-            });
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ==================================================
+        // LOGOUT
+        // ==================================================
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+        
+        // ==================================================
+        // VERIFICAR SESIÓN
+        // ==================================================
+        if (sessionStorage.getItem('crm_logged') !== 'true') {
+            window.location.href = 'index.html';
         }
         
         // ==================================================
         // INICIALIZAR
         // ==================================================
         window.seleccionarCliente = seleccionarCliente;
-        window.aplicarPlantilla = aplicarPlantilla;
+        window.cargarPlantilla = cargarPlantilla;
         window.enviarWhatsApp = enviarWhatsApp;
         window.abrirWhatsAppWeb = abrirWhatsAppWeb;
-        window.reenviar = reenviar;
+        window.reenviarMensaje = reenviarMensaje;
+        window.logout = logout;
         
-        // Cargar último cliente guardado
-        const ultimo = JSON.parse(localStorage.getItem('ultimoClienteWhatsApp') || 'null');
-        if (ultimo && ultimo.email) {
-            setTimeout(() => {
-                seleccionarCliente(ultimo.telefono || '', ultimo.nombre || '', ultimo.email || '');
-            }, 1000);
-        }
-        
-        // Iniciar
+        // Iniciar todo
         cargarDatos();
         initBuscador();
+        
+        // Recargar datos cada 60 segundos
         setInterval(cargarDatos, 60000);
     </script>
 </body>
