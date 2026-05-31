@@ -322,9 +322,8 @@
     </div>
 
     <script>
-        // 🔥 IMPORTANTE: Reemplazar con la URL de tu Google Apps Script
-        // Pasos para obtenerla: Extensiones → Apps Script → Implementar → Nueva implementación → Aplicación web
-        const GOOGLE_SCRIPT_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnTbZ0geQE2Ic7GpXBbvAPubWAHXhiSvFwptvraunxHcgqppx5ctcPCRLTLPK97DJiLxJTrsJZ2z9fbb1NmWkjx2eQ8hLEHL8EWv1ik057BpfbZN1OCVVTFLW1Aj7ZfbNJ5We4xhXjQRgpQiP5COwE8S5RAOnKnjwmNdhDDxKKA-4Y8FnT6ntS9xtkUg2iega_ALnI50entAXQGDmB0K9NrA0e3R9I-bI8V6BdRO4A0yQuD9U62ALDxPJr6YwlyZP5qcxeWRmaHjWzaYSp1_gE8U5vmbtw&lib=M2LO-tmzSGyRsALRnsZw75SLBtGflyhoX';
+        // Versión revertida: almacenamiento local + simulación de envío
+        // No requiere Google Apps Script
         
         document.getElementById('reservaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -334,10 +333,11 @@
             const errorDiv = document.getElementById('formError');
             const successDiv = document.getElementById('formSuccess');
             
+            // Ocultar mensajes previos
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
             
-            // Validar excursiones
+            // Validar que haya al menos una excursión seleccionada
             const excursionesSeleccionadas = [];
             document.querySelectorAll('#excursiones input[type="checkbox"]:checked').forEach(cb => {
                 excursionesSeleccionadas.push(cb.value);
@@ -357,17 +357,9 @@
                 return;
             }
             
-            // Validar forma de pago
-            const formaPago = document.getElementById('formaPago').value;
-            if (!formaPago) {
-                errorDiv.textContent = '❌ Por favor, selecciona una forma de pago.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            // Construir datos
+            // Obtener valores del formulario
             const formData = {
-                id: 'RES-' + Date.now(),
+                timestamp: new Date().toLocaleString('es-AR'),
                 nombre: document.getElementById('nombre').value.trim(),
                 apellido: document.getElementById('apellido').value.trim(),
                 email: document.getElementById('email').value.trim(),
@@ -377,11 +369,11 @@
                 excursiones: excursionesSeleccionadas.join(', '),
                 fecha: fechaInput,
                 personas: document.getElementById('personas').value,
-                formaPago: formaPago,
+                formaPago: document.getElementById('formaPago').value,
                 busqueda: document.getElementById('busqueda').value || 'No especificado'
             };
             
-            // Validar campos obligatorios
+            // Validaciones básicas
             if (!formData.nombre || !formData.apellido || !formData.email || !formData.telefono || !formData.pais || !formData.ciudad) {
                 errorDiv.textContent = '❌ Por favor, completá todos los campos obligatorios.';
                 errorDiv.style.display = 'block';
@@ -394,25 +386,32 @@
                 return;
             }
             
+            if (!formData.formaPago) {
+                errorDiv.textContent = '❌ Por favor, selecciona una forma de pago.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Mostrar loading
             submitBtn.disabled = true;
             loading.style.display = 'block';
             
-            try {
-                // Enviar a Google Sheets mediante Apps Script
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams(formData)
-                });
+            // Simular envío (para pruebas) - En producción se conectaría con Google Sheets
+            setTimeout(() => {
+                // Guardar en localStorage como respaldo
+                const reservas = JSON.parse(localStorage.getItem('reservasOffline') || '[]');
+                const nuevaReserva = {
+                    id: 'RES-' + Date.now(),
+                    ...formData,
+                    estado: 'pendiente'
+                };
+                reservas.push(nuevaReserva);
+                localStorage.setItem('reservasOffline', JSON.stringify(reservas));
+                
+                console.log('Reserva guardada:', nuevaReserva);
                 
                 // Mostrar éxito
                 successDiv.style.display = 'block';
-                
-                // Guardar copia local como respaldo
-                const reservas = JSON.parse(localStorage.getItem('reservasOffline') || '[]');
-                reservas.push({ ...formData, timestamp: new Date().toISOString() });
-                localStorage.setItem('reservasOffline', JSON.stringify(reservas));
                 
                 // Limpiar formulario
                 document.getElementById('reservaForm').reset();
@@ -422,18 +421,25 @@
                     window.location.href = 'gracias.html';
                 }, 2500);
                 
-            } catch (error) {
-                console.error('Error:', error);
-                errorDiv.textContent = '❌ Hubo un error al enviar la reserva. Por favor, intentá nuevamente o contactanos por WhatsApp.';
-                errorDiv.style.display = 'block';
                 submitBtn.disabled = false;
                 loading.style.display = 'none';
-            }
+            }, 1000);
         });
         
-        // Fecha mínima = hoy
+        // Validar fecha mínima (hoy)
         const hoy = new Date().toISOString().split('T')[0];
         document.getElementById('fecha').min = hoy;
+        
+        // Prevenir envío duplicado
+        let enviando = false;
+        document.getElementById('reservaForm').addEventListener('submit', function(e) {
+            if (enviando) {
+                e.preventDefault();
+                return;
+            }
+            enviando = true;
+            setTimeout(() => { enviando = false; }, 5000);
+        });
     </script>
 </body>
 </html>
