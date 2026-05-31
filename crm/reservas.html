@@ -124,18 +124,19 @@
             return fechaStr;
         }
 
-        // 🔥 FUNCIÓN CORREGIDA: divide por saltos de línea (\n) y también por otros separadores
+        // Función mejorada para dividir excursiones (por saltos de línea, pipes, comas, etc.)
         function dividirExcursiones(texto) {
             if (!texto) return [];
             let partes = [];
-            // Primero separar por saltos de línea (el separador que tenés en Google Sheets)
+            // Si contiene \n (salto de línea real en el texto)
             if (texto.includes('\n')) {
                 partes = texto.split('\n');
             }
-            // Si no, probar con separadores comunes
+            // Si contiene " | "
             else if (texto.includes(' | ')) {
                 partes = texto.split(' | ');
             }
+            // Si contiene ", "
             else if (texto.includes(', ')) {
                 partes = texto.split(', ');
             }
@@ -148,7 +149,7 @@
             else {
                 partes = [texto];
             }
-            // Limpiar números al inicio (ej: "1. ✔️ City Tour" -> "✔️ City Tour")
+            // Eliminar espacios, números iniciales y líneas vacías
             partes = partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             return partes;
         }
@@ -169,7 +170,7 @@
             if (!tbody) return;
             
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td';
+                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 const csvText = await response.text();
                 const filas = parseCSV(csvText);
@@ -188,9 +189,26 @@
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
-                    // Columna de excursiones está en índice 8 (columna I)
-                    const excursionesRaw = fila[8] || '';
+                    // 📌 Leer de ambas columnas posibles: índice 6 ("Excursión") e índice 8 ("Excursion")
+                    const excursionesCol6 = fila[6] || '';
+                    const excursionesCol8 = fila[8] || '';
+                    // Elegir la que tenga más caracteres o la que contenga saltos de línea
+                    let excursionesRaw = '';
+                    if (excursionesCol8.includes('\n') || excursionesCol8.length > excursionesCol6.length) {
+                        excursionesRaw = excursionesCol8;
+                    } else {
+                        excursionesRaw = excursionesCol6;
+                    }
+                    
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
+                    
+                    // Depuración en consola para ver qué se está leyendo
+                    if (i === 1) {
+                        console.log('🔍 Columna 6 (Excursión):', excursionesCol6);
+                        console.log('🔍 Columna 8 (Excursion):', excursionesCol8);
+                        console.log('🔍 Elegida:', excursionesRaw);
+                        console.log('🔍 Lista final:', listaExcursiones);
+                    }
                     
                     const reserva = {
                         id: id,
@@ -219,7 +237,7 @@
                 renderizarTabla();
             } catch (error) {
                 console.error('Error:', error);
-                if (tbody) tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</td`;
+                if (tbody) tbody.innerHTML = `<td><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</td`;
             }
         }
 
@@ -243,14 +261,18 @@
                     default: estadoClass = 'badge-confirmado'; estadoText = 'Confirmado';
                 }
                 
+                // Generar HTML de lista vertical
                 let excursionesHtml = '<ul class="excursiones-lista">';
-                if (!r.excursionesLista || r.excursionesLista.length === 0) excursionesHtml += '<li>Sin excursiones</li>';
-                else r.excursionesLista.forEach(exc => excursionesHtml += `<li>${escapeHtml(exc)}</li>`);
+                if (!r.excursionesLista || r.excursionesLista.length === 0) {
+                    excursionesHtml += '<li>Sin excursiones</li>';
+                } else {
+                    r.excursionesLista.forEach(exc => excursionesHtml += `<li>${escapeHtml(exc)}</li>`);
+                }
                 excursionesHtml += '</ul>';
                 
                 return `
                     <tr>
-                        <td><strong>${escapeHtml(r.id)}</strong></td
+                        <td><strong>${escapeHtml(r.id)}</strong></td>
                         <td>${escapeHtml(r.fecha)}</td
                         <td>${escapeHtml(r.nombre)}</td
                         <td style="font-size:11px">${escapeHtml(r.email)}</td
