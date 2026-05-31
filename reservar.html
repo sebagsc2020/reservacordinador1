@@ -6,70 +6,66 @@
     <title>🕐 Reserva tu Excursión | Aventura Total</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕐</text></svg>">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             padding: 40px 20px;
         }
-
-        /* Contenedor principal */
+        
+        /* Contenedor principal (mismo estilo que index.html) */
         .form-container {
             max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             overflow: hidden;
             transition: transform 0.3s ease;
         }
-
+        
         .form-container:hover {
             transform: translateY(-5px);
         }
-
-        /* Header */
+        
+        /* Header (gradiente igual al hero del index) */
         .form-header {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
             padding: 40px 30px;
             text-align: center;
         }
-
+        
         .form-header h1 {
             font-size: 32px;
             margin-bottom: 12px;
             letter-spacing: -0.5px;
         }
-
+        
         .form-header p {
             font-size: 16px;
             opacity: 0.85;
         }
-
+        
         /* Formulario */
         form {
             padding: 40px;
         }
-
+        
         .form-row {
             display: flex;
             gap: 24px;
             margin-bottom: 24px;
             flex-wrap: wrap;
         }
-
+        
         .form-group {
             flex: 1;
             min-width: 200px;
         }
-
+        
         label {
             display: block;
             margin-bottom: 8px;
@@ -77,12 +73,12 @@
             color: #1a1a2e;
             font-size: 14px;
         }
-
+        
         label.required::after {
             content: " *";
             color: #e74c3c;
         }
-
+        
         input, select {
             width: 100%;
             padding: 14px 16px;
@@ -93,32 +89,32 @@
             transition: all 0.3s ease;
             background: white;
         }
-
+        
         input:focus, select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
-
+        
         input:read-only {
             background-color: #f8fafc;
             cursor: not-allowed;
             border-color: #cbd5e1;
         }
-
+        
         select:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             background-color: #f1f5f9;
         }
-
+        
         /* Checkboxes de excursiones */
         .checkbox-excursiones {
             display: grid;
             gap: 12px;
             margin-top: 8px;
         }
-
+        
         .checkbox-item {
             display: flex;
             align-items: center;
@@ -129,19 +125,19 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-
+        
         .checkbox-item:hover {
             background: #f1f5f9;
             border-color: #667eea;
             transform: translateX(4px);
         }
-
+        
         .checkbox-item.seleccionado {
             background: #eef2ff;
             border-color: #667eea;
             box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
         }
-
+        
         .checkbox-item input {
             width: 20px;
             height: 20px;
@@ -149,7 +145,7 @@
             cursor: pointer;
             accent-color: #667eea;
         }
-
+        
         .checkbox-item label {
             margin: 0;
             cursor: pointer;
@@ -157,7 +153,7 @@
             font-weight: 500;
             color: #1e293b;
         }
-
+        
         .seleccionados-contador {
             text-align: center;
             font-size: 13px;
@@ -168,8 +164,8 @@
             background: #f1f5f9;
             border-radius: 40px;
         }
-
-        /* Checkbox de privacidad */
+        
+        /* Checkbox de privacidad (mismo estilo que el modal del index) */
         .checkbox-privacidad {
             display: flex;
             align-items: center;
@@ -180,57 +176,58 @@
             margin: 24px 0 20px 0;
             border: 1px solid #e2e8f0;
         }
-
+        
         .checkbox-privacidad input {
             width: 20px;
             height: 20px;
             cursor: pointer;
             accent-color: #667eea;
         }
-
+        
         .checkbox-privacidad label {
             margin: 0;
             cursor: pointer;
             font-weight: 500;
             font-size: 14px;
         }
-
+        
         .checkbox-privacidad a {
             color: #667eea;
             text-decoration: none;
             font-weight: 600;
         }
-
+        
         .checkbox-privacidad a:hover {
             text-decoration: underline;
         }
-
-        /* Botón enviar */
+        
+        /* Botón enviar (mismo estilo que btn-reservar-hero) */
         .submit-btn {
             width: 100%;
             padding: 16px;
             background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
             color: white;
             border: none;
-            border-radius: 40px;
+            border-radius: 50px;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 10px;
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
         }
-
+        
         .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(39, 174, 96, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(39, 174, 96, 0.4);
         }
-
+        
         .submit-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
-
+        
         /* Mensajes de estado */
         .status-message {
             padding: 12px;
@@ -239,13 +236,13 @@
             text-align: center;
             font-weight: 500;
         }
-
+        
         .status-message.error {
             background: #fee;
             color: #c0392b;
             border-left: 4px solid #e74c3c;
         }
-
+        
         /* Preloader */
         #preloader {
             position: fixed;
@@ -260,16 +257,16 @@
             z-index: 9999;
             transition: opacity 0.5s;
         }
-
+        
         #preloader.oculto {
             opacity: 0;
             visibility: hidden;
         }
-
+        
         .preloader-content {
             text-align: center;
         }
-
+        
         .cronometro {
             width: 75px;
             height: 75px;
@@ -279,30 +276,30 @@
             animation: girar 1s linear infinite;
             margin: 0 auto 20px;
         }
-
+        
         @keyframes girar {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
+        
         .preloader-texto {
             color: white;
             font-size: 20px;
             font-weight: 700;
             text-align: center;
         }
-
+        
         /* Animaciones */
         .categoria-group, .excursion-group {
             animation: fadeIn 0.3s ease;
         }
-
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Responsive */
+        
+        /* Responsive (mismo breakpoint que index) */
         @media (max-width: 768px) {
             body {
                 padding: 20px;
@@ -315,6 +312,21 @@
             }
             .form-row {
                 gap: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-container {
+                margin: 0 10px;
+            }
+            .form-header {
+                padding: 25px 20px;
+            }
+            form {
+                padding: 20px;
+            }
+            .checkbox-item {
+                padding: 10px 12px;
             }
         }
     </style>
