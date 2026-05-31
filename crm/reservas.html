@@ -7,47 +7,258 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
-        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
-        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
-        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; border: none; }
-        .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
-        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
-        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
-        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
-        .btn-filtrar, .btn-recargar { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        
+        /* ==================================================
+           BARRA LATERAL MÁS ANGOSTA
+        ================================================== */
+        .sidebar { 
+            width: 200px;  /* Reducido de 250px a 200px */
+            background: #1a1a2e; 
+            color: white; 
+            padding: 20px 0; 
+            position: fixed; 
+            height: 100vh; 
+            overflow-y: auto; 
+            z-index: 100;
+        }
+        .sidebar-logo { 
+            text-align: center; 
+            padding: 0 15px 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            margin-bottom: 15px; 
+        }
+        .sidebar-logo .logo-icon { font-size: 32px; } 
+        .sidebar-logo h2 { font-size: 16px; margin-top: 5px; } 
+        .sidebar-logo h2 span { color: #667eea; }
+        
+        .nav-menu { list-style: none; padding: 0 12px; } 
+        .nav-menu li { margin-bottom: 3px; }
+        .nav-menu a { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            padding: 8px 10px; 
+            color: rgba(255,255,255,0.7); 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-size: 12px; 
+        }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
+        .nav-menu a.active { background: #667eea; }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        .sidebar-footer { 
+            position: absolute; 
+            bottom: 15px; 
+            left: 12px; 
+            right: 12px; 
+        }
+        .btn-logout-sidebar { 
+            width: 100%; 
+            padding: 8px; 
+            background: rgba(231,76,60,0.2); 
+            color: #e74c3c; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 11px; 
+            border: none; 
+        }
+        
+        /* ==================================================
+           CONTENIDO PRINCIPAL
+        ================================================== */
+        .main-content { 
+            margin-left: 200px;  /* Ajustado al ancho de la sidebar */
+            flex: 1; 
+            padding: 20px; 
+            min-width: 0; 
+            overflow-x: auto;
+        }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .header h1 { font-size: 22px; color: #1a1a2e; }
+        .user-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            background: white; 
+            padding: 6px 15px; 
+            border-radius: 40px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+            font-size: 13px; 
+        }
+        .user-avatar { 
+            width: 30px; 
+            height: 30px; 
+            background: #667eea; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-weight: 700; 
+            font-size: 12px;
+        }
+        
+        /* ==================================================
+           FILTROS
+        ================================================== */
+        .filters-bar { 
+            background: white; 
+            padding: 12px 15px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            margin-bottom: 15px; 
+            display: flex; 
+            gap: 8px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+        }
+        .filter-input { 
+            padding: 8px 12px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 8px; 
+            font-size: 12px; 
+            flex: 2; 
+            min-width: 180px; 
+        }
+        .btn-filtrar, .btn-recargar { 
+            padding: 8px 15px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 12px; 
+            white-space: nowrap; 
+        }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
-        .table-container { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow: hidden; }
-        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
-        td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; vertical-align: top; } 
+        
+        /* ==================================================
+           TABLA - SIN SCROLL HORIZONTAL
+        ================================================== */
+        .table-container { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 12px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            overflow-x: auto;
+        }
+        .table-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 12px; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+        }
+        .table-header h3 { font-size: 16px; }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 11px;
+        }
+        
+        th { 
+            text-align: left; 
+            padding: 10px 8px; 
+            background: #f8f9fa; 
+            color: #666; 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            white-space: nowrap; 
+        }
+        
+        td { 
+            padding: 8px; 
+            border-bottom: 1px solid #f0f0f0; 
+            font-size: 11px; 
+            color: #333; 
+            vertical-align: top; 
+            word-break: break-word;
+        }
+        
         tr:hover td { background: #f8f9ff; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        
+        /* Columnas específicas con ancho máximo */
+        td:nth-child(6) { max-width: 180px; } /* Excursiones */
+        td:nth-child(4) { max-width: 140px; } /* Email */
+        td:nth-child(5) { max-width: 100px; } /* Teléfono */
+        
+        .badge { 
+            padding: 3px 8px; 
+            border-radius: 20px; 
+            font-size: 9px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            display: inline-block; 
+            white-space: nowrap;
+        }
         .badge-pendiente { background: #fff3cd; color: #856404; }
         .badge-confirmado { background: #d4edda; color: #155724; }
         .badge-pagado { background: #d1ecf1; color: #0c5460; }
-        .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin: 2px; width: 28px; text-align: center; }
+        
+        .btn-accion { 
+            padding: 4px 6px; 
+            border-radius: 4px; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 9px; 
+            font-weight: 600; 
+            margin: 1px; 
+            width: 24px; 
+            text-align: center; 
+        }
         .btn-pendiente { background: #ffc107; color: #856404; }
         .btn-confirmar { background: #27ae60; color: white; }
         .btn-pagar { background: #3498db; color: white; }
-        .acciones-container { display: flex; flex-direction: column; gap: 3px; }
-        .acciones-fila { display: flex; gap: 3px; justify-content: flex-start; }
-        .excursiones-lista { margin: 0; padding-left: 15px; list-style: none; }
-        .excursiones-lista li { padding: 3px 0; font-size: 11px; white-space: normal; word-break: break-word; }
-        .total-reservas { font-size: 12px; color: #666; }
-        .id-reserva { font-family: monospace; font-weight: bold; font-size: 11px; }
-        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } }
+        
+        .acciones-container { display: flex; flex-direction: column; gap: 2px; }
+        .acciones-fila { display: flex; gap: 2px; justify-content: flex-start; }
+        
+        .excursiones-lista { 
+            margin: 0; 
+            padding-left: 12px; 
+            list-style: none; 
+        }
+        .excursiones-lista li { 
+            padding: 2px 0; 
+            font-size: 10px; 
+            white-space: normal; 
+            word-break: break-word; 
+        }
+        
+        .total-reservas { font-size: 11px; color: #666; }
+        .id-reserva { font-family: monospace; font-weight: bold; font-size: 10px; }
+        
+        /* ==================================================
+           RESPONSIVE
+        ================================================== */
+        @media (max-width: 768px) { 
+            .sidebar { width: 60px; } 
+            .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
+            .nav-menu a { justify-content: center; padding: 10px; }
+            .nav-icon { font-size: 18px; width: auto; }
+            .main-content { margin-left: 60px; padding: 12px; }
+            .header h1 { font-size: 18px; }
+            .filters-bar { flex-direction: column; align-items: stretch; }
+            .filter-input { width: 100%; }
+            .btn-filtrar, .btn-recargar { text-align: center; }
+        }
+        
+        @media (max-width: 480px) {
+            th, td { font-size: 9px; padding: 5px; }
+            td:nth-child(6) { max-width: 120px; }
+        }
     </style>
 </head>
 <body>
@@ -66,7 +277,10 @@
     </nav>
 
     <div class="main-content">
-        <div class="header"><div><h1>📋 Reservas</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
+        <div class="header">
+            <div><h1>📋 Reservas</h1></div>
+            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+        </div>
 
         <div class="filters-bar">
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email, ciudad o ID..." id="busquedaReserva">
@@ -75,14 +289,17 @@
         </div>
 
         <div class="table-container">
-            <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan" class="total-reservas">0 reservas</span></div>
+            <div class="table-header">
+                <h3>Lista de Reservas</h3>
+                <span id="totalReservasSpan" class="total-reservas">0 reservas</span>
+            </div>
             <div class="table-wrapper">
                 <table id="reservasTable">
                     <thead>
-                        <tr><th>ID</th><th>Fecha Registro</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></tr>
+                        <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
                     <tbody id="tablaReservas">
-                        <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td
+                        <tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando datos...</td</td
                     </tbody>
                 </table>
             </div>
@@ -114,7 +331,7 @@
         let reservasFiltradas = [];
         
         // ==================================================
-        // DIVIDIR EXCURSIONES (mantiene saltos de línea)
+        // DIVIDIR EXCURSIONES
         // ==================================================
         function dividirExcursiones(texto) {
             if (!texto) return [];
@@ -127,8 +344,6 @@
                 partes = texto.split(' | ');
             } else if (texto.includes(', ')) {
                 partes = texto.split(', ');
-            } else if (texto.includes(',')) {
-                partes = texto.split(',');
             } else {
                 partes = [texto];
             }
@@ -140,7 +355,6 @@
         // ==================================================
         function formatearFecha(fechaStr) {
             if (!fechaStr) return '';
-            // Si es un objeto Date o string largo
             if (fechaStr.includes('GMT') || fechaStr.includes(' ')) {
                 try {
                     const fecha = new Date(fechaStr);
@@ -149,9 +363,7 @@
                     }
                 } catch(e) {}
             }
-            // Si ya tiene formato DD/MM/YYYY
             if (fechaStr.includes('/')) return fechaStr;
-            // Si tiene formato YYYY-MM-DD
             const partes = fechaStr.split('-');
             if (partes.length === 3 && partes[0].length === 4) {
                 return `${partes[2]}/${partes[1]}/${partes[0]}`;
@@ -160,7 +372,7 @@
         }
         
         // ==================================================
-        // ESTADOS (guardados en localStorage)
+        // ESTADOS
         // ==================================================
         function cargarEstadosGuardados() {
             try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } 
@@ -174,7 +386,7 @@
         }
         
         // ==================================================
-        // CARGAR RESERVAS DESDE LA API
+        // CARGAR RESERVAS
         // ==================================================
         async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
@@ -183,14 +395,12 @@
             if (!tbody) return;
             
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos desde la API...</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando datos...</td</td';
                 
-                console.log('📡 Llamando a la API:', API_URL);
                 const response = await fetch(API_URL);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const resultado = await response.json();
-                console.log('📦 Respuesta de la API:', resultado);
                 
                 if (resultado.error) throw new Error(resultado.error);
                 if (!resultado.data) throw new Error('No se recibieron datos');
@@ -198,7 +408,7 @@
                 const datos = resultado.data;
                 
                 if (!datos || datos.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📭 No hay reservas en la planilla</td</td';
+                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">📭 No hay reservas</td</td';
                     if (totalSpan) totalSpan.textContent = '0 reservas';
                     reservasData = [];
                     reservasFiltradas = [];
@@ -211,7 +421,6 @@
                 for (let i = 0; i < datos.length; i++) {
                     const fila = datos[i];
                     
-                    // Extraer ID correctamente
                     const id = fila.id || fila.ID || `R-${i+1}`;
                     const nombre = fila.nombre || '';
                     const apellido = fila.apellido || '';
@@ -220,7 +429,6 @@
                     let excursionesRaw = fila.excursiones || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     
-                    // Formatear fecha del timestamp
                     let fechaRegistro = '';
                     if (fila.timestamp) {
                         fechaRegistro = formatearFecha(fila.timestamp);
@@ -244,9 +452,6 @@
                     reservasData.push(reserva);
                 }
                 
-                console.log(`📊 Cargadas ${reservasData.length} reservas`);
-                
-                // Ordenar por ID descendente (más reciente primero)
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
                     const numB = parseInt(b.id.replace(/\D/g, '')) || 0; 
@@ -258,16 +463,13 @@
                 if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
                 
             } catch (error) {
-                console.error('❌ Error al cargar:', error);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">
-                    ❌ Error al cargar datos: ${error.message}<br><br>
-                    Verifica que la API esté desplegada correctamente
-                </td</td`;
+                console.error('Error:', error);
+                tbody.innerHTML = `<td><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td</td`;
             }
         }
         
         // ==================================================
-        // RENDERIZAR TABLA HTML
+        // RENDERIZAR TABLA
         // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
@@ -277,7 +479,7 @@
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas que coincidan con la búsqueda</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">📋 No hay coincidencias</td</td';
                 return;
             }
             
@@ -305,24 +507,24 @@
                 return `
                     <tr>
                         <td class="id-reserva">${escapeHtml(r.id)}</td>
-                        <td style="font-size:11px">${escapeHtml(fechaMostrar)}</td>
+                        <td style="font-size:10px">${escapeHtml(fechaMostrar)}</td>
                         <td>${escapeHtml(r.nombre)}</td>
-                        <td style="font-size:11px">${escapeHtml(r.email)}</td>
+                        <td style="font-size:10px">${escapeHtml(r.email)}</td>
                         <td>${escapeHtml(r.telefono)}</td>
                         <td>${excursionesHtml}</td>
                         <td>${escapeHtml(r.ciudad)}</td>
                         <td>${escapeHtml(r.personas)}</td>
-                        <td style="font-size:11px">${escapeHtml(r.formaPago)}</td>
-                        <td style="font-size:11px">${escapeHtml(r.lugar)}</td>
+                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td>
+                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td>
                         <td><span class="badge ${estadoClass}">${estadoText}</span></td>
                         <td>
                             <div class="acciones-container">
                                 <div class="acciones-fila">
                                     <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
-                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Marcar Pendiente">⏳</button>
+                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Pendiente">⏳</button>
                                 </div>
                                 <div class="acciones-fila">
-                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Marcar Pagada">💰</button>
+                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Pagado">💰</button>
                                 </div>
                             </div>
                         </td>
@@ -331,9 +533,6 @@
             }).join('');
         }
         
-        // ==================================================
-        // FILTRAR RESERVAS
-        // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
             if (!busqueda) return;
@@ -352,9 +551,6 @@
             renderizarTabla();
         }
         
-        // ==================================================
-        // CAMBIAR ESTADO DE RESERVA
-        // ==================================================
         function cambiarEstado(id, nuevoEstado) {
             const reserva = reservasData.find(r => r.id === id);
             if (reserva) {
@@ -366,9 +562,6 @@
             }
         }
         
-        // ==================================================
-        // ESCAPAR HTML
-        // ==================================================
         function escapeHtml(text) { 
             if (!text) return ''; 
             const div = document.createElement('div'); 
@@ -376,14 +569,8 @@
             return div.innerHTML; 
         }
         
-        // ==================================================
-        // INICIALIZAR
-        // ==================================================
         const busquedaInput = document.getElementById('busquedaReserva');
         if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
-        
-        // Reemplazar la URL antes de cargar
-        console.log('🔧 Configuración actual - Reemplaza TU_URL_AQUI por la URL real de tu Web App');
         
         cargarReservas();
         setInterval(cargarReservas, 60000);
