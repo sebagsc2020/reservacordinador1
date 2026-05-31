@@ -85,14 +85,15 @@
         <div class="table-container">
             <div class="table-header"><h3>Lista de Reservas</h3><span id="totalReservasSpan">0 reservas</span></div>
             <div class="table-wrapper">
-                <table>
+                 <div class="excursiones-lista" style="display:none"></div> <!-- oculto, solo para estructura -->
+                 <table>
                     <thead>
-                        <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursión</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></tr>
+                        <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
                     <tbody id="tablaReservas">
-                        <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>
+                        <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>
                     </tbody>
-                20
+                 </table>
             </div>
         </div>
     </div>
@@ -106,7 +107,6 @@
     </div>
 
     <script>
-        // Sesión
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
@@ -115,7 +115,6 @@
         let reservasData = [];
         let reservasFiltradas = [];
 
-        // Parsear CSV correctamente
         function parseCSV(csvText) {
             const lineas = csvText.split('\n');
             const resultados = [];
@@ -137,7 +136,6 @@
             return resultados;
         }
 
-        // Formatear fecha
         function formatearFecha(fechaStr) {
             if (!fechaStr) return '';
             if (fechaStr.includes('/')) return fechaStr;
@@ -146,27 +144,24 @@
             return fechaStr;
         }
 
-        // Extraer lista de excursiones desde el string (separadas por coma o pipe)
-        function extraerListaExcursiones(texto) {
+        // ========== NUEVA FUNCIÓN: divide las excursiones por cualquier separador común ==========
+        function dividirExcursiones(texto) {
             if (!texto) return [];
-            // Intentar separar por "|" primero (como se guarda en formData)
-            if (texto.includes('|')) {
-                return texto.split('|').map(e => e.trim()).filter(e => e);
+            // Reemplazar separadores comunes por un delimitador único "|"
+            let limpio = texto.replace(/[;,|]/g, '|');   // ; , |  se convierten a |
+            // También separar si hay saltos de línea
+            limpio = limpio.replace(/\n/g, '|');
+            // Dividir por pipe
+            let partes = limpio.split('|').map(p => p.trim()).filter(p => p);
+            if (partes.length === 0 && texto.length > 0) {
+                // Si no había separadores, es una sola excursión
+                return [texto];
             }
-            // Si no, separar por coma
-            if (texto.includes(',')) {
-                return texto.split(',').map(e => e.trim()).filter(e => e);
-            }
-            // Si no, es una sola excursión
-            return [texto];
+            // Eliminar números al inicio (ej: "1. ✔️ Trekking" -> "✔️ Trekking")
+            partes = partes.map(p => p.replace(/^\d+\.\s*/, ''));
+            return partes;
         }
 
-        // Limpiar números de las excursiones (ej: "1. ✔️ Trekking" → "✔️ Trekking")
-        function limpiarNumeroExcursion(texto) {
-            return texto.replace(/^\d+\.\s*/, '');
-        }
-
-        // Cargar estados guardados
         function cargarEstadosGuardados() {
             try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } 
             catch(e) { return {}; }
@@ -180,7 +175,7 @@
 
         async function cargarReservas() {
             try {
-                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>';
+                document.getElementById('tablaReservas').innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 const csvText = await response.text();
                 const filas = parseCSV(csvText);
@@ -190,28 +185,17 @@
                 reservasData = [];
                 const estadosGuardados = cargarEstadosGuardados();
                 
-                // Procesar filas (desde i=1 para saltar encabezados)
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
                     if (fila.length < 5) continue;
-                    
-                    // Mapeo de columnas según Google Sheets:
-                    // 0:ID, 1:Fecha, 2:Nombre, 3:Apellido, 4:Email, 
-                    // 5:Teléfono, 6:País, 7:Ciudad, 8:Excursión, 9:FechaExcursion, 
-                    // 10:Personas, 11:FormaPago, 12:Lugar
                     
                     const id = fila[0] || `R-${i}`;
                     const nombre = fila[2] || '';
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
-                    // Texto crudo de excursiones
                     const excursionesRaw = fila[8] || '';
-                    
-                    // Extraer lista de excursiones (separadas por | o ,)
-                    let listaExcursiones = extraerListaExcursiones(excursionesRaw);
-                    // Limpiar números de cada excursión
-                    listaExcursiones = listaExcursiones.map(exc => limpiarNumeroExcursion(exc));
+                    const listaExcursiones = dividirExcursiones(excursionesRaw);
                     
                     const reserva = {
                         id: id,
@@ -234,8 +218,10 @@
                 }
                 
                 console.log(`Cargadas ${reservasData.length} reservas`);
+                if (reservasData.length > 0) {
+                    console.log('Ejemplo de excursiones parseadas:', reservasData[0].excursionesLista);
+                }
                 
-                // Ordenar por ID descendente
                 reservasData.sort((a, b) => {
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
                     const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
@@ -247,7 +233,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('tablaReservas').innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error al cargar datos: ${error.message}</td</tr>`;
+                document.getElementById('tablaReservas').innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error al cargar datos: ${error.message}</td></tr>`;
             }
         }
 
@@ -256,7 +242,7 @@
             document.getElementById('totalReservasSpan').textContent = `${reservasFiltradas.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</tr>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td></tr>';
                 return;
             }
             
@@ -269,16 +255,11 @@
                     default: estadoClass = 'badge-confirmado'; estadoText = 'Confirmado';
                 }
                 
-                // Mostrar primera excursión + contador de adicionales
-                const cantExcursiones = r.excursionesLista.length;
-                let excursionMostrar = '';
-                if (cantExcursiones === 0) {
-                    excursionMostrar = 'Sin excursiones';
-                } else if (cantExcursiones === 1) {
-                    excursionMostrar = r.excursionesLista[0];
-                } else {
-                    excursionMostrar = `${r.excursionesLista[0]} (+${cantExcursiones - 1} más)`;
-                }
+                const cant = r.excursionesLista.length;
+                let excursionesMostrar = '';
+                if (cant === 0) excursionesMostrar = 'Sin excursiones';
+                else if (cant === 1) excursionesMostrar = r.excursionesLista[0];
+                else excursionesMostrar = `${r.excursionesLista[0]} (+${cant-1} más)`;
                 
                 return `
                     <tr>
@@ -287,7 +268,7 @@
                         <td>${escapeHtml(r.nombre)}</td>
                         <td style="font-size:11px">${escapeHtml(r.email)}</td>
                         <td>${escapeHtml(r.telefono)}</td>
-                        <td>${escapeHtml(excursionMostrar)}</td>
+                        <td>${escapeHtml(excursionesMostrar)}</td>
                         <td>${escapeHtml(r.ciudad)}</td>
                         <td>${escapeHtml(r.personas)}</td>
                         <td>${escapeHtml(r.formaPago)}</td>
@@ -312,14 +293,8 @@
 
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva').value.toLowerCase().trim();
-            if (!busqueda) {
-                reservasFiltradas = [...reservasData];
-            } else {
-                reservasFiltradas = reservasData.filter(r => 
-                    r.nombre.toLowerCase().includes(busqueda) ||
-                    r.ciudad.toLowerCase().includes(busqueda)
-                );
-            }
+            if (!busqueda) reservasFiltradas = [...reservasData];
+            else reservasFiltradas = reservasData.filter(r => r.nombre.toLowerCase().includes(busqueda) || r.ciudad.toLowerCase().includes(busqueda));
             renderizarTabla();
         }
 
@@ -344,17 +319,10 @@
                 default: estadoText = 'Confirmado';
             }
             
-            // Generar HTML para la lista de excursiones (TODAS)
-            let excursionesHtml = '';
-            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
-                excursionesHtml = '<div class="excursiones-lista">';
-                reserva.excursionesLista.forEach(exc => {
-                    excursionesHtml += `<div class="excursion-item">${escapeHtml(exc)}</div>`;
-                });
-                excursionesHtml += '</div>';
-            } else {
-                excursionesHtml = '<div class="excursiones-lista"><div class="excursion-item">No especificado</div></div>';
-            }
+            let excursionesHtml = '<div class="excursiones-lista">';
+            if (reserva.excursionesLista.length === 0) excursionesHtml += '<div class="excursion-item">No especificado</div>';
+            else reserva.excursionesLista.forEach(exc => { excursionesHtml += `<div class="excursion-item">${escapeHtml(exc)}</div>`; });
+            excursionesHtml += '</div>';
             
             const modalInfo = document.getElementById('modalInfo');
             modalInfo.innerHTML = `
@@ -376,20 +344,12 @@
         }
 
         function cerrarModal() { document.getElementById('modalReserva').classList.remove('show'); }
-        
-        function escapeHtml(text) { 
-            if (!text) return ''; 
-            const div = document.createElement('div'); 
-            div.textContent = text; 
-            return div.innerHTML; 
-        }
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
-        // Eventos
         document.getElementById('busquedaReserva').addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
         document.getElementById('modalReserva').addEventListener('click', e => { if (e.target === document.getElementById('modalReserva')) cerrarModal(); });
         document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
         
-        // Inicializar
         cargarReservas();
         setInterval(cargarReservas, 60000);
     </script>
