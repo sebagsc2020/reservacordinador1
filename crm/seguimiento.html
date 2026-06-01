@@ -216,6 +216,45 @@
         
         .loading-text { text-align: center; padding: 20px; color: #999; font-size: 12px; }
         
+        /* ========== BOTONES MODAL ========== */
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn-whatsapp {
+            flex: 1;
+            padding: 12px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-whatsapp:hover {
+            background: #1da851;
+            transform: translateY(-2px);
+        }
+        .btn-cerrar {
+            flex: 1;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-cerrar:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
         @media (max-width: 900px) { .kanban-board { grid-template-columns: 1fr; gap: 15px; } }
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
@@ -224,6 +263,7 @@
             .nav-icon { font-size: 18px; width: auto; }
             .main-content { margin-left: 60px; padding: 12px; }
             .metricas-grid { grid-template-columns: repeat(2, 1fr); }
+            .modal-buttons { flex-direction: column; }
         }
     </style>
 </head>
@@ -438,26 +478,24 @@
                     const fila = filas[i];
                     if (fila.length < 3 || !fila[0]) continue;
                     
-                    // Mapeo por posición (igual que en reservas.html)
-                    const id = fila[1] || `R-${i}`;           // columna B
-                    const timestamp = fila[0] || '';          // columna A
-                    const nombre = fila[2] || '';             // columna C
-                    const apellido = fila[3] || '';           // columna D
-                    const email = fila[4] || '';              // columna E
-                    const telefono = fila[5] || '';           // columna F
-                    const pais = fila[6] || '';               // columna G
-                    const ciudad = fila[7] || '';             // columna H
-                    const excursionesRaw = fila[8] || '';     // columna I
-                    const fecha = fila[9] || '';              // columna J
-                    const personas = fila[10] || '1';         // columna K
-                    const formaPago = fila[11] || '';         // columna L
-                    const lugar = fila[12] || '';             // columna M
+                    const id = fila[1] || `R-${i}`;
+                    const timestamp = fila[0] || '';
+                    const nombre = fila[2] || '';
+                    const apellido = fila[3] || '';
+                    const email = fila[4] || '';
+                    const telefono = fila[5] || '';
+                    const pais = fila[6] || '';
+                    const ciudad = fila[7] || '';
+                    const excursionesRaw = fila[8] || '';
+                    const fecha = fila[9] || '';
+                    const personas = fila[10] || '1';
+                    const formaPago = fila[11] || '';
+                    const lugar = fila[12] || '';
                     
                     const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     const excursionPrimera = listaExcursiones.length > 0 ? listaExcursiones[0] : 'Sin excursiones';
                     
-                    // Obtener estado del localStorage o usar 'confirmado' por defecto
                     let estado = estadosGuardados[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
@@ -482,9 +520,7 @@
                 }
                 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
-                console.log('📋 Estados en datos:', reservasData.map(r => `${r.id}: ${r.estado}`).join(', '));
                 
-                // Ordenar por ID descendente
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
                     const numB = parseInt(b.id.replace(/\D/g, '')) || 0; 
@@ -496,8 +532,6 @@
             } catch (error) {
                 console.error('❌ Error:', error);
                 if (pendienteContainer) pendienteContainer.innerHTML = `<div class="loading-text">❌ Error: ${error.message}</div>`;
-                if (confirmadoContainer) confirmadoContainer.innerHTML = `<div class="loading-text">❌ Error</div>`;
-                if (pagadoContainer) pagadoContainer.innerHTML = `<div class="loading-text">❌ Error</div>`;
             }
         }
         
@@ -505,13 +539,11 @@
         // ACTUALIZAR DASHBOARD
         // ==================================================
         function actualizarDashboard() {
-            // Calcular métricas
             const total = reservasData.length;
             const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
             const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
             const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
             
-            // Actualizar métricas
             document.getElementById('metricaTotal').textContent = total;
             document.getElementById('metricaConfirmadas').textContent = confirmadas;
             document.getElementById('metricaPendientes').textContent = pendientes;
@@ -521,14 +553,10 @@
             document.getElementById('countConfirmado').textContent = confirmadas;
             document.getElementById('countPagado').textContent = pagadas;
             
-            // Filtrar por estado
             const pendientesList = reservasData.filter(r => r.estado === 'pendiente');
             const confirmadosList = reservasData.filter(r => r.estado === 'confirmado');
             const pagadosList = reservasData.filter(r => r.estado === 'pagado');
             
-            console.log(`📊 Dashboard: Pendientes=${pendientesList.length}, Confirmados=${confirmadosList.length}, Pagados=${pagadosList.length}`);
-            
-            // Renderizar columnas
             document.getElementById('kanbanPendiente').innerHTML = renderizarTarjetas(pendientesList, 'pendiente');
             document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(confirmadosList, 'confirmado');
             document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(pagadosList, 'pagado');
@@ -559,26 +587,75 @@
         }
         
         // ==================================================
-        // VER DETALLE DE RESERVA
+        // FUNCIÓN PARA ENVIAR MENSAJE POR WHATSAPP
+        // ==================================================
+        function enviarPorWhatsApp(reserva) {
+            // Limpiar número de teléfono (solo dígitos)
+            let telefono = reserva.telefono.replace(/\D/g, '');
+            
+            // Si el número no tiene código país, agregar 54 para Argentina
+            if (telefono.length === 10) {
+                telefono = '54' + telefono;
+            }
+            
+            // Formatear lista de excursiones
+            let excursionesTexto = '';
+            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
+                excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
+            } else {
+                excursionesTexto = 'Sin excursiones específicas';
+            }
+            
+            // Crear mensaje
+            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
+
+✅ *CONFIRMACIÓN DE RESERVA*
+
+🆔 *N° de reserva:* ${reserva.id}
+📅 *Fecha:* ${reserva.fecha}
+
+👤 *DATOS DEL PASAJERO:*
+   Nombre: ${reserva.nombre}
+   📞 Teléfono: ${reserva.telefono}
+   📧 Email: ${reserva.email}
+
+📍 *DESTINO:*
+   ${reserva.pais} - ${reserva.ciudad}
+
+✨ *EXCURSIONES SELECCIONADAS:*
+${excursionesTexto}
+
+👥 *Cantidad de personas:* ${reserva.personas}
+💳 *Forma de pago:* ${reserva.formaPago}
+🚐 *Punto de encuentro:* ${reserva.lugar}
+
+📌 *PRÓXIMOS PASOS:*
+• En las próximas 24hs recibirás detalles de pago
+• Punto de encuentro exacto será confirmado
+
+🏔️ ¡Gracias por confiar en Aventura Total!`;
+
+            // Codificar mensaje para URL
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            
+            // Abrir WhatsApp
+            window.open(`https://wa.me/${telefono}?text=${mensajeCodificado}`, '_blank');
+        }
+        
+        // ==================================================
+        // VER DETALLE DE RESERVA (CON BOTÓN WHATSAPP)
         // ==================================================
         function verDetalle(id) {
             const reserva = reservasData.find(r => r.id === id);
             if (!reserva) return;
             
             let estadoText = '';
-            switch(reserva.estado) {
-                case 'pendiente': estadoText = 'Pendiente'; break;
-                case 'confirmado': estadoText = 'Confirmado'; break;
-                case 'pagado': estadoText = 'Pagado'; break;
-                default: estadoText = 'Confirmado';
-            }
-            
             let estadoColor = '';
             switch(reserva.estado) {
-                case 'pendiente': estadoColor = '#ffc107'; break;
-                case 'confirmado': estadoColor = '#27ae60'; break;
-                case 'pagado': estadoColor = '#3498db'; break;
-                default: estadoColor = '#667eea';
+                case 'pendiente': estadoText = 'Pendiente'; estadoColor = '#ffc107'; break;
+                case 'confirmado': estadoText = 'Confirmado'; estadoColor = '#27ae60'; break;
+                case 'pagado': estadoText = 'Pagado'; estadoColor = '#3498db'; break;
+                default: estadoText = 'Confirmado'; estadoColor = '#667eea';
             }
             
             let excursionesHtml = '<ul style="margin:5px 0 0 20px; padding:0;">';
@@ -598,6 +675,7 @@
                             <h2 style="color:#667eea;">📋 Detalle de Reserva</h2>
                             <button onclick="cerrarModal()" style="background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
                         </div>
+                        
                         <p><strong>ID:</strong> ${escapeHtml(reserva.id)}</p>
                         <p><strong>Fecha:</strong> ${escapeHtml(reserva.fecha)}</p>
                         <p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p>
@@ -610,12 +688,24 @@
                         <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
                         <p><strong>Lugar:</strong> ${escapeHtml(reserva.lugar)}</p>
                         <p><strong>Estado:</strong> <span style="background:${estadoColor}20; color:${estadoColor}; padding:4px 12px; border-radius:20px; font-weight:600;">${estadoText}</span></p>
-                        <button onclick="cerrarModal()" style="width:100%; padding:12px; background:#667eea; color:white; border:none; border-radius:12px; margin-top:15px; cursor:pointer;">Cerrar</button>
+                        
+                        <div class="modal-buttons">
+                            <button class="btn-whatsapp" onclick="enviarWhatsAppDesdeModal('${escapeHtml(reserva.id)}')">📱 Enviar por WhatsApp</button>
+                            <button class="btn-cerrar" onclick="cerrarModal()">Cerrar</button>
+                        </div>
                     </div>
                 </div>
             `;
             
             document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        // Función para enviar WhatsApp desde el modal
+        function enviarWhatsAppDesdeModal(id) {
+            const reserva = reservasData.find(r => r.id === id);
+            if (reserva) {
+                enviarPorWhatsApp(reserva);
+            }
         }
         
         function cerrarModal() {
@@ -640,6 +730,7 @@
         window.cerrarModal = cerrarModal;
         window.cargarDatos = cargarDatos;
         window.logout = logout;
+        window.enviarWhatsAppDesdeModal = enviarWhatsAppDesdeModal;
         
         cargarDatos();
         setInterval(cargarDatos, 60000);
