@@ -151,8 +151,8 @@
         .btn-confirmar-card { background: #27ae60; color: white; }
         .btn-pendiente-card { background: #ffc107; color: #856404; }
         .btn-pagar-card { background: #3498db; color: white; }
-        .btn-excluir-card { background: #e74c3c; color: white; }
         .btn-whatsapp-card { background: #25D366; color: white; }
+        .btn-excluir-card { background: #e74c3c; color: white; }
         
         .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
         
@@ -173,12 +173,12 @@
         <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2></div>
         <ul class="nav-menu">
             <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
             <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
             <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
             <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
             <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
+            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
         </ul>
         <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button></div>
     </nav>
@@ -328,13 +328,11 @@
         // FUNCIÓN PARA ENVIAR WHATSAPP
         // ==================================================
         function enviarWhatsApp(reserva) {
-            // Limpiar número de teléfono (solo dígitos)
             let telefono = reserva.telefono.replace(/\D/g, '');
             if (telefono.length === 10) {
                 telefono = '54' + telefono;
             }
             
-            // Formatear lista de excursiones
             let excursionesTexto = '';
             if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
                 excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
@@ -350,7 +348,6 @@
                 default: estadoTexto = 'Confirmado';
             }
             
-            // Crear mensaje
             const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
 
 ✅ *CONFIRMACIÓN DE RESERVA*
@@ -380,10 +377,7 @@ ${excursionesTexto}
 
 🏔️ ¡Gracias por confiar en Aventura Total!`;
 
-            // Codificar mensaje para URL
             const mensajeCodificado = encodeURIComponent(mensaje);
-            
-            // Abrir WhatsApp
             window.open(`https://wa.me/${telefono}?text=${mensajeCodificado}`, '_blank');
         }
         
@@ -519,7 +513,6 @@ ${excursionesTexto}
                 const colWidths = [28, 48, 28, 55, 12, 22, 40];
                 const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar'];
                 
-                // Título
                 doc.setFontSize(16);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(0, 0, 0);
