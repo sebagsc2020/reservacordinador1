@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas - CRM Aventura Total</title>
+    <!-- Incluir jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
@@ -26,9 +28,10 @@
         
         .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
-        .btn-filtrar, .btn-recargar { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-filtrar, .btn-recargar, .btn-pdf { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
+        .btn-pdf { background: #e74c3c; color: white; }
         
         /* Grid de 3 columnas para tarjetas */
         .cards-grid {
@@ -128,6 +131,7 @@
             padding: 12px 15px;
             background: #f8f9fa;
             border-top: 1px solid #f0f0f0;
+            flex-wrap: wrap;
         }
         .btn-card {
             flex: 1;
@@ -138,6 +142,7 @@
             font-size: 12px;
             font-weight: 600;
             transition: all 0.2s;
+            text-align: center;
         }
         .btn-card:hover {
             transform: scale(0.98);
@@ -147,6 +152,7 @@
         .btn-pendiente-card { background: #ffc107; color: #856404; }
         .btn-pagar-card { background: #3498db; color: white; }
         .btn-excluir-card { background: #e74c3c; color: white; }
+        .btn-whatsapp-card { background: #25D366; color: white; }
         
         .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
         
@@ -187,6 +193,7 @@
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
+            <button class="btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
         </div>
 
         <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
@@ -317,6 +324,69 @@
             }
         }
         
+        // ==================================================
+        // FUNCIÓN PARA ENVIAR WHATSAPP
+        // ==================================================
+        function enviarWhatsApp(reserva) {
+            // Limpiar número de teléfono (solo dígitos)
+            let telefono = reserva.telefono.replace(/\D/g, '');
+            if (telefono.length === 10) {
+                telefono = '54' + telefono;
+            }
+            
+            // Formatear lista de excursiones
+            let excursionesTexto = '';
+            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
+                excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
+            } else {
+                excursionesTexto = 'Sin excursiones específicas';
+            }
+            
+            let estadoTexto = '';
+            switch(reserva.estado) {
+                case 'pendiente': estadoTexto = 'Pendiente'; break;
+                case 'confirmado': estadoTexto = 'Confirmado'; break;
+                case 'pagado': estadoTexto = 'Pagado'; break;
+                default: estadoTexto = 'Confirmado';
+            }
+            
+            // Crear mensaje
+            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
+
+✅ *CONFIRMACIÓN DE RESERVA*
+
+🆔 *N° de reserva:* ${reserva.id}
+📅 *Fecha:* ${reserva.fecha}
+
+👤 *DATOS DEL PASAJERO:*
+   Nombre: ${reserva.nombre}
+   📞 Teléfono: ${reserva.telefono}
+   📧 Email: ${reserva.email}
+
+📍 *DESTINO:*
+   ${reserva.ciudad}
+
+✨ *EXCURSIONES SELECCIONADAS:*
+${excursionesTexto}
+
+👥 *Cantidad de personas:* ${reserva.personas}
+💳 *Forma de pago:* ${reserva.formaPago}
+🚐 *Punto de encuentro:* ${reserva.lugar}
+📌 *Estado:* ${estadoTexto}
+
+📌 *PRÓXIMOS PASOS:*
+• En las próximas 24hs recibirás detalles de pago
+• Punto de encuentro exacto será confirmado
+
+🏔️ ¡Gracias por confiar en Aventura Total!`;
+
+            // Codificar mensaje para URL
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            
+            // Abrir WhatsApp
+            window.open(`https://wa.me/${telefono}?text=${mensajeCodificado}`, '_blank');
+        }
+        
         function renderizarCards() {
             const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
@@ -396,6 +466,7 @@
                             <button class="btn-card btn-confirmar-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')">✅</button>
                             <button class="btn-card btn-pendiente-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')">⏳</button>
                             <button class="btn-card btn-pagar-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')">💰</button>
+                            <button class="btn-card btn-whatsapp-card" onclick="enviarWhatsApp(${JSON.stringify(r).replace(/"/g, '&quot;')})">💬 WhatsApp</button>
                             <button class="btn-card btn-excluir-card" onclick="excluirReserva('${escapeHtml(r.id)}')">🗑️</button>
                         </div>
                     </div>
@@ -422,6 +493,143 @@
                 });
             }
             renderizarCards();
+        }
+        
+        // ==================================================
+        // GENERAR PDF
+        // ==================================================
+        async function generarPDF() {
+            if (reservasFiltradas.length === 0) {
+                alert('⚠️ No hay reservas para exportar.');
+                return;
+            }
+            
+            const btnPDF = document.querySelector('.btn-pdf');
+            const textoOriginal = btnPDF.textContent;
+            btnPDF.textContent = '⏳ Generando...';
+            btnPDF.disabled = true;
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                const marginLeft = 8;
+                let y = marginLeft + 10;
+                const pageWidth = doc.internal.pageSize.getWidth();
+                
+                const colWidths = [28, 48, 28, 55, 12, 22, 40];
+                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar'];
+                
+                // Título
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(0, 0, 0);
+                doc.text('Reporte de Reservas', pageWidth / 2, y, { align: 'center' });
+                y += 10;
+                
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, marginLeft, y);
+                y += 6;
+                doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
+                y += 12;
+                
+                let x = marginLeft;
+                doc.setFillColor(255, 255, 255);
+                doc.setDrawColor(0, 0, 0);
+                doc.setLineWidth(0.1);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.setTextColor(0, 0, 0);
+                
+                for (let i = 0; i < headers.length; i++) {
+                    doc.rect(x, y, colWidths[i], 10);
+                    doc.text(headers[i], x + 2, y + 6);
+                    x += colWidths[i];
+                }
+                y += 10;
+                
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(0, 0, 0);
+                doc.setDrawColor(200, 200, 200);
+                
+                for (const reserva of reservasFiltradas) {
+                    if (y > 180) {
+                        doc.addPage();
+                        y = marginLeft + 10;
+                        x = marginLeft;
+                        doc.setFillColor(255, 255, 255);
+                        doc.setDrawColor(0, 0, 0);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(9);
+                        doc.setTextColor(0, 0, 0);
+                        for (let i = 0; i < headers.length; i++) {
+                            doc.rect(x, y, colWidths[i], 10);
+                            doc.text(headers[i], x + 2, y + 6);
+                            x += colWidths[i];
+                        }
+                        y += 10;
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(8);
+                        doc.setTextColor(0, 0, 0);
+                        doc.setDrawColor(200, 200, 200);
+                    }
+                    
+                    let excursionesTexto = '';
+                    if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
+                        excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
+                    } else {
+                        excursionesTexto = 'Sin excursiones';
+                    }
+                    
+                    const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
+                    const lineasExcursiones = excursionesTexto.split('\n').length;
+                    const alturaFila = Math.max(10, lineasExcursiones * 4.5 + 4);
+                    
+                    x = marginLeft;
+                    
+                    doc.rect(x, y, colWidths[0], alturaFila);
+                    doc.text(String(reserva.id), x + 2, y + 5);
+                    x += colWidths[0];
+                    
+                    doc.rect(x, y, colWidths[1], alturaFila);
+                    const nombreCliente = reserva.nombre.length > 30 ? reserva.nombre.substring(0, 27) + '...' : reserva.nombre;
+                    doc.text(nombreCliente, x + 2, y + 5);
+                    x += colWidths[1];
+                    
+                    doc.rect(x, y, colWidths[2], alturaFila);
+                    doc.text(reserva.telefono, x + 2, y + 5);
+                    x += colWidths[2];
+                    
+                    doc.rect(x, y, colWidths[3], alturaFila);
+                    const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 4);
+                    doc.text(lineas, x + 2, y + 5);
+                    x += colWidths[3];
+                    
+                    doc.rect(x, y, colWidths[4], alturaFila);
+                    doc.text(reserva.personas, x + 2, y + 5);
+                    x += colWidths[4];
+                    
+                    doc.rect(x, y, colWidths[5], alturaFila);
+                    doc.text(estadoTexto, x + 2, y + 5);
+                    x += colWidths[5];
+                    
+                    doc.rect(x, y, colWidths[6], alturaFila);
+                    const lugarTexto = reserva.lugar.length > 35 ? reserva.lugar.substring(0, 32) + '...' : reserva.lugar;
+                    doc.text(lugarTexto, x + 2, y + 5);
+                    
+                    y += alturaFila;
+                }
+                
+                doc.save(`reservas_${Date.now()}.pdf`);
+                
+            } catch (error) {
+                console.error('Error PDF:', error);
+                alert('❌ Error al generar el PDF.');
+            } finally {
+                btnPDF.textContent = textoOriginal;
+                btnPDF.disabled = false;
+            }
         }
         
         function cambiarEstado(id, nuevoEstado) {
@@ -460,6 +668,8 @@
         window.excluirReserva = excluirReserva;
         window.filtrarReservas = filtrarReservas;
         window.cargarReservas = cargarReservas;
+        window.generarPDF = generarPDF;
+        window.enviarWhatsApp = enviarWhatsApp;
         window.logout = logout;
         
         const busquedaInput = document.getElementById('busquedaReserva');
