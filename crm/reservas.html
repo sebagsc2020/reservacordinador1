@@ -30,14 +30,14 @@
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
         
-        .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .table-header h3 { font-size: 15px; }
-        .table-wrapper { overflow-x: auto; }
         
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 950px; }
-        th { text-align: left; padding: 8px 6px; background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
-        td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; font-size: 11px; color: #333; vertical-align: top; word-break: break-word; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 1200px; }
+        th, td { padding: 8px 6px; border-bottom: 1px solid #e0e0e0; vertical-align: top; text-align: left; word-break: break-word; }
+        th { background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
+        td { font-size: 11px; color: #333; }
         tr:hover td { background: #f8f9ff; }
         
         .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
@@ -57,14 +57,12 @@
         .excursiones-lista { margin: 0; padding-left: 12px; list-style: none; }
         .excursiones-lista li { padding: 2px 0; font-size: 10px; white-space: normal; word-break: break-word; }
         .total-reservas { font-size: 11px; color: #666; }
-        .col-acciones { min-width: 70px; white-space: nowrap; }
         
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
             .nav-menu a { justify-content: center; } 
             .main-content { margin-left: 60px; padding: 12px; }
-            .col-acciones { min-width: 60px; }
             .btn-accion { padding: 3px 5px; font-size: 9px; }
         }
     </style>
@@ -91,7 +89,7 @@
         </div>
 
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email, ciudad o ID..." id="busquedaReserva">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o ID..." id="busquedaReserva">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
         </div>
@@ -101,32 +99,29 @@
                 <h3>Lista de Reservas</h3>
                 <span id="totalReservasSpan" class="total-reservas">0 reservas</span>
             </div>
-            <div class="table-wrapper">
-                <table id="reservasTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
-                            <th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Pago</th><th>Lugar</th><th>Estado</th>
-                            <th class="col-acciones">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
-                </table
-            </div>
+            <table id="reservasTable">
+                <thead>
+                    <tr>
+                        <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
+                        <th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Pago</th><th>Lugar</th><th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaReservas">
+                    <tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <script>
         // ==================================================
-        // CONFIGURACIÓN - TU PLANILLA
+        // CONFIGURACIÓN
         // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
         const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
         
-        // ==================================================
-        // VERIFICAR AUTENTICACIÓN
-        // ==================================================
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
         }
@@ -136,63 +131,35 @@
             window.location.href = 'index.html'; 
         }
         
-        // ==================================================
-        // VARIABLES GLOBALES
-        // ==================================================
         let reservasData = [];
         let reservasFiltradas = [];
         
-        // ==================================================
-        // PARSEAR CSV
-        // ==================================================
         function parseCSV(csvText) {
             const filas = [];
-            let filaActual = [];
-            let celdaActual = '';
-            let dentroComillas = false;
-            
+            let filaActual = [], celdaActual = '', dentroComillas = false;
             for (let i = 0; i < csvText.length; i++) {
-                const char = csvText[i];
-                const nextChar = csvText[i + 1];
-                
+                const char = csvText[i], nextChar = csvText[i + 1];
                 if (dentroComillas) {
                     if (char === '"') {
-                        if (nextChar === '"') {
-                            celdaActual += '"';
-                            i++;
-                        } else {
-                            dentroComillas = false;
-                        }
-                    } else {
-                        celdaActual += char;
-                    }
+                        if (nextChar === '"') { celdaActual += '"'; i++; }
+                        else { dentroComillas = false; }
+                    } else { celdaActual += char; }
                 } else {
-                    if (char === '"') {
-                        dentroComillas = true;
-                    } else if (char === ',') {
-                        filaActual.push(celdaActual.trim());
-                        celdaActual = '';
-                    } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
-                        filaActual.push(celdaActual.trim());
-                        filas.push(filaActual);
-                        filaActual = [];
-                        celdaActual = '';
+                    if (char === '"') { dentroComillas = true; }
+                    else if (char === ',') { filaActual.push(celdaActual.trim()); celdaActual = ''; }
+                    else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
+                        filaActual.push(celdaActual.trim()); filas.push(filaActual);
+                        filaActual = []; celdaActual = '';
                         if (char === '\r') i++;
-                    } else {
-                        celdaActual += char;
-                    }
+                    } else { celdaActual += char; }
                 }
             }
             if (celdaActual.trim() || filaActual.length > 0) {
-                filaActual.push(celdaActual.trim());
-                filas.push(filaActual);
+                filaActual.push(celdaActual.trim()); filas.push(filaActual);
             }
             return filas.filter(fila => fila.some(celda => celda !== ''));
         }
         
-        // ==================================================
-        // FORMATEAR FECHA
-        // ==================================================
         function formatearFecha(fechaStr) {
             if (!fechaStr) return '';
             if (fechaStr.includes('/')) return fechaStr;
@@ -208,12 +175,12 @@
             if (partes.length === 3 && partes[0].length === 4) {
                 return `${partes[2]}/${partes[1]}/${partes[0]}`;
             }
+            if (fechaStr.includes(' ')) {
+                return fechaStr.split(' ')[0];
+            }
             return fechaStr;
         }
         
-        // ==================================================
-        // DIVIDIR EXCURSIONES
-        // ==================================================
         function dividirExcursiones(texto) {
             if (!texto) return [];
             let partes = [];
@@ -225,9 +192,6 @@
             return partes.map(p => p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(p => p);
         }
         
-        // ==================================================
-        // GESTIÓN DE ESTADOS Y EXCLUIDOS
-        // ==================================================
         function cargarEstadosGuardados() {
             try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } 
             catch(e) { return {}; }
@@ -252,15 +216,12 @@
             }
         }
         
-        // ==================================================
-        // CARGAR RESERVAS
-        // ==================================================
         async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td></tr>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -296,11 +257,12 @@
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
                     }
+                    let fechaFormateada = formatearFecha(timestamp) || formatearFecha(fecha);
                     
                     reservasData.push({
-                        id: id, fecha: formatearFecha(timestamp) || formatearFecha(fecha),
-                        nombre: nombreCompleto, email, telefono, ciudad,
-                        excursionesLista: listaExcursiones, personas, 
+                        id: id, fecha: fechaFormateada,
+                        nombre: nombreCompleto, email: email, telefono: telefono, ciudad: ciudad,
+                        excursionesLista: listaExcursiones, personas: personas,
                         formaPago: formaPago || 'No especificado',
                         lugar: lugar || 'No especificado', estado: estado
                     });
@@ -317,20 +279,19 @@
                 if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
                 
             } catch (error) {
-                console.error(error);
+                console.error('Error:', error);
                 tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
-        // ==================================================
-        // RENDERIZAR TABLA
-        // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
+            const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             
             if (reservasFiltradas.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">📋 No hay reservas</td</td';
+                if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
             
@@ -355,37 +316,49 @@
                 excursionesHtml += '</ul>';
                 
                 html += '<tr>';
-                html += `<td><strong>${escapeHtml(r.id)}</strong></td>`;
-                html += `<td>${escapeHtml(r.fecha)}</td`;
-                html += `<td>${escapeHtml(r.nombre)}</td`;
-                html += `<td>${escapeHtml(r.email)}</td`;
-                html += `<td>${escapeHtml(r.telefono)}</td`;
-                html += `<td>${excursionesHtml}</td`;
-                html += `<td>${escapeHtml(r.ciudad)}</td`;
-                html += `<td>${escapeHtml(r.personas)}</td`;
-                html += `<td>${escapeHtml(r.formaPago)}</td`;
-                html += `<td>${escapeHtml(r.lugar)}</td`;
-                html += `<td><span class="badge ${estadoClass}">${estadoText}</span></td>`;
-                html += `<td class="col-acciones">
+                html += '<td class="id-reserva"><strong>' + escapeHtml(r.id) + '</strong></td>';
+                html += '<td>' + escapeHtml(r.fecha) + '</td>';
+                html += '<td>' + escapeHtml(r.nombre) + '</td>';
+                html += '<td style="word-break:break-all;">' + escapeHtml(r.email) + '</td>';
+                html += '<td>' + escapeHtml(r.telefono) + '</td>';
+                html += '<td>' + excursionesHtml + '</td>';
+                html += '<td>' + escapeHtml(r.ciudad) + '</td>';
+                html += '<td>' + escapeHtml(r.personas) + '</td>';
+                html += '<td>' + escapeHtml(r.formaPago) + '</td>';
+                html += '<td>' + escapeHtml(r.lugar) + '</td>';
+                html += '<td><span class="badge ' + estadoClass + '">' + estadoText + '</span></td>';
+                html += '<td class="col-acciones">
                             <div class="acciones-container">
                                 <div class="acciones-fila">
-                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
-                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Pendiente">⏳</button>
+                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado(\'' + escapeHtml(r.id) + '\', \'confirmado\')">✅</button>
+                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado(\'' + escapeHtml(r.id) + '\', \'pendiente\')">⏳</button>
                                 </div>
                                 <div class="acciones-fila">
-                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Pagado">💰</button>
-                                    <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir">🗑️</button>
+                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado(\'' + escapeHtml(r.id) + '\', \'pagado\')">💰</button>
+                                    <button class="btn-accion btn-excluir" onclick="excluirReserva(\'' + escapeHtml(r.id) + '\')">🗑️</button>
                                 </div>
                             </div>
-                        </td`;
+                        </td>';
                 html += '</tr>';
             }
             tbody.innerHTML = html;
+            if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
         }
         
-        // ==================================================
-        // FUNCIONES DE ACCIONES
-        // ==================================================
+        function filtrarReservas() {
+            const busqueda = document.getElementById('busquedaReserva');
+            if (!busqueda) return;
+            const texto = busqueda.value.toLowerCase().trim();
+            if (!texto) reservasFiltradas = [...reservasData];
+            else reservasFiltradas = reservasData.filter(r => 
+                r.nombre.toLowerCase().includes(texto) || 
+                r.email.toLowerCase().includes(texto) ||
+                r.ciudad.toLowerCase().includes(texto) ||
+                r.id.toLowerCase().includes(texto)
+            );
+            renderizarTabla();
+        }
+        
         function cambiarEstado(id, nuevoEstado) {
             const reserva = reservasData.find(r => r.id === id);
             if (reserva) {
@@ -405,20 +378,6 @@
             }
         }
         
-        function filtrarReservas() {
-            const busqueda = document.getElementById('busquedaReserva');
-            if (!busqueda) return;
-            const texto = busqueda.value.toLowerCase().trim();
-            if (!texto) reservasFiltradas = [...reservasData];
-            else reservasFiltradas = reservasData.filter(r => 
-                r.nombre.toLowerCase().includes(texto) || 
-                r.email.toLowerCase().includes(texto) ||
-                r.ciudad.toLowerCase().includes(texto) ||
-                r.id.toLowerCase().includes(texto)
-            );
-            renderizarTabla();
-        }
-        
         function escapeHtml(text) { 
             if (!text) return ''; 
             const div = document.createElement('div'); 
@@ -426,9 +385,6 @@
             return div.innerHTML; 
         }
         
-        // ==================================================
-        // INICIALIZAR
-        // ==================================================
         window.cambiarEstado = cambiarEstado;
         window.excluirReserva = excluirReserva;
         window.filtrarReservas = filtrarReservas;
