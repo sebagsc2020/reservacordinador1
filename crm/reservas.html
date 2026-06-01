@@ -173,8 +173,10 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
-            ~
+                <tbody id="tablaReservas">
+                    <tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -278,7 +280,7 @@
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td></tr>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -317,9 +319,9 @@
                     else if (fecha) fechaFormateada = formatearFecha(fecha);
                     
                     reservasData.push({
-                        id, fecha: fechaFormateada, nombre: nombreCompleto, email, telefono,
-                        ciudad, excursionesLista: listaExcursiones, personas: personas,
-                        formaPago: formaPago || 'No especificado', lugar: lugar || 'No especificado', estado
+                        id: id, fecha: fechaFormateada, nombre: nombreCompleto, email: email, telefono: telefono,
+                        ciudad: ciudad, excursionesLista: listaExcursiones, personas: personas,
+                        formaPago: formaPago || 'No especificado', lugar: lugar || 'No especificado', estado: estado
                     });
                 }
                 
@@ -334,7 +336,7 @@
                 if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message} </td</td`;
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
@@ -344,7 +346,7 @@
             if (!tbody) return;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">📋 No hay reservas</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">📋 No hay reservas</td></tr>';
                 if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
@@ -370,17 +372,17 @@
                 excursionesHtml += '</ul>';
                 
                 html += '<tr>';
-                html += `<td><strong>${escapeHtml(r.id)}</strong></td`;
-                html += `<td>${escapeHtml(r.fecha)}</td`;
+                html += `<td class="id-reserva"><strong>${escapeHtml(r.id)}</strong></td>`;
+                html += `<td style="font-size:10px">${escapeHtml(r.fecha)}</td`;
                 html += `<td>${escapeHtml(r.nombre)}</td`;
-                html += `<td style="word-break:break-all;">${escapeHtml(r.email)}</td`;
+                html += `<td style="font-size:10px; word-break:break-all;">${escapeHtml(r.email)}</td`;
                 html += `<td>${escapeHtml(r.telefono)}</td`;
                 html += `<td>${excursionesHtml}</td`;
                 html += `<td>${escapeHtml(r.ciudad)}</td`;
                 html += `<td>${escapeHtml(r.personas)}</td`;
-                html += `<td>${escapeHtml(r.formaPago)}</td`;
-                html += `<td>${escapeHtml(r.lugar)}</td`;
-                html += `<td><span class="badge ${estadoClass}">${estadoText}</span></td`;
+                html += `<td style="font-size:10px">${escapeHtml(r.formaPago)}</td`;
+                html += `<td style="font-size:10px">${escapeHtml(r.lugar)}</td`;
+                html += `<td><span class="badge ${estadoClass}">${estadoText}</span></td>`;
                 html += `<td class="col-acciones">
                             <div class="acciones-container">
                                 <div class="acciones-fila">
