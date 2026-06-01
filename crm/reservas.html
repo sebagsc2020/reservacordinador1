@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas - CRM Aventura Total</title>
+    <!-- Incluir jsPDF para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
@@ -27,9 +29,10 @@
         
         .filters-bar { background: white; padding: 12px 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .filter-input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 12px; flex: 1; min-width: 160px; }
-        .btn-filtrar, .btn-recargar { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-filtrar, .btn-recargar, .btn-pdf { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
+        .btn-pdf { background: #e74c3c; color: white; }
         
         .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
@@ -59,6 +62,8 @@
         .excursiones-lista li { padding: 2px 0; font-size: 10px; white-space: normal; word-break: break-word; }
         .total-reservas { font-size: 11px; color: #666; }
         .col-acciones { min-width: 70px; white-space: nowrap; }
+        
+        .filtro-ciudad { border-left: 2px solid #667eea; padding-left: 15px; margin-left: 5px; }
         
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
@@ -92,9 +97,11 @@
         </div>
 
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email, ciudad o ID..." id="busquedaReserva">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o ID..." id="busquedaReserva">
+            <input type="text" class="filter-input filtro-ciudad" placeholder="📍 Filtrar por ciudad..." id="busquedaCiudad">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
+            <button class="btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
         </div>
 
         <div class="table-container">
@@ -112,7 +119,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaReservas"><tr><td colspan="13" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
-                ~
+                恐
             </div>
         </div>
     </div>
@@ -276,7 +283,6 @@
                     const fila = filas[i];
                     if (fila.length < 3 || !fila[0]) continue;
                     
-                    // Mapeo por posición: columna B (índice 1) es el ID
                     const id = fila[1] || `R-${i}`;
                     if (excluidos.includes(id)) continue;
                     
@@ -329,10 +335,12 @@
         // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
+            const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             
             if (reservasFiltradas.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:20px;">📋 No hay reservas</td</td';
+                if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
             
@@ -358,16 +366,16 @@
                 return `
                     <tr>
                         <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td>
-                        <td>${escapeHtml(r.nombre)}</td>
-                        <td style="font-size:10px">${escapeHtml(r.email)}</td>
-                        <td>${escapeHtml(r.telefono)}</td>
-                        <td>${excursionesHtml}</td>
-                        <td>${escapeHtml(r.ciudad)}</td>
-                        <td>${escapeHtml(r.personas)}</td>
-                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td>
-                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td>
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
+                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td
+                        <td>${escapeHtml(r.nombre)}</td
+                        <td style="font-size:10px">${escapeHtml(r.email)}</td
+                        <td>${escapeHtml(r.telefono)}</td
+                        <td>${excursionesHtml}</td
+                        <td>${escapeHtml(r.ciudad)}</td
+                        <td>${escapeHtml(r.personas)}</td
+                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td
+                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
                         <td class="col-acciones">
                             <div class="acciones-container">
                                 <div class="acciones-fila">
@@ -379,10 +387,159 @@
                                     <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir/Eliminar">🗑️</button>
                                 </div>
                             </div>
-                        </td>
+                        </td
                     </tr>
                 `;
             }).join('');
+            if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
+        }
+        
+        // ==================================================
+        // FUNCIÓN DE FILTRADO (incluye búsqueda por ciudad)
+        // ==================================================
+        function filtrarReservas() {
+            const busquedaGeneral = document.getElementById('busquedaReserva');
+            const busquedaCiudad = document.getElementById('busquedaCiudad');
+            
+            const textoGeneral = busquedaGeneral ? busquedaGeneral.value.toLowerCase().trim() : '';
+            const textoCiudad = busquedaCiudad ? busquedaCiudad.value.toLowerCase().trim() : '';
+            
+            reservasFiltradas = reservasData.filter(r => {
+                // Filtro por ciudad (si hay texto)
+                if (textoCiudad && !r.ciudad.toLowerCase().includes(textoCiudad)) {
+                    return false;
+                }
+                // Filtro general (nombre, email, id)
+                if (textoGeneral && !r.nombre.toLowerCase().includes(textoGeneral) && 
+                    !r.email.toLowerCase().includes(textoGeneral) &&
+                    !r.id.toLowerCase().includes(textoGeneral)) {
+                    return false;
+                }
+                return true;
+            });
+            
+            renderizarTabla();
+        }
+        
+        // ==================================================
+        // FUNCIÓN PARA GENERAR PDF
+        // ==================================================
+        async function generarPDF() {
+            // Verificar si hay reservas filtradas
+            if (reservasFiltradas.length === 0) {
+                alert('⚠️ No hay reservas para exportar. Aplica un filtro de ciudad primero.');
+                return;
+            }
+            
+            // Obtener el nombre de la ciudad filtrada (para el encabezado)
+            const ciudadFiltro = document.getElementById('busquedaCiudad').value.trim();
+            let tituloPDF = 'Reporte de Reservas';
+            if (ciudadFiltro) {
+                tituloPDF = `Reporte de Reservas - Ciudad: ${ciudadFiltro.toUpperCase()}`;
+            }
+            
+            // Mostrar mensaje de carga
+            const btnPDF = document.querySelector('.btn-pdf');
+            const textoOriginal = btnPDF.textContent;
+            btnPDF.textContent = '⏳ Generando PDF...';
+            btnPDF.disabled = true;
+            
+            try {
+                // Usar la biblioteca jsPDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                
+                // Configurar fuente y márgenes
+                const margin = 10;
+                let y = margin + 10;
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const colWidths = [25, 45, 25, 50, 15, 40]; // ID, Cliente, Teléfono, Excursiones, Pax, Lugar
+                
+                // Título
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.text(tituloPDF, pageWidth / 2, y, { align: 'center' });
+                y += 10;
+                
+                // Fecha de generación
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                const fechaActual = new Date().toLocaleString('es-ES');
+                doc.text(`Generado: ${fechaActual}`, margin, y);
+                y += 8;
+                doc.text(`Total de reservas: ${reservasFiltradas.length}`, margin, y);
+                y += 12;
+                
+                // Encabezados de la tabla
+                doc.setFillColor(102, 126, 234);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.setTextColor(255, 255, 255);
+                
+                let headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Lugar'];
+                let x = margin;
+                for (let i = 0; i < headers.length; i++) {
+                    doc.rect(x, y, colWidths[i], 8, 'F');
+                    doc.text(headers[i], x + 2, y + 5);
+                    x += colWidths[i];
+                }
+                y += 8;
+                
+                // Datos de las reservas
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(0, 0, 0);
+                
+                for (const reserva of reservasFiltradas) {
+                    // Verificar si necesitamos nueva página
+                    if (y > 180) {
+                        doc.addPage();
+                        y = margin + 10;
+                        // Re-dibujar encabezados en la nueva página
+                        x = margin;
+                        for (let i = 0; i < headers.length; i++) {
+                            doc.setFillColor(102, 126, 234);
+                            doc.rect(x, y, colWidths[i], 8, 'F');
+                            doc.setFont('helvetica', 'bold');
+                            doc.setTextColor(255, 255, 255);
+                            doc.text(headers[i], x + 2, y + 5);
+                            x += colWidths[i];
+                        }
+                        y += 8;
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(8);
+                        doc.setTextColor(0, 0, 0);
+                    }
+                    
+                    // Preparar datos
+                    const id = reserva.id;
+                    const cliente = reserva.nombre;
+                    const telefono = reserva.telefono;
+                    const excursiones = reserva.excursionesLista.join(', ').substring(0, 60);
+                    const pax = reserva.personas;
+                    const lugar = reserva.lugar.substring(0, 35);
+                    
+                    const datos = [id, cliente, telefono, excursiones, pax, lugar];
+                    x = margin;
+                    const rowHeight = 8;
+                    
+                    for (let i = 0; i < datos.length; i++) {
+                        doc.text(String(datos[i]), x + 2, y + 4);
+                        x += colWidths[i];
+                    }
+                    y += rowHeight;
+                }
+                
+                // Guardar el PDF
+                doc.save(`reservas_${ciudadFiltro || 'todas'}_${Date.now()}.pdf`);
+                
+            } catch (error) {
+                console.error('Error al generar PDF:', error);
+                alert('❌ Error al generar el PDF. Intenta nuevamente.');
+            } finally {
+                btnPDF.textContent = textoOriginal;
+                btnPDF.disabled = false;
+            }
         }
         
         // ==================================================
@@ -407,20 +564,6 @@
             }
         }
         
-        function filtrarReservas() {
-            const busqueda = document.getElementById('busquedaReserva');
-            if (!busqueda) return;
-            const texto = busqueda.value.toLowerCase().trim();
-            if (!texto) reservasFiltradas = [...reservasData];
-            else reservasFiltradas = reservasData.filter(r => 
-                r.nombre.toLowerCase().includes(texto) || 
-                r.email.toLowerCase().includes(texto) ||
-                r.ciudad.toLowerCase().includes(texto) ||
-                r.id.toLowerCase().includes(texto)
-            );
-            renderizarTabla();
-        }
-        
         function escapeHtml(text) { 
             if (!text) return ''; 
             const div = document.createElement('div'); 
@@ -435,10 +578,13 @@
         window.excluirReserva = excluirReserva;
         window.filtrarReservas = filtrarReservas;
         window.cargarReservas = cargarReservas;
+        window.generarPDF = generarPDF;
         window.logout = logout;
         
         const busquedaInput = document.getElementById('busquedaReserva');
+        const busquedaCiudadInput = document.getElementById('busquedaCiudad');
         if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
+        if (busquedaCiudadInput) busquedaCiudadInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
         
         cargarReservas();
         setInterval(cargarReservas, 60000);
