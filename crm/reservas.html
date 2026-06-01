@@ -76,7 +76,7 @@
             <div class="table-wrapper">
                 <table id="reservasTable">
                     <thead>
-                        <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></table>
+                        <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
                     <tbody id="tablaReservas">
                         <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td
@@ -132,6 +132,7 @@
             else if (texto.includes(', ')) partes = texto.split(', ');
             else if (texto.includes(',')) partes = texto.split(',');
             else if (texto.includes('|')) partes = texto.split('|');
+            else if (texto.includes('✔️')) partes = [texto];
             else partes = [texto];
             return partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
         }
@@ -158,6 +159,12 @@
                 const filas = parseCSV(csvText);
                 if (filas.length === 0) throw new Error('No se encontraron datos');
                 
+                // Mostrar encabezados para depuración
+                console.log('📋 Encabezados:', filas[0]);
+                if (filas.length > 1) {
+                    console.log('📋 Primera fila de datos:', filas[1]);
+                }
+                
                 reservasData = [];
                 const estadosGuardados = cargarEstadosGuardados();
                 
@@ -170,7 +177,12 @@
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
-                    let excursionesRaw = fila[8] || fila[6] || '';
+                    // Buscar excursiones en múltiples columnas posibles
+                    let excursionesRaw = '';
+                    if (fila[8] && fila[8].length > 0) excursionesRaw = fila[8];
+                    else if (fila[6] && fila[6].length > 0) excursionesRaw = fila[6];
+                    else if (fila[7] && fila[7].length > 0) excursionesRaw = fila[7];
+                    
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     
                     const reserva = {
@@ -191,6 +203,10 @@
                 }
                 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
+                if (reservasData.length > 0) {
+                    console.log('🔍 Primera reserva:', reservasData[0]);
+                }
+                
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
                     const numB = parseInt(b.id.replace(/\D/g, '')) || 0; 
@@ -211,7 +227,7 @@
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</td';
+                tbody.innerHTML = '</td><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</td';
                 return;
             }
             
