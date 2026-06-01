@@ -110,7 +110,7 @@
             <button class="btn-excel" onclick="exportarExcel()">📊 Exportar Excel</button>
         </div>
 
-        <!-- Selector de columnas para PDF - Solo las columnas que queremos mostrar -->
+        <!-- Selector de columnas para PDF -->
         <div class="column-selector">
             <span>📋 Columnas para PDF:</span>
             <div class="checkbox-group" id="columnasSelector">
@@ -153,7 +153,7 @@
         const SHEET_NAME = 'Hoja 1';
         const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
         
-        // ANCHOS DE COLUMNAS PARA PDF (solo las que están en el selector)
+        // ANCHOS DE COLUMNAS PARA PDF
         const columnasPDF = {
             id: { header: 'ID', ancho: 30, getter: (r) => r.id },
             fecha: { header: 'Fecha', ancho: 28, getter: (r) => r.fecha },
@@ -309,7 +309,7 @@
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
+                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -373,7 +373,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = `<td><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message} </td</td`;
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message} </td</td`;
             }
         }
         
@@ -501,10 +501,9 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                 const marginLeft = 15;
-                const marginRight = 15;
                 let y = 25;
                 const pageWidth = doc.internal.pageSize.getWidth();
-                const maxWidth = pageWidth - marginLeft - marginRight;
+                const maxWidth = pageWidth - marginLeft - 15;
                 
                 // Calcular anchos
                 let totalAncho = 0;
@@ -532,14 +531,14 @@
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
                 y += 12;
                 
-                // Encabezados - Fondo gris claro, texto negro
+                // Encabezados - Fondo gris, letras negras
                 let x = marginLeft;
-                doc.setFillColor(200, 200, 200); // Gris claro
+                doc.setFillColor(192, 192, 192); // Gris (#C0C0C0)
                 doc.setDrawColor(0, 0, 0);
                 doc.setLineWidth(0.1);
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(9);
-                doc.setTextColor(0, 0, 0);
+                doc.setTextColor(0, 0, 0); // Letras negras
                 
                 for (let i = 0; i < columnas.length; i++) {
                     doc.rect(x, y, anchosFinales[i], 10, 'FD');
@@ -560,7 +559,7 @@
                         doc.addPage();
                         y = 20;
                         x = marginLeft;
-                        doc.setFillColor(200, 200, 200);
+                        doc.setFillColor(192, 192, 192);
                         doc.setDrawColor(0, 0, 0);
                         doc.setFont('helvetica', 'bold');
                         doc.setFontSize(9);
@@ -629,7 +628,7 @@
         }
         
         // ==================================================
-        // EXPORTAR A EXCEL (todas las columnas)
+        // EXPORTAR A EXCEL
         // ==================================================
         function exportarExcel() {
             if (reservasFiltradas.length === 0) {
