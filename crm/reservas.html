@@ -36,7 +36,7 @@
         .table-header h3 { font-size: 15px; }
         .table-wrapper { overflow-x: auto; }
         
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 950px; }
         th { text-align: left; padding: 8px 6px; background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
         td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; font-size: 11px; color: #333; vertical-align: top; word-break: break-word; }
         tr:hover td { background: #f8f9ff; }
@@ -45,24 +45,53 @@
         .badge-pendiente { background: #fff3cd; color: #856404; }
         .badge-confirmado { background: #d4edda; color: #155724; }
         .badge-pagado { background: #d1ecf1; color: #0c5460; }
-        .badge-excluido { background: #f8d7da; color: #721c24; }
         
-        .btn-accion { padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin: 2px; }
+        /* ========== BOTONES EN DOS COLUMNAS ========== */
+        .acciones-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .acciones-fila {
+            display: flex;
+            gap: 4px;
+            justify-content: flex-start;
+        }
+        .btn-accion {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-accion:hover {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
         .btn-confirmar { background: #27ae60; color: white; }
         .btn-pendiente { background: #ffc107; color: #856404; }
         .btn-pagar { background: #3498db; color: white; }
         .btn-excluir { background: #e74c3c; color: white; }
         
-        .acciones-container { display: flex; gap: 5px; flex-wrap: wrap; }
         .excursiones-lista { margin: 0; padding-left: 12px; list-style: none; }
         .excursiones-lista li { padding: 2px 0; font-size: 10px; white-space: normal; word-break: break-word; }
         .total-reservas { font-size: 11px; color: #666; }
+        
+        /* Columna de acciones con ancho fijo */
+        .col-acciones {
+            min-width: 70px;
+            white-space: nowrap;
+        }
         
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
             .nav-menu a { justify-content: center; } 
-            .main-content { margin-left: 60px; padding: 12px; } 
+            .main-content { margin-left: 60px; padding: 12px; }
+            .col-acciones { min-width: 60px; }
+            .btn-accion { padding: 3px 5px; font-size: 9px; }
         }
     </style>
 </head>
@@ -103,10 +132,11 @@
                     <thead>
                         <tr>
                             <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
-                            <th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th>
+                            <th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Pago</th><th>Lugar</th><th>Estado</th>
+                            <th class="col-acciones">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaReservas"><tr><td colspan="12">⏳ Cargando...</td></tr></tbody>
+                    <tbody id="tablaReservas"><tr><td colspan="13">⏳ Cargando...</td</td</tbody>
                 </table>
             </div>
         </div>
@@ -139,7 +169,7 @@
         let reservasFiltradas = [];
         
         // ==================================================
-        // PARSEAR CSV (maneja comillas y saltos de línea)
+        // PARSEAR CSV
         // ==================================================
         function parseCSV(csvText) {
             const filas = [];
@@ -235,7 +265,6 @@
             localStorage.setItem('estadosReservas', JSON.stringify(estados));
         }
         
-        // Excluir reserva (guardar en localStorage separado)
         function cargarExcluidos() {
             try { return JSON.parse(localStorage.getItem('reservasExcluidas') || '[]'); } 
             catch(e) { return []; }
@@ -249,16 +278,6 @@
             }
         }
         
-        function eliminarExcluido(id) {
-            let excluidos = cargarExcluidos();
-            excluidos = excluidos.filter(e => e !== id);
-            localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
-        }
-        
-        function estaExcluido(id) {
-            return cargarExcluidos().includes(id);
-        }
-        
         // ==================================================
         // CARGAR RESERVAS
         // ==================================================
@@ -267,7 +286,7 @@
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="12">⏳ Cargando...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="13">⏳ Cargando...</td></tr>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -283,7 +302,6 @@
                     if (fila.length < 3 || !fila[0]) continue;
                     
                     const id = fila[1] || `R-${i}`;
-                    // Si está excluida, la saltamos (no se muestra)
                     if (excluidos.includes(id)) continue;
                     
                     const timestamp = fila[0] || '';
@@ -291,7 +309,6 @@
                     const apellido = fila[3] || '';
                     const email = fila[4] || '';
                     const telefono = fila[5] || '';
-                    const pais = fila[6] || '';
                     const ciudad = fila[7] || '';
                     const excursionesRaw = fila[8] || '';
                     const fecha = fila[9] || '';
@@ -308,8 +325,9 @@
                     
                     reservasData.push({
                         id, fecha: formatearFecha(timestamp) || formatearFecha(fecha),
-                        nombre: nombreCompleto, email, telefono, pais, ciudad,
-                        excursionesLista: listaExcursiones, personas, formaPago: formaPago || 'No especificado',
+                        nombre: nombreCompleto, email, telefono, ciudad,
+                        excursionesLista: listaExcursiones, personas, 
+                        formaPago: formaPago || 'No especificado',
                         lugar: lugar || 'No especificado', estado
                     });
                 }
@@ -326,21 +344,19 @@
                 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="12">❌ Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="13">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
         // ==================================================
-        // RENDERIZAR TABLA
+        // RENDERIZAR TABLA (con botones en DOS COLUMNAS)
         // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
-            const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12">📋 No hay reservas</td></tr>';
-                if (totalSpan) totalSpan.textContent = '0 reservas';
+                tbody.innerHTML = '<tr><td colspan="13">📋 No hay reservas</td</td';
                 return;
             }
             
@@ -366,22 +382,28 @@
                 return `
                     <tr>
                         <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td>
-                        <td>${escapeHtml(r.nombre)}</td>
-                        <td style="font-size:10px">${escapeHtml(r.email)}</td>
-                        <td>${escapeHtml(r.telefono)}</td>
-                        <td>${excursionesHtml}</td>
-                        <td>${escapeHtml(r.ciudad)}</td>
-                        <td>${escapeHtml(r.personas)}</td>
-                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td>
-                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td>
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
-                        <td class="acciones-container">
-                            <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
-                            <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Pendiente">⏳</button>
-                            <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Pagado">💰</button>
-                            <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir/Eliminar">🗑️</button>
-                        </td>
+                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td
+                        <td>${escapeHtml(r.nombre)}</td
+                        <td style="font-size:10px">${escapeHtml(r.email)}</td
+                        <td>${escapeHtml(r.telefono)}</td
+                        <td>${excursionesHtml}</td
+                        <td>${escapeHtml(r.ciudad)}</td
+                        <td>${escapeHtml(r.personas)}</td
+                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td
+                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
+                        <td class="col-acciones">
+                            <div class="acciones-container">
+                                <div class="acciones-fila">
+                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
+                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Pendiente">⏳</button>
+                                </div>
+                                <div class="acciones-fila">
+                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Pagado">💰</button>
+                                    <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir/Eliminar">🗑️</button>
+                                </div>
+                            </div>
+                        </td
                     </tr>
                 `;
             }).join('');
@@ -404,7 +426,6 @@
         function excluirReserva(id) {
             if (confirm(`⚠️ ¿Estás seguro de que deseas EXCLUIR la reserva ${id}?\n\nLa reserva dejará de mostrarse en el listado.`)) {
                 guardarExcluido(id);
-                // Recargar datos para actualizar la tabla
                 cargarReservas();
                 alert(`✅ Reserva ${id} excluida correctamente.`);
             }
