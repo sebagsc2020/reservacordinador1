@@ -490,7 +490,7 @@ ${excursionesTexto}
         }
         
         // ==================================================
-        // GENERAR PDF CON FILA DE TOTAL SIMPLIFICADA
+        // GENERAR PDF CON SUMA TOTAL DE PAX
         // ==================================================
         async function generarPDF() {
             if (reservasFiltradas.length === 0) {
@@ -634,7 +634,7 @@ ${excursionesTexto}
                     y += alturaFila;
                 }
                 
-                // === FILA DE TOTAL (SOLO UNA LÍNEA) ===
+                // === FILA DE TOTAL (con la suma de Pax) ===
                 y += 5;
                 
                 // Posición donde empieza la columna de Excursiones (donde va "TOTAL GENERAL")
@@ -656,12 +656,13 @@ ${excursionesTexto}
                 // Celda vacía para Teléfono
                 doc.rect(marginLeft + colWidths[0] + colWidths[1], y, colWidths[2], 10);
                 
-                // Celda "TOTAL GENERAL" (solo esta celda tiene texto)
+                // Celda "TOTAL GENERAL"
                 doc.rect(totalX, y, colWidths[3], 10);
                 doc.text('TOTAL GENERAL', totalX + 2, y + 6);
                 
-                // Celda vacía para Pax
+                // Celda con la SUMA TOTAL DE PAX
                 doc.rect(totalX + colWidths[3], y, colWidths[4], 10);
+                doc.text(String(totalPasajeros), totalX + colWidths[3] + 2, y + 6);
                 
                 // Celda vacía para Estado
                 doc.rect(totalX + colWidths[3] + colWidths[4], y, colWidths[5], 10);
@@ -681,53 +682,3 @@ ${excursionesTexto}
                 btnPDF.textContent = textoOriginal;
                 btnPDF.disabled = false;
             }
-        }
-        
-        function cambiarEstado(id, nuevoEstado) {
-            const reserva = reservasData.find(r => r.id === id);
-            if (reserva) {
-                reserva.estado = nuevoEstado;
-                const estados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
-                estados[id] = nuevoEstado;
-                localStorage.setItem('estadosReservas', JSON.stringify(estados));
-                const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
-                if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
-                renderizarCards();
-            }
-        }
-        
-        function excluirReserva(id) {
-            if (confirm(`⚠️ ¿Estás seguro de excluir la reserva ${id}?`)) {
-                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
-                if (!excluidos.includes(id)) {
-                    excluidos.push(id);
-                    localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
-                }
-                cargarReservas();
-                alert(`✅ Reserva ${id} excluida.`);
-            }
-        }
-        
-        function escapeHtml(text) { 
-            if (!text) return ''; 
-            const div = document.createElement('div'); 
-            div.textContent = text; 
-            return div.innerHTML; 
-        }
-        
-        window.cambiarEstado = cambiarEstado;
-        window.excluirReserva = excluirReserva;
-        window.filtrarReservas = filtrarReservas;
-        window.cargarReservas = cargarReservas;
-        window.generarPDF = generarPDF;
-        window.enviarWhatsApp = enviarWhatsApp;
-        window.logout = logout;
-        
-        const busquedaInput = document.getElementById('busquedaReserva');
-        if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
-        
-        cargarReservas();
-        setInterval(cargarReservas, 60000);
-    </script>
-</body>
-</html>
