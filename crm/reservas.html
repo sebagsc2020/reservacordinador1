@@ -90,7 +90,8 @@
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
-        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI/gviz/tq?tqx=out:csv&sheet=Hoja%201';
+        // 🔥 URL CORREGIDA con formato export
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI/export?format=csv&gid=0';
         
         let reservasData = [];
         let reservasFiltradas = [];
@@ -127,14 +128,26 @@
         function dividirExcursiones(texto) {
             if (!texto) return [];
             let partes = [];
-            if (texto.includes('\n')) partes = texto.split('\n');
-            else if (texto.includes(' | ')) partes = texto.split(' | ');
-            else if (texto.includes(', ')) partes = texto.split(', ');
-            else if (texto.includes(',')) partes = texto.split(',');
-            else if (texto.includes('|')) partes = texto.split('|');
-            else if (texto.includes('✔️')) partes = [texto];
-            else partes = [texto];
-            return partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
+            if (texto.includes('\n')) {
+                partes = texto.split('\n');
+            }
+            else if (texto.includes(' | ')) {
+                partes = texto.split(' | ');
+            }
+            else if (texto.includes(', ')) {
+                partes = texto.split(', ');
+            }
+            else if (texto.includes(',')) {
+                partes = texto.split(',');
+            }
+            else if (texto.includes('|')) {
+                partes = texto.split('|');
+            }
+            else {
+                partes = [texto];
+            }
+            partes = partes.map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
+            return partes;
         }
 
         function cargarEstadosGuardados() {
@@ -153,13 +166,17 @@
             if (!tbody) return;
             
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td';
+                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const csvText = await response.text();
                 const filas = parseCSV(csvText);
                 if (filas.length === 0) throw new Error('No se encontraron datos');
                 
-                // Mostrar encabezados para depuración
                 console.log('📋 Encabezados:', filas[0]);
                 if (filas.length > 1) {
                     console.log('📋 Primera fila de datos:', filas[1]);
@@ -170,19 +187,14 @@
                 
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
-                    if (fila.length < 3) continue;
+                    if (fila.length < 5) continue;
                     
                     const id = fila[0] || `R-${i}`;
                     const nombre = fila[2] || '';
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
-                    // Buscar excursiones en múltiples columnas posibles
-                    let excursionesRaw = '';
-                    if (fila[8] && fila[8].length > 0) excursionesRaw = fila[8];
-                    else if (fila[6] && fila[6].length > 0) excursionesRaw = fila[6];
-                    else if (fila[7] && fila[7].length > 0) excursionesRaw = fila[7];
-                    
+                    let excursionesRaw = fila[8] || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     
                     const reserva = {
@@ -194,9 +206,9 @@
                         pais: fila[6] || '',
                         ciudad: fila[7] || '',
                         excursionesLista: listaExcursiones,
-                        personas: fila[10] || '1',
-                        formaPago: fila[11] || 'No especificado',
-                        lugar: fila[12] || 'No especificado',
+                        personas: fila[9] || '1',
+                        formaPago: fila[10] || 'No especificado',
+                        lugar: fila[11] || 'No especificado',
                         estado: estadosGuardados[id] || 'confirmado'
                     };
                     reservasData.push(reserva);
@@ -216,7 +228,7 @@
                 renderizarTabla();
             } catch (error) {
                 console.error('Error:', error);
-                if (tbody) tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</td`;
+                if (tbody) tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}<br><br>Verifica que la hoja de cálculo sea pública (Compartir → Cualquier persona con el enlace → Lector)</td</td`;
             }
         }
 
@@ -227,7 +239,7 @@
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '</td><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</td';
                 return;
             }
             
