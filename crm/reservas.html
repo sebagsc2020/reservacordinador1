@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,59 +8,63 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
-        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
-        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
+        /* Sidebar reducida a 140px */
+        .sidebar { width: 140px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-logo { text-align: center; padding: 0 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+        .sidebar-logo .logo-icon { font-size: 28px; } .sidebar-logo h2 { font-size: 13px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 8px; } .nav-menu li { margin-bottom: 3px; }
+        .nav-menu a { display: flex; align-items: center; gap: 6px; padding: 8px 8px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; font-size: 11px; }
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
-        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; border: none; }
+        .nav-icon { font-size: 14px; width: 22px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 15px; left: 8px; right: 8px; }
+        .btn-logout-sidebar { width: 100%; padding: 6px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 10px; border: none; }
         
-        .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
-        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
-        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        /* Ajuste del contenido principal */
+        .main-content { margin-left: 140px; flex: 1; padding: 20px; min-width: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .header h1 { font-size: 22px; color: #1a1a2e; }
+        .user-info { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 15px; border-radius: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 13px; }
+        .user-avatar { width: 30px; height: 30px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; }
         
-        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
-        .btn-filtrar, .btn-recargar { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .filters-bar { background: white; padding: 12px 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .filter-input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 12px; flex: 2; min-width: 200px; }
+        .btn-filtrar, .btn-recargar { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
         
-        .table-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow: hidden; }
-        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .table-header h3 { font-size: 15px; }
         .table-wrapper { overflow-x: auto; }
         
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 12px; }
-        th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; vertical-align: top; } 
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 11px; }
+        th { text-align: left; padding: 8px 6px; background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; }
+        td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; font-size: 11px; color: #333; vertical-align: top; } 
         tr:hover td { background: #f8f9ff; }
         
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
         .badge-pendiente { background: #fff3cd; color: #856404; }
         .badge-confirmado { background: #d4edda; color: #155724; }
         .badge-pagado { background: #d1ecf1; color: #0c5460; }
         
         .acciones-container { display: flex; flex-direction: column; gap: 3px; }
         .acciones-fila { display: flex; gap: 3px; justify-content: flex-start; }
-        .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin: 2px; width: 28px; text-align: center; }
+        .btn-accion { padding: 4px 6px; border-radius: 4px; border: none; cursor: pointer; font-size: 9px; font-weight: 600; margin: 1px; width: 24px; text-align: center; }
         .btn-pendiente { background: #ffc107; color: #856404; }
         .btn-confirmar { background: #27ae60; color: white; }
         .btn-pagar { background: #3498db; color: white; }
         .btn-excluir { background: #e74c3c; color: white; }
         
-        .excursiones-lista { margin: 0; padding-left: 15px; list-style: none; }
-        .excursiones-lista li { padding: 3px 0; font-size: 11px; }
-        .total-reservas { font-size: 12px; color: #666; }
+        .excursiones-lista { margin: 0; padding-left: 12px; list-style: none; }
+        .excursiones-lista li { padding: 2px 0; font-size: 10px; }
+        .total-reservas { font-size: 11px; color: #666; }
         
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
             .nav-menu a { justify-content: center; } 
-            .main-content { margin-left: 60px; padding: 15px; } 
+            .main-content { margin-left: 60px; padding: 12px; }
+            .btn-accion { padding: 3px 4px; width: 20px; font-size: 8px; }
         }
     </style>
 </head>
@@ -106,7 +109,7 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaReservas"></tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td</tr</tbody>
+                    <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td</tr</tbody>
                 </table>
             </div>
         </div>
@@ -314,7 +317,7 @@
                 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message} </td</tr`;
             }
         }
         
@@ -327,7 +330,7 @@
             if (!tbody) return;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</tr';
                 if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
@@ -354,16 +357,16 @@
                 return `
                     <tr>
                         <td class="id-reserva"><strong>${escapeHtml(r.id)}</strong></td>
-                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td>
-                        <td>${escapeHtml(r.nombre)}</td>
-                        <td style="font-size:10px">${escapeHtml(r.email)}</td>
-                        <td>${escapeHtml(r.telefono)}</td>
-                        <td>${excursionesHtml}</td>
-                        <td>${escapeHtml(r.ciudad)}</td>
-                        <td>${escapeHtml(r.personas)}</td>
-                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td>
-                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td>
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
+                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td
+                        <td>${escapeHtml(r.nombre)}</td
+                        <td style="font-size:10px">${escapeHtml(r.email)}</td
+                        <td>${escapeHtml(r.telefono)}</td
+                        <td>${excursionesHtml}</td
+                        <td>${escapeHtml(r.ciudad)}</td
+                        <td>${escapeHtml(r.personas)}</td
+                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td
+                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
                         <td class="col-acciones">
                             <div class="acciones-container">
                                 <div class="acciones-fila">
@@ -375,7 +378,7 @@
                                     <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir">🗑️</button>
                                 </div>
                             </div>
-                        </td>
+                        </td
                     </tr>
                 `;
             }).join('');
