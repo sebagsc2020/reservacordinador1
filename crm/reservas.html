@@ -110,19 +110,19 @@
             <button class="btn-excel" onclick="exportarExcel()">📊 Exportar Excel</button>
         </div>
 
-        <!-- Selector de columnas para PDF -->
+        <!-- Selector de columnas para PDF - Email, Ciudad y Pago desmarcados por defecto -->
         <div class="column-selector">
             <span>📋 Columnas para PDF:</span>
             <div class="checkbox-group" id="columnasSelector">
                 <label><input type="checkbox" value="id" checked> ID</label>
                 <label><input type="checkbox" value="fecha" checked> Fecha</label>
                 <label><input type="checkbox" value="cliente" checked> Cliente</label>
-                <label><input type="checkbox" value="email" checked> Email</label>
+                <label><input type="checkbox" value="email"> Email</label>
                 <label><input type="checkbox" value="telefono" checked> Teléfono</label>
                 <label><input type="checkbox" value="excursiones" checked> Excursiones</label>
-                <label><input type="checkbox" value="ciudad" checked> Ciudad</label>
+                <label><input type="checkbox" value="ciudad"> Ciudad</label>
                 <label><input type="checkbox" value="pax" checked> Pax</label>
-                <label><input type="checkbox" value="pago" checked> Pago</label>
+                <label><input type="checkbox" value="pago"> Pago</label>
                 <label><input type="checkbox" value="lugar" checked> Lugar</label>
                 <label><input type="checkbox" value="estado" checked> Estado</label>
             </div>
@@ -142,7 +142,7 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaReservas"><td><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
+                    <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
                 ~
             </div>
         </div>
@@ -166,7 +166,7 @@
             excursiones: { 
                 header: 'Excursiones', 
                 ancho: 65, 
-                getter: (r) => r.excursionesLista,  // Devuelve el array directamente
+                getter: (r) => r.excursionesLista,
                 esLista: true 
             },
             ciudad: { header: 'Ciudad', ancho: 35, getter: (r) => r.ciudad },
@@ -525,27 +525,27 @@
                 // Título
                 doc.setFontSize(18);
                 doc.setFont('helvetica', 'bold');
-                doc.setTextColor(0, 0, 0); // Negro
+                doc.setTextColor(0, 0, 0);
                 doc.text(tituloPDF, pageWidth / 2, y, { align: 'center' });
                 y += 12;
                 
                 // Fecha y total
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
-                doc.setTextColor(0, 0, 0); // Negro
+                doc.setTextColor(0, 0, 0);
                 doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, marginLeft, y);
                 y += 7;
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
                 y += 12;
                 
-                // Encabezados - Fondo gris claro, texto negro
+                // Encabezados - Fondo gris muy claro, texto negro
                 let x = marginLeft;
-                doc.setFillColor(230, 230, 230); // Gris claro
+                doc.setFillColor(245, 245, 245); // Gris más claro (#F5F5F5)
                 doc.setDrawColor(0, 0, 0);
                 doc.setLineWidth(0.1);
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(9);
-                doc.setTextColor(0, 0, 0); // Negro
+                doc.setTextColor(0, 0, 0);
                 
                 for (let i = 0; i < columnas.length; i++) {
                     doc.rect(x, y, anchosFinales[i], 10, 'FD');
@@ -557,7 +557,7 @@
                 // Datos
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(8);
-                doc.setTextColor(0, 0, 0); // Negro
+                doc.setTextColor(0, 0, 0);
                 doc.setDrawColor(200, 200, 200);
                 
                 for (const reserva of reservasFiltradas) {
@@ -566,7 +566,7 @@
                         doc.addPage();
                         y = 20;
                         x = marginLeft;
-                        doc.setFillColor(230, 230, 230);
+                        doc.setFillColor(245, 245, 245);
                         doc.setDrawColor(0, 0, 0);
                         doc.setFont('helvetica', 'bold');
                         doc.setFontSize(9);
@@ -585,7 +585,7 @@
                     
                     x = marginLeft;
                     
-                    // Calcular altura de fila basada en contenido (especialmente para excursiones en lista)
+                    // Calcular altura de fila
                     let alturaFila = 10;
                     for (let i = 0; i < columnas.length; i++) {
                         let texto;
