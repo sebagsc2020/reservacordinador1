@@ -36,7 +36,6 @@
         .btn-pdf { background: #e74c3c; color: white; }
         .btn-excel { background: #0f9d58; color: white; }
         
-        /* Selector de columnas */
         .column-selector { background: white; border-radius: 12px; padding: 10px 15px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-wrap: wrap; align-items: center; gap: 15px; }
         .column-selector span { font-weight: 600; font-size: 12px; color: #333; }
         .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -144,7 +143,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
-                ~
+                </table>
             </div>
         </div>
     </div>
@@ -157,19 +156,19 @@
         const SHEET_NAME = 'Hoja 1';
         const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
         
-        // Mapeo de columnas para PDF
+        // ANCHOS DE COLUMNAS PARA PDF (en mm) - VALORES MÁS ANCHOS
         const columnasPDF = {
-            id: { header: 'ID', ancho: 25, getter: (r) => r.id },
-            fecha: { header: 'Fecha', ancho: 20, getter: (r) => r.fecha },
-            cliente: { header: 'Cliente', ancho: 35, getter: (r) => r.nombre },
-            email: { header: 'Email', ancho: 40, getter: (r) => r.email },
-            telefono: { header: 'Teléfono', ancho: 25, getter: (r) => r.telefono },
-            excursiones: { header: 'Excursiones', ancho: 45, getter: (r) => r.excursionesLista.join(', ').substring(0, 55) },
-            ciudad: { header: 'Ciudad', ancho: 25, getter: (r) => r.ciudad },
-            pax: { header: 'Pax', ancho: 10, getter: (r) => r.personas },
-            pago: { header: 'Pago', ancho: 20, getter: (r) => r.formaPago },
-            lugar: { header: 'Lugar', ancho: 30, getter: (r) => r.lugar },
-            estado: { header: 'Estado', ancho: 20, getter: (r) => r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado') }
+            id: { header: 'ID', ancho: 30, getter: (r) => r.id },
+            fecha: { header: 'Fecha', ancho: 28, getter: (r) => r.fecha },
+            cliente: { header: 'Cliente', ancho: 50, getter: (r) => r.nombre },
+            email: { header: 'Email', ancho: 55, getter: (r) => r.email },
+            telefono: { header: 'Teléfono', ancho: 32, getter: (r) => r.telefono },
+            excursiones: { header: 'Excursiones', ancho: 65, getter: (r) => r.excursionesLista.join(', ').substring(0, 80) },
+            ciudad: { header: 'Ciudad', ancho: 35, getter: (r) => r.ciudad },
+            pax: { header: 'Pax', ancho: 15, getter: (r) => r.personas },
+            pago: { header: 'Pago', ancho: 30, getter: (r) => r.formaPago },
+            lugar: { header: 'Lugar', ancho: 45, getter: (r) => r.lugar },
+            estado: { header: 'Estado', ancho: 25, getter: (r) => r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado') }
         };
         
         // ==================================================
@@ -311,7 +310,7 @@
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
+                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -375,7 +374,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `</table><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message} </td</td`;
             }
         }
         
@@ -500,50 +499,53 @@
             
             try {
                 const { jsPDF } = window.jspdf;
+                // A4 Horizontal (landscape)
                 const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-                const margin = 10;
-                let y = margin + 10;
+                const marginLeft = 15;
+                const marginRight = 15;
+                let y = 25;
                 const pageWidth = doc.internal.pageSize.getWidth();
+                const maxWidth = pageWidth - marginLeft - marginRight;
                 
-                // Calcular ancho total
-                let totalWidth = margin;
-                for (const col of columnas) totalWidth += col.ancho;
+                // Calcular si las columnas entran, si no, escalar proporcionalmente
+                let totalAncho = 0;
+                for (const col of columnas) totalAncho += col.ancho;
                 
-                if (totalWidth > pageWidth) {
-                    // Ajustar anchos proporcionalmente
-                    const factor = (pageWidth - margin) / (totalWidth - margin);
-                    for (const col of columnas) col.ancho = col.ancho * factor;
+                let anchosFinales = columnas.map(col => col.ancho);
+                if (totalAncho > maxWidth) {
+                    const factor = maxWidth / totalAncho;
+                    anchosFinales = columnas.map(col => col.ancho * factor);
                 }
                 
                 // Título
-                doc.setFontSize(16);
+                doc.setFontSize(18);
                 doc.setFont('helvetica', 'bold');
                 doc.text(tituloPDF, pageWidth / 2, y, { align: 'center' });
-                y += 10;
-                
-                // Fecha
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, margin, y);
-                y += 8;
-                doc.text(`Total de reservas: ${reservasFiltradas.length}`, margin, y);
                 y += 12;
                 
-                // Encabezados
-                let x = margin;
+                // Fecha y total
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, marginLeft, y);
+                y += 7;
+                doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
+                y += 12;
+                
+                // Encabezados con fondo
+                let x = marginLeft;
                 doc.setFillColor(102, 126, 234);
                 doc.setDrawColor(0, 0, 0);
                 doc.setLineWidth(0.1);
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(8);
+                doc.setFontSize(9);
                 doc.setTextColor(255, 255, 255);
                 
-                for (const col of columnas) {
-                    doc.rect(x, y, col.ancho, 8, 'FD');
-                    doc.text(col.header, x + 2, y + 5);
-                    x += col.ancho;
+                for (let i = 0; i < columnas.length; i++) {
+                    doc.rect(x, y, anchosFinales[i], 10, 'FD');
+                    doc.text(columnas[i].header, x + 3, y + 6);
+                    x += anchosFinales[i];
                 }
-                y += 8;
+                y += 10;
                 
                 // Datos
                 doc.setFont('helvetica', 'normal');
@@ -552,35 +554,46 @@
                 doc.setDrawColor(200, 200, 200);
                 
                 for (const reserva of reservasFiltradas) {
+                    // Verificar salto de página
                     if (y > 180) {
                         doc.addPage();
-                        y = margin + 10;
-                        x = margin;
+                        y = 20;
+                        x = marginLeft;
                         doc.setFillColor(102, 126, 234);
                         doc.setDrawColor(0, 0, 0);
                         doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(9);
                         doc.setTextColor(255, 255, 255);
-                        for (const col of columnas) {
-                            doc.rect(x, y, col.ancho, 8, 'FD');
-                            doc.text(col.header, x + 2, y + 5);
-                            x += col.ancho;
+                        for (let i = 0; i < columnas.length; i++) {
+                            doc.rect(x, y, anchosFinales[i], 10, 'FD');
+                            doc.text(columnas[i].header, x + 3, y + 6);
+                            x += anchosFinales[i];
                         }
-                        y += 8;
+                        y += 10;
                         doc.setFont('helvetica', 'normal');
                         doc.setFontSize(8);
                         doc.setTextColor(0, 0, 0);
                         doc.setDrawColor(200, 200, 200);
                     }
                     
-                    x = margin;
-                    for (const col of columnas) {
-                        let valor = col.getter(reserva);
-                        if (valor && valor.length > 40) valor = valor.substring(0, 38) + '...';
-                        doc.rect(x, y, col.ancho, 8);
-                        doc.text(String(valor || ''), x + 2, y + 5);
-                        x += col.ancho;
+                    x = marginLeft;
+                    let alturaFila = 10;
+                    
+                    // Calcular altura de fila basada en contenido multilínea
+                    for (let i = 0; i < columnas.length; i++) {
+                        const texto = columnas[i].getter(reserva) || '';
+                        const lineas = doc.splitTextToSize(String(texto), anchosFinales[i] - 4);
+                        alturaFila = Math.max(alturaFila, lineas.length * 4 + 4);
                     }
-                    y += 8;
+                    
+                    for (let i = 0; i < columnas.length; i++) {
+                        const texto = columnas[i].getter(reserva) || '';
+                        doc.rect(x, y, anchosFinales[i], alturaFila);
+                        const lineas = doc.splitTextToSize(String(texto), anchosFinales[i] - 4);
+                        doc.text(lineas, x + 3, y + 5);
+                        x += anchosFinales[i];
+                    }
+                    y += alturaFila;
                 }
                 
                 doc.save(`reservas_${ciudadFiltro || 'todas'}_${Date.now()}.pdf`);
@@ -595,7 +608,7 @@
         }
         
         // ==================================================
-        // EXPORTAR A EXCEL (todas las columnas)
+        // EXPORTAR A EXCEL
         // ==================================================
         function exportarExcel() {
             if (reservasFiltradas.length === 0) {
@@ -625,7 +638,7 @@
                 
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.aoa_to_sheet(datosExcel);
-                ws['!cols'] = [{wch:15},{wch:12},{wch:25},{wch:30},{wch:15},{wch:40},{wch:20},{wch:6},{wch:18},{wch:25},{wch:12}];
+                ws['!cols'] = [{wch:15},{wch:12},{wch:25},{wch:30},{wch:15},{wch:50},{wch:20},{wch:6},{wch:18},{wch:25},{wch:12}];
                 XLSX.utils.book_append_sheet(wb, ws, 'Reservas');
                 XLSX.writeFile(wb, nombreArchivo);
                 
