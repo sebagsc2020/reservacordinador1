@@ -45,6 +45,7 @@
         .categoria-group, .excursion-group { animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 768px) { body { padding: 20px; } form { padding: 24px; } .form-header h1 { font-size: 24px; } }
+        .error-label { color: #e74c3c; font-size: 12px; margin-top: 5px; display: none; }
     </style>
 </head>
 <body>
@@ -54,21 +55,75 @@
         <div class="form-header"><h1>🕐 Reserva tu Excursión</h1><p>Completa el formulario y obtén el mejor precio</p></div>
         <form id="excursionForm">
             <div class="form-row">
-                <div class="form-group"><label for="nombre" class="required">Nombre</label><input type="text" id="nombre" name="nombre" required autocomplete="given-name" placeholder="Tu nombre"></div>
-                <div class="form-group"><label for="apellido" class="required">Apellido</label><input type="text" id="apellido" name="apellido" required autocomplete="family-name" placeholder="Tu apellido"></div>
+                <div class="form-group">
+                    <label for="nombre" class="required">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" required autocomplete="given-name" placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label for="apellido" class="required">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" required autocomplete="family-name" placeholder="Tu apellido">
+                </div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label for="email" class="required">Email</label><input type="email" id="email" name="email" required autocomplete="email" placeholder="correo@ejemplo.com"></div>
-                <div class="form-group"><label for="telefono" class="required">Teléfono</label><input type="tel" id="telefono" name="telefono" required autocomplete="tel" placeholder="+54 900 000 000"></div>
+                <div class="form-group">
+                    <label for="email" class="required">Email</label>
+                    <input type="email" id="email" name="email" required autocomplete="email" placeholder="correo@ejemplo.com">
+                </div>
+                <div class="form-group">
+                    <label for="telefono" class="required">Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono" required autocomplete="tel" placeholder="+54 900 000 000">
+                </div>
             </div>
-            <div class="form-group"><label for="pais" class="required">País</label><select id="pais" name="pais" required><option value="">Selecciona un país</option><option value="argentina">📌 Argentina</option><option value="brasil">📌 Brasil</option><option value="chile">📌 Chile</option></select></div>
-            <div class="form-group categoria-group" id="categoriaGroup" style="display: none;"><label for="categoria" class="required">Ciudad</label><select id="categoria" name="categoria" disabled><option value="">Selecciona una ciudad</option></select></div>
-            <div class="form-group excursion-group" id="excursionGroup" style="display: none;"><label class="required">Excursiones (selecciona una o varias)</label><div class="checkbox-excursiones" id="checkboxExcursiones"></div><div class="seleccionados-contador" id="contadorSeleccionados"><span class="sin-seleccion">✨ Selecciona al menos una excursión</span></div></div>
+            <div class="form-group">
+                <label for="pais" class="required">País</label>
+                <select id="pais" name="pais" required>
+                    <option value="">Selecciona un país</option>
+                    <option value="argentina">📌 Argentina</option>
+                    <option value="brasil">📌 Brasil</option>
+                    <option value="chile">📌 Chile</option>
+                </select>
+            </div>
+            <div class="form-group categoria-group" id="categoriaGroup" style="display: none;">
+                <label for="categoria" class="required">Ciudad</label>
+                <select id="categoria" name="categoria" disabled>
+                    <option value="">Selecciona una ciudad</option>
+                </select>
+            </div>
+            <div class="form-group excursion-group" id="excursionGroup" style="display: none;">
+                <label class="required">Excursiones (selecciona una o varias)</label>
+                <div class="checkbox-excursiones" id="checkboxExcursiones"></div>
+                <div class="seleccionados-contador" id="contadorSeleccionados">
+                    <span class="sin-seleccion">✨ Selecciona al menos una excursión</span>
+                </div>
+            </div>
             <input type="hidden" id="fecha" name="fecha">
-            <div class="form-row"><div class="form-group"><label for="fecha_mostrar" class="required">Fecha de reserva</label><input type="text" id="fecha_mostrar" readonly placeholder="Fecha del sistema"></div><div class="form-group"><label for="personas" class="required">Nº de personas</label><input type="number" id="personas" name="personas" min="1" max="20" value="1" required></div></div>
-            <div class="form-group"><label for="formaPago" class="required">Forma de Pago</label><select id="formaPago" name="formaPago" required><option value="">Selecciona una forma de pago</option><option value="💵 Efectivo">💵 Efectivo</option><option value="💳 Débito/Crédito">💳 Débito/Crédito</option><option value="🏦 Transferencia">🏦 Transferencia</option></select></div>
-            <div class="form-group"><label for="mensaje">📍 ¿Dónde te buscamos?</label><input type="text" id="mensaje" name="lugar" placeholder="Hotel, dirección, etc."></div>
-            <div class="checkbox-privacidad"><input type="checkbox" id="privacidad" name="privacidad" required><label for="privacidad">He leído y acepto la <a href="#" id="linkPrivacidad">política de privacidad</a></label></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fecha_mostrar" class="required">Fecha de reserva</label>
+                    <input type="text" id="fecha_mostrar" readonly placeholder="Fecha del sistema">
+                </div>
+                <div class="form-group">
+                    <label for="personas" class="required">Nº de personas</label>
+                    <input type="number" id="personas" name="personas" min="1" max="20" value="1" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="formaPago" class="required">Forma de Pago</label>
+                <select id="formaPago" name="formaPago" required>
+                    <option value="">Selecciona una forma de pago</option>
+                    <option value="💵 Efectivo">💵 Efectivo</option>
+                    <option value="💳 Débito/Crédito">💳 Débito/Crédito</option>
+                    <option value="🏦 Transferencia">🏦 Transferencia</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="mensaje">📍 ¿Dónde te buscamos?</label>
+                <input type="text" id="mensaje" name="lugar" placeholder="Hotel, dirección, etc.">
+            </div>
+            <div class="checkbox-privacidad">
+                <input type="checkbox" id="privacidad" name="privacidad" required>
+                <label for="privacidad">He leído y acepto la <a href="#" id="linkPrivacidad">política de privacidad</a></label>
+            </div>
             <div id="statusMessage" class="status-message" style="display: none;"></div>
             <button type="submit" class="submit-btn" id="submitBtn">📩 Enviar Reserva</button>
         </form>
@@ -76,7 +131,7 @@
 
     <script>
         // ==================================================
-        // URL DE TU WEB APP (YA ACTUALIZADA)
+        // URL DE TU WEB APP
         // ==================================================
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzqKJ3jifH5AV2G4HKnfUgfvhY07yqa20p8jsnQDgFvVHS2c0TOBxyZjY66yMaGLPlew/exec';
         
@@ -225,7 +280,6 @@
             formData.append('lugar', document.getElementById('mensaje').value || 'No especificado');
             
             console.log('📤 Enviando datos a:', GOOGLE_SCRIPT_URL);
-            console.log('📦 Datos:', Object.fromEntries(formData));
             
             const submitBtn = document.querySelector('.submit-btn');
             submitBtn.disabled = true;
