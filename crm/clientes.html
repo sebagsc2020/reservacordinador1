@@ -7,30 +7,54 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
-        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
-        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
+        
+        /* Sidebar más angosta */
+        .sidebar { width: 200px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-logo { text-align: center; padding: 0 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+        .sidebar-logo .logo-icon { font-size: 32px; } .sidebar-logo h2 { font-size: 16px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 12px; } .nav-menu li { margin-bottom: 3px; }
+        .nav-menu a { display: flex; align-items: center; gap: 8px; padding: 8px 10px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; font-size: 12px; }
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
-        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
-        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
-        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
-        .search-bar { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; gap: 15px; flex-wrap: wrap; }
-        .search-input { flex: 1; min-width: 200px; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
-        .btn-buscar { padding: 12px 25px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
-        .table-container { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; } th { text-align: left; padding: 12px 15px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; }
-        td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #333; } tr:hover td { background: #f8f9ff; }
-        .cliente-nombre { font-weight: 600; color: #667eea; cursor: pointer; }
-        .badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .badge-frecuente { background: #d4edda; color: #155724; } .badge-vip { background: #fff3cd; color: #856404; } .badge-nuevo { background: #d1ecf1; color: #0c5460; }
-        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 15px; left: 12px; right: 12px; }
+        .btn-logout-sidebar { width: 100%; padding: 8px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 11px; border: none; }
+        
+        .main-content { margin-left: 200px; flex: 1; padding: 20px; min-width: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .header h1 { font-size: 22px; color: #1a1a2e; }
+        .user-info { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 15px; border-radius: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 13px; }
+        .user-avatar { width: 30px; height: 30px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; }
+        
+        .filters-bar { background: white; padding: 12px 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .filter-input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 12px; flex: 1; min-width: 160px; }
+        .btn-filtrar, .btn-recargar { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-filtrar { background: #667eea; color: white; }
+        .btn-recargar { background: #27ae60; color: white; }
+        
+        .stats-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; }
+        .stats-number { font-size: 36px; font-weight: 800; color: #667eea; }
+        .stats-label { font-size: 12px; color: #666; margin-top: 5px; }
+        
+        .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .table-wrapper { overflow-x: auto; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 600px; }
+        th { text-align: left; padding: 8px 6px; background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
+        td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; font-size: 11px; color: #333; vertical-align: top; }
+        tr:hover td { background: #f8f9ff; }
+        
+        .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 600; display: inline-block; }
+        .badge-activo { background: #d4edda; color: #155724; }
+        
+        .btn-ver { padding: 4px 10px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 10px; }
+        
+        @media (max-width: 768px) { 
+            .sidebar { width: 60px; } 
+            .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
+            .nav-menu a { justify-content: center; } 
+            .main-content { margin-left: 60px; padding: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -45,53 +69,323 @@
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
             <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
         </ul>
-        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar Sesión</button></div>
+        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button></div>
     </nav>
+
     <div class="main-content">
-        <div class="header"><div><h1>👥 Clientes</h1></div><div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div></div>
-        <div class="search-bar">
-            <input type="text" class="search-input" placeholder="🔍 Buscar..." id="busqueda">
-            <button class="btn-buscar" onclick="buscarClientes()">🔍 Buscar</button>
+        <div class="header">
+            <div><h1>👥 Clientes</h1></div>
+            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
         </div>
+
+        <div class="filters-bar">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono..." id="busquedaCliente">
+            <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Filtrar</button>
+            <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
+        </div>
+
+        <div class="stats-card">
+            <div class="stats-number" id="totalClientes">0</div>
+            <div class="stats-label">Clientes Registrados</div>
+        </div>
+
         <div class="table-container">
-            <div style="display:flex;justify-content:space-between;margin-bottom:15px;"><h3 style="font-size:18px;">Lista de Clientes</h3><span id="totalClientesSpan" style="color:#999;">0</span></div>
-            <table><thead><tr><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Reservas</th><th>Tipo</th></tr></thead><tbody id="tablaClientes"></tbody></table>
+            <div class="table-header">
+                <h3>Lista de Clientes</h3>
+                <span id="totalClientesSpan" class="total-reservas" style="font-size:11px;color:#666;">0 clientes</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Reservas</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="tablaClientes"><tr><td colspan="7">⏳ Cargando...</td</td</tbody>
+                ~
+            </div>
         </div>
     </div>
+
     <script>
-        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
+        // ==================================================
+        // CONFIGURACIÓN - MISMA PLANILLA QUE DASHBOARD
+        // ==================================================
+        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
+        const SHEET_NAME = 'Hoja 1';
+        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
         
-        function verificarSesionUnica() {
-            const sessionId = sessionStorage.getItem('crm_session_id');
-            const sesionActiva = JSON.parse(localStorage.getItem('crm_sesion_activa') || '{}');
-            if (!sessionId || sesionActiva.id !== sessionId) { sessionStorage.clear(); alert('⚠️ Sesión cerrada.'); window.location.href = 'index.html'; return false; }
-            localStorage.setItem('crm_sesion_activa', JSON.stringify({ ...sesionActiva, timestamp: Date.now() }));
-            return true;
-        }
-        if (!verificarSesionUnica()) throw new Error('Sesión inválida');
-        setInterval(verificarSesionUnica, 10000);
-        
-        function logout() {
-            const sessionId = sessionStorage.getItem('crm_session_id');
-            const sesionActiva = JSON.parse(localStorage.getItem('crm_sesion_activa') || '{}');
-            if (sesionActiva.id === sessionId) localStorage.removeItem('crm_sesion_activa');
-            sessionStorage.clear(); window.location.href = 'index.html';
+        // ==================================================
+        // VERIFICAR AUTENTICACIÓN
+        // ==================================================
+        if (sessionStorage.getItem('crm_logged') !== 'true') { 
+            window.location.href = 'index.html'; 
         }
         
-        const clientes = [
-            { nombre: 'Sebastián González', email: 'sebagsc2020@gmail.com', telefono: '+54 351 8692251', reservas: 3, tipo: 'vip' },
-            { nombre: 'Sebastián González', email: 'scpicturesbc@gmail.com', telefono: '+54 351 8692251', reservas: 1, tipo: 'nuevo' }
-        ];
+        function logout() { 
+            sessionStorage.clear(); 
+            window.location.href = 'index.html'; 
+        }
         
-        function renderClientes(data) {
-            document.getElementById('totalClientesSpan').textContent = data.length + ' clientes';
-            document.getElementById('tablaClientes').innerHTML = data.map(c => `<tr><td><span class="cliente-nombre">${c.nombre}</span></td><td>${c.email}</td><td>${c.telefono}</td><td>${c.reservas}</td><td><span class="badge badge-${c.tipo}">${c.tipo}</span></td></tr>`).join('');
+        // ==================================================
+        // VARIABLES GLOBALES
+        // ==================================================
+        let clientesData = [];
+        let clientesFiltrados = [];
+        let reservasPorCliente = new Map();
+        
+        // ==================================================
+        // PARSEAR CSV (mismo que en dashboard y reservas)
+        // ==================================================
+        function parseCSV(csvText) {
+            const filas = [];
+            let filaActual = [];
+            let celdaActual = '';
+            let dentroComillas = false;
+            
+            for (let i = 0; i < csvText.length; i++) {
+                const char = csvText[i];
+                const nextChar = csvText[i + 1];
+                
+                if (dentroComillas) {
+                    if (char === '"') {
+                        if (nextChar === '"') {
+                            celdaActual += '"';
+                            i++;
+                        } else {
+                            dentroComillas = false;
+                        }
+                    } else {
+                        celdaActual += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        dentroComillas = true;
+                    } else if (char === ',') {
+                        filaActual.push(celdaActual.trim());
+                        celdaActual = '';
+                    } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
+                        filaActual.push(celdaActual.trim());
+                        filas.push(filaActual);
+                        filaActual = [];
+                        celdaActual = '';
+                        if (char === '\r') i++;
+                    } else {
+                        celdaActual += char;
+                    }
+                }
+            }
+            if (celdaActual.trim() || filaActual.length > 0) {
+                filaActual.push(celdaActual.trim());
+                filas.push(filaActual);
+            }
+            return filas.filter(fila => fila.some(celda => celda !== ''));
         }
-        renderClientes(clientes);
-        function buscarClientes() {
-            const t = document.getElementById('busqueda').value.toLowerCase();
-            renderClientes(clientes.filter(c => c.nombre.toLowerCase().includes(t) || c.email.toLowerCase().includes(t)));
+        
+        // ==================================================
+        // CARGAR CLIENTES DESDE LA PLANILLA
+        // ==================================================
+        async function cargarClientes() {
+            const tbody = document.getElementById('tablaClientes');
+            const totalSpan = document.getElementById('totalClientesSpan');
+            const totalNum = document.getElementById('totalClientes');
+            
+            if (!tbody) return;
+            try {
+                tbody.innerHTML = '<tr><td colspan="7">⏳ Cargando...<tr></tr>';
+                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const csvText = await response.text();
+                const filas = parseCSV(csvText);
+                if (filas.length < 2) throw new Error('No hay datos');
+                
+                // Mapa de clientes únicos por email
+                const clientesMap = new Map();
+                reservasPorCliente.clear();
+                
+                for (let i = 1; i < filas.length; i++) {
+                    const fila = filas[i];
+                    if (fila.length < 3 || !fila[0]) continue;
+                    
+                    const id = fila[1] || `R-${i}`;
+                    const nombre = fila[2] || '';
+                    const apellido = fila[3] || '';
+                    const email = fila[4] || '';
+                    const telefono = fila[5] || '';
+                    
+                    if (!email) continue;
+                    
+                    const nombreCompleto = `${nombre} ${apellido}`.trim() || 'Sin nombre';
+                    
+                    // Contar reservas por cliente
+                    if (!reservasPorCliente.has(email)) {
+                        reservasPorCliente.set(email, 0);
+                    }
+                    reservasPorCliente.set(email, reservasPorCliente.get(email) + 1);
+                    
+                    // Guardar cliente único
+                    if (!clientesMap.has(email)) {
+                        clientesMap.set(email, {
+                            email: email,
+                            nombre: nombreCompleto,
+                            telefono: telefono
+                        });
+                    }
+                }
+                
+                // Convertir mapa a array
+                clientesData = Array.from(clientesMap.values()).map(cliente => ({
+                    ...cliente,
+                    totalReservas: reservasPorCliente.get(cliente.email) || 0
+                }));
+                
+                // Ordenar por nombre
+                clientesData.sort((a, b) => a.nombre.localeCompare(b.nombre));
+                
+                clientesFiltrados = [...clientesData];
+                renderizarTabla();
+                
+                if (totalNum) totalNum.textContent = clientesData.length;
+                if (totalSpan) totalSpan.textContent = `${clientesData.length} clientes`;
+                
+                console.log(`📊 Clientes cargados: ${clientesData.length}`);
+                
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="7">❌ Error: ${error.message}</td></tr>`;
+            }
         }
+        
+        // ==================================================
+        // RENDERIZAR TABLA DE CLIENTES
+        // ==================================================
+        function renderizarTabla() {
+            const tbody = document.getElementById('tablaClientes');
+            if (!tbody) return;
+            
+            if (clientesFiltrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">📋 No hay clientes</td</td';
+                return;
+            }
+            
+            tbody.innerHTML = clientesFiltrados.map((cliente, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td
+                    <td style="font-size:11px">${escapeHtml(cliente.email)}</td
+                    <td>${escapeHtml(cliente.telefono)}</td
+                    <td><span class="badge" style="background:#eef2ff; color:#667eea;">${cliente.totalReservas} reserva(s)</span></td
+                    <td><span class="badge badge-activo">Activo</span></td
+                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td
+                </tr>
+            `).join('');
+        }
+        
+        // ==================================================
+        // FILTRAR CLIENTES
+        // ==================================================
+        function filtrarClientes() {
+            const busqueda = document.getElementById('busquedaCliente');
+            if (!busqueda) return;
+            const texto = busqueda.value.toLowerCase().trim();
+            
+            if (!texto) {
+                clientesFiltrados = [...clientesData];
+            } else {
+                clientesFiltrados = clientesData.filter(c => 
+                    c.nombre.toLowerCase().includes(texto) || 
+                    c.email.toLowerCase().includes(texto) ||
+                    (c.telefono && c.telefono.includes(texto))
+                );
+            }
+            renderizarTabla();
+        }
+        
+        // ==================================================
+        // VER RESERVAS DEL CLIENTE (MODAL)
+        // ==================================================
+        async function verReservasCliente(email) {
+            try {
+                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                const csvText = await response.text();
+                const filas = parseCSV(csvText);
+                
+                const reservas = [];
+                for (let i = 1; i < filas.length; i++) {
+                    const fila = filas[i];
+                    if (fila.length < 3 || !fila[0]) continue;
+                    
+                    const emailFila = fila[4] || '';
+                    if (emailFila.toLowerCase() !== email.toLowerCase()) continue;
+                    
+                    const id = fila[1] || `R-${i}`;
+                    const fecha = fila[9] || '';
+                    const excursionesRaw = fila[8] || '';
+                    const excursion = excursionesRaw.split('\n')[0] || excursionesRaw.split(' | ')[0] || 'Sin excursión';
+                    
+                    reservas.push({ id, fecha: fecha || 'Sin fecha', excursion: excursion.substring(0, 50) });
+                }
+                
+                let reservasHtml = '';
+                if (reservas.length === 0) {
+                    reservasHtml = '<p>No hay reservas para este cliente</p>';
+                } else {
+                    reservasHtml = '<ul style="margin:0; padding-left:20px;">';
+                    reservas.forEach(r => {
+                        reservasHtml += `<li><strong>${escapeHtml(r.id)}</strong> - ${escapeHtml(r.fecha)} - ${escapeHtml(r.excursion)}</li>`;
+                    });
+                    reservasHtml += '</ul>';
+                }
+                
+                const modalHtml = `
+                    <div id="modalReservas" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:1000;">
+                        <div style="background:white; border-radius:16px; max-width:500px; width:90%; max-height:70vh; overflow-y:auto; padding:20px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <h3 style="color:#667eea;">📋 Reservas del cliente</h3>
+                                <button onclick="cerrarModalReservas()" style="background:none; border:none; font-size:22px; cursor:pointer;">✕</button>
+                            </div>
+                            <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+                            <p><strong>Total reservas:</strong> ${reservas.length}</p>
+                            <hr style="margin:10px 0;">
+                            ${reservasHtml}
+                            <button onclick="cerrarModalReservas()" style="width:100%; padding:10px; background:#667eea; color:white; border:none; border-radius:8px; margin-top:15px; cursor:pointer;">Cerrar</button>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+            } catch (error) {
+                alert('Error al cargar reservas: ' + error.message);
+            }
+        }
+        
+        function cerrarModalReservas() {
+            const modal = document.getElementById('modalReservas');
+            if (modal) modal.remove();
+        }
+        
+        // ==================================================
+        // ESCAPAR HTML
+        // ==================================================
+        function escapeHtml(text) { 
+            if (!text) return ''; 
+            const div = document.createElement('div'); 
+            div.textContent = text; 
+            return div.innerHTML; 
+        }
+        
+        // ==================================================
+        // INICIALIZAR
+        // ==================================================
+        window.filtrarClientes = filtrarClientes;
+        window.cargarClientes = cargarClientes;
+        window.verReservasCliente = verReservasCliente;
+        window.cerrarModalReservas = cerrarModalReservas;
+        window.logout = logout;
+        
+        const busquedaInput = document.getElementById('busquedaCliente');
+        if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarClientes(); });
+        
+        cargarClientes();
+        setInterval(cargarClientes, 60000);
     </script>
 </body>
 </html>
