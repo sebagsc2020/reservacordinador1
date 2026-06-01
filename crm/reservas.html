@@ -1,3 +1,5 @@
+vamos a tomar este hyml como parametro de funcionamiento
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,17 +10,17 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        .sidebar { width: 190px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
-        .sidebar-logo { text-align: center; padding: 0 15px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 36px; } .sidebar-logo h2 { font-size: 16px; margin-top: 6px; } .sidebar-logo h2 span { color: #667eea; }
-        .nav-menu { list-style: none; padding: 0 12px; } .nav-menu li { margin-bottom: 4px; }
-        .nav-menu a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 13px; }
+        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
-        .sidebar-footer { position: absolute; bottom: 20px; left: 12px; right: 12px; }
-        .btn-logout-sidebar { width: 100%; padding: 10px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; border: none; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
+        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; border: none; }
         
-        .main-content { margin-left: 190px; flex: 1; padding: 30px; min-width: 0; }
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; }
         .header h1 { font-size: 26px; color: #1a1a2e; }
         .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
@@ -105,7 +107,7 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td</tr</tbody>
+                    <tbody id="tablaReservas"></tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td</tr</tbody>
                 </table>
             </div>
         </div>
@@ -113,12 +115,15 @@
 
     <script>
         // ==================================================
-        // CONFIGURACIÓN - API JSON DE GOOGLE SHEETS
+        // CONFIGURACIÓN - TU PLANILLA
         // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
-        const JSON_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
         
+        // ==================================================
+        // VERIFICAR AUTENTICACIÓN
+        // ==================================================
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
         }
@@ -128,100 +133,180 @@
             window.location.href = 'index.html'; 
         }
         
+        // ==================================================
+        // VARIABLES GLOBALES
+        // ==================================================
         let reservasData = [];
         let reservasFiltradas = [];
         
+        // ==================================================
+        // PARSEAR CSV
+        // ==================================================
+        function parseCSV(csvText) {
+            const filas = [];
+            let filaActual = [];
+            let celdaActual = '';
+            let dentroComillas = false;
+            
+            for (let i = 0; i < csvText.length; i++) {
+                const char = csvText[i];
+                const nextChar = csvText[i + 1];
+                
+                if (dentroComillas) {
+                    if (char === '"') {
+                        if (nextChar === '"') {
+                            celdaActual += '"';
+                            i++;
+                        } else {
+                            dentroComillas = false;
+                        }
+                    } else {
+                        celdaActual += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        dentroComillas = true;
+                    } else if (char === ',') {
+                        filaActual.push(celdaActual.trim());
+                        celdaActual = '';
+                    } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
+                        filaActual.push(celdaActual.trim());
+                        filas.push(filaActual);
+                        filaActual = [];
+                        celdaActual = '';
+                        if (char === '\r') i++;
+                    } else {
+                        celdaActual += char;
+                    }
+                }
+            }
+            if (celdaActual.trim() || filaActual.length > 0) {
+                filaActual.push(celdaActual.trim());
+                filas.push(filaActual);
+            }
+            return filas.filter(fila => fila.some(celda => celda !== ''));
+        }
+        
+        // ==================================================
+        // FORMATEAR FECHA
+        // ==================================================
+        function formatearFecha(fechaStr) {
+            if (!fechaStr) return '';
+            if (fechaStr.includes('/')) return fechaStr;
+            if (fechaStr.includes('GMT')) {
+                try {
+                    const fecha = new Date(fechaStr);
+                    if (!isNaN(fecha.getTime())) {
+                        return `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
+                    }
+                } catch(e) {}
+            }
+            const partes = fechaStr.split('-');
+            if (partes.length === 3 && partes[0].length === 4) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            return fechaStr;
+        }
+        
+        // ==================================================
+        // DIVIDIR EXCURSIONES
+        // ==================================================
+        function dividirExcursiones(texto) {
+            if (!texto) return [];
+            let partes = [];
+            if (texto.includes('\n')) partes = texto.split('\n');
+            else if (texto.includes(' | ')) partes = texto.split(' | ');
+            else if (texto.includes(', ')) partes = texto.split(', ');
+            else if (texto.includes(',')) partes = texto.split(',');
+            else partes = [texto];
+            return partes.map(p => p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(p => p);
+        }
+        
+        // ==================================================
+        // GESTIÓN DE ESTADOS Y EXCLUIDOS
+        // ==================================================
+        function cargarEstadosGuardados() {
+            try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } 
+            catch(e) { return {}; }
+        }
+        
+        function guardarEstado(id, estado) {
+            const estados = cargarEstadosGuardados();
+            estados[id] = estado;
+            localStorage.setItem('estadosReservas', JSON.stringify(estados));
+        }
+        
+        function cargarExcluidos() {
+            try { return JSON.parse(localStorage.getItem('reservasExcluidas') || '[]'); } 
+            catch(e) { return []; }
+        }
+        
+        function guardarExcluido(id) {
+            const excluidos = cargarExcluidos();
+            if (!excluidos.includes(id)) {
+                excluidos.push(id);
+                localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
+            }
+        }
+        
+        // ==================================================
+        // CARGAR RESERVAS
+        // ==================================================
         async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
-            
             try {
                 tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td></tr>';
-                
-                const response = await fetch(JSON_URL);
-                const texto = await response.text();
-                
-                // Limpiar formato JSONP
-                let jsonStr = texto;
-                jsonStr = jsonStr.replace("/*O_o*/", "");
-                jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
-                jsonStr = jsonStr.slice(0, -2);
-                
-                const data = JSON.parse(jsonStr);
-                const rows = data.table.rows;
-                
-                if (!rows || rows.length === 0) throw new Error('No hay datos');
+                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const csvText = await response.text();
+                const filas = parseCSV(csvText);
+                if (filas.length < 2) throw new Error('No hay datos');
                 
                 reservasData = [];
-                const estadosGuardados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
-                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
+                const estadosGuardados = cargarEstadosGuardados();
+                const excluidos = cargarExcluidos();
                 
-                for (let i = 0; i < rows.length; i++) {
-                    const c = rows[i].c;
-                    if (!c || c.length < 5) continue;
+                for (let i = 1; i < filas.length; i++) {
+                    const fila = filas[i];
+                    if (fila.length < 3 || !fila[0]) continue;
                     
-                    const id = (c[1] && c[1].v) ? String(c[1].v) : '';
-                    if (!id || excluidos.includes(id)) continue;
+                    const id = fila[1] || `R-${i}`;
+                    if (excluidos.includes(id)) continue;
                     
-                    const nombre = (c[2] && c[2].v) ? String(c[2].v) : '';
-                    const apellido = (c[3] && c[3].v) ? String(c[3].v) : '';
-                    const email = (c[4] && c[4].v) ? String(c[4].v) : '';
-                    const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
-                    const ciudad = (c[7] && c[7].v) ? String(c[7].v) : '';
+                    const timestamp = fila[0] || '';
+                    const nombre = fila[2] || '';
+                    const apellido = fila[3] || '';
+                    const email = fila[4] || '';
+                    const telefono = fila[5] || '';
+                    const ciudad = fila[7] || '';
+                    const excursionesRaw = fila[8] || '';
+                    const fecha = fila[9] || '';
+                    const personas = fila[10] || '1';
+                    const formaPago = fila[11] || '';
+                    const lugar = fila[12] || '';
                     
-                    // Manejar excursiones (pueden venir con saltos de línea)
-                    let excursionesLista = [];
-                    const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
-                    if (excursionesRaw) {
-                        if (excursionesRaw.includes('\n')) {
-                            excursionesLista = excursionesRaw.split('\n');
-                        } else if (excursionesRaw.includes(' | ')) {
-                            excursionesLista = excursionesRaw.split(' | ');
-                        } else {
-                            excursionesLista = [excursionesRaw];
-                        }
-                        excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e);
-                    }
-                    
-                    let fecha = '';
-                    const timestamp = (c[0] && c[0].v) ? c[0].v : null;
-                    if (timestamp) {
-                        const fechaObj = new Date(timestamp);
-                        if (!isNaN(fechaObj.getTime())) {
-                            fecha = `${fechaObj.getDate().toString().padStart(2,'0')}/${(fechaObj.getMonth()+1).toString().padStart(2,'0')}/${fechaObj.getFullYear()}`;
-                        }
-                    }
-                    
-                    const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
-                    const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
-                    const lugar = (c[12] && c[12].v) ? String(c[12].v) : 'No especificado';
-                    
-                    const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
+                    const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
+                    const listaExcursiones = dividirExcursiones(excursionesRaw);
                     let estado = estadosGuardados[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
                     }
                     
                     reservasData.push({
-                        id: id,
-                        fecha: fecha,
-                        nombre: nombreCompleto,
-                        email: email,
-                        telefono: telefono,
-                        ciudad: ciudad,
-                        excursionesLista: excursionesLista,
-                        personas: personas,
-                        formaPago: formaPago,
-                        lugar: lugar,
-                        estado: estado
+                        id, fecha: formatearFecha(timestamp) || formatearFecha(fecha),
+                        nombre: nombreCompleto, email, telefono, ciudad,
+                        excursionesLista: listaExcursiones, personas, 
+                        formaPago: formaPago || 'No especificado',
+                        lugar: lugar || 'No especificado', estado
                     });
                 }
                 
-                reservasData.sort((a, b) => {
-                    const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
-                    const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
-                    return numB - numA;
+                reservasData.sort((a, b) => { 
+                    const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
+                    const numB = parseInt(b.id.replace(/\D/g, '')) || 0; 
+                    return numB - numA; 
                 });
                 
                 reservasFiltradas = [...reservasData];
@@ -229,18 +314,21 @@
                 if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
                 
             } catch (error) {
-                console.error('Error:', error);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message} </td</tr`;
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
+        // ==================================================
+        // RENDERIZAR TABLA
+        // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</tr';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td></tr>';
                 if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
@@ -267,58 +355,42 @@
                 return `
                     <tr>
                         <td class="id-reserva"><strong>${escapeHtml(r.id)}</strong></td>
-                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td
-                        <td>${escapeHtml(r.nombre)}</td
-                        <td style="font-size:10px">${escapeHtml(r.email)}</td
-                        <td>${escapeHtml(r.telefono)}</td
-                        <td>${excursionesHtml}</td
-                        <td>${escapeHtml(r.ciudad)}</td
-                        <td>${escapeHtml(r.personas)}</td
-                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td
-                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
+                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td>
+                        <td>${escapeHtml(r.nombre)}</td>
+                        <td style="font-size:10px">${escapeHtml(r.email)}</td>
+                        <td>${escapeHtml(r.telefono)}</td>
+                        <td>${excursionesHtml}</td>
+                        <td>${escapeHtml(r.ciudad)}</td>
+                        <td>${escapeHtml(r.personas)}</td>
+                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td>
+                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td>
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
                         <td class="col-acciones">
                             <div class="acciones-container">
                                 <div class="acciones-fila">
-                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')">✅</button>
-                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')">⏳</button>
+                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
+                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Pendiente">⏳</button>
                                 </div>
                                 <div class="acciones-fila">
-                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')">💰</button>
-                                    <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')">🗑️</button>
+                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Pagado">💰</button>
+                                    <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir">🗑️</button>
                                 </div>
                             </div>
-                        </td
+                        </td>
                     </tr>
                 `;
             }).join('');
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
         }
         
-        function filtrarReservas() {
-            const busqueda = document.getElementById('busquedaReserva');
-            if (!busqueda) return;
-            const texto = busqueda.value.toLowerCase().trim();
-            if (!texto) {
-                reservasFiltradas = [...reservasData];
-            } else {
-                reservasFiltradas = reservasData.filter(r => 
-                    (r.nombre && r.nombre.toLowerCase().includes(texto)) || 
-                    (r.email && r.email.toLowerCase().includes(texto)) ||
-                    (r.ciudad && r.ciudad.toLowerCase().includes(texto)) ||
-                    (r.id && r.id.toLowerCase().includes(texto))
-                );
-            }
-            renderizarTabla();
-        }
-        
+        // ==================================================
+        // FUNCIONES DE ACCIONES
+        // ==================================================
         function cambiarEstado(id, nuevoEstado) {
             const reserva = reservasData.find(r => r.id === id);
             if (reserva) {
                 reserva.estado = nuevoEstado;
-                const estados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
-                estados[id] = nuevoEstado;
-                localStorage.setItem('estadosReservas', JSON.stringify(estados));
+                guardarEstado(id, nuevoEstado);
                 const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
                 if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
                 renderizarTabla();
@@ -327,14 +399,24 @@
         
         function excluirReserva(id) {
             if (confirm(`⚠️ ¿Estás seguro de excluir la reserva ${id}?`)) {
-                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
-                if (!excluidos.includes(id)) {
-                    excluidos.push(id);
-                    localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
-                }
+                guardarExcluido(id);
                 cargarReservas();
                 alert(`✅ Reserva ${id} excluida.`);
             }
+        }
+        
+        function filtrarReservas() {
+            const busqueda = document.getElementById('busquedaReserva');
+            if (!busqueda) return;
+            const texto = busqueda.value.toLowerCase().trim();
+            if (!texto) reservasFiltradas = [...reservasData];
+            else reservasFiltradas = reservasData.filter(r => 
+                r.nombre.toLowerCase().includes(texto) || 
+                r.email.toLowerCase().includes(texto) ||
+                r.ciudad.toLowerCase().includes(texto) ||
+                r.id.toLowerCase().includes(texto)
+            );
+            renderizarTabla();
         }
         
         function escapeHtml(text) { 
@@ -344,6 +426,9 @@
             return div.innerHTML; 
         }
         
+        // ==================================================
+        // INICIALIZAR
+        // ==================================================
         window.cambiarEstado = cambiarEstado;
         window.excluirReserva = excluirReserva;
         window.filtrarReservas = filtrarReservas;
