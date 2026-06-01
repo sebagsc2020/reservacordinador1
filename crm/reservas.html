@@ -119,7 +119,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaReservas"><tr><td colspan="13" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
-                恐
+                </table>
             </div>
         </div>
     </div>
@@ -151,7 +151,7 @@
         let reservasFiltradas = [];
         
         // ==================================================
-        // PARSEAR CSV
+        // PARSEAR CSV (MISMO QUE FUNCIONABA ANTES)
         // ==================================================
         function parseCSV(csvText) {
             const filas = [];
@@ -261,7 +261,7 @@
         }
         
         // ==================================================
-        // CARGAR RESERVAS
+        // CARGAR RESERVAS (CON MAPEO CORRECTO)
         // ==================================================
         async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
@@ -279,24 +279,30 @@
                 const estadosGuardados = cargarEstadosGuardados();
                 const excluidos = cargarExcluidos();
                 
+                // Obtener encabezados de la primera fila
+                const encabezados = filas[0];
+                console.log('📋 Encabezados encontrados:', encabezados);
+                
+                // Mapear índices según posición (más confiable)
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
                     if (fila.length < 3 || !fila[0]) continue;
                     
-                    const id = fila[1] || `R-${i}`;
+                    // MAPEO POR POSICIÓN (igual que funcionaba antes)
+                    const id = fila[1] || `R-${i}`;           // Columna B (índice 1)
                     if (excluidos.includes(id)) continue;
                     
-                    const timestamp = fila[0] || '';
-                    const nombre = fila[2] || '';
-                    const apellido = fila[3] || '';
-                    const email = fila[4] || '';
-                    const telefono = fila[5] || '';
-                    const ciudad = fila[7] || '';
-                    const excursionesRaw = fila[8] || '';
-                    const fecha = fila[9] || '';
-                    const personas = fila[10] || '1';
-                    const formaPago = fila[11] || '';
-                    const lugar = fila[12] || '';
+                    const timestamp = fila[0] || '';          // Columna A
+                    const nombre = fila[2] || '';             // Columna C
+                    const apellido = fila[3] || '';           // Columna D
+                    const email = fila[4] || '';              // Columna E
+                    const telefono = fila[5] || '';           // Columna F
+                    const ciudad = fila[7] || '';             // Columna H
+                    const excursionesRaw = fila[8] || '';     // Columna I
+                    const fecha = fila[9] || '';              // Columna J
+                    const personas = fila[10] || '1';         // Columna K
+                    const formaPago = fila[11] || '';         // Columna L
+                    const lugar = fila[12] || '';             // Columna M
                     
                     const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
@@ -306,13 +312,22 @@
                     }
                     
                     reservasData.push({
-                        id, fecha: formatearFecha(timestamp) || formatearFecha(fecha),
-                        nombre: nombreCompleto, email, telefono, ciudad,
-                        excursionesLista: listaExcursiones, personas, 
+                        id: id,
+                        fecha: formatearFecha(timestamp) || formatearFecha(fecha),
+                        nombre: nombreCompleto,
+                        email: email,
+                        telefono: telefono,
+                        ciudad: ciudad,
+                        excursionesLista: listaExcursiones,
+                        personas: personas,
                         formaPago: formaPago || 'No especificado',
-                        lugar: lugar || 'No especificado', estado
+                        lugar: lugar || 'No especificado',
+                        estado: estado
                     });
                 }
+                
+                console.log(`📊 Cargadas ${reservasData.length} reservas`);
+                console.log('📝 Primera reserva:', reservasData[0]);
                 
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
@@ -325,7 +340,7 @@
                 if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
                 
             } catch (error) {
-                console.error(error);
+                console.error('Error:', error);
                 tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
@@ -395,7 +410,7 @@
         }
         
         // ==================================================
-        // FUNCIÓN DE FILTRADO (incluye búsqueda por ciudad)
+        // FILTRAR RESERVAS (incluye ciudad)
         // ==================================================
         function filtrarReservas() {
             const busquedaGeneral = document.getElementById('busquedaReserva');
@@ -405,11 +420,11 @@
             const textoCiudad = busquedaCiudad ? busquedaCiudad.value.toLowerCase().trim() : '';
             
             reservasFiltradas = reservasData.filter(r => {
-                // Filtro por ciudad (si hay texto)
+                // Filtro por ciudad
                 if (textoCiudad && !r.ciudad.toLowerCase().includes(textoCiudad)) {
                     return false;
                 }
-                // Filtro general (nombre, email, id)
+                // Filtro general
                 if (textoGeneral && !r.nombre.toLowerCase().includes(textoGeneral) && 
                     !r.email.toLowerCase().includes(textoGeneral) &&
                     !r.id.toLowerCase().includes(textoGeneral)) {
@@ -422,62 +437,54 @@
         }
         
         // ==================================================
-        // FUNCIÓN PARA GENERAR PDF
+        // GENERAR PDF
         // ==================================================
         async function generarPDF() {
-            // Verificar si hay reservas filtradas
             if (reservasFiltradas.length === 0) {
                 alert('⚠️ No hay reservas para exportar. Aplica un filtro de ciudad primero.');
                 return;
             }
             
-            // Obtener el nombre de la ciudad filtrada (para el encabezado)
             const ciudadFiltro = document.getElementById('busquedaCiudad').value.trim();
             let tituloPDF = 'Reporte de Reservas';
             if (ciudadFiltro) {
                 tituloPDF = `Reporte de Reservas - Ciudad: ${ciudadFiltro.toUpperCase()}`;
             }
             
-            // Mostrar mensaje de carga
             const btnPDF = document.querySelector('.btn-pdf');
             const textoOriginal = btnPDF.textContent;
-            btnPDF.textContent = '⏳ Generando PDF...';
+            btnPDF.textContent = '⏳ Generando...';
             btnPDF.disabled = true;
             
             try {
-                // Usar la biblioteca jsPDF
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                 
-                // Configurar fuente y márgenes
                 const margin = 10;
                 let y = margin + 10;
                 const pageWidth = doc.internal.pageSize.getWidth();
-                const colWidths = [25, 45, 25, 50, 15, 40]; // ID, Cliente, Teléfono, Excursiones, Pax, Lugar
+                const colWidths = [25, 45, 25, 50, 15, 40];
                 
-                // Título
                 doc.setFontSize(16);
                 doc.setFont('helvetica', 'bold');
                 doc.text(tituloPDF, pageWidth / 2, y, { align: 'center' });
                 y += 10;
                 
-                // Fecha de generación
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
-                const fechaActual = new Date().toLocaleString('es-ES');
-                doc.text(`Generado: ${fechaActual}`, margin, y);
+                doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, margin, y);
                 y += 8;
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, margin, y);
                 y += 12;
                 
-                // Encabezados de la tabla
+                // Encabezados
+                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Lugar'];
+                let x = margin;
                 doc.setFillColor(102, 126, 234);
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(9);
                 doc.setTextColor(255, 255, 255);
                 
-                let headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Lugar'];
-                let x = margin;
                 for (let i = 0; i < headers.length; i++) {
                     doc.rect(x, y, colWidths[i], 8, 'F');
                     doc.text(headers[i], x + 2, y + 5);
@@ -485,23 +492,21 @@
                 }
                 y += 8;
                 
-                // Datos de las reservas
+                // Datos
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(0, 0, 0);
                 
                 for (const reserva of reservasFiltradas) {
-                    // Verificar si necesitamos nueva página
                     if (y > 180) {
                         doc.addPage();
                         y = margin + 10;
-                        // Re-dibujar encabezados en la nueva página
                         x = margin;
+                        doc.setFillColor(102, 126, 234);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setTextColor(255, 255, 255);
                         for (let i = 0; i < headers.length; i++) {
-                            doc.setFillColor(102, 126, 234);
                             doc.rect(x, y, colWidths[i], 8, 'F');
-                            doc.setFont('helvetica', 'bold');
-                            doc.setTextColor(255, 255, 255);
                             doc.text(headers[i], x + 2, y + 5);
                             x += colWidths[i];
                         }
@@ -511,31 +516,28 @@
                         doc.setTextColor(0, 0, 0);
                     }
                     
-                    // Preparar datos
-                    const id = reserva.id;
-                    const cliente = reserva.nombre;
-                    const telefono = reserva.telefono;
-                    const excursiones = reserva.excursionesLista.join(', ').substring(0, 60);
-                    const pax = reserva.personas;
-                    const lugar = reserva.lugar.substring(0, 35);
+                    const datos = [
+                        reserva.id,
+                        reserva.nombre,
+                        reserva.telefono,
+                        reserva.excursionesLista.join(', ').substring(0, 60),
+                        reserva.personas,
+                        reserva.lugar.substring(0, 35)
+                    ];
                     
-                    const datos = [id, cliente, telefono, excursiones, pax, lugar];
                     x = margin;
-                    const rowHeight = 8;
-                    
                     for (let i = 0; i < datos.length; i++) {
                         doc.text(String(datos[i]), x + 2, y + 4);
                         x += colWidths[i];
                     }
-                    y += rowHeight;
+                    y += 8;
                 }
                 
-                // Guardar el PDF
                 doc.save(`reservas_${ciudadFiltro || 'todas'}_${Date.now()}.pdf`);
                 
             } catch (error) {
-                console.error('Error al generar PDF:', error);
-                alert('❌ Error al generar el PDF. Intenta nuevamente.');
+                console.error('Error PDF:', error);
+                alert('❌ Error al generar el PDF.');
             } finally {
                 btnPDF.textContent = textoOriginal;
                 btnPDF.disabled = false;
@@ -557,10 +559,10 @@
         }
         
         function excluirReserva(id) {
-            if (confirm(`⚠️ ¿Estás seguro de que deseas EXCLUIR la reserva ${id}?\n\nLa reserva dejará de mostrarse en el listado.`)) {
+            if (confirm(`⚠️ ¿Estás seguro de excluir la reserva ${id}?`)) {
                 guardarExcluido(id);
                 cargarReservas();
-                alert(`✅ Reserva ${id} excluida correctamente.`);
+                alert(`✅ Reserva ${id} excluida.`);
             }
         }
         
