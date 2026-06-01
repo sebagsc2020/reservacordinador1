@@ -110,19 +110,16 @@
             <button class="btn-excel" onclick="exportarExcel()">📊 Exportar Excel</button>
         </div>
 
-        <!-- Selector de columnas para PDF - Email, Ciudad y Pago desmarcados por defecto -->
+        <!-- Selector de columnas para PDF - Solo las columnas que queremos mostrar -->
         <div class="column-selector">
             <span>📋 Columnas para PDF:</span>
             <div class="checkbox-group" id="columnasSelector">
                 <label><input type="checkbox" value="id" checked> ID</label>
                 <label><input type="checkbox" value="fecha" checked> Fecha</label>
                 <label><input type="checkbox" value="cliente" checked> Cliente</label>
-                <label><input type="checkbox" value="email"> Email</label>
                 <label><input type="checkbox" value="telefono" checked> Teléfono</label>
                 <label><input type="checkbox" value="excursiones" checked> Excursiones</label>
-                <label><input type="checkbox" value="ciudad"> Ciudad</label>
                 <label><input type="checkbox" value="pax" checked> Pax</label>
-                <label><input type="checkbox" value="pago"> Pago</label>
                 <label><input type="checkbox" value="lugar" checked> Lugar</label>
                 <label><input type="checkbox" value="estado" checked> Estado</label>
             </div>
@@ -143,7 +140,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
-                ~
+                </table
             </div>
         </div>
     </div>
@@ -156,23 +153,20 @@
         const SHEET_NAME = 'Hoja 1';
         const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
         
-        // ANCHOS DE COLUMNAS PARA PDF (en mm)
+        // ANCHOS DE COLUMNAS PARA PDF (solo las que están en el selector)
         const columnasPDF = {
             id: { header: 'ID', ancho: 30, getter: (r) => r.id },
             fecha: { header: 'Fecha', ancho: 28, getter: (r) => r.fecha },
-            cliente: { header: 'Cliente', ancho: 50, getter: (r) => r.nombre },
-            email: { header: 'Email', ancho: 55, getter: (r) => r.email },
+            cliente: { header: 'Cliente', ancho: 55, getter: (r) => r.nombre },
             telefono: { header: 'Teléfono', ancho: 32, getter: (r) => r.telefono },
             excursiones: { 
                 header: 'Excursiones', 
-                ancho: 65, 
+                ancho: 70, 
                 getter: (r) => r.excursionesLista,
                 esLista: true 
             },
-            ciudad: { header: 'Ciudad', ancho: 35, getter: (r) => r.ciudad },
-            pax: { header: 'Pax', ancho: 15, getter: (r) => r.personas },
-            pago: { header: 'Pago', ancho: 30, getter: (r) => r.formaPago },
-            lugar: { header: 'Lugar', ancho: 45, getter: (r) => r.lugar },
+            pax: { header: 'Pax', ancho: 18, getter: (r) => r.personas },
+            lugar: { header: 'Lugar', ancho: 50, getter: (r) => r.lugar },
             estado: { header: 'Estado', ancho: 25, getter: (r) => r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado') }
         };
         
@@ -379,7 +373,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<td><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message} </td</td`;
             }
         }
         
@@ -538,9 +532,9 @@
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
                 y += 12;
                 
-                // Encabezados - Fondo gris muy claro, texto negro
+                // Encabezados - Fondo gris claro, texto negro
                 let x = marginLeft;
-                doc.setFillColor(245, 245, 245); // Gris más claro (#F5F5F5)
+                doc.setFillColor(200, 200, 200); // Gris claro
                 doc.setDrawColor(0, 0, 0);
                 doc.setLineWidth(0.1);
                 doc.setFont('helvetica', 'bold');
@@ -566,7 +560,7 @@
                         doc.addPage();
                         y = 20;
                         x = marginLeft;
-                        doc.setFillColor(245, 245, 245);
+                        doc.setFillColor(200, 200, 200);
                         doc.setDrawColor(0, 0, 0);
                         doc.setFont('helvetica', 'bold');
                         doc.setFontSize(9);
@@ -635,7 +629,7 @@
         }
         
         // ==================================================
-        // EXPORTAR A EXCEL
+        // EXPORTAR A EXCEL (todas las columnas)
         // ==================================================
         function exportarExcel() {
             if (reservasFiltradas.length === 0) {
