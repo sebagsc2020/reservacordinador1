@@ -33,14 +33,8 @@
         .btn-recargar { background: #27ae60; color: white; }
         .btn-pdf { background: #e74c3c; color: white; }
         
-        /* Grid de 3 columnas para tarjetas */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
+        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         
-        /* Tarjeta individual */
         .reserva-card {
             background: white;
             border-radius: 16px;
@@ -53,7 +47,6 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.12);
         }
         
-        /* Cabecera de la tarjeta */
         .card-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -74,44 +67,15 @@
             opacity: 0.9;
         }
         
-        /* Cuerpo de la tarjeta */
-        .card-body {
-            padding: 15px;
-        }
-        .card-info {
-            margin-bottom: 12px;
-        }
-        .card-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            color: #999;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-        .card-value {
-            font-size: 13px;
-            font-weight: 500;
-            color: #333;
-            word-break: break-word;
-        }
+        .card-body { padding: 15px; }
+        .card-info { margin-bottom: 12px; }
+        .card-label { font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .card-value { font-size: 13px; font-weight: 500; color: #333; word-break: break-word; }
         
-        /* Lista de excursiones */
-        .excursiones-lista-card {
-            margin: 0;
-            padding-left: 16px;
-            list-style: none;
-        }
-        .excursiones-lista-card li {
-            font-size: 11px;
-            padding: 3px 0;
-            color: #555;
-            border-bottom: 1px dashed #eee;
-        }
-        .excursiones-lista-card li:last-child {
-            border-bottom: none;
-        }
+        .excursiones-lista-card { margin: 0; padding-left: 16px; list-style: none; }
+        .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: #555; border-bottom: 1px dashed #eee; }
+        .excursiones-lista-card li:last-child { border-bottom: none; }
         
-        /* Estado */
         .card-estado {
             display: inline-block;
             padding: 4px 12px;
@@ -124,7 +88,6 @@
         .estado-confirmado { background: #d4edda; color: #155724; }
         .estado-pagado { background: #d1ecf1; color: #0c5460; }
         
-        /* Acciones en la tarjeta */
         .card-actions {
             display: flex;
             gap: 8px;
@@ -144,10 +107,7 @@
             transition: all 0.2s;
             text-align: center;
         }
-        .btn-card:hover {
-            transform: scale(0.98);
-            opacity: 0.9;
-        }
+        .btn-card:hover { transform: scale(0.98); opacity: 0.9; }
         .btn-confirmar-card { background: #27ae60; color: white; }
         .btn-pendiente-card { background: #ffc107; color: #856404; }
         .btn-pagar-card { background: #3498db; color: white; }
@@ -156,9 +116,7 @@
         
         .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
         
-        @media (max-width: 1200px) {
-            .cards-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+        @media (max-width: 1200px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
@@ -191,9 +149,9 @@
 
         <div class="filters-bar">
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
-            <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
-            <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
-            <button class="btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
+            <button class="btn-filtrar" id="btnFiltrar">🔍 Filtrar</button>
+            <button class="btn-recargar" id="btnRecargar">🔄 Recargar</button>
+            <button class="btn-pdf" id="btnPDF">📄 Descargar PDF</button>
         </div>
 
         <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
@@ -324,9 +282,6 @@
             }
         }
         
-        // ==================================================
-        // FUNCIÓN PARA ENVIAR WHATSAPP
-        // ==================================================
         function enviarWhatsApp(reserva) {
             let telefono = reserva.telefono.replace(/\D/g, '');
             if (telefono.length === 10) {
@@ -419,55 +374,45 @@ ${excursionesTexto}
                             <span class="card-fecha">${escapeHtml(r.fecha)}</span>
                         </div>
                         <div class="card-body">
-                            <div class="card-info">
-                                <div class="card-label">👤 CLIENTE</div>
-                                <div class="card-value">${escapeHtml(r.nombre)}</div>
-                            </div>
-                            <div class="card-info">
-                                <div class="card-label">📧 EMAIL</div>
-                                <div class="card-value">${escapeHtml(r.email)}</div>
-                            </div>
-                            <div class="card-info">
-                                <div class="card-label">📞 TELÉFONO</div>
-                                <div class="card-value">${escapeHtml(r.telefono)}</div>
-                            </div>
-                            <div class="card-info">
-                                <div class="card-label">📍 CIUDAD</div>
-                                <div class="card-value">${escapeHtml(r.ciudad)}</div>
-                            </div>
-                            <div class="card-info">
-                                <div class="card-label">✨ EXCURSIONES</div>
-                                ${excursionesHtml}
-                            </div>
-                            <div class="card-info">
-                                <div class="card-label">👥 PERSONAS</div>
-                                <div class="card-value">${escapeHtml(r.personas)}</div>
-                            </div>
-                            <div class="card-info">
-                                <div class="card-label">💳 FORMA DE PAGO</div>
-                                <div class="card-value">${escapeHtml(r.formaPago)}</div>
-                            </div>
-                            <div class="card-info">
-                                <div class="card-label">🚐 LUGAR</div>
-                                <div class="card-value">${escapeHtml(r.lugar)}</div>
-                            </div>
-                            <div class="card-info">
-                                <div class="card-label">📌 ESTADO</div>
-                                <div class="card-value"><span class="card-estado ${estadoClass}">${estadoText}</span></div>
-                            </div>
+                            <div class="card-info"><div class="card-label">👤 CLIENTE</div><div class="card-value">${escapeHtml(r.nombre)}</div></div>
+                            <div class="card-info"><div class="card-label">📧 EMAIL</div><div class="card-value">${escapeHtml(r.email)}</div></div>
+                            <div class="card-info"><div class="card-label">📞 TELÉFONO</div><div class="card-value">${escapeHtml(r.telefono)}</div></div>
+                            <div class="card-info"><div class="card-label">📍 CIUDAD</div><div class="card-value">${escapeHtml(r.ciudad)}</div></div>
+                            <div class="card-info"><div class="card-label">✨ EXCURSIONES</div>${excursionesHtml}</div>
+                            <div class="card-info"><div class="card-label">👥 PERSONAS</div><div class="card-value">${escapeHtml(r.personas)}</div></div>
+                            <div class="card-info"><div class="card-label">💳 FORMA DE PAGO</div><div class="card-value">${escapeHtml(r.formaPago)}</div></div>
+                            <div class="card-info"><div class="card-label">🚐 LUGAR</div><div class="card-value">${escapeHtml(r.lugar)}</div></div>
+                            <div class="card-info"><div class="card-label">📌 ESTADO</div><div class="card-value"><span class="card-estado ${estadoClass}">${estadoText}</span></div></div>
                         </div>
                         <div class="card-actions">
-                            <button class="btn-card btn-confirmar-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')">✅</button>
-                            <button class="btn-card btn-pendiente-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')">⏳</button>
-                            <button class="btn-card btn-pagar-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')">💰</button>
-                            <button class="btn-card btn-whatsapp-card" onclick="enviarWhatsApp(${JSON.stringify(r).replace(/"/g, '&quot;')})">💬 WhatsApp</button>
-                            <button class="btn-card btn-excluir-card" onclick="excluirReserva('${escapeHtml(r.id)}')">🗑️</button>
+                            <button class="btn-card btn-confirmar-card" data-id="${escapeHtml(r.id)}" data-estado="confirmado">✅</button>
+                            <button class="btn-card btn-pendiente-card" data-id="${escapeHtml(r.id)}" data-estado="pendiente">⏳</button>
+                            <button class="btn-card btn-pagar-card" data-id="${escapeHtml(r.id)}" data-estado="pagado">💰</button>
+                            <button class="btn-card btn-whatsapp-card" data-id="${escapeHtml(r.id)}">💬 WhatsApp</button>
+                            <button class="btn-card btn-excluir-card" data-id="${escapeHtml(r.id)}">🗑️</button>
                         </div>
                     </div>
                 `;
             }
             container.innerHTML = html;
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
+            
+            document.querySelectorAll('.btn-confirmar-card').forEach(btn => {
+                btn.addEventListener('click', () => cambiarEstado(btn.dataset.id, 'confirmado'));
+            });
+            document.querySelectorAll('.btn-pendiente-card').forEach(btn => {
+                btn.addEventListener('click', () => cambiarEstado(btn.dataset.id, 'pendiente'));
+            });
+            document.querySelectorAll('.btn-pagar-card').forEach(btn => {
+                btn.addEventListener('click', () => cambiarEstado(btn.dataset.id, 'pagado'));
+            });
+            document.querySelectorAll('.btn-whatsapp-card').forEach(btn => {
+                const reserva = reservasData.find(r => r.id === btn.dataset.id);
+                btn.addEventListener('click', () => enviarWhatsApp(reserva));
+            });
+            document.querySelectorAll('.btn-excluir-card').forEach(btn => {
+                btn.addEventListener('click', () => excluirReserva(btn.dataset.id));
+            });
         }
         
         function filtrarReservas() {
@@ -489,19 +434,40 @@ ${excursionesTexto}
             renderizarCards();
         }
         
-        // ==================================================
-        // GENERAR PDF CON 8 COLUMNAS (incluyendo Observaciones)
-        // ==================================================
+        function cambiarEstado(id, nuevoEstado) {
+            const reserva = reservasData.find(r => r.id === id);
+            if (reserva) {
+                reserva.estado = nuevoEstado;
+                const estados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
+                estados[id] = nuevoEstado;
+                localStorage.setItem('estadosReservas', JSON.stringify(estados));
+                const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
+                if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
+                renderizarCards();
+            }
+        }
+        
+        function excluirReserva(id) {
+            if (confirm(`⚠️ ¿Estás seguro de excluir la reserva ${id}?`)) {
+                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
+                if (!excluidos.includes(id)) {
+                    excluidos.push(id);
+                    localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
+                }
+                cargarReservas();
+                alert(`✅ Reserva ${id} excluida.`);
+            }
+        }
+        
         async function generarPDF() {
             if (reservasFiltradas.length === 0) {
                 alert('⚠️ No hay reservas para exportar.');
                 return;
             }
             
-            // Calcular total de pasajeros (Pax)
             const totalPasajeros = reservasFiltradas.reduce((sum, r) => sum + (parseInt(r.personas) || 0), 0);
             
-            const btnPDF = document.querySelector('.btn-pdf');
+            const btnPDF = document.getElementById('btnPDF');
             const textoOriginal = btnPDF.textContent;
             btnPDF.textContent = '⏳ Generando...';
             btnPDF.disabled = true;
@@ -513,7 +479,6 @@ ${excursionesTexto}
                 let y = marginLeft + 10;
                 const pageWidth = doc.internal.pageSize.getWidth();
                 
-                // 8 columnas: ID (35), Cliente (42), Teléfono (25), Excursiones (48), Pax (12), Estado (20), Lugar (35), Observaciones (35)
                 const colWidths = [35, 42, 25, 48, 12, 20, 35, 35];
                 const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar', 'Observaciones'];
                 
@@ -524,13 +489,19 @@ ${excursionesTexto}
                 doc.text('Reporte de Reservas', pageWidth / 2, y, { align: 'center' });
                 y += 10;
                 
-                // Fecha y total
+                // Fecha y total de reservas
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
                 doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, marginLeft, y);
                 y += 6;
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
-                y += 12;
+                y += 8;
+                
+                // === LÍNEA DE EMPRESA, NOMBRE Y TEL ===
+                doc.setFontSize(9);
+                doc.setFont('courier', 'normal');
+                doc.text('EMPRESA: ____________________          NOMBRE: ____________________          TEL: ____________________', marginLeft, y);
+                y += 10;
                 
                 // Encabezados
                 let x = marginLeft;
@@ -589,45 +560,37 @@ ${excursionesTexto}
                     
                     x = marginLeft;
                     
-                    // ID
                     doc.rect(x, y, colWidths[0], alturaFila);
                     doc.text(String(reserva.id), x + 2, y + 5);
                     x += colWidths[0];
                     
-                    // Cliente
                     doc.rect(x, y, colWidths[1], alturaFila);
                     const nombreCliente = reserva.nombre.length > 32 ? reserva.nombre.substring(0, 29) + '...' : reserva.nombre;
                     doc.text(nombreCliente, x + 2, y + 5);
                     x += colWidths[1];
                     
-                    // Teléfono
                     doc.rect(x, y, colWidths[2], alturaFila);
                     doc.text(reserva.telefono, x + 2, y + 5);
                     x += colWidths[2];
                     
-                    // Excursiones
                     doc.rect(x, y, colWidths[3], alturaFila);
                     const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 4);
                     doc.text(lineas, x + 2, y + 5);
                     x += colWidths[3];
                     
-                    // Pax
                     doc.rect(x, y, colWidths[4], alturaFila);
                     doc.text(String(reserva.personas), x + 2, y + 5);
                     x += colWidths[4];
                     
-                    // Estado
                     doc.rect(x, y, colWidths[5], alturaFila);
                     doc.text(estadoTexto, x + 2, y + 5);
                     x += colWidths[5];
                     
-                    // Lugar
                     doc.rect(x, y, colWidths[6], alturaFila);
                     const lugarTexto = reserva.lugar.length > 28 ? reserva.lugar.substring(0, 25) + '...' : reserva.lugar;
                     doc.text(lugarTexto, x + 2, y + 5);
                     x += colWidths[6];
                     
-                    // Observaciones (vacío por ahora, editable manualmente)
                     doc.rect(x, y, colWidths[7], alturaFila);
                     doc.text('', x + 2, y + 5);
                     
@@ -636,34 +599,22 @@ ${excursionesTexto}
                 
                 // === FILA DE TOTAL ===
                 y += 5;
+                const totalX = marginLeft + colWidths[0] + colWidths[1] + colWidths[2];
                 
-                // Posiciones para la fila de total
-                const totalX = marginLeft + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3];
-                
-                doc.setFillColor(230, 230, 230);
+                doc.setFillColor(255, 255, 255);
                 doc.setDrawColor(0, 0, 0);
                 doc.setLineWidth(0.1);
-                
-                // Celda vacía para ID
-                doc.rect(marginLeft, y, colWidths[0], 10);
-                
-                // Celda vacía para Cliente
-                doc.rect(marginLeft + colWidths[0], y, colWidths[1], 10);
-                
-                // Celda vacía para Teléfono
-                doc.rect(marginLeft + colWidths[0] + colWidths[1], y, colWidths[2], 10);
-                
-                // Celda "TOTAL GENERAL"
-                doc.rect(totalX, y, colWidths[3], 10);
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(9);
-                doc.text('TOTAL GENERAL', totalX + 2, y + 6);
+                doc.setTextColor(0, 0, 0);
                 
-                // Celda con la suma de Pax
+                doc.rect(marginLeft, y, colWidths[0], 10);
+                doc.rect(marginLeft + colWidths[0], y, colWidths[1], 10);
+                doc.rect(marginLeft + colWidths[0] + colWidths[1], y, colWidths[2], 10);
+                doc.rect(totalX, y, colWidths[3], 10);
+                doc.text('TOTAL GENERAL', totalX + 2, y + 6);
                 doc.rect(totalX + colWidths[3], y, colWidths[4], 10);
                 doc.text(String(totalPasajeros), totalX + colWidths[3] + 2, y + 6);
-                
-                // Celdas vacías para Estado, Lugar y Observaciones
                 doc.rect(totalX + colWidths[3] + colWidths[4], y, colWidths[5], 10);
                 doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5], y, colWidths[6], 10);
                 doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, colWidths[7], 10);
@@ -679,31 +630,6 @@ ${excursionesTexto}
             }
         }
         
-        function cambiarEstado(id, nuevoEstado) {
-            const reserva = reservasData.find(r => r.id === id);
-            if (reserva) {
-                reserva.estado = nuevoEstado;
-                const estados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
-                estados[id] = nuevoEstado;
-                localStorage.setItem('estadosReservas', JSON.stringify(estados));
-                const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
-                if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
-                renderizarCards();
-            }
-        }
-        
-        function excluirReserva(id) {
-            if (confirm(`⚠️ ¿Estás seguro de excluir la reserva ${id}?`)) {
-                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
-                if (!excluidos.includes(id)) {
-                    excluidos.push(id);
-                    localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
-                }
-                cargarReservas();
-                alert(`✅ Reserva ${id} excluida.`);
-            }
-        }
-        
         function escapeHtml(text) { 
             if (!text) return ''; 
             const div = document.createElement('div'); 
@@ -711,16 +637,19 @@ ${excursionesTexto}
             return div.innerHTML; 
         }
         
-        window.cambiarEstado = cambiarEstado;
-        window.excluirReserva = excluirReserva;
+        window.logout = logout;
         window.filtrarReservas = filtrarReservas;
         window.cargarReservas = cargarReservas;
         window.generarPDF = generarPDF;
-        window.enviarWhatsApp = enviarWhatsApp;
-        window.logout = logout;
+        
+        document.getElementById('btnFiltrar').addEventListener('click', filtrarReservas);
+        document.getElementById('btnRecargar').addEventListener('click', cargarReservas);
+        document.getElementById('btnPDF').addEventListener('click', generarPDF);
         
         const busquedaInput = document.getElementById('busquedaReserva');
-        if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
+        if (busquedaInput) busquedaInput.addEventListener('keypress', function(e) { 
+            if (e.key === 'Enter') filtrarReservas(); 
+        });
         
         cargarReservas();
         setInterval(cargarReservas, 60000);
