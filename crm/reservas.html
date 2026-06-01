@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas - CRM Aventura Total</title>
-    <!-- Incluir jsPDF para generar PDF -->
+    <!-- Incluir jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Incluir SheetJS para generar Excel -->
+    <!-- Incluir SheetJS para Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        /* Sidebar más angosta - de 200px a 160px */
         .sidebar { width: 160px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
         .sidebar-logo { text-align: center; padding: 0 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
         .sidebar-logo .logo-icon { font-size: 28px; } .sidebar-logo h2 { font-size: 14px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
@@ -23,7 +22,6 @@
         .sidebar-footer { position: absolute; bottom: 15px; left: 8px; right: 8px; }
         .btn-logout-sidebar { width: 100%; padding: 6px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 10px; border: none; }
         
-        /* Ajuste del contenido principal */
         .main-content { margin-left: 160px; flex: 1; padding: 20px; min-width: 0; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .header h1 { font-size: 22px; color: #1a1a2e; }
@@ -38,47 +36,23 @@
         .btn-pdf { background: #e74c3c; color: white; }
         .btn-excel { background: #0f9d58; color: white; }
         
+        /* Selector de columnas */
+        .column-selector { background: white; border-radius: 12px; padding: 10px 15px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-wrap: wrap; align-items: center; gap: 15px; }
+        .column-selector span { font-weight: 600; font-size: 12px; color: #333; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; }
+        .checkbox-group label { display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer; }
+        .checkbox-group input { cursor: pointer; }
+        
         .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .table-header h3 { font-size: 15px; }
         .table-wrapper { overflow-x: auto; }
         
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            font-size: 11px; 
-            min-width: 1200px;
-        }
-        th, td { 
-            padding: 8px 6px; 
-            border-bottom: 1px solid #f0f0f0; 
-            vertical-align: top; 
-            word-break: break-word;
-        }
-        th { 
-            text-align: left; 
-            background: #f8f9fa; 
-            color: #666; 
-            font-size: 10px; 
-            text-transform: uppercase; 
-            white-space: nowrap;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 1200px; }
+        th, td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; vertical-align: top; word-break: break-word; }
+        th { text-align: left; background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
         td { font-size: 11px; color: #333; }
         tr:hover td { background: #f8f9ff; }
-        
-        /* Anchos específicos para cada columna */
-        th:nth-child(1), td:nth-child(1) { min-width: 100px; }
-        th:nth-child(2), td:nth-child(2) { min-width: 70px; }
-        th:nth-child(3), td:nth-child(3) { min-width: 130px; }
-        th:nth-child(4), td:nth-child(4) { min-width: 140px; }
-        th:nth-child(5), td:nth-child(5) { min-width: 90px; }
-        th:nth-child(6), td:nth-child(6) { min-width: 180px; }
-        th:nth-child(7), td:nth-child(7) { min-width: 100px; }
-        th:nth-child(8), td:nth-child(8) { min-width: 40px; }
-        th:nth-child(9), td:nth-child(9) { min-width: 90px; }
-        th:nth-child(10), td:nth-child(10) { min-width: 100px; }
-        th:nth-child(11), td:nth-child(11) { min-width: 80px; }
-        th:nth-child(12), td:nth-child(12) { min-width: 70px; }
         
         .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
         .badge-pendiente { background: #fff3cd; color: #856404; }
@@ -103,6 +77,7 @@
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
             .nav-menu a { justify-content: center; } 
             .main-content { margin-left: 60px; padding: 12px; }
+            .checkbox-group { gap: 8px; }
         }
     </style>
 </head>
@@ -136,6 +111,24 @@
             <button class="btn-excel" onclick="exportarExcel()">📊 Exportar Excel</button>
         </div>
 
+        <!-- Selector de columnas para PDF -->
+        <div class="column-selector">
+            <span>📋 Columnas para PDF:</span>
+            <div class="checkbox-group" id="columnasSelector">
+                <label><input type="checkbox" value="id" checked> ID</label>
+                <label><input type="checkbox" value="fecha" checked> Fecha</label>
+                <label><input type="checkbox" value="cliente" checked> Cliente</label>
+                <label><input type="checkbox" value="email" checked> Email</label>
+                <label><input type="checkbox" value="telefono" checked> Teléfono</label>
+                <label><input type="checkbox" value="excursiones" checked> Excursiones</label>
+                <label><input type="checkbox" value="ciudad" checked> Ciudad</label>
+                <label><input type="checkbox" value="pax" checked> Pax</label>
+                <label><input type="checkbox" value="pago" checked> Pago</label>
+                <label><input type="checkbox" value="lugar" checked> Lugar</label>
+                <label><input type="checkbox" value="estado" checked> Estado</label>
+            </div>
+        </div>
+
         <div class="table-container">
             <div class="table-header">
                 <h3>Lista de Reservas</h3>
@@ -158,11 +151,26 @@
 
     <script>
         // ==================================================
-        // CONFIGURACIÓN - TU PLANILLA
+        // CONFIGURACIÓN
         // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
         const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        
+        // Mapeo de columnas para PDF
+        const columnasPDF = {
+            id: { header: 'ID', ancho: 25, getter: (r) => r.id },
+            fecha: { header: 'Fecha', ancho: 20, getter: (r) => r.fecha },
+            cliente: { header: 'Cliente', ancho: 35, getter: (r) => r.nombre },
+            email: { header: 'Email', ancho: 40, getter: (r) => r.email },
+            telefono: { header: 'Teléfono', ancho: 25, getter: (r) => r.telefono },
+            excursiones: { header: 'Excursiones', ancho: 45, getter: (r) => r.excursionesLista.join(', ').substring(0, 55) },
+            ciudad: { header: 'Ciudad', ancho: 25, getter: (r) => r.ciudad },
+            pax: { header: 'Pax', ancho: 10, getter: (r) => r.personas },
+            pago: { header: 'Pago', ancho: 20, getter: (r) => r.formaPago },
+            lugar: { header: 'Lugar', ancho: 30, getter: (r) => r.lugar },
+            estado: { header: 'Estado', ancho: 20, getter: (r) => r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado') }
+        };
         
         // ==================================================
         // VERIFICAR AUTENTICACIÓN
@@ -348,21 +356,12 @@
                     }
                     
                     reservasData.push({
-                        id: id,
-                        fecha: fechaFormateada,
-                        nombre: nombreCompleto,
-                        email: email,
-                        telefono: telefono,
-                        ciudad: ciudad,
-                        excursionesLista: listaExcursiones,
-                        personas: personas,
-                        formaPago: formaPago || 'No especificado',
-                        lugar: lugar || 'No especificado',
-                        estado: estado
+                        id: id, fecha: fechaFormateada, nombre: nombreCompleto, email: email,
+                        telefono: telefono, ciudad: ciudad, excursionesLista: listaExcursiones,
+                        personas: personas, formaPago: formaPago || 'No especificado',
+                        lugar: lugar || 'No especificado', estado: estado
                     });
                 }
-                
-                console.log(`📊 Cargadas ${reservasData.length} reservas`);
                 
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
@@ -426,21 +425,9 @@
                 html += `<td>${escapeHtml(r.formaPago)}</td`;
                 html += `<td>${escapeHtml(r.lugar)}</td`;
                 html += `<td><span class="badge ${estadoClass}">${estadoText}</span></td>`;
-                html += `<td class="col-acciones">
-                            <div class="acciones-container">
-                                <div class="acciones-fila">
-                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
-                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Pendiente">⏳</button>
-                                </div>
-                                <div class="acciones-fila">
-                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Pagado">💰</button>
-                                    <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir">🗑️</button>
-                                </div>
-                            </div>
-                        </td>`;
+                html += `<td class="col-acciones"><div class="acciones-container"><div class="acciones-fila"><button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')">✅</button><button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')">⏳</button></div><div class="acciones-fila"><button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')">💰</button><button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')">🗑️</button></div></div></td>`;
                 html += '</tr>';
             }
-            
             tbody.innerHTML = html;
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
         }
@@ -451,7 +438,6 @@
         function filtrarReservas() {
             const busquedaGeneral = document.getElementById('busquedaReserva');
             const busquedaCiudad = document.getElementById('busquedaCiudad');
-            
             const textoGeneral = busquedaGeneral ? busquedaGeneral.value.toLowerCase().trim() : '';
             const textoCiudad = busquedaCiudad ? busquedaCiudad.value.toLowerCase().trim() : '';
             
@@ -460,35 +446,52 @@
             } else {
                 reservasFiltradas = reservasData.filter(r => {
                     let coincide = true;
-                    if (textoCiudad && !r.ciudad.toLowerCase().includes(textoCiudad)) {
-                        coincide = false;
-                    }
+                    if (textoCiudad && !r.ciudad.toLowerCase().includes(textoCiudad)) coincide = false;
                     if (textoGeneral && coincide && !r.nombre.toLowerCase().includes(textoGeneral) && 
-                        !r.email.toLowerCase().includes(textoGeneral) &&
-                        !r.id.toLowerCase().includes(textoGeneral)) {
-                        coincide = false;
-                    }
+                        !r.email.toLowerCase().includes(textoGeneral) && !r.id.toLowerCase().includes(textoGeneral)) coincide = false;
                     return coincide;
                 });
             }
-            
             renderizarTabla();
         }
         
         // ==================================================
-        // GENERAR PDF CON LÍNEAS DE CUADRÍCULA
+        // OBTENER COLUMNAS SELECCIONADAS PARA PDF
+        // ==================================================
+        function getColumnasSeleccionadas() {
+            const checkboxes = document.querySelectorAll('#columnasSelector input:checked');
+            const seleccionadas = [];
+            for (const cb of checkboxes) {
+                if (columnasPDF[cb.value]) {
+                    seleccionadas.push({
+                        key: cb.value,
+                        header: columnasPDF[cb.value].header,
+                        ancho: columnasPDF[cb.value].ancho,
+                        getter: columnasPDF[cb.value].getter
+                    });
+                }
+            }
+            return seleccionadas;
+        }
+        
+        // ==================================================
+        // GENERAR PDF CON COLUMNAS SELECCIONADAS
         // ==================================================
         async function generarPDF() {
             if (reservasFiltradas.length === 0) {
-                alert('⚠️ No hay reservas para exportar. Aplica un filtro primero.');
+                alert('⚠️ No hay reservas para exportar.');
+                return;
+            }
+            
+            const columnas = getColumnasSeleccionadas();
+            if (columnas.length === 0) {
+                alert('⚠️ Selecciona al menos una columna para el PDF.');
                 return;
             }
             
             const ciudadFiltro = document.getElementById('busquedaCiudad').value.trim();
             let tituloPDF = 'Reporte de Reservas';
-            if (ciudadFiltro) {
-                tituloPDF = `Reporte de Reservas - Ciudad: ${ciudadFiltro.toUpperCase()}`;
-            }
+            if (ciudadFiltro) tituloPDF = `Reporte de Reservas - Ciudad: ${ciudadFiltro.toUpperCase()}`;
             
             const btnPDF = document.querySelector('.btn-pdf');
             const textoOriginal = btnPDF.textContent;
@@ -498,13 +501,19 @@
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-                
                 const margin = 10;
                 let y = margin + 10;
                 const pageWidth = doc.internal.pageSize.getWidth();
-                // 11 columnas: ID, Fecha, Cliente, Email, Teléfono, Excursiones, Ciudad, Pax, Pago, Lugar, Estado
-                const colWidths = [25, 20, 35, 40, 25, 45, 25, 10, 20, 30, 20];
-                const headers = ['ID', 'Fecha', 'Cliente', 'Email', 'Teléfono', 'Excursiones', 'Ciudad', 'Pax', 'Pago', 'Lugar', 'Estado'];
+                
+                // Calcular ancho total
+                let totalWidth = margin;
+                for (const col of columnas) totalWidth += col.ancho;
+                
+                if (totalWidth > pageWidth) {
+                    // Ajustar anchos proporcionalmente
+                    const factor = (pageWidth - margin) / (totalWidth - margin);
+                    for (const col of columnas) col.ancho = col.ancho * factor;
+                }
                 
                 // Título
                 doc.setFontSize(16);
@@ -512,7 +521,7 @@
                 doc.text(tituloPDF, pageWidth / 2, y, { align: 'center' });
                 y += 10;
                 
-                // Fecha de generación
+                // Fecha
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
                 doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, margin, y);
@@ -520,7 +529,7 @@
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, margin, y);
                 y += 12;
                 
-                // Dibujar encabezados con fondo y líneas
+                // Encabezados
                 let x = margin;
                 doc.setFillColor(102, 126, 234);
                 doc.setDrawColor(0, 0, 0);
@@ -529,21 +538,20 @@
                 doc.setFontSize(8);
                 doc.setTextColor(255, 255, 255);
                 
-                for (let i = 0; i < headers.length; i++) {
-                    doc.rect(x, y, colWidths[i], 8, 'FD');
-                    doc.text(headers[i], x + 2, y + 5);
-                    x += colWidths[i];
+                for (const col of columnas) {
+                    doc.rect(x, y, col.ancho, 8, 'FD');
+                    doc.text(col.header, x + 2, y + 5);
+                    x += col.ancho;
                 }
                 y += 8;
                 
-                // Datos de las reservas con líneas de cuadrícula
+                // Datos
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(0, 0, 0);
                 doc.setDrawColor(200, 200, 200);
                 
                 for (const reserva of reservasFiltradas) {
-                    // Verificar si necesitamos nueva página
                     if (y > 180) {
                         doc.addPage();
                         y = margin + 10;
@@ -552,10 +560,10 @@
                         doc.setDrawColor(0, 0, 0);
                         doc.setFont('helvetica', 'bold');
                         doc.setTextColor(255, 255, 255);
-                        for (let i = 0; i < headers.length; i++) {
-                            doc.rect(x, y, colWidths[i], 8, 'FD');
-                            doc.text(headers[i], x + 2, y + 5);
-                            x += colWidths[i];
+                        for (const col of columnas) {
+                            doc.rect(x, y, col.ancho, 8, 'FD');
+                            doc.text(col.header, x + 2, y + 5);
+                            x += col.ancho;
                         }
                         y += 8;
                         doc.setFont('helvetica', 'normal');
@@ -564,32 +572,15 @@
                         doc.setDrawColor(200, 200, 200);
                     }
                     
-                    // Preparar datos
-                    const excursionesTexto = reserva.excursionesLista.join(', ').substring(0, 55);
-                    const datos = [
-                        reserva.id,
-                        reserva.fecha,
-                        reserva.nombre.substring(0, 30),
-                        reserva.email.substring(0, 35),
-                        reserva.telefono,
-                        excursionesTexto,
-                        reserva.ciudad.substring(0, 25),
-                        reserva.personas,
-                        reserva.formaPago.substring(0, 15),
-                        reserva.lugar.substring(0, 28),
-                        reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado')
-                    ];
-                    
                     x = margin;
-                    const rowHeight = 8;
-                    
-                    // Dibujar cada celda con borde
-                    for (let i = 0; i < datos.length; i++) {
-                        doc.rect(x, y, colWidths[i], rowHeight);
-                        doc.text(String(datos[i]), x + 2, y + 5);
-                        x += colWidths[i];
+                    for (const col of columnas) {
+                        let valor = col.getter(reserva);
+                        if (valor && valor.length > 40) valor = valor.substring(0, 38) + '...';
+                        doc.rect(x, y, col.ancho, 8);
+                        doc.text(String(valor || ''), x + 2, y + 5);
+                        x += col.ancho;
                     }
-                    y += rowHeight;
+                    y += 8;
                 }
                 
                 doc.save(`reservas_${ciudadFiltro || 'todas'}_${Date.now()}.pdf`);
@@ -604,16 +595,16 @@
         }
         
         // ==================================================
-        // EXPORTAR A EXCEL
+        // EXPORTAR A EXCEL (todas las columnas)
         // ==================================================
         function exportarExcel() {
             if (reservasFiltradas.length === 0) {
-                alert('⚠️ No hay reservas para exportar. Aplica un filtro primero.');
+                alert('⚠️ No hay reservas para exportar.');
                 return;
             }
             
             const ciudadFiltro = document.getElementById('busquedaCiudad').value.trim();
-            let nombreArchivo = `reservas_${ciudadFiltro || 'todas'}_${Date.now()}.xlsx`;
+            const nombreArchivo = `reservas_${ciudadFiltro || 'todas'}_${Date.now()}.xlsx`;
             
             const btnExcel = document.querySelector('.btn-excel');
             const textoOriginal = btnExcel.textContent;
@@ -621,49 +612,26 @@
             btnExcel.disabled = true;
             
             try {
-                // Preparar datos para Excel
-                const datosExcel = [];
+                const datosExcel = [['ID', 'Fecha', 'Cliente', 'Email', 'Teléfono', 'Excursiones', 'Ciudad', 'Pax', 'Forma de Pago', 'Lugar', 'Estado']];
                 
-                // Encabezados
-                datosExcel.push(['ID', 'Fecha', 'Cliente', 'Email', 'Teléfono', 'Excursiones', 'Ciudad', 'Pax', 'Forma de Pago', 'Lugar', 'Estado']);
-                
-                // Datos
                 for (const reserva of reservasFiltradas) {
-                    const excursionesTexto = reserva.excursionesLista.join(', ');
-                    const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
-                    
                     datosExcel.push([
-                        reserva.id,
-                        reserva.fecha,
-                        reserva.nombre,
-                        reserva.email,
-                        reserva.telefono,
-                        excursionesTexto,
-                        reserva.ciudad,
-                        reserva.personas,
-                        reserva.formaPago,
-                        reserva.lugar,
-                        estadoTexto                    ]);
+                        reserva.id, reserva.fecha, reserva.nombre, reserva.email, reserva.telefono,
+                        reserva.excursionesLista.join(', '), reserva.ciudad, reserva.personas,
+                        reserva.formaPago, reserva.lugar,
+                        reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado')
+                    ]);
                 }
                 
-                // Crear libro de Excel
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.aoa_to_sheet(datosExcel);
-                
-                // Ajustar anchos de columnas
-                ws['!cols'] = [
-                    {wch:15}, {wch:12}, {wch:25}, {wch:30}, {wch:15},
-                    {wch:40}, {wch:20}, {wch:6}, {wch:18}, {wch:25}, {wch:12}
-                ];
-                
+                ws['!cols'] = [{wch:15},{wch:12},{wch:25},{wch:30},{wch:15},{wch:40},{wch:20},{wch:6},{wch:18},{wch:25},{wch:12}];
                 XLSX.utils.book_append_sheet(wb, ws, 'Reservas');
-                
-                // Descargar archivo
                 XLSX.writeFile(wb, nombreArchivo);
                 
             } catch (error) {
                 console.error('Error Excel:', error);
-                alert('❌ Error al generar el archivo Excel.');
+                alert('❌ Error al generar Excel.');
             } finally {
                 btnExcel.textContent = textoOriginal;
                 btnExcel.disabled = false;
