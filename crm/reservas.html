@@ -131,6 +131,7 @@
             padding: 12px 15px;
             background: #f8f9fa;
             border-top: 1px solid #f0f0f0;
+            flex-wrap: wrap;
         }
         .btn-card {
             flex: 1;
@@ -141,6 +142,7 @@
             font-size: 12px;
             font-weight: 600;
             transition: all 0.2s;
+            text-align: center;
         }
         .btn-card:hover {
             transform: scale(0.98);
@@ -150,6 +152,7 @@
         .btn-pendiente-card { background: #ffc107; color: #856404; }
         .btn-pagar-card { background: #3498db; color: white; }
         .btn-excluir-card { background: #e74c3c; color: white; }
+        .btn-whatsapp-card { background: #25D366; color: white; }
         
         .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
         
@@ -321,6 +324,69 @@
             }
         }
         
+        // ==================================================
+        // FUNCIÓN PARA ENVIAR WHATSAPP
+        // ==================================================
+        function enviarWhatsApp(reserva) {
+            // Limpiar número de teléfono (solo dígitos)
+            let telefono = reserva.telefono.replace(/\D/g, '');
+            if (telefono.length === 10) {
+                telefono = '54' + telefono;
+            }
+            
+            // Formatear lista de excursiones
+            let excursionesTexto = '';
+            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
+                excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
+            } else {
+                excursionesTexto = 'Sin excursiones específicas';
+            }
+            
+            let estadoTexto = '';
+            switch(reserva.estado) {
+                case 'pendiente': estadoTexto = 'Pendiente'; break;
+                case 'confirmado': estadoTexto = 'Confirmado'; break;
+                case 'pagado': estadoTexto = 'Pagado'; break;
+                default: estadoTexto = 'Confirmado';
+            }
+            
+            // Crear mensaje
+            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
+
+✅ *CONFIRMACIÓN DE RESERVA*
+
+🆔 *N° de reserva:* ${reserva.id}
+📅 *Fecha:* ${reserva.fecha}
+
+👤 *DATOS DEL PASAJERO:*
+   Nombre: ${reserva.nombre}
+   📞 Teléfono: ${reserva.telefono}
+   📧 Email: ${reserva.email}
+
+📍 *DESTINO:*
+   ${reserva.ciudad}
+
+✨ *EXCURSIONES SELECCIONADAS:*
+${excursionesTexto}
+
+👥 *Cantidad de personas:* ${reserva.personas}
+💳 *Forma de pago:* ${reserva.formaPago}
+🚐 *Punto de encuentro:* ${reserva.lugar}
+📌 *Estado:* ${estadoTexto}
+
+📌 *PRÓXIMOS PASOS:*
+• En las próximas 24hs recibirás detalles de pago
+• Punto de encuentro exacto será confirmado
+
+🏔️ ¡Gracias por confiar en Aventura Total!`;
+
+            // Codificar mensaje para URL
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            
+            // Abrir WhatsApp
+            window.open(`https://wa.me/${telefono}?text=${mensajeCodificado}`, '_blank');
+        }
+        
         function renderizarCards() {
             const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
@@ -400,6 +466,7 @@
                             <button class="btn-card btn-confirmar-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')">✅</button>
                             <button class="btn-card btn-pendiente-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')">⏳</button>
                             <button class="btn-card btn-pagar-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')">💰</button>
+                            <button class="btn-card btn-whatsapp-card" onclick="enviarWhatsApp(${JSON.stringify(r).replace(/"/g, '&quot;')})">💬 WhatsApp</button>
                             <button class="btn-card btn-excluir-card" onclick="excluirReserva('${escapeHtml(r.id)}')">🗑️</button>
                         </div>
                     </div>
@@ -429,7 +496,7 @@
         }
         
         // ==================================================
-        // GENERAR PDF (7 columnas, excursiones en lista vertical)
+        // GENERAR PDF
         // ==================================================
         async function generarPDF() {
             if (reservasFiltradas.length === 0) {
@@ -446,12 +513,9 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                 const marginLeft = 8;
-                const marginRight = 8;
                 let y = marginLeft + 10;
                 const pageWidth = doc.internal.pageSize.getWidth();
-                const usableWidth = pageWidth - marginLeft - marginRight;
                 
-                // 7 columnas: ID, Cliente, Teléfono, Excursiones, Pax, Estado, Lugar
                 const colWidths = [28, 48, 28, 55, 12, 22, 40];
                 const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar'];
                 
@@ -462,7 +526,6 @@
                 doc.text('Reporte de Reservas', pageWidth / 2, y, { align: 'center' });
                 y += 10;
                 
-                // Fecha y total
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
                 doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, marginLeft, y);
@@ -470,7 +533,6 @@
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
                 y += 12;
                 
-                // Encabezados (fondo blanco, texto negro, con borde)
                 let x = marginLeft;
                 doc.setFillColor(255, 255, 255);
                 doc.setDrawColor(0, 0, 0);
@@ -486,14 +548,12 @@
                 }
                 y += 10;
                 
-                // Datos (fondo blanco, texto negro)
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(0, 0, 0);
                 doc.setDrawColor(200, 200, 200);
                 
                 for (const reserva of reservasFiltradas) {
-                    // Verificar si necesitamos nueva página
                     if (y > 180) {
                         doc.addPage();
                         y = marginLeft + 10;
@@ -515,7 +575,6 @@
                         doc.setDrawColor(200, 200, 200);
                     }
                     
-                    // Preparar texto de excursiones (una por línea)
                     let excursionesTexto = '';
                     if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
                         excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
@@ -524,46 +583,37 @@
                     }
                     
                     const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
-                    
-                    // Calcular altura de fila según las excursiones
                     const lineasExcursiones = excursionesTexto.split('\n').length;
                     const alturaFila = Math.max(10, lineasExcursiones * 4.5 + 4);
                     
                     x = marginLeft;
                     
-                    // ID
                     doc.rect(x, y, colWidths[0], alturaFila);
                     doc.text(String(reserva.id), x + 2, y + 5);
                     x += colWidths[0];
                     
-                    // Cliente
                     doc.rect(x, y, colWidths[1], alturaFila);
                     const nombreCliente = reserva.nombre.length > 30 ? reserva.nombre.substring(0, 27) + '...' : reserva.nombre;
                     doc.text(nombreCliente, x + 2, y + 5);
                     x += colWidths[1];
                     
-                    // Teléfono
                     doc.rect(x, y, colWidths[2], alturaFila);
                     doc.text(reserva.telefono, x + 2, y + 5);
                     x += colWidths[2];
                     
-                    // Excursiones (multilínea)
                     doc.rect(x, y, colWidths[3], alturaFila);
                     const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 4);
                     doc.text(lineas, x + 2, y + 5);
                     x += colWidths[3];
                     
-                    // Pax
                     doc.rect(x, y, colWidths[4], alturaFila);
                     doc.text(reserva.personas, x + 2, y + 5);
                     x += colWidths[4];
                     
-                    // Estado
                     doc.rect(x, y, colWidths[5], alturaFila);
                     doc.text(estadoTexto, x + 2, y + 5);
                     x += colWidths[5];
                     
-                    // Lugar
                     doc.rect(x, y, colWidths[6], alturaFila);
                     const lugarTexto = reserva.lugar.length > 35 ? reserva.lugar.substring(0, 32) + '...' : reserva.lugar;
                     doc.text(lugarTexto, x + 2, y + 5);
@@ -619,6 +669,7 @@
         window.filtrarReservas = filtrarReservas;
         window.cargarReservas = cargarReservas;
         window.generarPDF = generarPDF;
+        window.enviarWhatsApp = enviarWhatsApp;
         window.logout = logout;
         
         const busquedaInput = document.getElementById('busquedaReserva');
