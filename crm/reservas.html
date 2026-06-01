@@ -301,7 +301,7 @@
                         telefono: telefono,
                         ciudad: ciudad,
                         excursionesLista: excursionesLista,
-                        personas: personas,
+                        personas: parseInt(personas) || 1,
                         formaPago: formaPago,
                         lugar: lugar,
                         estado: estado
@@ -490,13 +490,16 @@ ${excursionesTexto}
         }
         
         // ==================================================
-        // GENERAR PDF
+        // GENERAR PDF CON 8 COLUMNAS (incluyendo Observaciones)
         // ==================================================
         async function generarPDF() {
             if (reservasFiltradas.length === 0) {
                 alert('⚠️ No hay reservas para exportar.');
                 return;
             }
+            
+            // Calcular total de pasajeros (Pax)
+            const totalPasajeros = reservasFiltradas.reduce((sum, r) => sum + (parseInt(r.personas) || 0), 0);
             
             const btnPDF = document.querySelector('.btn-pdf');
             const textoOriginal = btnPDF.textContent;
@@ -510,15 +513,18 @@ ${excursionesTexto}
                 let y = marginLeft + 10;
                 const pageWidth = doc.internal.pageSize.getWidth();
                 
-                const colWidths = [28, 48, 28, 55, 12, 22, 40];
-                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar'];
+                // 8 columnas: ID (35), Cliente (42), Teléfono (25), Excursiones (48), Pax (12), Estado (20), Lugar (35), Observaciones (35)
+                const colWidths = [35, 42, 25, 48, 12, 20, 35, 35];
+                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar', 'Observaciones'];
                 
+                // Título
                 doc.setFontSize(16);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(0, 0, 0);
                 doc.text('Reporte de Reservas', pageWidth / 2, y, { align: 'center' });
                 y += 10;
                 
+                // Fecha y total
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
                 doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, marginLeft, y);
@@ -526,6 +532,7 @@ ${excursionesTexto}
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
                 y += 12;
                 
+                // Encabezados
                 let x = marginLeft;
                 doc.setFillColor(255, 255, 255);
                 doc.setDrawColor(0, 0, 0);
@@ -541,6 +548,7 @@ ${excursionesTexto}
                 }
                 y += 10;
                 
+                // Datos
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(0, 0, 0);
@@ -581,38 +589,84 @@ ${excursionesTexto}
                     
                     x = marginLeft;
                     
+                    // ID
                     doc.rect(x, y, colWidths[0], alturaFila);
                     doc.text(String(reserva.id), x + 2, y + 5);
                     x += colWidths[0];
                     
+                    // Cliente
                     doc.rect(x, y, colWidths[1], alturaFila);
-                    const nombreCliente = reserva.nombre.length > 30 ? reserva.nombre.substring(0, 27) + '...' : reserva.nombre;
+                    const nombreCliente = reserva.nombre.length > 32 ? reserva.nombre.substring(0, 29) + '...' : reserva.nombre;
                     doc.text(nombreCliente, x + 2, y + 5);
                     x += colWidths[1];
                     
+                    // Teléfono
                     doc.rect(x, y, colWidths[2], alturaFila);
                     doc.text(reserva.telefono, x + 2, y + 5);
                     x += colWidths[2];
                     
+                    // Excursiones
                     doc.rect(x, y, colWidths[3], alturaFila);
                     const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 4);
                     doc.text(lineas, x + 2, y + 5);
                     x += colWidths[3];
                     
+                    // Pax
                     doc.rect(x, y, colWidths[4], alturaFila);
-                    doc.text(reserva.personas, x + 2, y + 5);
+                    doc.text(String(reserva.personas), x + 2, y + 5);
                     x += colWidths[4];
                     
+                    // Estado
                     doc.rect(x, y, colWidths[5], alturaFila);
                     doc.text(estadoTexto, x + 2, y + 5);
                     x += colWidths[5];
                     
+                    // Lugar
                     doc.rect(x, y, colWidths[6], alturaFila);
-                    const lugarTexto = reserva.lugar.length > 35 ? reserva.lugar.substring(0, 32) + '...' : reserva.lugar;
+                    const lugarTexto = reserva.lugar.length > 28 ? reserva.lugar.substring(0, 25) + '...' : reserva.lugar;
                     doc.text(lugarTexto, x + 2, y + 5);
+                    x += colWidths[6];
+                    
+                    // Observaciones (vacío por ahora, editable manualmente)
+                    doc.rect(x, y, colWidths[7], alturaFila);
+                    doc.text('', x + 2, y + 5);
                     
                     y += alturaFila;
                 }
+                
+                // === FILA DE TOTAL ===
+                y += 5;
+                
+                // Posiciones para la fila de total
+                const totalX = marginLeft + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3];
+                
+                doc.setFillColor(230, 230, 230);
+                doc.setDrawColor(0, 0, 0);
+                doc.setLineWidth(0.1);
+                
+                // Celda vacía para ID
+                doc.rect(marginLeft, y, colWidths[0], 10);
+                
+                // Celda vacía para Cliente
+                doc.rect(marginLeft + colWidths[0], y, colWidths[1], 10);
+                
+                // Celda vacía para Teléfono
+                doc.rect(marginLeft + colWidths[0] + colWidths[1], y, colWidths[2], 10);
+                
+                // Celda "TOTAL GENERAL"
+                doc.rect(totalX, y, colWidths[3], 10);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.text('TOTAL GENERAL', totalX + 2, y + 6);
+                
+                // Celda con la suma de Pax
+                doc.rect(totalX + colWidths[3], y, colWidths[4], 10);
+                doc.text(String(totalPasajeros), totalX + colWidths[3] + 2, y + 6);
+                
+                // Celdas vacías para Estado, Lugar y Observaciones
+                doc.rect(totalX + colWidths[3] + colWidths[4], y, colWidths[5], 10);
+                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5], y, colWidths[6], 10);
+                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, colWidths[7], 10);
                 
                 doc.save(`reservas_${Date.now()}.pdf`);
                 
