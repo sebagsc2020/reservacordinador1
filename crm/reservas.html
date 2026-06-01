@@ -38,10 +38,44 @@
         .table-header h3 { font-size: 15px; }
         .table-wrapper { overflow-x: auto; }
         
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 950px; }
-        th { text-align: left; padding: 8px 6px; background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
-        td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; font-size: 11px; color: #333; vertical-align: top; word-break: break-word; }
+        /* Tabla con ancho fijo para cada columna */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 11px; 
+            table-layout: auto;
+            min-width: 1200px;
+        }
+        th, td { 
+            padding: 8px 6px; 
+            border-bottom: 1px solid #f0f0f0; 
+            vertical-align: top; 
+            word-break: break-word;
+        }
+        th { 
+            text-align: left; 
+            background: #f8f9fa; 
+            color: #666; 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            white-space: nowrap;
+        }
+        td { font-size: 11px; color: #333; }
         tr:hover td { background: #f8f9ff; }
+        
+        /* Anchos específicos para cada columna */
+        th:nth-child(1), td:nth-child(1) { min-width: 100px; } /* ID */
+        th:nth-child(2), td:nth-child(2) { min-width: 80px; }  /* Fecha */
+        th:nth-child(3), td:nth-child(3) { min-width: 130px; } /* Cliente */
+        th:nth-child(4), td:nth-child(4) { min-width: 140px; } /* Email */
+        th:nth-child(5), td:nth-child(5) { min-width: 90px; }  /* Teléfono */
+        th:nth-child(6), td:nth-child(6) { min-width: 180px; } /* Excursiones */
+        th:nth-child(7), td:nth-child(7) { min-width: 100px; } /* Ciudad */
+        th:nth-child(8), td:nth-child(8) { min-width: 40px; }  /* Pax */
+        th:nth-child(9), td:nth-child(9) { min-width: 90px; }  /* Pago */
+        th:nth-child(10), td:nth-child(10) { min-width: 100px; } /* Lugar */
+        th:nth-child(11), td:nth-child(11) { min-width: 80px; } /* Estado */
+        th:nth-child(12), td:nth-child(12) { min-width: 70px; } /* Acciones */
         
         .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
         .badge-pendiente { background: #fff3cd; color: #856404; }
@@ -60,17 +94,12 @@
         .excursiones-lista { margin: 0; padding-left: 12px; list-style: none; }
         .excursiones-lista li { padding: 2px 0; font-size: 10px; white-space: normal; word-break: break-word; }
         .total-reservas { font-size: 11px; color: #666; }
-        .col-acciones { min-width: 70px; white-space: nowrap; }
-        
-        .filtro-ciudad { border-left: 2px solid #667eea; padding-left: 15px; margin-left: 5px; }
         
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
             .nav-menu a { justify-content: center; } 
             .main-content { margin-left: 60px; padding: 12px; }
-            .col-acciones { min-width: 60px; }
-            .btn-accion { padding: 3px 5px; font-size: 9px; }
         }
     </style>
 </head>
@@ -97,7 +126,7 @@
 
         <div class="filters-bar">
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o ID..." id="busquedaReserva">
-            <input type="text" class="filter-input filtro-ciudad" placeholder="📍 Filtrar por ciudad..." id="busquedaCiudad">
+            <input type="text" class="filter-input" placeholder="📍 Filtrar por ciudad..." id="busquedaCiudad" style="border-left: 2px solid #667eea; padding-left: 15px;">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
             <button class="btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
@@ -114,11 +143,11 @@
                         <tr>
                             <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
                             <th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Pago</th><th>Lugar</th><th>Estado</th>
-                            <th class="col-acciones">Acciones</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaReservas"><tr><td colspan="13" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
-                恐
+                    <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
+                ~
             </div>
         </div>
     </div>
@@ -215,6 +244,10 @@
             if (partes.length === 3 && partes[0].length === 4) {
                 return `${partes[2]}/${partes[1]}/${partes[0]}`;
             }
+            // Si es timestamp largo, extraer solo la fecha
+            if (fechaStr.includes(' ')) {
+                return fechaStr.split(' ')[0];
+            }
             return fechaStr;
         }
         
@@ -267,7 +300,7 @@
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -277,9 +310,6 @@
                 reservasData = [];
                 const estadosGuardados = cargarEstadosGuardados();
                 const excluidos = cargarExcluidos();
-                
-                const encabezados = filas[0];
-                console.log('📋 Encabezados:', encabezados);
                 
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
@@ -307,9 +337,17 @@
                         estado = 'confirmado';
                     }
                     
+                    // Formatear fecha correctamente
+                    let fechaFormateada = '';
+                    if (timestamp) {
+                        fechaFormateada = formatearFecha(timestamp);
+                    } else if (fecha) {
+                        fechaFormateada = formatearFecha(fecha);
+                    }
+                    
                     reservasData.push({
                         id: id,
-                        fecha: formatearFecha(timestamp) || formatearFecha(fecha),
+                        fecha: fechaFormateada,
                         nombre: nombreCompleto,
                         email: email,
                         telefono: telefono,
@@ -323,7 +361,9 @@
                 }
                 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
-                console.log('📝 Primera reserva:', reservasData[0]);
+                if (reservasData.length > 0) {
+                    console.log('📝 Primera reserva:', reservasData[0]);
+                }
                 
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
@@ -337,12 +377,12 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
         // ==================================================
-        // RENDERIZAR TABLA - CORREGIDO
+        // RENDERIZAR TABLA - VERSIÓN CORREGIDA
         // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
@@ -350,7 +390,7 @@
             if (!tbody) return;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:20px;">📋 No hay reservas</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">📋 No hay reservas</td</td';
                 if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
@@ -376,17 +416,17 @@
                 excursionesHtml += '</ul>';
                 
                 html += '<tr>';
-                html += `<td class="id-reserva"><strong>${escapeHtml(r.id)}</strong></td>`;
-                html += `<td style="font-size:10px">${escapeHtml(r.fecha)}</td`;
-                html += `<td>${escapeHtml(r.nombre)}</td`;
-                html += `<td style="font-size:10px">${escapeHtml(r.email)}</td`;
-                html += `<td>${escapeHtml(r.telefono)}</td`;
-                html += `<td class="col-excursiones">${excursionesHtml}</td`;
-                html += `<td>${escapeHtml(r.ciudad)}</td`;
-                html += `<td>${escapeHtml(r.personas)}</td`;
-                html += `<td style="font-size:10px">${escapeHtml(r.formaPago)}</td`;
-                html += `<td style="font-size:10px">${escapeHtml(r.lugar)}</td`;
-                html += `<td><span class="badge ${estadoClass}">${estadoText}</span></td`;
+                html += `<td><strong>${escapeHtml(r.id)}</strong></td>`;
+                html += `<td>${escapeHtml(r.fecha)}</td>`;
+                html += `<td>${escapeHtml(r.nombre)}</td>`;
+                html += `<td>${escapeHtml(r.email)}</td>`;
+                html += `<td>${escapeHtml(r.telefono)}</td>`;
+                html += `<td>${excursionesHtml}</td>`;
+                html += `<td>${escapeHtml(r.ciudad)}</td>`;
+                html += `<td>${escapeHtml(r.personas)}</td>`;
+                html += `<td>${escapeHtml(r.formaPago)}</td>`;
+                html += `<td>${escapeHtml(r.lugar)}</td>`;
+                html += `<td><span class="badge ${estadoClass}">${estadoText}</span></td>`;
                 html += `<td class="col-acciones">
                             <div class="acciones-container">
                                 <div class="acciones-fila">
@@ -398,7 +438,7 @@
                                     <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir">🗑️</button>
                                 </div>
                             </div>
-                        </td`;
+                        </td>`;
                 html += '</tr>';
             }
             
@@ -416,17 +456,22 @@
             const textoGeneral = busquedaGeneral ? busquedaGeneral.value.toLowerCase().trim() : '';
             const textoCiudad = busquedaCiudad ? busquedaCiudad.value.toLowerCase().trim() : '';
             
-            reservasFiltradas = reservasData.filter(r => {
-                if (textoCiudad && !r.ciudad.toLowerCase().includes(textoCiudad)) {
-                    return false;
-                }
-                if (textoGeneral && !r.nombre.toLowerCase().includes(textoGeneral) && 
-                    !r.email.toLowerCase().includes(textoGeneral) &&
-                    !r.id.toLowerCase().includes(textoGeneral)) {
-                    return false;
-                }
-                return true;
-            });
+            if (!textoGeneral && !textoCiudad) {
+                reservasFiltradas = [...reservasData];
+            } else {
+                reservasFiltradas = reservasData.filter(r => {
+                    let coincide = true;
+                    if (textoCiudad && !r.ciudad.toLowerCase().includes(textoCiudad)) {
+                        coincide = false;
+                    }
+                    if (textoGeneral && coincide && !r.nombre.toLowerCase().includes(textoGeneral) && 
+                        !r.email.toLowerCase().includes(textoGeneral) &&
+                        !r.id.toLowerCase().includes(textoGeneral)) {
+                        coincide = false;
+                    }
+                    return coincide;
+                });
+            }
             
             renderizarTabla();
         }
