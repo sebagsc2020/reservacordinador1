@@ -8,7 +8,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        /* Sidebar más angosta */
+        /* Sidebar */
         .sidebar { width: 200px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
         .sidebar-logo { text-align: center; padding: 0 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
         .sidebar-logo .logo-icon { font-size: 32px; } .sidebar-logo h2 { font-size: 16px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
@@ -46,30 +46,10 @@
         .badge-confirmado { background: #d4edda; color: #155724; }
         .badge-pagado { background: #d1ecf1; color: #0c5460; }
         
-        /* ========== BOTONES EN DOS COLUMNAS ========== */
-        .acciones-container {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .acciones-fila {
-            display: flex;
-            gap: 4px;
-            justify-content: flex-start;
-        }
-        .btn-accion {
-            padding: 4px 8px;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-size: 10px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .btn-accion:hover {
-            transform: scale(0.98);
-            opacity: 0.9;
-        }
+        .acciones-container { display: flex; flex-direction: column; gap: 4px; }
+        .acciones-fila { display: flex; gap: 4px; justify-content: flex-start; }
+        .btn-accion { padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s; }
+        .btn-accion:hover { transform: scale(0.98); opacity: 0.9; }
         .btn-confirmar { background: #27ae60; color: white; }
         .btn-pendiente { background: #ffc107; color: #856404; }
         .btn-pagar { background: #3498db; color: white; }
@@ -78,12 +58,7 @@
         .excursiones-lista { margin: 0; padding-left: 12px; list-style: none; }
         .excursiones-lista li { padding: 2px 0; font-size: 10px; white-space: normal; word-break: break-word; }
         .total-reservas { font-size: 11px; color: #666; }
-        
-        /* Columna de acciones con ancho fijo */
-        .col-acciones {
-            min-width: 70px;
-            white-space: nowrap;
-        }
+        .col-acciones { min-width: 70px; white-space: nowrap; }
         
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
@@ -128,7 +103,7 @@
                 <span id="totalReservasSpan" class="total-reservas">0 reservas</span>
             </div>
             <div class="table-wrapper">
-                <table>
+                <table id="reservasTable">
                     <thead>
                         <tr>
                             <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
@@ -136,8 +111,8 @@
                             <th class="col-acciones">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaReservas"><tr><td colspan="13">⏳ Cargando...</td</td</tbody>
-                </table>
+                    <tbody id="tablaReservas"><tr><td colspan="13" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
+                ~
             </div>
         </div>
     </div>
@@ -286,7 +261,7 @@
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="13">⏳ Cargando...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -301,6 +276,7 @@
                     const fila = filas[i];
                     if (fila.length < 3 || !fila[0]) continue;
                     
+                    // Mapeo por posición: columna B (índice 1) es el ID
                     const id = fila[1] || `R-${i}`;
                     if (excluidos.includes(id)) continue;
                     
@@ -344,19 +320,19 @@
                 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="13">❌ Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
         // ==================================================
-        // RENDERIZAR TABLA (con botones en DOS COLUMNAS)
+        // RENDERIZAR TABLA
         // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
             if (!tbody) return;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="13">📋 No hay reservas</td</td';
+                tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:20px;">📋 No hay reservas</td</td';
                 return;
             }
             
@@ -382,16 +358,16 @@
                 return `
                     <tr>
                         <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td
-                        <td>${escapeHtml(r.nombre)}</td
-                        <td style="font-size:10px">${escapeHtml(r.email)}</td
-                        <td>${escapeHtml(r.telefono)}</td
-                        <td>${excursionesHtml}</td
-                        <td>${escapeHtml(r.ciudad)}</td
-                        <td>${escapeHtml(r.personas)}</td
-                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td
-                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
+                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td>
+                        <td>${escapeHtml(r.nombre)}</td>
+                        <td style="font-size:10px">${escapeHtml(r.email)}</td>
+                        <td>${escapeHtml(r.telefono)}</td>
+                        <td>${excursionesHtml}</td>
+                        <td>${escapeHtml(r.ciudad)}</td>
+                        <td>${escapeHtml(r.personas)}</td>
+                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td>
+                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td>
+                        <td><span class="badge ${estadoClass}">${estadoText}</span></td>
                         <td class="col-acciones">
                             <div class="acciones-container">
                                 <div class="acciones-fila">
@@ -403,7 +379,7 @@
                                     <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir/Eliminar">🗑️</button>
                                 </div>
                             </div>
-                        </td
+                        </td>
                     </tr>
                 `;
             }).join('');
