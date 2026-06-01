@@ -76,9 +76,9 @@
 
     <script>
         // ==================================================
-        // ⚠️ IMPORTANTE: REEMPLAZA ESTA URL CON LA DE TU WEB APP
+        // URL DE TU WEB APP (YA ACTUALIZADA)
         // ==================================================
-        const GOOGLE_SCRIPT_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnRZxBaPJTaIAiCy2D6UcTHkA1JRcqxrZ-WMiEdVKVhMSiF38yLiVvB9TewcsJCZo2QlSysljLZwc2TR-Ux_XAskjjPZWT9wh0VtPX8AeCG2cflyu9LFn8kjcVQe_28f9pTV9yRCCQVQcnCsP2lHG4e24piUQeotcZ1W1bRJ7oLuzeov-zXhzHu7RLJrcIKRXZCNRcDghSCxc1-y5_ChpEpMryUyw156ocxtTu8gDJkarxPKEJbZa6GVYk1OoL8h41VCaY_yoggQFcFUN418ubxKc-eRxw&lib=MFGZ3_pfGUGQiSE0Vem01DyLBtGflyhoX';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzqKJ3jifH5AV2G4HKnfUgfvhY07yqa20p8jsnQDgFvVHS2c0TOBxyZjY66yMaGLPlew/exec';
         
         window.addEventListener('load', () => { setTimeout(() => { document.getElementById('preloader').classList.add('oculto'); }, 1000); });
 
@@ -232,7 +232,7 @@
             submitBtn.textContent = '⏳ Enviando...';
             
             try {
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
