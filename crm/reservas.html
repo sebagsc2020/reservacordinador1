@@ -35,35 +35,21 @@
         .table-header h3 { font-size: 15px; }
         
         table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 1200px; }
-        th, td { padding: 8px 6px; border-bottom: 1px solid #e0e0e0; vertical-align: top; text-align: left; word-break: break-word; }
-        th { background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
+        th, td { padding: 8px 6px; border-bottom: 1px solid #e0e0e0; vertical-align: top; text-align: left; }
+        th { background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; }
         td { font-size: 11px; color: #333; }
-        tr:hover td { background: #f8f9ff; }
         
-        .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
-        .badge-pendiente { background: #fff3cd; color: #856404; }
+        .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; display: inline-block; }
         .badge-confirmado { background: #d4edda; color: #155724; }
-        .badge-pagado { background: #d1ecf1; color: #0c5460; }
         
-        .acciones-container { display: flex; flex-direction: column; gap: 4px; }
-        .acciones-fila { display: flex; gap: 4px; justify-content: flex-start; }
-        .btn-accion { padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s; }
-        .btn-accion:hover { transform: scale(0.98); opacity: 0.9; }
+        .btn-accion { padding: 4px 6px; border-radius: 4px; border: none; cursor: pointer; font-size: 10px; margin: 1px; }
         .btn-confirmar { background: #27ae60; color: white; }
-        .btn-pendiente { background: #ffc107; color: #856404; }
-        .btn-pagar { background: #3498db; color: white; }
-        .btn-excluir { background: #e74c3c; color: white; }
-        
-        .excursiones-lista { margin: 0; padding-left: 12px; list-style: none; }
-        .excursiones-lista li { padding: 2px 0; font-size: 10px; white-space: normal; word-break: break-word; }
-        .total-reservas { font-size: 11px; color: #666; }
         
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
             .nav-menu a { justify-content: center; } 
             .main-content { margin-left: 60px; padding: 12px; }
-            .btn-accion { padding: 3px 5px; font-size: 9px; }
         }
     </style>
 </head>
@@ -89,7 +75,7 @@
         </div>
 
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o ID..." id="busquedaReserva">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar..." id="busquedaReserva">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
         </div>
@@ -101,27 +87,22 @@
             </div>
             <table id="reservasTable">
                 <thead>
-                    <tr>
-                        <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
-                        <th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Pago</th><th>Lugar</th><th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
+                    <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th></tr>
                 </thead>
-                <tbody id="tablaReservas">
-                    <tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td
-                </tbody>
+                <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;">Cargando...</td</td</tbody>
             </table>
         </div>
     </div>
 
     <script>
         // ==================================================
-        // CONFIGURACIÓN
+        // SIMPLE - VERSIÓN DE PRUEBA
         // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
-        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(SHEET_NAME);
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/export?format=csv&gid=0';
         
+        // Verificar sesión
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
         }
@@ -134,291 +115,137 @@
         let reservasData = [];
         let reservasFiltradas = [];
         
-        function parseCSV(csvText) {
-            var filas = [];
-            var filaActual = [];
-            var celdaActual = '';
-            var dentroComillas = false;
-            
-            for (var i = 0; i < csvText.length; i++) {
-                var char = csvText[i];
-                var nextChar = csvText[i + 1];
-                
-                if (dentroComillas) {
-                    if (char === '"') {
-                        if (nextChar === '"') {
-                            celdaActual += '"';
-                            i++;
-                        } else {
-                            dentroComillas = false;
-                        }
-                    } else {
-                        celdaActual += char;
-                    }
-                } else {
-                    if (char === '"') {
-                        dentroComillas = true;
-                    } else if (char === ',') {
-                        filaActual.push(celdaActual.trim());
-                        celdaActual = '';
-                    } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
-                        filaActual.push(celdaActual.trim());
-                        filas.push(filaActual);
-                        filaActual = [];
-                        celdaActual = '';
-                        if (char === '\r') i++;
-                    } else {
-                        celdaActual += char;
-                    }
-                }
-            }
-            if (celdaActual.trim() || filaActual.length > 0) {
-                filaActual.push(celdaActual.trim());
-                filas.push(filaActual);
-            }
-            return filas.filter(function(fila) { return fila.some(function(celda) { return celda !== ''; }); });
-        }
-        
-        function formatearFecha(fechaStr) {
-            if (!fechaStr) return '';
-            if (fechaStr.indexOf('/') !== -1) return fechaStr;
-            if (fechaStr.indexOf('GMT') !== -1) {
-                try {
-                    var fecha = new Date(fechaStr);
-                    if (!isNaN(fecha.getTime())) {
-                        return fecha.getDate().toString().padStart(2,'0') + '/' + (fecha.getMonth()+1).toString().padStart(2,'0') + '/' + fecha.getFullYear();
-                    }
-                } catch(e) {}
-            }
-            var partes = fechaStr.split('-');
-            if (partes.length === 3 && partes[0].length === 4) {
-                return partes[2] + '/' + partes[1] + '/' + partes[0];
-            }
-            if (fechaStr.indexOf(' ') !== -1) {
-                return fechaStr.split(' ')[0];
-            }
-            return fechaStr;
-        }
-        
-        function dividirExcursiones(texto) {
-            if (!texto) return [];
-            var partes = [];
-            if (texto.indexOf('\n') !== -1) partes = texto.split('\n');
-            else if (texto.indexOf(' | ') !== -1) partes = texto.split(' | ');
-            else if (texto.indexOf(', ') !== -1) partes = texto.split(', ');
-            else if (texto.indexOf(',') !== -1) partes = texto.split(',');
-            else partes = [texto];
-            return partes.map(function(p) { return p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, ''); }).filter(function(p) { return p; });
-        }
-        
-        function cargarEstadosGuardados() {
-            try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } 
-            catch(e) { return {}; }
-        }
-        
-        function guardarEstado(id, estado) {
-            var estados = cargarEstadosGuardados();
-            estados[id] = estado;
-            localStorage.setItem('estadosReservas', JSON.stringify(estados));
-        }
-        
-        function cargarExcluidos() {
-            try { return JSON.parse(localStorage.getItem('reservasExcluidas') || '[]'); } 
-            catch(e) { return []; }
-        }
-        
-        function guardarExcluido(id) {
-            var excluidos = cargarExcluidos();
-            if (excluidos.indexOf(id) === -1) {
-                excluidos.push(id);
-                localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
-            }
-        }
-        
+        // Función simple para cargar CSV
         async function cargarReservas() {
-            var tbody = document.getElementById('tablaReservas');
-            var totalSpan = document.getElementById('totalReservasSpan');
-            if (!tbody) return;
+            const tbody = document.getElementById('tablaReservas');
+            const totalSpan = document.getElementById('totalReservasSpan');
+            
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td></tr>';
-                var response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
-                if (!response.ok) throw new Error('HTTP ' + response.status);
-                var csvText = await response.text();
-                var filas = parseCSV(csvText);
-                if (filas.length < 2) throw new Error('No hay datos');
+                tbody.innerHTML = '<tr><td colspan="12">Cargando...</td></tr>';
+                const response = await fetch(CSV_URL);
+                const texto = await response.text();
+                
+                // Parsear CSV simple
+                const lineas = texto.split('\n');
+                const headers = lineas[0].split(',');
                 
                 reservasData = [];
-                var estadosGuardados = cargarEstadosGuardados();
-                var excluidos = cargarExcluidos();
                 
-                for (var i = 1; i < filas.length; i++) {
-                    var fila = filas[i];
-                    if (fila.length < 3 || !fila[0]) continue;
+                for (let i = 1; i < lineas.length; i++) {
+                    if (!lineas[i].trim()) continue;
                     
-                    var id = fila[1] || 'R-' + i;
-                    if (excluidos.indexOf(id) !== -1) continue;
+                    // Parseo simple (sin comillas complejas)
+                    const valores = lineas[i].split(',');
                     
-                    var timestamp = fila[0] || '';
-                    var nombre = fila[2] || '';
-                    var apellido = fila[3] || '';
-                    var email = fila[4] || '';
-                    var telefono = fila[5] || '';
-                    var ciudad = fila[7] || '';
-                    var excursionesRaw = fila[8] || '';
-                    var fecha = fila[9] || '';
-                    var personas = fila[10] || '1';
-                    var formaPago = fila[11] || '';
-                    var lugar = fila[12] || '';
+                    if (valores.length < 5) continue;
                     
-                    var nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
-                    var listaExcursiones = dividirExcursiones(excursionesRaw);
-                    var estado = estadosGuardados[id];
-                    if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
-                        estado = 'confirmado';
+                    const id = valores[1] || 'R-' + i;
+                    const nombre = valores[2] || '';
+                    const apellido = valores[3] || '';
+                    const email = valores[4] || '';
+                    const telefono = valores[5] || '';
+                    const ciudad = valores[7] || '';
+                    const excursionesRaw = valores[8] || '';
+                    const fecha = valores[9] || '';
+                    const personas = valores[10] || '1';
+                    const formaPago = valores[11] || '';
+                    const lugar = valores[12] || '';
+                    
+                    // Dividir excursiones por salto de línea
+                    let excursionesLista = [];
+                    if (excursionesRaw.indexOf('\n') !== -1) {
+                        excursionesLista = excursionesRaw.split('\n');
+                    } else if (excursionesRaw.indexOf(' | ') !== -1) {
+                        excursionesLista = excursionesRaw.split(' | ');
+                    } else {
+                        excursionesLista = [excursionesRaw];
                     }
-                    var fechaFormateada = formatearFecha(timestamp) || formatearFecha(fecha);
                     
                     reservasData.push({
-                        id: id, fecha: fechaFormateada,
-                        nombre: nombreCompleto, email: email, telefono: telefono, ciudad: ciudad,
-                        excursionesLista: listaExcursiones, personas: personas,
+                        id: id,
+                        fecha: fecha,
+                        nombre: nombre + ' ' + apellido,
+                        email: email,
+                        telefono: telefono,
+                        ciudad: ciudad,
+                        excursionesLista: excursionesLista,
+                        personas: personas,
                         formaPago: formaPago || 'No especificado',
-                        lugar: lugar || 'No especificado', estado: estado
+                        lugar: lugar || 'No especificado',
+                        estado: 'confirmado'
                     });
                 }
                 
-                reservasData.sort(function(a, b) { 
-                    var numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
-                    var numB = parseInt(b.id.replace(/\D/g, '')) || 0; 
-                    return numB - numA; 
-                });
-                
-                reservasFiltradas = reservasData.slice();
+                reservasFiltradas = [...reservasData];
                 renderizarTabla();
-                if (totalSpan) totalSpan.textContent = reservasData.length + ' reservas';
+                totalSpan.textContent = reservasData.length + ' reservas';
                 
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ' + error.message + '</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12">Error: ' + error.message + '</td></tr>';
             }
         }
         
         function renderizarTabla() {
-            var tbody = document.getElementById('tablaReservas');
-            var totalSpan = document.getElementById('totalReservasSpan');
-            if (!tbody) return;
+            const tbody = document.getElementById('tablaReservas');
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">📋 No hay reservas</td></tr>';
-                if (totalSpan) totalSpan.textContent = '0 reservas';
+                tbody.innerHTML = '<tr><td colspan="12">No hay reservas</td></tr>';
                 return;
             }
             
-            var html = '';
-            for (var idx = 0; idx < reservasFiltradas.length; idx++) {
-                var r = reservasFiltradas[idx];
-                var estadoClass = '', estadoText = '';
-                switch(r.estado) {
-                    case 'pendiente': estadoClass = 'badge-pendiente'; estadoText = 'Pendiente'; break;
-                    case 'confirmado': estadoClass = 'badge-confirmado'; estadoText = 'Confirmado'; break;
-                    case 'pagado': estadoClass = 'badge-pagado'; estadoText = 'Pagado'; break;
-                    default: estadoClass = 'badge-confirmado'; estadoText = 'Confirmado';
-                }
+            let html = '';
+            for (let i = 0; i < reservasFiltradas.length; i++) {
+                const r = reservasFiltradas[i];
                 
-                var excursionesHtml = '<ul class="excursiones-lista">';
-                if (!r.excursionesLista || r.excursionesLista.length === 0) {
-                    excursionesHtml += '<li>Sin excursiones</li>';
-                } else {
-                    for (var e = 0; e < r.excursionesLista.length; e++) {
-                        excursionesHtml += '<li>' + (e+1) + '. ' + escapeHtml(r.excursionesLista[e]) + '</li>';
+                // Limpiar excursiones
+                let excursionesHtml = '<ul style="margin:0; padding-left:15px;">';
+                for (let e = 0; e < r.excursionesLista.length; e++) {
+                    if (r.excursionesLista[e] && r.excursionesLista[e].trim()) {
+                        excursionesHtml += '<li>' + r.excursionesLista[e].trim() + '</li>';
                     }
                 }
                 excursionesHtml += '</ul>';
                 
                 html += '<tr>';
-                html += '<td class="id-reserva"><strong>' + escapeHtml(r.id) + '</strong></td>';
-                html += '<td>' + escapeHtml(r.fecha) + '</td>';
-                html += '<td>' + escapeHtml(r.nombre) + '</td>';
-                html += '<td style="word-break:break-all;">' + escapeHtml(r.email) + '</td>';
-                html += '<td>' + escapeHtml(r.telefono) + '</td>';
+                html += '<td><strong>' + r.id + '</strong></td>';
+                html += '<td>' + r.fecha + '</td>';
+                html += '<td>' + r.nombre + '</td>';
+                html += '<td>' + r.email + '</td>';
+                html += '<td>' + r.telefono + '</td>';
                 html += '<td>' + excursionesHtml + '</td>';
-                html += '<td>' + escapeHtml(r.ciudad) + '</td>';
-                html += '<td>' + escapeHtml(r.personas) + '</td>';
-                html += '<td>' + escapeHtml(r.formaPago) + '</td>';
-                html += '<td>' + escapeHtml(r.lugar) + '</td>';
-                html += '<td><span class="badge ' + estadoClass + '">' + estadoText + '</span></td>';
-                html += '<td class="col-acciones">
-                            <div class="acciones-container">
-                                <div class="acciones-fila">
-                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado(\'' + escapeHtml(r.id) + '\', \'confirmado\')">✅</button>
-                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado(\'' + escapeHtml(r.id) + '\', \'pendiente\')">⏳</button>
-                                </div>
-                                <div class="acciones-fila">
-                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado(\'' + escapeHtml(r.id) + '\', \'pagado\')">💰</button>
-                                    <button class="btn-accion btn-excluir" onclick="excluirReserva(\'' + escapeHtml(r.id) + '\')">🗑️</button>
-                                </div>
-                            </div>
-                        </td>';
+                html += '<td>' + r.ciudad + '</td>';
+                html += '<td>' + r.personas + '</td>';
+                html += '<td>' + r.formaPago + '</td>';
+                html += '<td>' + r.lugar + '</td>';
+                html += '<td><span class="badge badge-confirmado">Confirmado</span></td>';
+                html += '<td><button class="btn-accion btn-confirmar">✅</button></td>';
                 html += '</tr>';
             }
             tbody.innerHTML = html;
-            if (totalSpan) totalSpan.textContent = reservasFiltradas.length + ' de ' + reservasData.length + ' reservas';
         }
         
         function filtrarReservas() {
-            var busqueda = document.getElementById('busquedaReserva');
-            if (!busqueda) return;
-            var texto = busqueda.value.toLowerCase().trim();
+            const busqueda = document.getElementById('busquedaReserva');
+            const texto = busqueda.value.toLowerCase();
+            
             if (!texto) {
-                reservasFiltradas = reservasData.slice();
+                reservasFiltradas = [...reservasData];
             } else {
-                reservasFiltradas = reservasData.filter(function(r) {
-                    return r.nombre.toLowerCase().indexOf(texto) !== -1 || 
-                           r.email.toLowerCase().indexOf(texto) !== -1 ||
-                           r.ciudad.toLowerCase().indexOf(texto) !== -1 ||
-                           r.id.toLowerCase().indexOf(texto) !== -1;
-                });
+                reservasFiltradas = reservasData.filter(r => 
+                    r.nombre.toLowerCase().indexOf(texto) !== -1 || 
+                    r.email.toLowerCase().indexOf(texto) !== -1 ||
+                    r.id.toLowerCase().indexOf(texto) !== -1
+                );
             }
             renderizarTabla();
         }
         
-        function cambiarEstado(id, nuevoEstado) {
-            var reserva = reservasData.find(function(r) { return r.id === id; });
-            if (reserva) {
-                reserva.estado = nuevoEstado;
-                guardarEstado(id, nuevoEstado);
-                var indexFiltrada = reservasFiltradas.findIndex(function(r) { return r.id === id; });
-                if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
-                renderizarTabla();
-            }
-        }
-        
-        function excluirReserva(id) {
-            if (confirm('⚠️ ¿Estás seguro de excluir la reserva ' + id + '?')) {
-                guardarExcluido(id);
-                cargarReservas();
-                alert('✅ Reserva ' + id + ' excluida.');
-            }
-        }
-        
-        function escapeHtml(text) { 
-            if (!text) return ''; 
-            var div = document.createElement('div'); 
-            div.textContent = text; 
-            return div.innerHTML; 
-        }
-        
-        window.cambiarEstado = cambiarEstado;
-        window.excluirReserva = excluirReserva;
-        window.filtrarReservas = filtrarReservas;
         window.cargarReservas = cargarReservas;
+        window.filtrarReservas = filtrarReservas;
         window.logout = logout;
         
-        var busquedaInput = document.getElementById('busquedaReserva');
-        if (busquedaInput) busquedaInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') filtrarReservas(); });
-        
         cargarReservas();
-        setInterval(cargarReservas, 60000);
     </script>
 </body>
 </html>
