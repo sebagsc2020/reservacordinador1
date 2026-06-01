@@ -36,6 +36,9 @@
         .btn-pdf { background: #e74c3c; color: white; }
         .btn-excel { background: #0f9d58; color: white; }
         
+        /* Estilo para el filtro de excursión */
+        .filter-excursion { border-left: 2px solid #e74c3c; padding-left: 15px; margin-left: 5px; }
+        
         .column-selector { background: white; border-radius: 12px; padding: 10px 15px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-wrap: wrap; align-items: center; gap: 15px; }
         .column-selector span { font-weight: 600; font-size: 12px; color: #333; }
         .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -77,6 +80,8 @@
             .nav-menu a { justify-content: center; } 
             .main-content { margin-left: 60px; padding: 12px; }
             .checkbox-group { gap: 8px; }
+            .filters-bar { flex-direction: column; align-items: stretch; }
+            .filter-input { width: 100%; }
         }
     </style>
 </head>
@@ -104,6 +109,7 @@
         <div class="filters-bar">
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o ID..." id="busquedaReserva">
             <input type="text" class="filter-input" placeholder="📍 Filtrar por ciudad..." id="busquedaCiudad" style="border-left: 2px solid #667eea; padding-left: 15px;">
+            <input type="text" class="filter-input filter-excursion" placeholder="🎟️ Filtrar por excursión..." id="busquedaExcursion">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
             <button class="btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
@@ -309,7 +315,7 @@
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -431,25 +437,46 @@
         }
         
         // ==================================================
-        // FILTRAR RESERVAS
+        // FILTRAR RESERVAS (incluye filtro por excursión)
         // ==================================================
         function filtrarReservas() {
             const busquedaGeneral = document.getElementById('busquedaReserva');
             const busquedaCiudad = document.getElementById('busquedaCiudad');
+            const busquedaExcursion = document.getElementById('busquedaExcursion');
+            
             const textoGeneral = busquedaGeneral ? busquedaGeneral.value.toLowerCase().trim() : '';
             const textoCiudad = busquedaCiudad ? busquedaCiudad.value.toLowerCase().trim() : '';
+            const textoExcursion = busquedaExcursion ? busquedaExcursion.value.toLowerCase().trim() : '';
             
-            if (!textoGeneral && !textoCiudad) {
+            if (!textoGeneral && !textoCiudad && !textoExcursion) {
                 reservasFiltradas = [...reservasData];
             } else {
                 reservasFiltradas = reservasData.filter(r => {
                     let coincide = true;
-                    if (textoCiudad && !r.ciudad.toLowerCase().includes(textoCiudad)) coincide = false;
+                    
+                    // Filtro por ciudad
+                    if (textoCiudad && !r.ciudad.toLowerCase().includes(textoCiudad)) {
+                        coincide = false;
+                    }
+                    
+                    // Filtro por excursión (busca en la lista de excursiones)
+                    if (textoExcursion && coincide) {
+                        const tieneExcursion = r.excursionesLista.some(exc => 
+                            exc.toLowerCase().includes(textoExcursion)
+                        );
+                        if (!tieneExcursion) coincide = false;
+                    }
+                    
+                    // Filtro general
                     if (textoGeneral && coincide && !r.nombre.toLowerCase().includes(textoGeneral) && 
-                        !r.email.toLowerCase().includes(textoGeneral) && !r.id.toLowerCase().includes(textoGeneral)) coincide = false;
+                        !r.email.toLowerCase().includes(textoGeneral) && !r.id.toLowerCase().includes(textoGeneral)) {
+                        coincide = false;
+                    }
+                    
                     return coincide;
                 });
             }
+            
             renderizarTabla();
         }
         
@@ -474,7 +501,7 @@
         }
         
         // ==================================================
-        // GENERAR PDF CON COLUMNAS SELECCIONADAS
+        // GENERAR PDF
         // ==================================================
         async function generarPDF() {
             if (reservasFiltradas.length === 0) {
@@ -489,8 +516,10 @@
             }
             
             const ciudadFiltro = document.getElementById('busquedaCiudad').value.trim();
+            const excursionFiltro = document.getElementById('busquedaExcursion').value.trim();
             let tituloPDF = 'Reporte de Reservas';
             if (ciudadFiltro) tituloPDF = `Reporte de Reservas - Ciudad: ${ciudadFiltro.toUpperCase()}`;
+            if (excursionFiltro) tituloPDF = `Reporte de Reservas - Excursión: ${excursionFiltro.toUpperCase()}`;
             
             const btnPDF = document.querySelector('.btn-pdf');
             const textoOriginal = btnPDF.textContent;
@@ -531,14 +560,14 @@
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
                 y += 12;
                 
-                // Encabezados - Fondo gris, letras negras
+                // Encabezados
                 let x = marginLeft;
-                doc.setFillColor(192, 192, 192); // Gris (#C0C0C0)
+                doc.setFillColor(192, 192, 192);
                 doc.setDrawColor(0, 0, 0);
                 doc.setLineWidth(0.1);
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(9);
-                doc.setTextColor(0, 0, 0); // Letras negras
+                doc.setTextColor(0, 0, 0);
                 
                 for (let i = 0; i < columnas.length; i++) {
                     doc.rect(x, y, anchosFinales[i], 10, 'FD');
@@ -554,7 +583,6 @@
                 doc.setDrawColor(200, 200, 200);
                 
                 for (const reserva of reservasFiltradas) {
-                    // Verificar salto de página
                     if (y > 180) {
                         doc.addPage();
                         y = 20;
@@ -578,7 +606,6 @@
                     
                     x = marginLeft;
                     
-                    // Calcular altura de fila
                     let alturaFila = 10;
                     for (let i = 0; i < columnas.length; i++) {
                         let texto;
@@ -616,7 +643,7 @@
                     y += alturaFila;
                 }
                 
-                doc.save(`reservas_${ciudadFiltro || 'todas'}_${Date.now()}.pdf`);
+                doc.save(`reservas_${ciudadFiltro || excursionFiltro || 'todas'}_${Date.now()}.pdf`);
                 
             } catch (error) {
                 console.error('Error PDF:', error);
@@ -637,7 +664,10 @@
             }
             
             const ciudadFiltro = document.getElementById('busquedaCiudad').value.trim();
-            const nombreArchivo = `reservas_${ciudadFiltro || 'todas'}_${Date.now()}.xlsx`;
+            const excursionFiltro = document.getElementById('busquedaExcursion').value.trim();
+            let nombreArchivo = `reservas_${Date.now()}.xlsx`;
+            if (ciudadFiltro) nombreArchivo = `reservas_${ciudadFiltro}_${Date.now()}.xlsx`;
+            if (excursionFiltro) nombreArchivo = `reservas_${excursionFiltro}_${Date.now()}.xlsx`;
             
             const btnExcel = document.querySelector('.btn-excel');
             const textoOriginal = btnExcel.textContent;
@@ -713,8 +743,11 @@
         
         const busquedaInput = document.getElementById('busquedaReserva');
         const busquedaCiudadInput = document.getElementById('busquedaCiudad');
+        const busquedaExcursionInput = document.getElementById('busquedaExcursion');
+        
         if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
         if (busquedaCiudadInput) busquedaCiudadInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
+        if (busquedaExcursionInput) busquedaExcursionInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
         
         cargarReservas();
         setInterval(cargarReservas, 60000);
