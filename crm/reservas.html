@@ -2,256 +2,67 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        /* ========== SIDEBAR MÁS ANGOSTA ========== */
-        .sidebar { 
-            width: 180px; 
-            background: #1a1a2e; 
-            color: white; 
-            padding: 20px 0; 
-            position: fixed; 
-            height: 100vh; 
-            overflow-y: auto; 
-            z-index: 100;
-        }
-        .sidebar-logo { 
-            text-align: center; 
-            padding: 0 12px 20px; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-            margin-bottom: 15px; 
-        }
-        .sidebar-logo .logo-icon { font-size: 32px; } 
-        .sidebar-logo h2 { font-size: 14px; margin-top: 5px; } 
-        .sidebar-logo h2 span { color: #667eea; }
+        /* Sidebar más angosta */
+        .sidebar { width: 200px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-logo { text-align: center; padding: 0 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+        .sidebar-logo .logo-icon { font-size: 32px; } .sidebar-logo h2 { font-size: 16px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 12px; } .nav-menu li { margin-bottom: 3px; }
+        .nav-menu a { display: flex; align-items: center; gap: 8px; padding: 8px 10px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; font-size: 12px; }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 15px; left: 12px; right: 12px; }
+        .btn-logout-sidebar { width: 100%; padding: 8px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 11px; border: none; }
         
-        .nav-menu { list-style: none; padding: 0 10px; } 
-        .nav-menu li { margin-bottom: 3px; }
-        .nav-menu a { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            padding: 8px 10px; 
-            color: rgba(255,255,255,0.7); 
-            text-decoration: none; 
-            border-radius: 8px; 
-            font-size: 12px; 
-        }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
-        .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 16px; width: 22px; text-align: center; }
-        
-        .sidebar-footer { 
-            position: absolute; 
-            bottom: 15px; 
-            left: 10px; 
-            right: 10px; 
-        }
-        .btn-logout-sidebar { 
-            width: 100%; 
-            padding: 8px; 
-            background: rgba(231,76,60,0.2); 
-            color: #e74c3c; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 11px; 
-            border: none; 
-        }
-        
-        /* ========== CONTENIDO PRINCIPAL ========== */
-        .main-content { 
-            margin-left: 180px; 
-            flex: 1; 
-            padding: 20px; 
-            min-width: 0; 
-            overflow-x: auto;
-        }
-        
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 20px; 
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+        .main-content { margin-left: 200px; flex: 1; padding: 20px; min-width: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .header h1 { font-size: 22px; color: #1a1a2e; }
-        .user-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            background: white; 
-            padding: 6px 15px; 
-            border-radius: 40px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
-            font-size: 13px; 
-        }
-        .user-avatar { 
-            width: 30px; 
-            height: 30px; 
-            background: #667eea; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: 700; 
-            font-size: 12px;
-        }
+        .user-info { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 15px; border-radius: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 13px; }
+        .user-avatar { width: 30px; height: 30px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; }
         
-        /* ========== FILTROS ========== */
-        .filters-bar { 
-            background: white; 
-            padding: 12px 15px; 
-            border-radius: 12px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-            margin-bottom: 20px; 
-            display: flex; 
-            gap: 8px; 
-            align-items: center; 
-            flex-wrap: wrap; 
-        }
-        .filter-input { 
-            padding: 8px 12px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 8px; 
-            font-size: 12px; 
-            flex: 1; 
-            min-width: 160px; 
-        }
-        .btn-filtrar, .btn-recargar { 
-            padding: 8px 15px; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 12px; 
-            white-space: nowrap; 
-        }
+        .filters-bar { background: white; padding: 12px 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .filter-input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 12px; flex: 1; min-width: 160px; }
+        .btn-filtrar, .btn-recargar { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
         
-        /* ========== TABLA - SIN SCROLL HORIZONTAL ========== */
-        .table-container { 
-            background: white; 
-            border-radius: 12px; 
-            padding: 12px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-        }
-        .table-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 12px; 
-            flex-wrap: wrap; 
-            gap: 8px; 
-        }
+        .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .table-header h3 { font-size: 15px; }
+        .table-wrapper { overflow-x: auto; }
         
-        .table-wrapper { 
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            font-size: 11px;
-            min-width: 800px;
-        }
-        
-        th { 
-            text-align: left; 
-            padding: 8px 6px; 
-            background: #f8f9fa; 
-            color: #666; 
-            font-size: 10px; 
-            text-transform: uppercase; 
-            white-space: nowrap; 
-        }
-        
-        td { 
-            padding: 8px 6px; 
-            border-bottom: 1px solid #f0f0f0; 
-            font-size: 11px; 
-            color: #333; 
-            vertical-align: top; 
-            word-break: break-word;
-        }
-        
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 900px; }
+        th { text-align: left; padding: 8px 6px; background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
+        td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; font-size: 11px; color: #333; vertical-align: top; word-break: break-word; }
         tr:hover td { background: #f8f9ff; }
         
-        /* Columnas con ancho máximo para evitar desborde */
-        .col-excursiones { max-width: 160px; }
-        .col-email { max-width: 140px; word-break: break-all; }
-        .col-telefono { max-width: 90px; }
-        .col-lugar { max-width: 100px; }
-        
-        .badge { 
-            padding: 3px 8px; 
-            border-radius: 20px; 
-            font-size: 9px; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            display: inline-block; 
-            white-space: nowrap;
-        }
+        .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
         .badge-pendiente { background: #fff3cd; color: #856404; }
         .badge-confirmado { background: #d4edda; color: #155724; }
         .badge-pagado { background: #d1ecf1; color: #0c5460; }
+        .badge-excluido { background: #f8d7da; color: #721c24; }
         
-        .btn-accion { 
-            padding: 4px 6px; 
-            border-radius: 4px; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 9px; 
-            font-weight: 600; 
-            margin: 1px; 
-            width: 22px; 
-            text-align: center; 
-        }
-        .btn-pendiente { background: #ffc107; color: #856404; }
+        .btn-accion { padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin: 2px; }
         .btn-confirmar { background: #27ae60; color: white; }
+        .btn-pendiente { background: #ffc107; color: #856404; }
         .btn-pagar { background: #3498db; color: white; }
+        .btn-excluir { background: #e74c3c; color: white; }
         
-        .acciones-container { display: flex; flex-direction: column; gap: 2px; }
-        .acciones-fila { display: flex; gap: 2px; justify-content: flex-start; }
-        
-        .excursiones-lista { 
-            margin: 0; 
-            padding-left: 12px; 
-            list-style: none; 
-        }
-        .excursiones-lista li { 
-            padding: 2px 0; 
-            font-size: 10px; 
-            white-space: normal; 
-            word-break: break-word; 
-        }
-        
+        .acciones-container { display: flex; gap: 5px; flex-wrap: wrap; }
+        .excursiones-lista { margin: 0; padding-left: 12px; list-style: none; }
+        .excursiones-lista li { padding: 2px 0; font-size: 10px; white-space: normal; word-break: break-word; }
         .total-reservas { font-size: 11px; color: #666; }
-        .id-reserva { font-family: monospace; font-weight: bold; font-size: 10px; }
         
-        /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
-            .nav-menu a { justify-content: center; padding: 10px; }
-            .nav-icon { font-size: 18px; width: auto; }
-            .main-content { margin-left: 60px; padding: 12px; }
-            .header h1 { font-size: 18px; }
-            .filters-bar { flex-direction: column; align-items: stretch; }
-            .filter-input { width: 100%; }
-            .btn-filtrar, .btn-recargar { text-align: center; }
-            th, td { font-size: 9px; padding: 5px 4px; }
-            .col-excursiones { max-width: 100px; }
-            .col-email { max-width: 90px; }
+            .nav-menu a { justify-content: center; } 
+            .main-content { margin-left: 60px; padding: 12px; } 
         }
     </style>
 </head>
@@ -291,23 +102,11 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Fecha</th>
-                            <th>Cliente</th>
-                            <th class="col-email">Email</th>
-                            <th class="col-telefono">Teléfono</th>
-                            <th class="col-excursiones">Excursiones</th>
-                            <th>Ciudad</th>
-                            <th>Pax</th>
-                            <th>Pago</th>
-                            <th class="col-lugar">Lugar</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
+                            <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
+                            <th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Pago</th><th>Lugar</th><th>Estado</th><th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaReservas">
-                        <tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando datos...</td</td
-                    </tbody>
+                    <tbody id="tablaReservas"><tr><td colspan="12">⏳ Cargando...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -315,12 +114,10 @@
 
     <script>
         // ==================================================
-        // CONFIGURACIÓN - TU PLANILLA CORRECTA
+        // CONFIGURACIÓN - TU PLANILLA
         // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
-        
-        // URL para obtener datos como CSV
         const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
         
         // ==================================================
@@ -342,7 +139,7 @@
         let reservasFiltradas = [];
         
         // ==================================================
-        // PARSEAR CSV
+        // PARSEAR CSV (maneja comillas y saltos de línea)
         // ==================================================
         function parseCSV(csvText) {
             const filas = [];
@@ -382,12 +179,10 @@
                     }
                 }
             }
-            
             if (celdaActual.trim() || filaActual.length > 0) {
                 filaActual.push(celdaActual.trim());
                 filas.push(filaActual);
             }
-            
             return filas.filter(fila => fila.some(celda => celda !== ''));
         }
         
@@ -397,10 +192,6 @@
         function formatearFecha(fechaStr) {
             if (!fechaStr) return '';
             if (fechaStr.includes('/')) return fechaStr;
-            const partes = fechaStr.split('-');
-            if (partes.length === 3 && partes[0].length === 4) {
-                return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
             if (fechaStr.includes('GMT')) {
                 try {
                     const fecha = new Date(fechaStr);
@@ -408,6 +199,10 @@
                         return `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
                     }
                 } catch(e) {}
+            }
+            const partes = fechaStr.split('-');
+            if (partes.length === 3 && partes[0].length === 4) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
             }
             return fechaStr;
         }
@@ -418,22 +213,16 @@
         function dividirExcursiones(texto) {
             if (!texto) return [];
             let partes = [];
-            if (texto.includes('\n')) {
-                partes = texto.split('\n');
-            } else if (texto.includes(' | ')) {
-                partes = texto.split(' | ');
-            } else if (texto.includes(', ')) {
-                partes = texto.split(', ');
-            } else if (texto.includes(',')) {
-                partes = texto.split(',');
-            } else {
-                partes = [texto];
-            }
+            if (texto.includes('\n')) partes = texto.split('\n');
+            else if (texto.includes(' | ')) partes = texto.split(' | ');
+            else if (texto.includes(', ')) partes = texto.split(', ');
+            else if (texto.includes(',')) partes = texto.split(',');
+            else partes = [texto];
             return partes.map(p => p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(p => p);
         }
         
         // ==================================================
-        // ESTADOS
+        // GESTIÓN DE ESTADOS Y EXCLUIDOS
         // ==================================================
         function cargarEstadosGuardados() {
             try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } 
@@ -446,77 +235,84 @@
             localStorage.setItem('estadosReservas', JSON.stringify(estados));
         }
         
+        // Excluir reserva (guardar en localStorage separado)
+        function cargarExcluidos() {
+            try { return JSON.parse(localStorage.getItem('reservasExcluidas') || '[]'); } 
+            catch(e) { return []; }
+        }
+        
+        function guardarExcluido(id) {
+            const excluidos = cargarExcluidos();
+            if (!excluidos.includes(id)) {
+                excluidos.push(id);
+                localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
+            }
+        }
+        
+        function eliminarExcluido(id) {
+            let excluidos = cargarExcluidos();
+            excluidos = excluidos.filter(e => e !== id);
+            localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
+        }
+        
+        function estaExcluido(id) {
+            return cargarExcluidos().includes(id);
+        }
+        
         // ==================================================
         // CARGAR RESERVAS
         // ==================================================
         async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
             const totalSpan = document.getElementById('totalReservasSpan');
-            
             if (!tbody) return;
-            
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando datos...</td</td';
-                
+                tbody.innerHTML = '<tr><td colspan="12">⏳ Cargando...</td></tr>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
                 const csvText = await response.text();
                 const filas = parseCSV(csvText);
-                
-                if (filas.length < 2) {
-                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">📭 No hay reservas</td</td';
-                    if (totalSpan) totalSpan.textContent = '0 reservas';
-                    return;
-                }
-                
-                const encabezados = filas[0];
-                const datos = filas.slice(1);
+                if (filas.length < 2) throw new Error('No hay datos');
                 
                 reservasData = [];
                 const estadosGuardados = cargarEstadosGuardados();
+                const excluidos = cargarExcluidos();
                 
-                for (let i = 0; i < datos.length; i++) {
-                    const fila = datos[i];
+                for (let i = 1; i < filas.length; i++) {
+                    const fila = filas[i];
                     if (fila.length < 3 || !fila[0]) continue;
                     
-                    // Mapeo por índice (más confiable que por nombre)
-                    const id = fila[1] || `R-${i+1}`;      // columna B
-                    const timestamp = fila[0] || '';       // columna A
-                    const nombre = fila[2] || '';          // columna C
-                    const apellido = fila[3] || '';        // columna D
-                    const email = fila[4] || '';           // columna E
-                    const telefono = fila[5] || '';        // columna F
-                    const pais = fila[6] || '';            // columna G
-                    const ciudad = fila[7] || '';          // columna H
-                    const excursionesRaw = fila[8] || '';  // columna I
-                    const fecha = fila[9] || '';           // columna J
-                    const personas = fila[10] || '1';      // columna K
-                    const formaPago = fila[11] || '';      // columna L
-                    const lugar = fila[12] || '';          // columna M
+                    const id = fila[1] || `R-${i}`;
+                    // Si está excluida, la saltamos (no se muestra)
+                    if (excluidos.includes(id)) continue;
+                    
+                    const timestamp = fila[0] || '';
+                    const nombre = fila[2] || '';
+                    const apellido = fila[3] || '';
+                    const email = fila[4] || '';
+                    const telefono = fila[5] || '';
+                    const pais = fila[6] || '';
+                    const ciudad = fila[7] || '';
+                    const excursionesRaw = fila[8] || '';
+                    const fecha = fila[9] || '';
+                    const personas = fila[10] || '1';
+                    const formaPago = fila[11] || '';
+                    const lugar = fila[12] || '';
                     
                     const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
+                    let estado = estadosGuardados[id];
+                    if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
+                        estado = 'confirmado';
+                    }
                     
-                    const reserva = {
-                        id: id,
-                        fechaRegistro: formatearFecha(timestamp),
-                        fechaViaje: formatearFecha(fecha),
-                        nombre: nombreCompleto,
-                        email: email,
-                        telefono: telefono,
-                        pais: pais,
-                        ciudad: ciudad,
-                        excursionesLista: listaExcursiones,
-                        personas: personas,
-                        formaPago: formaPago || 'No especificado',
-                        lugar: lugar || 'No especificado',
-                        estado: estadosGuardados[id] || 'confirmado'
-                    };
-                    reservasData.push(reserva);
+                    reservasData.push({
+                        id, fecha: formatearFecha(timestamp) || formatearFecha(fecha),
+                        nombre: nombreCompleto, email, telefono, pais, ciudad,
+                        excursionesLista: listaExcursiones, personas, formaPago: formaPago || 'No especificado',
+                        lugar: lugar || 'No especificado', estado
+                    });
                 }
-                
-                console.log(`📊 Cargadas ${reservasData.length} reservas`);
                 
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
@@ -529,8 +325,8 @@
                 if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
                 
             } catch (error) {
-                console.error('Error:', error);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td</td`;
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="12">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
@@ -540,12 +336,11 @@
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
             const totalSpan = document.getElementById('totalReservasSpan');
-            
             if (!tbody) return;
-            if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:20px;">📋 No hay coincidencias</td</td';
+                tbody.innerHTML = '<tr><td colspan="12">📋 No hay reservas</td></tr>';
+                if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
             
@@ -568,31 +363,24 @@
                 }
                 excursionesHtml += '</ul>';
                 
-                const fechaMostrar = r.fechaRegistro || r.fechaViaje || '';
-                
                 return `
                     <tr>
-                        <td class="id-reserva">${escapeHtml(r.id)}</td>
-                        <td style="font-size:10px">${escapeHtml(fechaMostrar)}</td>
+                        <td><strong>${escapeHtml(r.id)}</strong></td>
+                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td>
                         <td>${escapeHtml(r.nombre)}</td>
-                        <td class="col-email" style="font-size:10px;word-break:break-all;">${escapeHtml(r.email)}</td>
-                        <td class="col-telefono">${escapeHtml(r.telefono)}</td>
-                        <td class="col-excursiones">${excursionesHtml}</td>
+                        <td style="font-size:10px">${escapeHtml(r.email)}</td>
+                        <td>${escapeHtml(r.telefono)}</td>
+                        <td>${excursionesHtml}</td>
                         <td>${escapeHtml(r.ciudad)}</td>
                         <td>${escapeHtml(r.personas)}</td>
                         <td style="font-size:10px">${escapeHtml(r.formaPago)}</td>
-                        <td class="col-lugar" style="font-size:10px">${escapeHtml(r.lugar)}</td>
+                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td>
                         <td><span class="badge ${estadoClass}">${estadoText}</span></td>
-                        <td>
-                            <div class="acciones-container">
-                                <div class="acciones-fila">
-                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
-                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Pendiente">⏳</button>
-                                </div>
-                                <div class="acciones-fila">
-                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Pagado">💰</button>
-                                </div>
-                            </div>
+                        <td class="acciones-container">
+                            <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
+                            <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Pendiente">⏳</button>
+                            <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Pagado">💰</button>
+                            <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir/Eliminar">🗑️</button>
                         </td>
                     </tr>
                 `;
@@ -600,28 +388,7 @@
         }
         
         // ==================================================
-        // FILTRAR RESERVAS
-        // ==================================================
-        function filtrarReservas() {
-            const busqueda = document.getElementById('busquedaReserva');
-            if (!busqueda) return;
-            const texto = busqueda.value.toLowerCase().trim();
-            
-            if (!texto) {
-                reservasFiltradas = [...reservasData];
-            } else {
-                reservasFiltradas = reservasData.filter(r => 
-                    (r.nombre && r.nombre.toLowerCase().includes(texto)) || 
-                    (r.email && r.email.toLowerCase().includes(texto)) ||
-                    (r.ciudad && r.ciudad.toLowerCase().includes(texto)) ||
-                    (r.id && r.id.toLowerCase().includes(texto))
-                );
-            }
-            renderizarTabla();
-        }
-        
-        // ==================================================
-        // CAMBIAR ESTADO
+        // FUNCIONES DE ACCIONES
         // ==================================================
         function cambiarEstado(id, nuevoEstado) {
             const reserva = reservasData.find(r => r.id === id);
@@ -634,9 +401,29 @@
             }
         }
         
-        // ==================================================
-        // ESCAPAR HTML
-        // ==================================================
+        function excluirReserva(id) {
+            if (confirm(`⚠️ ¿Estás seguro de que deseas EXCLUIR la reserva ${id}?\n\nLa reserva dejará de mostrarse en el listado.`)) {
+                guardarExcluido(id);
+                // Recargar datos para actualizar la tabla
+                cargarReservas();
+                alert(`✅ Reserva ${id} excluida correctamente.`);
+            }
+        }
+        
+        function filtrarReservas() {
+            const busqueda = document.getElementById('busquedaReserva');
+            if (!busqueda) return;
+            const texto = busqueda.value.toLowerCase().trim();
+            if (!texto) reservasFiltradas = [...reservasData];
+            else reservasFiltradas = reservasData.filter(r => 
+                r.nombre.toLowerCase().includes(texto) || 
+                r.email.toLowerCase().includes(texto) ||
+                r.ciudad.toLowerCase().includes(texto) ||
+                r.id.toLowerCase().includes(texto)
+            );
+            renderizarTabla();
+        }
+        
         function escapeHtml(text) { 
             if (!text) return ''; 
             const div = document.createElement('div'); 
@@ -647,6 +434,12 @@
         // ==================================================
         // INICIALIZAR
         // ==================================================
+        window.cambiarEstado = cambiarEstado;
+        window.excluirReserva = excluirReserva;
+        window.filtrarReservas = filtrarReservas;
+        window.cargarReservas = cargarReservas;
+        window.logout = logout;
+        
         const busquedaInput = document.getElementById('busquedaReserva');
         if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
         
