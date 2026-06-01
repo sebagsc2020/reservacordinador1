@@ -25,12 +25,10 @@
         .user-avatar { width: 30px; height: 30px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; }
         
         .filters-bar { background: white; padding: 12px 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .filter-input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 12px; flex: 1; min-width: 160px; }
+        .filter-input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 12px; flex: 1; min-width: 200px; }
         .btn-filtrar, .btn-recargar { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
-        
-        .filter-excursion { border-left: 2px solid #e74c3c; padding-left: 15px; margin-left: 5px; }
         
         .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
@@ -89,8 +87,7 @@
         </div>
 
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email, ciudad o ID..." id="busquedaReserva">
-            <input type="text" class="filter-input filter-excursion" placeholder="🎟️ Buscar por excursión..." id="busquedaExcursion">
+            <input type="text" class="filter-input" placeholder="🎟️ Filtrar por excursión..." id="busquedaExcursion">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
         </div>
@@ -115,11 +112,10 @@
 
     <script>
         // ==================================================
-        // USAR LA API DE GOOGLE SHEETS (método confiable)
+        // CONFIGURACIÓN - EXPORTACIÓN CSV DIRECTA
         // ==================================================
-        
-        // Configuración de la API
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzzqKJ3jifH5AV2G4HKnfUgfvhY07yqa20p8jsnQDgFvVHS2c0TOBxyZjY66yMaGLPlew/exec';
+        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/export?format=csv';
         
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
@@ -134,7 +130,7 @@
         let reservasFiltradas = [];
         
         // ==================================================
-        // CARGAR RESERVAS DESDE LA API
+        // CARGAR RESERVAS
         // ==================================================
         async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
@@ -142,69 +138,105 @@
             if (!tbody) return;
             
             try {
-                tbody.innerHTML = '<table><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td</tr';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td</tr';
                 
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error('Error al cargar datos');
+                const response = await fetch(CSV_URL);
+                const texto = await response.text();
                 
-                const resultado = await response.json();
+                const lineas = texto.split('\n');
+                if (lineas.length < 2) throw new Error('No hay datos');
                 
-                if (!resultado.data || resultado.data.length === 0) {
-                    throw new Error('No hay datos disponibles');
-                }
-                
-                // Procesar los datos
                 reservasData = [];
                 const estadosGuardados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 
-                for (const item of resultado.data) {
-                    const id = item.id || 'Sin ID';
+                for (let i = 1; i < lineas.length; i++) {
+                    if (!lineas[i].trim()) continue;
                     
-                    // Saltar si está excluido
+                    // Parsear CSV respetando comillas
+                    const valores = [];
+                    let campo = '';
+                    let enComillas = false;
+                    const linea = lineas[i];
+                    
+                    for (let j = 0; j < linea.length; j++) {
+                        const char = linea[j];
+                        if (char === '"') {
+                            enComillas = !enComillas;
+                        } else if (char === ',' && !enComillas) {
+                            valores.push(campo);
+                            campo = '';
+                        } else {
+                            campo += char;
+                        }
+                    }
+                    valores.push(campo);
+                    
+                    if (valores.length < 5) continue;
+                    
+                    const id = valores[1] || 'R-' + i;
                     if (excluidos.includes(id)) continue;
                     
-                    // Procesar excursiones (pueden venir con \n)
-                    let excursionesLista = [];
-                    if (item.excursiones) {
-                        if (item.excursiones.includes('\n')) {
-                            excursionesLista = item.excursiones.split('\n');
-                        } else if (item.excursiones.includes(' | ')) {
-                            excursionesLista = item.excursiones.split(' | ');
-                        } else {
-                            excursionesLista = [item.excursiones];
-                        }
-                        // Limpiar cada excursión
-                        excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '')).filter(e => e);
-                    }
+                    const timestamp = valores[0] || '';
+                    const nombre = valores[2] || '';
+                    const apellido = valores[3] || '';
+                    const email = valores[4] || '';
+                    const telefono = valores[5] || '';
+                    const ciudad = valores[7] || '';
+                    const excursionesRaw = valores[8] || '';
+                    const fechaRaw = valores[9] || '';
+                    const personas = valores[10] || '1';
+                    const formaPago = valores[11] || 'No especificado';
+                    const lugar = valores[12] || 'No especificado';
                     
                     // Formatear fecha
                     let fecha = '';
-                    if (item.fecha) {
-                        fecha = item.fecha;
-                    } else if (item.timestamp) {
-                        const ts = new Date(item.timestamp);
-                        fecha = `${ts.getDate().toString().padStart(2,'0')}/${(ts.getMonth()+1).toString().padStart(2,'0')}/${ts.getFullYear()}`;
+                    if (timestamp && timestamp.includes('-')) {
+                        const partes = timestamp.split('-');
+                        if (partes.length === 3) {
+                            fecha = partes[2] + '/' + partes[1] + '/' + partes[0];
+                        }
+                    } else if (fechaRaw && fechaRaw.includes('-')) {
+                        const partes = fechaRaw.split('-');
+                        if (partes.length === 3) {
+                            fecha = partes[2] + '/' + partes[1] + '/' + partes[0];
+                        }
+                    } else if (timestamp && timestamp.includes('/')) {
+                        fecha = timestamp;
+                    } else {
+                        fecha = fechaRaw;
                     }
                     
-                    // Obtener estado guardado
+                    // Procesar excursiones
+                    let excursionesLista = [];
+                    if (excursionesRaw) {
+                        if (excursionesRaw.includes('\n')) {
+                            excursionesLista = excursionesRaw.split('\n');
+                        } else if (excursionesRaw.includes(' | ')) {
+                            excursionesLista = excursionesRaw.split(' | ');
+                        } else {
+                            excursionesLista = [excursionesRaw];
+                        }
+                        excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e);
+                    }
+                    
+                    const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
                     let estado = estadosGuardados[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
                     }
                     
-                    // Crear objeto reserva
                     reservasData.push({
                         id: id,
                         fecha: fecha,
-                        nombre: (item.nombre || '') + ' ' + (item.apellido || ''),
-                        email: item.email || '',
-                        telefono: item.telefono || '',
-                        ciudad: item.ciudad || '',
+                        nombre: nombreCompleto,
+                        email: email,
+                        telefono: telefono,
+                        ciudad: ciudad,
                         excursionesLista: excursionesLista,
-                        personas: item.personas || '1',
-                        formaPago: item.formapago || item.formaPago || 'No especificado',
-                        lugar: item.lugar || 'No especificado',
+                        personas: personas,
+                        formaPago: formaPago,
+                        lugar: lugar,
                         estado: estado
                     });
                 }
@@ -222,7 +254,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message} </td</tr`;
+                tbody.innerHTML = `</table><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message} </td</tr`;
             }
         }
         
@@ -291,38 +323,19 @@
         }
         
         // ==================================================
-        // FILTRAR RESERVAS
+        // FILTRAR POR EXCURSIÓN (solo este filtro)
         // ==================================================
         function filtrarReservas() {
-            const busquedaGeneral = document.getElementById('busquedaReserva');
             const busquedaExcursion = document.getElementById('busquedaExcursion');
-            
-            const textoGeneral = busquedaGeneral ? busquedaGeneral.value.toLowerCase().trim() : '';
             const textoExcursion = busquedaExcursion ? busquedaExcursion.value.toLowerCase().trim() : '';
             
-            if (!textoGeneral && !textoExcursion) {
+            if (!textoExcursion) {
                 reservasFiltradas = [...reservasData];
             } else {
                 reservasFiltradas = reservasData.filter(r => {
-                    let coincide = true;
-                    
-                    if (textoExcursion) {
-                        const tieneExcursion = r.excursionesLista.some(exc => 
-                            exc.toLowerCase().includes(textoExcursion)
-                        );
-                        if (!tieneExcursion) coincide = false;
-                    }
-                    
-                    if (textoGeneral && coincide) {
-                        if (!r.nombre.toLowerCase().includes(textoGeneral) && 
-                            !r.email.toLowerCase().includes(textoGeneral) &&
-                            !r.ciudad.toLowerCase().includes(textoGeneral) &&
-                            !r.id.toLowerCase().includes(textoGeneral)) {
-                            coincide = false;
-                        }
-                    }
-                    
-                    return coincide;
+                    return r.excursionesLista.some(exc => 
+                        exc.toLowerCase().includes(textoExcursion)
+                    );
                 });
             }
             renderizarTabla();
@@ -373,10 +386,10 @@
         window.cargarReservas = cargarReservas;
         window.logout = logout;
         
-        const busquedaInput = document.getElementById('busquedaReserva');
         const busquedaExcursionInput = document.getElementById('busquedaExcursion');
-        if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
-        if (busquedaExcursionInput) busquedaExcursionInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
+        if (busquedaExcursionInput) busquedaExcursionInput.addEventListener('keypress', function(e) { 
+            if (e.key === 'Enter') filtrarReservas(); 
+        });
         
         cargarReservas();
         setInterval(cargarReservas, 60000);
