@@ -429,7 +429,7 @@
         }
         
         // ==================================================
-        // GENERAR PDF
+        // GENERAR PDF (solo 6 columnas, excursiones en lista vertical)
         // ==================================================
         async function generarPDF() {
             if (reservasFiltradas.length === 0) {
@@ -450,94 +450,117 @@
                 const pageWidth = doc.internal.pageSize.getWidth();
                 
                 // Título
-                doc.setFontSize(18);
+                doc.setFontSize(16);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(0, 0, 0);
                 doc.text('Reporte de Reservas', pageWidth / 2, y, { align: 'center' });
-                y += 12;
+                y += 10;
                 
                 // Fecha y total
-                doc.setFontSize(10);
+                doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
-                doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, margin, y);
-                y += 7;
+                doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, margin, y);
+                y += 6;
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, margin, y);
                 y += 12;
                 
-                // Configurar columnas del PDF
-                const colWidths = [25, 20, 35, 40, 25, 45, 25, 10, 20, 30, 20];
-                const headers = ['ID', 'Fecha', 'Cliente', 'Email', 'Teléfono', 'Excursiones', 'Ciudad', 'Pax', 'Pago', 'Lugar', 'Estado'];
+                // 6 columnas: ID, Cliente, Teléfono, Excursiones, Pax, Estado
+                const colWidths = [30, 55, 30, 70, 15, 25];
+                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado'];
                 
-                // Encabezados
+                // Encabezados (fondo blanco, texto negro, con borde)
                 let x = margin;
-                doc.setFillColor(200, 200, 200);
+                doc.setFillColor(255, 255, 255); // Blanco
                 doc.setDrawColor(0, 0, 0);
                 doc.setLineWidth(0.1);
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(8);
+                doc.setFontSize(9);
                 doc.setTextColor(0, 0, 0);
                 
                 for (let i = 0; i < headers.length; i++) {
-                    doc.rect(x, y, colWidths[i], 10, 'FD');
-                    doc.text(headers[i], x + 2, y + 6);
+                    doc.rect(x, y, colWidths[i], 10);
+                    doc.text(headers[i], x + 3, y + 6);
                     x += colWidths[i];
                 }
                 y += 10;
                 
-                // Datos
+                // Datos (fondo blanco, texto negro)
                 doc.setFont('helvetica', 'normal');
-                doc.setFontSize(7);
+                doc.setFontSize(8);
                 doc.setTextColor(0, 0, 0);
                 doc.setDrawColor(200, 200, 200);
                 
                 for (const reserva of reservasFiltradas) {
+                    // Verificar si necesitamos nueva página
                     if (y > 180) {
                         doc.addPage();
                         y = margin + 10;
                         x = margin;
-                        doc.setFillColor(200, 200, 200);
+                        doc.setFillColor(255, 255, 255);
                         doc.setDrawColor(0, 0, 0);
                         doc.setFont('helvetica', 'bold');
-                        doc.setFontSize(8);
+                        doc.setFontSize(9);
                         doc.setTextColor(0, 0, 0);
                         for (let i = 0; i < headers.length; i++) {
-                            doc.rect(x, y, colWidths[i], 10, 'FD');
-                            doc.text(headers[i], x + 2, y + 6);
+                            doc.rect(x, y, colWidths[i], 10);
+                            doc.text(headers[i], x + 3, y + 6);
                             x += colWidths[i];
                         }
                         y += 10;
                         doc.setFont('helvetica', 'normal');
-                        doc.setFontSize(7);
+                        doc.setFontSize(8);
                         doc.setTextColor(0, 0, 0);
                         doc.setDrawColor(200, 200, 200);
                     }
                     
-                    const excursionesTexto = reserva.excursionesLista.join(', ').substring(0, 55);
+                    // Preparar texto de excursiones (una por línea)
+                    let excursionesTexto = '';
+                    if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
+                        excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
+                    } else {
+                        excursionesTexto = 'Sin excursiones';
+                    }
+                    
                     const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
                     
-                    const datos = [
-                        reserva.id,
-                        reserva.fecha,
-                        reserva.nombre.substring(0, 30),
-                        reserva.email.substring(0, 35),
-                        reserva.telefono,
-                        excursionesTexto,
-                        reserva.ciudad.substring(0, 20),
-                        reserva.personas,
-                        reserva.formaPago.substring(0, 15),
-                        reserva.lugar.substring(0, 25),
-                        estadoTexto
-                    ];
+                    // Calcular altura de fila según las excursiones
+                    const lineasExcursiones = excursionesTexto.split('\n').length;
+                    const alturaFila = Math.max(10, lineasExcursiones * 5 + 4);
                     
                     x = margin;
-                    const rowHeight = 8;
                     
-                    for (let i = 0; i < datos.length; i++) {
-                        doc.rect(x, y, colWidths[i], rowHeight);
-                        doc.text(String(datos[i]), x + 2, y + 5);
-                        x += colWidths[i];
-                    }
-                    y += rowHeight;
+                    // ID
+                    doc.rect(x, y, colWidths[0], alturaFila);
+                    doc.text(String(reserva.id), x + 3, y + 5);
+                    x += colWidths[0];
+                    
+                    // Cliente
+                    doc.rect(x, y, colWidths[1], alturaFila);
+                    const nombreCliente = reserva.nombre.length > 35 ? reserva.nombre.substring(0, 32) + '...' : reserva.nombre;
+                    doc.text(nombreCliente, x + 3, y + 5);
+                    x += colWidths[1];
+                    
+                    // Teléfono
+                    doc.rect(x, y, colWidths[2], alturaFila);
+                    doc.text(reserva.telefono, x + 3, y + 5);
+                    x += colWidths[2];
+                    
+                    // Excursiones (multilínea)
+                    doc.rect(x, y, colWidths[3], alturaFila);
+                    const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 6);
+                    doc.text(lineas, x + 3, y + 5);
+                    x += colWidths[3];
+                    
+                    // Pax
+                    doc.rect(x, y, colWidths[4], alturaFila);
+                    doc.text(reserva.personas, x + 3, y + 5);
+                    x += colWidths[4];
+                    
+                    // Estado
+                    doc.rect(x, y, colWidths[5], alturaFila);
+                    doc.text(estadoTexto, x + 3, y + 5);
+                    
+                    y += alturaFila;
                 }
                 
                 doc.save(`reservas_${Date.now()}.pdf`);
