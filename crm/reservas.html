@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas - CRM Aventura Total</title>
+    <!-- Incluir jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
@@ -26,9 +28,10 @@
         
         .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
-        .btn-filtrar, .btn-recargar { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-filtrar, .btn-recargar, .btn-pdf { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
+        .btn-pdf { background: #e74c3c; color: white; }
         
         /* Grid de 3 columnas para tarjetas */
         .cards-grid {
@@ -187,6 +190,7 @@
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
+            <button class="btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
         </div>
 
         <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
@@ -424,6 +428,129 @@
             renderizarCards();
         }
         
+        // ==================================================
+        // GENERAR PDF
+        // ==================================================
+        async function generarPDF() {
+            if (reservasFiltradas.length === 0) {
+                alert('⚠️ No hay reservas para exportar.');
+                return;
+            }
+            
+            const btnPDF = document.querySelector('.btn-pdf');
+            const textoOriginal = btnPDF.textContent;
+            btnPDF.textContent = '⏳ Generando...';
+            btnPDF.disabled = true;
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                const margin = 10;
+                let y = margin + 10;
+                const pageWidth = doc.internal.pageSize.getWidth();
+                
+                // Título
+                doc.setFontSize(18);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(0, 0, 0);
+                doc.text('Reporte de Reservas', pageWidth / 2, y, { align: 'center' });
+                y += 12;
+                
+                // Fecha y total
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, margin, y);
+                y += 7;
+                doc.text(`Total de reservas: ${reservasFiltradas.length}`, margin, y);
+                y += 12;
+                
+                // Configurar columnas del PDF
+                const colWidths = [25, 20, 35, 40, 25, 45, 25, 10, 20, 30, 20];
+                const headers = ['ID', 'Fecha', 'Cliente', 'Email', 'Teléfono', 'Excursiones', 'Ciudad', 'Pax', 'Pago', 'Lugar', 'Estado'];
+                
+                // Encabezados
+                let x = margin;
+                doc.setFillColor(200, 200, 200);
+                doc.setDrawColor(0, 0, 0);
+                doc.setLineWidth(0.1);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.setTextColor(0, 0, 0);
+                
+                for (let i = 0; i < headers.length; i++) {
+                    doc.rect(x, y, colWidths[i], 10, 'FD');
+                    doc.text(headers[i], x + 2, y + 6);
+                    x += colWidths[i];
+                }
+                y += 10;
+                
+                // Datos
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7);
+                doc.setTextColor(0, 0, 0);
+                doc.setDrawColor(200, 200, 200);
+                
+                for (const reserva of reservasFiltradas) {
+                    if (y > 180) {
+                        doc.addPage();
+                        y = margin + 10;
+                        x = margin;
+                        doc.setFillColor(200, 200, 200);
+                        doc.setDrawColor(0, 0, 0);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(8);
+                        doc.setTextColor(0, 0, 0);
+                        for (let i = 0; i < headers.length; i++) {
+                            doc.rect(x, y, colWidths[i], 10, 'FD');
+                            doc.text(headers[i], x + 2, y + 6);
+                            x += colWidths[i];
+                        }
+                        y += 10;
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(7);
+                        doc.setTextColor(0, 0, 0);
+                        doc.setDrawColor(200, 200, 200);
+                    }
+                    
+                    const excursionesTexto = reserva.excursionesLista.join(', ').substring(0, 55);
+                    const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
+                    
+                    const datos = [
+                        reserva.id,
+                        reserva.fecha,
+                        reserva.nombre.substring(0, 30),
+                        reserva.email.substring(0, 35),
+                        reserva.telefono,
+                        excursionesTexto,
+                        reserva.ciudad.substring(0, 20),
+                        reserva.personas,
+                        reserva.formaPago.substring(0, 15),
+                        reserva.lugar.substring(0, 25),
+                        estadoTexto
+                    ];
+                    
+                    x = margin;
+                    const rowHeight = 8;
+                    
+                    for (let i = 0; i < datos.length; i++) {
+                        doc.rect(x, y, colWidths[i], rowHeight);
+                        doc.text(String(datos[i]), x + 2, y + 5);
+                        x += colWidths[i];
+                    }
+                    y += rowHeight;
+                }
+                
+                doc.save(`reservas_${Date.now()}.pdf`);
+                
+            } catch (error) {
+                console.error('Error PDF:', error);
+                alert('❌ Error al generar el PDF.');
+            } finally {
+                btnPDF.textContent = textoOriginal;
+                btnPDF.disabled = false;
+            }
+        }
+        
         function cambiarEstado(id, nuevoEstado) {
             const reserva = reservasData.find(r => r.id === id);
             if (reserva) {
@@ -460,6 +587,7 @@
         window.excluirReserva = excluirReserva;
         window.filtrarReservas = filtrarReservas;
         window.cargarReservas = cargarReservas;
+        window.generarPDF = generarPDF;
         window.logout = logout;
         
         const busquedaInput = document.getElementById('busquedaReserva');
