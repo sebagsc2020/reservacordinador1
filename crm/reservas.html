@@ -10,7 +10,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        /* Sidebar */
         .sidebar { width: 200px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
         .sidebar-logo { text-align: center; padding: 0 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
         .sidebar-logo .logo-icon { font-size: 32px; } .sidebar-logo h2 { font-size: 16px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
@@ -119,7 +118,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaReservas"><tr><td colspan="13" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
-                </table>
+                恐
             </div>
         </div>
     </div>
@@ -151,7 +150,7 @@
         let reservasFiltradas = [];
         
         // ==================================================
-        // PARSEAR CSV (MISMO QUE FUNCIONABA ANTES)
+        // PARSEAR CSV
         // ==================================================
         function parseCSV(csvText) {
             const filas = [];
@@ -261,7 +260,7 @@
         }
         
         // ==================================================
-        // CARGAR RESERVAS (CON MAPEO CORRECTO)
+        // CARGAR RESERVAS
         // ==================================================
         async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
@@ -279,30 +278,27 @@
                 const estadosGuardados = cargarEstadosGuardados();
                 const excluidos = cargarExcluidos();
                 
-                // Obtener encabezados de la primera fila
                 const encabezados = filas[0];
-                console.log('📋 Encabezados encontrados:', encabezados);
+                console.log('📋 Encabezados:', encabezados);
                 
-                // Mapear índices según posición (más confiable)
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
                     if (fila.length < 3 || !fila[0]) continue;
                     
-                    // MAPEO POR POSICIÓN (igual que funcionaba antes)
-                    const id = fila[1] || `R-${i}`;           // Columna B (índice 1)
+                    const id = fila[1] || `R-${i}`;
                     if (excluidos.includes(id)) continue;
                     
-                    const timestamp = fila[0] || '';          // Columna A
-                    const nombre = fila[2] || '';             // Columna C
-                    const apellido = fila[3] || '';           // Columna D
-                    const email = fila[4] || '';              // Columna E
-                    const telefono = fila[5] || '';           // Columna F
-                    const ciudad = fila[7] || '';             // Columna H
-                    const excursionesRaw = fila[8] || '';     // Columna I
-                    const fecha = fila[9] || '';              // Columna J
-                    const personas = fila[10] || '1';         // Columna K
-                    const formaPago = fila[11] || '';         // Columna L
-                    const lugar = fila[12] || '';             // Columna M
+                    const timestamp = fila[0] || '';
+                    const nombre = fila[2] || '';
+                    const apellido = fila[3] || '';
+                    const email = fila[4] || '';
+                    const telefono = fila[5] || '';
+                    const ciudad = fila[7] || '';
+                    const excursionesRaw = fila[8] || '';
+                    const fecha = fila[9] || '';
+                    const personas = fila[10] || '1';
+                    const formaPago = fila[11] || '';
+                    const lugar = fila[12] || '';
                     
                     const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
@@ -346,7 +342,7 @@
         }
         
         // ==================================================
-        // RENDERIZAR TABLA
+        // RENDERIZAR TABLA - CORREGIDO
         // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
@@ -359,7 +355,8 @@
                 return;
             }
             
-            tbody.innerHTML = reservasFiltradas.map(r => {
+            let html = '';
+            for (const r of reservasFiltradas) {
                 let estadoClass = '', estadoText = '';
                 switch(r.estado) {
                     case 'pendiente': estadoClass = 'badge-pendiente'; estadoText = 'Pendiente'; break;
@@ -372,26 +369,25 @@
                 if (!r.excursionesLista || r.excursionesLista.length === 0) {
                     excursionesHtml += '<li>Sin excursiones</li>';
                 } else {
-                    r.excursionesLista.forEach((exc, idx) => {
-                        excursionesHtml += `<li>${idx+1}. ${escapeHtml(exc)}</li>`;
-                    });
+                    for (let idx = 0; idx < r.excursionesLista.length; idx++) {
+                        excursionesHtml += `<li>${idx+1}. ${escapeHtml(r.excursionesLista[idx])}</li>`;
+                    }
                 }
                 excursionesHtml += '</ul>';
                 
-                return `
-                    <tr>
-                        <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td style="font-size:10px">${escapeHtml(r.fecha)}</td
-                        <td>${escapeHtml(r.nombre)}</td
-                        <td style="font-size:10px">${escapeHtml(r.email)}</td
-                        <td>${escapeHtml(r.telefono)}</td
-                        <td>${excursionesHtml}</td
-                        <td>${escapeHtml(r.ciudad)}</td
-                        <td>${escapeHtml(r.personas)}</td
-                        <td style="font-size:10px">${escapeHtml(r.formaPago)}</td
-                        <td style="font-size:10px">${escapeHtml(r.lugar)}</td
-                        <td><span class="badge ${estadoClass}">${estadoText}</span></td
-                        <td class="col-acciones">
+                html += '<tr>';
+                html += `<td class="id-reserva"><strong>${escapeHtml(r.id)}</strong></td>`;
+                html += `<td style="font-size:10px">${escapeHtml(r.fecha)}</td`;
+                html += `<td>${escapeHtml(r.nombre)}</td`;
+                html += `<td style="font-size:10px">${escapeHtml(r.email)}</td`;
+                html += `<td>${escapeHtml(r.telefono)}</td`;
+                html += `<td class="col-excursiones">${excursionesHtml}</td`;
+                html += `<td>${escapeHtml(r.ciudad)}</td`;
+                html += `<td>${escapeHtml(r.personas)}</td`;
+                html += `<td style="font-size:10px">${escapeHtml(r.formaPago)}</td`;
+                html += `<td style="font-size:10px">${escapeHtml(r.lugar)}</td`;
+                html += `<td><span class="badge ${estadoClass}">${estadoText}</span></td`;
+                html += `<td class="col-acciones">
                             <div class="acciones-container">
                                 <div class="acciones-fila">
                                     <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
@@ -399,18 +395,19 @@
                                 </div>
                                 <div class="acciones-fila">
                                     <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Pagado">💰</button>
-                                    <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir/Eliminar">🗑️</button>
+                                    <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir">🗑️</button>
                                 </div>
                             </div>
-                        </td
-                    </tr>
-                `;
-            }).join('');
+                        </td`;
+                html += '</tr>';
+            }
+            
+            tbody.innerHTML = html;
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
         }
         
         // ==================================================
-        // FILTRAR RESERVAS (incluye ciudad)
+        // FILTRAR RESERVAS
         // ==================================================
         function filtrarReservas() {
             const busquedaGeneral = document.getElementById('busquedaReserva');
@@ -420,11 +417,9 @@
             const textoCiudad = busquedaCiudad ? busquedaCiudad.value.toLowerCase().trim() : '';
             
             reservasFiltradas = reservasData.filter(r => {
-                // Filtro por ciudad
                 if (textoCiudad && !r.ciudad.toLowerCase().includes(textoCiudad)) {
                     return false;
                 }
-                // Filtro general
                 if (textoGeneral && !r.nombre.toLowerCase().includes(textoGeneral) && 
                     !r.email.toLowerCase().includes(textoGeneral) &&
                     !r.id.toLowerCase().includes(textoGeneral)) {
@@ -477,7 +472,6 @@
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, margin, y);
                 y += 12;
                 
-                // Encabezados
                 const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Lugar'];
                 let x = margin;
                 doc.setFillColor(102, 126, 234);
@@ -492,7 +486,6 @@
                 }
                 y += 8;
                 
-                // Datos
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(0, 0, 0);
