@@ -490,7 +490,7 @@ ${excursionesTexto}
         }
         
         // ==================================================
-        // GENERAR PDF CON 8 COLUMNAS (incluyendo Observaciones)
+        // GENERAR PDF CON FILA DE TOTAL SIMPLIFICADA
         // ==================================================
         async function generarPDF() {
             if (reservasFiltradas.length === 0) {
@@ -513,7 +513,7 @@ ${excursionesTexto}
                 let y = marginLeft + 10;
                 const pageWidth = doc.internal.pageSize.getWidth();
                 
-                // 8 columnas: ID (35), Cliente (42), Teléfono (25), Excursiones (48), Pax (12), Estado (20), Lugar (35), Observaciones (35)
+                // 8 columnas
                 const colWidths = [35, 42, 25, 48, 12, 20, 35, 35];
                 const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar', 'Observaciones'];
                 
@@ -627,22 +627,25 @@ ${excursionesTexto}
                     doc.text(lugarTexto, x + 2, y + 5);
                     x += colWidths[6];
                     
-                    // Observaciones (vacío por ahora, editable manualmente)
+                    // Observaciones
                     doc.rect(x, y, colWidths[7], alturaFila);
                     doc.text('', x + 2, y + 5);
                     
                     y += alturaFila;
                 }
                 
-                // === FILA DE TOTAL ===
+                // === FILA DE TOTAL (SOLO UNA LÍNEA) ===
                 y += 5;
                 
-                // Posiciones para la fila de total
-                const totalX = marginLeft + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3];
+                // Posición donde empieza la columna de Excursiones (donde va "TOTAL GENERAL")
+                const totalX = marginLeft + colWidths[0] + colWidths[1] + colWidths[2];
                 
-                doc.setFillColor(230, 230, 230);
+                doc.setFillColor(255, 255, 255);
                 doc.setDrawColor(0, 0, 0);
                 doc.setLineWidth(0.1);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.setTextColor(0, 0, 0);
                 
                 // Celda vacía para ID
                 doc.rect(marginLeft, y, colWidths[0], 10);
@@ -653,19 +656,20 @@ ${excursionesTexto}
                 // Celda vacía para Teléfono
                 doc.rect(marginLeft + colWidths[0] + colWidths[1], y, colWidths[2], 10);
                 
-                // Celda "TOTAL GENERAL"
+                // Celda "TOTAL GENERAL" (solo esta celda tiene texto)
                 doc.rect(totalX, y, colWidths[3], 10);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
                 doc.text('TOTAL GENERAL', totalX + 2, y + 6);
                 
-                // Celda con la suma de Pax
+                // Celda vacía para Pax
                 doc.rect(totalX + colWidths[3], y, colWidths[4], 10);
-                doc.text(String(totalPasajeros), totalX + colWidths[3] + 2, y + 6);
                 
-                // Celdas vacías para Estado, Lugar y Observaciones
+                // Celda vacía para Estado
                 doc.rect(totalX + colWidths[3] + colWidths[4], y, colWidths[5], 10);
+                
+                // Celda vacía para Lugar
                 doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5], y, colWidths[6], 10);
+                
+                // Celda vacía para Observaciones
                 doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, colWidths[7], 10);
                 
                 doc.save(`reservas_${Date.now()}.pdf`);
