@@ -21,7 +21,7 @@
             background: white;
             border-radius: 24px;
             padding: 45px 40px;
-            max-width: 550px;
+            max-width: 600px;
             width: 100%;
             box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             text-align: center;
@@ -55,7 +55,6 @@
             margin-bottom: 25px;
         }
         
-        /* ===== RESUMEN ===== */
         .info-box {
             background: #fafbfc;
             border: 1px solid #f0f0f0;
@@ -95,7 +94,7 @@
             letter-spacing: 0.8px;
             margin-bottom: 2px;
         }
-        .info-item .texto span { color: #333; font-size: 15px; font-weight: 500; }
+        .info-item .texto span { color: #333; font-size: 14px; font-weight: 500; }
         
         .excursiones-lista { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; }
         .excursion-tag {
@@ -109,7 +108,6 @@
             width: fit-content;
         }
         
-        /* ===== BOTONES ===== */
         .btn-group { display: flex; gap: 12px; margin-top: 25px; }
         
         .btn {
@@ -130,14 +128,6 @@
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.3); }
         
-        .btn-whatsapp {
-            background: #25D366;
-            color: white;
-            border: none;
-        }
-        .btn-whatsapp:hover { background: #1da851; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,211,102,0.3); }
-        
-        /* ===== INFO ADICIONAL ===== */
         .info-adicional {
             margin-top: 25px;
             padding-top: 20px;
@@ -146,6 +136,17 @@
             color: #aaa;
         }
         .info-adicional p { margin-bottom: 4px; }
+        
+        .mensaje-alerta {
+            background: #fff8e1;
+            color: #f39c12;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
         
         @media (max-width: 480px) {
             .container { padding: 30px 20px; border-radius: 16px; }
@@ -162,12 +163,14 @@
         <p class="mensaje-principal">Gracias por confiar en nosotros. Tu aventura está a punto de comenzar.</p>
         
         <div class="info-box" id="resumenReserva">
-            <!-- Se llena con JavaScript -->
+            <div style="text-align:center; padding:20px;">
+                <div class="emoji" style="font-size:40px;">⏳</div>
+                <p>Cargando tus datos...</p>
+            </div>
         </div>
 
         <div class="btn-group">
             <a href="reservar.html" class="btn btn-primary">🏠 Nueva Reserva</a>
-            <a href="#" id="whatsappBtn" class="btn btn-whatsapp" target="_blank">💬 WhatsApp</a>
         </div>
 
         <div class="info-adicional">
@@ -177,57 +180,286 @@
     </div>
 
     <script>
-        const ultimaReserva = JSON.parse(sessionStorage.getItem('ultimaReserva'));
-        const urlParams = new URLSearchParams(window.location.search);
-        const status = urlParams.get('status');
-        
-        if (ultimaReserva) {
-            const partesFecha = ultimaReserva.fecha.split('-');
-            const fechaObj = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
-            const fechaFormateada = fechaObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        // ==================================================
+        // FUNCIÓN PARA FORMATEAR FECHA
+        // ==================================================
+        function formatearFecha(fechaStr) {
+            if (!fechaStr) return 'No especificada';
             
-            let excursionesArray = [];
-            if (ultimaReserva.excursiones) excursionesArray = ultimaReserva.excursiones.split(' | ');
-            else if (ultimaReserva.excursion) excursionesArray = [ultimaReserva.excursion];
-            
-            const excursionesHTML = excursionesArray.map(exc => `<span class="excursion-tag">${exc.trim()}</span>`).join('');
-            
-            const excursionesWhatsApp = excursionesArray.map((exc, i) => `   ${i+1}. ${exc.trim()}`).join('\n');
-            
-            let iconoPago = '💳';
-            if (ultimaReserva.formaPago === 'Efectivo') iconoPago = '💵';
-            if (ultimaReserva.formaPago === 'Transferencia') iconoPago = '🏦';
-            
-            const mensajeWhatsApp = `¡Hola! 🕐\n\nQuiero confirmar mi reserva:\n\n👤 Nombre: ${ultimaReserva.nombre} ${ultimaReserva.apellido||''}\n📧 Email: ${ultimaReserva.email}\n📞 Teléfono: ${ultimaReserva.telefono}\n🌎 País: ${ultimaReserva.pais||''}\n📂 Categoría: ${ultimaReserva.categoria||''}\n\n🕐 Excursiones:\n${excursionesWhatsApp}\n\n🗓️ Fecha: ${fechaFormateada}\n👥 Personas: ${ultimaReserva.personas}\n${iconoPago} Forma de Pago: ${ultimaReserva.formaPago||'No especificada'}\n🏨 Te buscamos en: ${ultimaReserva.mensaje||'No especificado'}\n\nGracias! 🙌`;
-            
-            document.getElementById('whatsappBtn').href = `https://wa.me/5493518692251?text=${encodeURIComponent(mensajeWhatsApp)}`;
-            
-            const resumenHTML = `
-                <h3>📋 Resumen de tu Reserva</h3>
-                <div class="info-item"><div class="emoji">👤</div><div class="texto"><strong>Cliente</strong><span>${ultimaReserva.nombre} ${ultimaReserva.apellido||''}</span></div></div>
-                <div class="info-item"><div class="emoji">📧</div><div class="texto"><strong>Email</strong><span>${ultimaReserva.email}</span></div></div>
-                <div class="info-item"><div class="emoji">📞</div><div class="texto"><strong>Teléfono</strong><span>${ultimaReserva.telefono}</span></div></div>
-                <div class="info-item"><div class="emoji">🌎</div><div class="texto"><strong>País</strong><span>${ultimaReserva.pais||'No especificado'}</span></div></div>
-                <div class="info-item"><div class="emoji">📂</div><div class="texto"><strong>Categoría</strong><span>${ultimaReserva.categoria||'No especificado'}</span></div></div>
-                <div class="info-item"><div class="emoji">🕐</div><div class="texto"><strong>Excursiones</strong><div class="excursiones-lista">${excursionesHTML}</div></div></div>
-                <div class="info-item"><div class="emoji">🗓️</div><div class="texto"><strong>Fecha</strong><span>${fechaFormateada}</span></div></div>
-                <div class="info-item"><div class="emoji">👥</div><div class="texto"><strong>Personas</strong><span>${ultimaReserva.personas}</span></div></div>
-                <div class="info-item"><div class="emoji">${iconoPago}</div><div class="texto"><strong>Forma de Pago</strong><span>${ultimaReserva.formaPago||'No especificada'}</span></div></div>
-                <div class="info-item"><div class="emoji">🏨</div><div class="texto"><strong>Te buscamos en</strong><span>${ultimaReserva.mensaje||'No especificado'}</span></div></div>
-            `;
-            
-            document.getElementById('resumenReserva').innerHTML = resumenHTML;
-            
-            if (status === 'parcial') {
-                document.getElementById('resumenReserva').insertAdjacentHTML('beforebegin', '<div style="background:#fff8e1;color:#f39c12;padding:12px;border-radius:10px;margin-bottom:15px;text-align:center;font-size:13px;font-weight:600;">⚠️ La reserva se guardó pero hubo un problema técnico. Te contactaremos.</div>');
+            // Formato DD-MM-YYYY
+            if (fechaStr.includes('-')) {
+                const partes = fechaStr.split('-');
+                if (partes.length === 3) {
+                    const fecha = new Date(partes[2], partes[1] - 1, partes[0]);
+                    if (!isNaN(fecha.getTime())) {
+                        return fecha.toLocaleDateString('es-ES', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        });
+                    }
+                }
             }
-        } else {
-            document.getElementById('resumenReserva').innerHTML = '<div style="text-align:center;padding:20px;"><p style="font-size:40px;">📧</p><p style="color:#888;">Recibirás un email con todos los detalles</p></div>';
-            document.getElementById('whatsappBtn').href = 'https://wa.me/5493518692251?text=¡Hola!%20Quiero%20información%20sobre%20las%20excursiones%20🏔️';
+            
+            // Formato DD/MM/YYYY
+            if (fechaStr.includes('/')) {
+                const partes = fechaStr.split('/');
+                if (partes.length === 3) {
+                    const fecha = new Date(partes[2], partes[1] - 1, partes[0]);
+                    if (!isNaN(fecha.getTime())) {
+                        return fecha.toLocaleDateString('es-ES', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        });
+                    }
+                }
+            }
+            
+            return fechaStr;
+        }
+
+        // ==================================================
+        // FUNCIÓN PARA LIMPIAR EXCURSIONES
+        // ==================================================
+        function limpiarExcursion(texto) {
+            if (!texto) return '';
+            return texto.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
+        }
+
+        // ==================================================
+        // RECUPERAR DATOS DE LA RESERVA
+        // ==================================================
+        let datosReserva = null;
+        
+        // Intentar desde sessionStorage
+        try {
+            const sessionData = sessionStorage.getItem('ultimaReserva');
+            if (sessionData) {
+                datosReserva = JSON.parse(sessionData);
+                console.log('✅ Datos cargados desde sessionStorage:', datosReserva);
+            }
+        } catch(e) { console.error('Error sessionStorage:', e); }
+        
+        // Si no hay, intentar desde localStorage
+        if (!datosReserva) {
+            try {
+                const localData = localStorage.getItem('ultimaReserva');
+                if (localData) {
+                    if (localData.includes('=')) {
+                        const params = new URLSearchParams(localData);
+                        datosReserva = {
+                            id: params.get('id') || '',
+                            nombre: params.get('nombre') || '',
+                            apellido: params.get('apellido') || '',
+                            email: params.get('email') || '',
+                            telefono: params.get('telefono') || '',
+                            pais: params.get('pais') || '',
+                            ciudad: params.get('ciudad') || '',
+                            excursiones: params.get('excursiones') || '',
+                            fecha: params.get('fecha') || '',
+                            personas: params.get('personas') || '',
+                            formaPago: params.get('formaPago') || '',
+                            lugar: params.get('lugar') || params.get('mensaje') || ''
+                        };
+                    } else {
+                        datosReserva = JSON.parse(localData);
+                    }
+                    console.log('✅ Datos cargados desde localStorage:', datosReserva);
+                }
+            } catch(e) { console.error('Error localStorage:', e); }
         }
         
-        setTimeout(() => sessionStorage.removeItem('ultimaReserva'), 600000);
-        window.addEventListener('pageshow', function(event) { if (event.persisted) window.location.reload(); });
+        // Verificar si hay datos en la URL (por si acaso)
+        const urlParams = new URLSearchParams(window.location.search);
+        const statusParam = urlParams.get('status');
+        
+        // ==================================================
+        // MOSTRAR LOS DATOS EN EL HTML
+        // ==================================================
+        const resumenDiv = document.getElementById('resumenReserva');
+        
+        if (datosReserva && Object.keys(datosReserva).length > 0 && 
+            (datosReserva.nombre || datosReserva.email)) {
+            
+            // Procesar excursiones
+            let excursionesArray = [];
+            if (datosReserva.excursiones) {
+                if (datosReserva.excursiones.includes('\n')) {
+                    excursionesArray = datosReserva.excursiones.split('\n');
+                } else if (datosReserva.excursiones.includes(' | ')) {
+                    excursionesArray = datosReserva.excursiones.split(' | ');
+                } else {
+                    excursionesArray = [datosReserva.excursiones];
+                }
+            } else if (datosReserva.excursion) {
+                excursionesArray = [datosReserva.excursion];
+            }
+            
+            // Limpiar cada excursión
+            excursionesArray = excursionesArray.map(limpiarExcursion).filter(e => e);
+            
+            const excursionesHTML = excursionesArray.length > 0 
+                ? excursionesArray.map(exc => `<span class="excursion-tag">${exc}</span>`).join('')
+                : '<span class="excursion-tag">Sin excursiones especificadas</span>';
+            
+            // Formatear fecha
+            const fechaFormateada = formatearFecha(datosReserva.fecha);
+            
+            // Icono según forma de pago
+            let iconoPago = '💳';
+            if (datosReserva.formaPago && datosReserva.formaPago.includes('Efectivo')) iconoPago = '💵';
+            if (datosReserva.formaPago && datosReserva.formaPago.includes('Transferencia')) iconoPago = '🏦';
+            if (datosReserva.formaPago && datosReserva.formaPago.includes('Débito')) iconoPago = '💳';
+            
+            // Nombre completo
+            const nombreCompleto = `${datosReserva.nombre || ''} ${datosReserva.apellido || ''}`.trim() || 'No especificado';
+            
+            // Ciudad o destino
+            const ciudadDestino = datosReserva.ciudad || datosReserva.categoria || 'No especificado';
+            
+            // Lugar de encuentro
+            const lugarEncuentro = datosReserva.lugar || datosReserva.mensaje || 'No especificado';
+            
+            // Construir el HTML del resumen
+            const resumenHTML = `
+                <h3>📋 Resumen de tu Reserva</h3>
+                
+                <div class="info-item">
+                    <div class="emoji">🆔</div>
+                    <div class="texto">
+                        <strong>ID Reserva</strong>
+                        <span>${datosReserva.id || 'Generado automáticamente'}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="emoji">👤</div>
+                    <div class="texto">
+                        <strong>Cliente</strong>
+                        <span>${nombreCompleto}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="emoji">📧</div>
+                    <div class="texto">
+                        <strong>Email</strong>
+                        <span>${datosReserva.email || 'No especificado'}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="emoji">📞</div>
+                    <div class="texto">
+                        <strong>Teléfono</strong>
+                        <span>${datosReserva.telefono || 'No especificado'}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="emoji">🌎</div>
+                    <div class="texto">
+                        <strong>País</strong>
+                        <span>${datosReserva.pais || 'No especificado'}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="emoji">📍</div>
+                    <div class="texto">
+                        <strong>Ciudad / Destino</strong>
+                        <span>${ciudadDestino}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="emoji">✨</div>
+                    <div class="texto">
+                        <strong>Excursiones</strong>
+                        <div class="excursiones-lista">${excursionesHTML}</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="emoji">📅</div>
+                    <div class="texto">
+                        <strong>Fecha de reserva</strong>
+                        <span>${fechaFormateada}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="emoji">👥</div>
+                    <div class="texto">
+                        <strong>Cantidad de personas</strong>
+                        <span>${datosReserva.personas || '1'}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="emoji">${iconoPago}</div>
+                    <div class="texto">
+                        <strong>Forma de pago</strong>
+                        <span>${datosReserva.formaPago || 'No especificada'}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="emoji">🚐</div>
+                    <div class="texto">
+                        <strong>Punto de encuentro</strong>
+                        <span>${lugarEncuentro}</span>
+                    </div>
+                </div>
+            `;
+            
+            resumenDiv.innerHTML = resumenHTML;
+            
+            // Mostrar alerta si hubo error parcial
+            if (statusParam === 'parcial' || statusParam === 'local') {
+                const alertaDiv = document.createElement('div');
+                alertaDiv.className = 'mensaje-alerta';
+                alertaDiv.innerHTML = '⚠️ La reserva se guardó correctamente. En breve recibirás la confirmación.';
+                resumenDiv.insertAdjacentElement('beforebegin', alertaDiv);
+            }
+            
+        } else {
+            // No hay datos: mostrar mensaje de error amigable
+            resumenDiv.innerHTML = `
+                <h3>📋 Tu Reserva</h3>
+                <div class="info-item">
+                    <div class="emoji">✅</div>
+                    <div class="texto">
+                        <span>Tu reserva ha sido registrada correctamente.</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="emoji">📞</div>
+                    <div class="texto">
+                        <span>En breve nos pondremos en contacto contigo.</span>
+                    </div>
+                </div>
+                <div style="background:#fee; padding:12px; border-radius:10px; margin-top:15px; text-align:center;">
+                    <span style="color:#c0392b;">⚠️ No pudimos recuperar los detalles de tu reserva. Te contactaremos por email o WhatsApp.</span>
+                </div>
+            `;
+        }
+        
+        // Limpiar los datos después de 10 minutos
+        setTimeout(() => {
+            try {
+                sessionStorage.removeItem('ultimaReserva');
+                localStorage.removeItem('ultimaReserva');
+            } catch(e) {}
+        }, 600000);
+        
+        // Recargar si la página viene del bfcache del navegador
+        window.addEventListener('pageshow', function(event) { 
+            if (event.persisted) window.location.reload(); 
+        });
     </script>
 </body>
 </html>
