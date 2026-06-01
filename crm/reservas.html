@@ -8,7 +8,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        /* Sidebar más angosta - de 250px a 160px */
         .sidebar { width: 160px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
         .sidebar-logo { text-align: center; padding: 0 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
         .sidebar-logo .logo-icon { font-size: 28px; } .sidebar-logo h2 { font-size: 14px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
@@ -19,7 +18,6 @@
         .sidebar-footer { position: absolute; bottom: 15px; left: 10px; right: 10px; }
         .btn-logout-sidebar { width: 100%; padding: 6px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 10px; border: none; }
         
-        /* Ajuste del contenido principal */
         .main-content { margin-left: 160px; flex: 1; padding: 20px; min-width: 0; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .header h1 { font-size: 22px; color: #1a1a2e; }
@@ -32,13 +30,11 @@
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
         
-        /* Estilo para el filtro de excursión */
         .filter-excursion { border-left: 2px solid #e74c3c; padding-left: 15px; margin-left: 5px; }
         
         .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .table-header h3 { font-size: 15px; }
-        .table-wrapper { overflow-x: auto; }
         
         table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 11px; }
         th { text-align: left; padding: 8px 6px; background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; }
@@ -104,32 +100,27 @@
                 <h3>Lista de Reservas</h3>
                 <span id="totalReservasSpan" class="total-reservas">0 reservas</span>
             </div>
-            <div class="table-wrapper">
-                <table id="reservasTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
-                            <th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaReservas"></table><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td</tr</tbody>
-                </table>
-            </div>
+            <table id="reservasTable">
+                <thead>
+                    <tr>
+                        <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
+                        <th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td</tr</tbody>
+            </table>
         </div>
     </div>
 
     <script>
         // ==================================================
-        // CONFIGURACIÓN - TU PLANILLA
+        // USAR LA API DE GOOGLE SHEETS (método confiable)
         // ==================================================
-        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const SHEET_NAME = 'Hoja 1';
-        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
         
-        // ==================================================
-        // VERIFICAR AUTENTICACIÓN
-        // ==================================================
+        // Configuración de la API
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzzqKJ3jifH5AV2G4HKnfUgfvhY07yqa20p8jsnQDgFvVHS2c0TOBxyZjY66yMaGLPlew/exec';
+        
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
         }
@@ -139,180 +130,90 @@
             window.location.href = 'index.html'; 
         }
         
-        // ==================================================
-        // VARIABLES GLOBALES
-        // ==================================================
         let reservasData = [];
         let reservasFiltradas = [];
         
         // ==================================================
-        // PARSEAR CSV
-        // ==================================================
-        function parseCSV(csvText) {
-            const filas = [];
-            let filaActual = [];
-            let celdaActual = '';
-            let dentroComillas = false;
-            
-            for (let i = 0; i < csvText.length; i++) {
-                const char = csvText[i];
-                const nextChar = csvText[i + 1];
-                
-                if (dentroComillas) {
-                    if (char === '"') {
-                        if (nextChar === '"') {
-                            celdaActual += '"';
-                            i++;
-                        } else {
-                            dentroComillas = false;
-                        }
-                    } else {
-                        celdaActual += char;
-                    }
-                } else {
-                    if (char === '"') {
-                        dentroComillas = true;
-                    } else if (char === ',') {
-                        filaActual.push(celdaActual.trim());
-                        celdaActual = '';
-                    } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
-                        filaActual.push(celdaActual.trim());
-                        filas.push(filaActual);
-                        filaActual = [];
-                        celdaActual = '';
-                        if (char === '\r') i++;
-                    } else {
-                        celdaActual += char;
-                    }
-                }
-            }
-            if (celdaActual.trim() || filaActual.length > 0) {
-                filaActual.push(celdaActual.trim());
-                filas.push(filaActual);
-            }
-            return filas.filter(fila => fila.some(celda => celda !== ''));
-        }
-        
-        // ==================================================
-        // FORMATEAR FECHA
-        // ==================================================
-        function formatearFecha(fechaStr) {
-            if (!fechaStr) return '';
-            if (fechaStr.includes('/')) return fechaStr;
-            if (fechaStr.includes('GMT')) {
-                try {
-                    const fecha = new Date(fechaStr);
-                    if (!isNaN(fecha.getTime())) {
-                        return `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
-                    }
-                } catch(e) {}
-            }
-            const partes = fechaStr.split('-');
-            if (partes.length === 3 && partes[0].length === 4) {
-                return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
-            return fechaStr;
-        }
-        
-        // ==================================================
-        // DIVIDIR EXCURSIONES
-        // ==================================================
-        function dividirExcursiones(texto) {
-            if (!texto) return [];
-            let partes = [];
-            if (texto.includes('\n')) partes = texto.split('\n');
-            else if (texto.includes(' | ')) partes = texto.split(' | ');
-            else if (texto.includes(', ')) partes = texto.split(', ');
-            else if (texto.includes(',')) partes = texto.split(',');
-            else partes = [texto];
-            return partes.map(p => p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(p => p);
-        }
-        
-        // ==================================================
-        // GESTIÓN DE ESTADOS Y EXCLUIDOS
-        // ==================================================
-        function cargarEstadosGuardados() {
-            try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } 
-            catch(e) { return {}; }
-        }
-        
-        function guardarEstado(id, estado) {
-            const estados = cargarEstadosGuardados();
-            estados[id] = estado;
-            localStorage.setItem('estadosReservas', JSON.stringify(estados));
-        }
-        
-        function cargarExcluidos() {
-            try { return JSON.parse(localStorage.getItem('reservasExcluidas') || '[]'); } 
-            catch(e) { return []; }
-        }
-        
-        function guardarExcluido(id) {
-            const excluidos = cargarExcluidos();
-            if (!excluidos.includes(id)) {
-                excluidos.push(id);
-                localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
-            }
-        }
-        
-        // ==================================================
-        // CARGAR RESERVAS
+        // CARGAR RESERVAS DESDE LA API
         // ==================================================
         async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
+            
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td</td';
-                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const csvText = await response.text();
-                const filas = parseCSV(csvText);
-                if (filas.length < 2) throw new Error('No hay datos');
+                tbody.innerHTML = '<table><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...</td</tr';
                 
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Error al cargar datos');
+                
+                const resultado = await response.json();
+                
+                if (!resultado.data || resultado.data.length === 0) {
+                    throw new Error('No hay datos disponibles');
+                }
+                
+                // Procesar los datos
                 reservasData = [];
-                const estadosGuardados = cargarEstadosGuardados();
-                const excluidos = cargarExcluidos();
+                const estadosGuardados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
+                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 
-                for (let i = 1; i < filas.length; i++) {
-                    const fila = filas[i];
-                    if (fila.length < 3 || !fila[0]) continue;
+                for (const item of resultado.data) {
+                    const id = item.id || 'Sin ID';
                     
-                    const id = fila[1] || `R-${i}`;
+                    // Saltar si está excluido
                     if (excluidos.includes(id)) continue;
                     
-                    const timestamp = fila[0] || '';
-                    const nombre = fila[2] || '';
-                    const apellido = fila[3] || '';
-                    const email = fila[4] || '';
-                    const telefono = fila[5] || '';
-                    const ciudad = fila[7] || '';
-                    const excursionesRaw = fila[8] || '';
-                    const fecha = fila[9] || '';
-                    const personas = fila[10] || '1';
-                    const formaPago = fila[11] || '';
-                    const lugar = fila[12] || '';
+                    // Procesar excursiones (pueden venir con \n)
+                    let excursionesLista = [];
+                    if (item.excursiones) {
+                        if (item.excursiones.includes('\n')) {
+                            excursionesLista = item.excursiones.split('\n');
+                        } else if (item.excursiones.includes(' | ')) {
+                            excursionesLista = item.excursiones.split(' | ');
+                        } else {
+                            excursionesLista = [item.excursiones];
+                        }
+                        // Limpiar cada excursión
+                        excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '')).filter(e => e);
+                    }
                     
-                    const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
-                    const listaExcursiones = dividirExcursiones(excursionesRaw);
+                    // Formatear fecha
+                    let fecha = '';
+                    if (item.fecha) {
+                        fecha = item.fecha;
+                    } else if (item.timestamp) {
+                        const ts = new Date(item.timestamp);
+                        fecha = `${ts.getDate().toString().padStart(2,'0')}/${(ts.getMonth()+1).toString().padStart(2,'0')}/${ts.getFullYear()}`;
+                    }
+                    
+                    // Obtener estado guardado
                     let estado = estadosGuardados[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
                     }
                     
+                    // Crear objeto reserva
                     reservasData.push({
-                        id, fecha: formatearFecha(timestamp) || formatearFecha(fecha),
-                        nombre: nombreCompleto, email, telefono, ciudad,
-                        excursionesLista: listaExcursiones, personas, 
-                        formaPago: formaPago || 'No especificado',
-                        lugar: lugar || 'No especificado', estado
+                        id: id,
+                        fecha: fecha,
+                        nombre: (item.nombre || '') + ' ' + (item.apellido || ''),
+                        email: item.email || '',
+                        telefono: item.telefono || '',
+                        ciudad: item.ciudad || '',
+                        excursionesLista: excursionesLista,
+                        personas: item.personas || '1',
+                        formaPago: item.formapago || item.formaPago || 'No especificado',
+                        lugar: item.lugar || 'No especificado',
+                        estado: estado
                     });
                 }
                 
-                reservasData.sort((a, b) => { 
-                    const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
-                    const numB = parseInt(b.id.replace(/\D/g, '')) || 0; 
-                    return numB - numA; 
+                // Ordenar por ID (más reciente primero)
+                reservasData.sort((a, b) => {
+                    const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
+                    const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
+                    return numB - numA;
                 });
                 
                 reservasFiltradas = [...reservasData];
@@ -320,8 +221,8 @@
                 if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
                 
             } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `</td><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message} </td</tr`;
+                console.error('Error:', error);
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message} </td</tr`;
             }
         }
         
@@ -334,7 +235,7 @@
             if (!tbody) return;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</tr';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</tr';
                 if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
@@ -390,7 +291,7 @@
         }
         
         // ==================================================
-        // FILTRAR RESERVAS (incluye búsqueda por excursión)
+        // FILTRAR RESERVAS
         // ==================================================
         function filtrarReservas() {
             const busquedaGeneral = document.getElementById('busquedaReserva');
@@ -405,7 +306,6 @@
                 reservasFiltradas = reservasData.filter(r => {
                     let coincide = true;
                     
-                    // Filtro por excursión (busca en la lista de excursiones)
                     if (textoExcursion) {
                         const tieneExcursion = r.excursionesLista.some(exc => 
                             exc.toLowerCase().includes(textoExcursion)
@@ -413,7 +313,6 @@
                         if (!tieneExcursion) coincide = false;
                     }
                     
-                    // Filtro general
                     if (textoGeneral && coincide) {
                         if (!r.nombre.toLowerCase().includes(textoGeneral) && 
                             !r.email.toLowerCase().includes(textoGeneral) &&
@@ -430,13 +329,16 @@
         }
         
         // ==================================================
-        // FUNCIONES DE ACCIONES
+        // ACCIONES
         // ==================================================
         function cambiarEstado(id, nuevoEstado) {
             const reserva = reservasData.find(r => r.id === id);
             if (reserva) {
                 reserva.estado = nuevoEstado;
-                guardarEstado(id, nuevoEstado);
+                const estados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
+                estados[id] = nuevoEstado;
+                localStorage.setItem('estadosReservas', JSON.stringify(estados));
+                
                 const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
                 if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
                 renderizarTabla();
@@ -445,7 +347,11 @@
         
         function excluirReserva(id) {
             if (confirm(`⚠️ ¿Estás seguro de excluir la reserva ${id}?`)) {
-                guardarExcluido(id);
+                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
+                if (!excluidos.includes(id)) {
+                    excluidos.push(id);
+                    localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
+                }
                 cargarReservas();
                 alert(`✅ Reserva ${id} excluida.`);
             }
