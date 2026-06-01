@@ -30,36 +30,135 @@
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
         
-        .table-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow-x: auto; }
-        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        /* Grid de 3 columnas para tarjetas */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
         
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 12px; }
-        th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; vertical-align: top; } 
-        tr:hover td { background: #f8f9ff; }
+        /* Tarjeta individual */
+        .reserva-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .reserva-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
         
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; }
-        .badge-pendiente { background: #fff3cd; color: #856404; }
-        .badge-confirmado { background: #d4edda; color: #155724; }
-        .badge-pagado { background: #d1ecf1; color: #0c5460; }
+        /* Cabecera de la tarjeta */
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-id {
+            font-weight: 700;
+            font-size: 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+        .card-fecha {
+            font-size: 11px;
+            opacity: 0.9;
+        }
         
-        .acciones-container { display: flex; flex-direction: column; gap: 3px; }
-        .acciones-fila { display: flex; gap: 3px; justify-content: flex-start; }
-        .btn-accion { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; margin: 2px; width: 28px; text-align: center; }
-        .btn-pendiente { background: #ffc107; color: #856404; }
-        .btn-confirmar { background: #27ae60; color: white; }
-        .btn-pagar { background: #3498db; color: white; }
-        .btn-excluir { background: #e74c3c; color: white; }
+        /* Cuerpo de la tarjeta */
+        .card-body {
+            padding: 15px;
+        }
+        .card-info {
+            margin-bottom: 12px;
+        }
+        .card-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #999;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .card-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            word-break: break-word;
+        }
         
-        .excursiones-lista { margin: 0; padding-left: 15px; list-style: none; }
-        .excursiones-lista li { padding: 3px 0; font-size: 11px; }
-        .total-reservas { font-size: 12px; color: #666; }
+        /* Lista de excursiones */
+        .excursiones-lista-card {
+            margin: 0;
+            padding-left: 16px;
+            list-style: none;
+        }
+        .excursiones-lista-card li {
+            font-size: 11px;
+            padding: 3px 0;
+            color: #555;
+            border-bottom: 1px dashed #eee;
+        }
+        .excursiones-lista-card li:last-child {
+            border-bottom: none;
+        }
         
+        /* Estado */
+        .card-estado {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .estado-pendiente { background: #fff3cd; color: #856404; }
+        .estado-confirmado { background: #d4edda; color: #155724; }
+        .estado-pagado { background: #d1ecf1; color: #0c5460; }
+        
+        /* Acciones en la tarjeta */
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #f0f0f0;
+        }
+        .btn-card {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-card:hover {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        .btn-confirmar-card { background: #27ae60; color: white; }
+        .btn-pendiente-card { background: #ffc107; color: #856404; }
+        .btn-pagar-card { background: #3498db; color: white; }
+        .btn-excluir-card { background: #e74c3c; color: white; }
+        
+        .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
+        
+        @media (max-width: 1200px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
             .nav-menu a { justify-content: center; } 
-            .main-content { margin-left: 60px; padding: 15px; } 
+            .main-content { margin-left: 60px; padding: 15px; }
+            .cards-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -90,23 +189,10 @@
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
         </div>
 
-        <div class="table-container">
-            <div class="table-header">
-                <h3>Lista de Reservas</h3>
-                <span id="totalReservasSpan" class="total-reservas">0 reservas</span>
-            </div>
-            <table id="reservasTable">
-                <thead>
-                    <tr>
-                        <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
-                        <th>Excursiones</th><th>Ciudad</th><th>Pax</th><th>Forma de Pago</th><th>Lugar</th><th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaReservas">
-                    <tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...<\/td><\/tr>
-                </tbody>
-            </table>
+        <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
+
+        <div id="cardsContainer" class="cards-grid">
+            <div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>
         </div>
     </div>
 
@@ -131,17 +217,16 @@
         let reservasFiltradas = [];
         
         async function cargarReservas() {
-            const tbody = document.getElementById('tablaReservas');
+            const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
-            if (!tbody) return;
+            if (!container) return;
             
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando...<\/td><\/tr>';
+                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>';
                 
                 const response = await fetch(JSON_URL);
                 const texto = await response.text();
                 
-                // Limpiar formato JSONP
                 let jsonStr = texto;
                 jsonStr = jsonStr.replace("/*O_o*/", "");
                 jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
@@ -169,7 +254,6 @@
                     const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
                     const ciudad = (c[7] && c[7].v) ? String(c[7].v) : '';
                     
-                    // Manejar excursiones - JSON mantiene los saltos de línea
                     let excursionesLista = [];
                     const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
                     if (excursionesRaw) {
@@ -224,22 +308,22 @@
                 });
                 
                 reservasFiltradas = [...reservasData];
-                renderizarTabla();
+                renderizarCards();
                 if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
                 
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}<\/td><\/tr>`;
+                container.innerHTML = `<div style="text-align:center; color:red; grid-column:1/-1; padding:50px;">❌ Error: ${error.message}</div>`;
             }
         }
         
-        function renderizarTabla() {
-            const tbody = document.getElementById('tablaReservas');
+        function renderizarCards() {
+            const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
-            if (!tbody) return;
+            if (!container) return;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas<\/td><\/tr>';
+                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">📋 No hay reservas</div>';
                 if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
@@ -248,13 +332,13 @@
             for (const r of reservasFiltradas) {
                 let estadoClass = '', estadoText = '';
                 switch(r.estado) {
-                    case 'pendiente': estadoClass = 'badge-pendiente'; estadoText = 'Pendiente'; break;
-                    case 'confirmado': estadoClass = 'badge-confirmado'; estadoText = 'Confirmado'; break;
-                    case 'pagado': estadoClass = 'badge-pagado'; estadoText = 'Pagado'; break;
-                    default: estadoClass = 'badge-confirmado'; estadoText = 'Confirmado';
+                    case 'pendiente': estadoClass = 'estado-pendiente'; estadoText = 'Pendiente'; break;
+                    case 'confirmado': estadoClass = 'estado-confirmado'; estadoText = 'Confirmado'; break;
+                    case 'pagado': estadoClass = 'estado-pagado'; estadoText = 'Pagado'; break;
+                    default: estadoClass = 'estado-confirmado'; estadoText = 'Confirmado';
                 }
                 
-                let excursionesHtml = '<ul class="excursiones-lista">';
+                let excursionesHtml = '<ul class="excursiones-lista-card">';
                 if (!r.excursionesLista || r.excursionesLista.length === 0) {
                     excursionesHtml += '<li>Sin excursiones</li>';
                 } else {
@@ -264,33 +348,60 @@
                 }
                 excursionesHtml += '</ul>';
                 
-                html += '<tr>';
-                html += `<td class="id-reserva"><strong>${escapeHtml(r.id)}<\/strong><\/td>`;
-                html += `<td style="font-size:10px">${escapeHtml(r.fecha)}<\/td>`;
-                html += `<td>${escapeHtml(r.nombre)}<\/td>`;
-                html += `<td style="font-size:10px">${escapeHtml(r.email)}<\/td>`;
-                html += `<td>${escapeHtml(r.telefono)}<\/td>`;
-                html += `<td>${excursionesHtml}<\/td>`;
-                html += `<td>${escapeHtml(r.ciudad)}<\/td>`;
-                html += `<td>${escapeHtml(r.personas)}<\/td>`;
-                html += `<td style="font-size:10px">${escapeHtml(r.formaPago)}<\/td>`;
-                html += `<td style="font-size:10px">${escapeHtml(r.lugar)}<\/td>`;
-                html += `<td><span class="badge ${estadoClass}">${estadoText}<\/span><\/td>`;
-                html += `<td class="col-acciones">
-                            <div class="acciones-container">
-                                <div class="acciones-fila">
-                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')">✅</button>
-                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')">⏳</button>
-                                </div>
-                                <div class="acciones-fila">
-                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')">💰</button>
-                                    <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')">🗑️</button>
-                                </div>
+                html += `
+                    <div class="reserva-card">
+                        <div class="card-header">
+                            <span class="card-id">${escapeHtml(r.id)}</span>
+                            <span class="card-fecha">${escapeHtml(r.fecha)}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-info">
+                                <div class="card-label">👤 CLIENTE</div>
+                                <div class="card-value">${escapeHtml(r.nombre)}</div>
                             </div>
-                        <\/td>`;
-                html += '<\/tr>';
+                            <div class="card-info">
+                                <div class="card-label">📧 EMAIL</div>
+                                <div class="card-value">${escapeHtml(r.email)}</div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-label">📞 TELÉFONO</div>
+                                <div class="card-value">${escapeHtml(r.telefono)}</div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-label">📍 CIUDAD</div>
+                                <div class="card-value">${escapeHtml(r.ciudad)}</div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-label">✨ EXCURSIONES</div>
+                                ${excursionesHtml}
+                            </div>
+                            <div class="card-info">
+                                <div class="card-label">👥 PERSONAS</div>
+                                <div class="card-value">${escapeHtml(r.personas)}</div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-label">💳 FORMA DE PAGO</div>
+                                <div class="card-value">${escapeHtml(r.formaPago)}</div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-label">🚐 LUGAR</div>
+                                <div class="card-value">${escapeHtml(r.lugar)}</div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-label">📌 ESTADO</div>
+                                <div class="card-value"><span class="card-estado ${estadoClass}">${estadoText}</span></div>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-card btn-confirmar-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')">✅</button>
+                            <button class="btn-card btn-pendiente-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')">⏳</button>
+                            <button class="btn-card btn-pagar-card" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')">💰</button>
+                            <button class="btn-card btn-excluir-card" onclick="excluirReserva('${escapeHtml(r.id)}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
             }
-            tbody.innerHTML = html;
+            container.innerHTML = html;
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
         }
         
@@ -310,7 +421,7 @@
                     return coincideNombre || coincideExcursion;
                 });
             }
-            renderizarTabla();
+            renderizarCards();
         }
         
         function cambiarEstado(id, nuevoEstado) {
@@ -322,7 +433,7 @@
                 localStorage.setItem('estadosReservas', JSON.stringify(estados));
                 const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
                 if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
-                renderizarTabla();
+                renderizarCards();
             }
         }
         
