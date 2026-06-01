@@ -8,52 +8,51 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        /* Sidebar más angosta */
-        .sidebar { width: 200px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
-        .sidebar-logo { text-align: center; padding: 0 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
-        .sidebar-logo .logo-icon { font-size: 32px; } .sidebar-logo h2 { font-size: 16px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
-        .nav-menu { list-style: none; padding: 0 12px; } .nav-menu li { margin-bottom: 3px; }
-        .nav-menu a { display: flex; align-items: center; gap: 8px; padding: 8px 10px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; font-size: 12px; }
+        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
-        .sidebar-footer { position: absolute; bottom: 15px; left: 12px; right: 12px; }
-        .btn-logout-sidebar { width: 100%; padding: 8px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 11px; border: none; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
+        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; border: none; }
         
-        .main-content { margin-left: 200px; flex: 1; padding: 20px; min-width: 0; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .header h1 { font-size: 22px; color: #1a1a2e; }
-        .user-info { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 15px; border-radius: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 13px; }
-        .user-avatar { width: 30px; height: 30px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; }
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 26px; color: #1a1a2e; }
+        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
+        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
-        .filters-bar { background: white; padding: 12px 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .filter-input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 12px; flex: 1; min-width: 160px; }
-        .btn-filtrar, .btn-recargar { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
+        .btn-filtrar, .btn-recargar { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
         
-        .stats-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; }
-        .stats-number { font-size: 36px; font-weight: 800; color: #667eea; }
-        .stats-label { font-size: 12px; color: #666; margin-top: 5px; }
-        
-        .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .table-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .table-wrapper { overflow-x: auto; }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 600px; }
-        th { text-align: left; padding: 8px 6px; background: #f8f9fa; color: #666; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
-        td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; font-size: 11px; color: #333; vertical-align: top; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 11px; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; color: #333; } 
         tr:hover td { background: #f8f9ff; }
         
-        .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 600; display: inline-block; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; display: inline-block; }
         .badge-activo { background: #d4edda; color: #155724; }
         
-        .btn-ver { padding: 4px 10px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 10px; }
+        .btn-ver { padding: 5px 12px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; }
+        .btn-ver:hover { background: #5a67d8; }
+        
+        .stats-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); text-align: center; }
+        .stats-number { font-size: 40px; font-weight: 800; color: #667eea; }
+        .stats-label { font-size: 13px; color: #666; margin-top: 5px; }
         
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
             .nav-menu a { justify-content: center; } 
-            .main-content { margin-left: 60px; padding: 12px; }
+            .main-content { margin-left: 60px; padding: 15px; } 
         }
     </style>
 </head>
@@ -78,29 +77,31 @@
             <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
         </div>
 
+        <div class="stats-card">
+            <div class="stats-number" id="totalClientes">0</div>
+            <div class="stats-label">Clientes Registrados</div>
+        </div>
+
         <div class="filters-bar">
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono..." id="busquedaCliente">
             <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
         </div>
 
-        <div class="stats-card">
-            <div class="stats-number" id="totalClientes">0</div>
-            <div class="stats-label">Clientes Registrados</div>
-        </div>
-
         <div class="table-container">
             <div class="table-header">
                 <h3>Lista de Clientes</h3>
-                <span id="totalClientesSpan" class="total-reservas" style="font-size:11px;color:#666;">0 clientes</span>
+                <span id="totalClientesSpan" style="font-size:12px;color:#666;">0 clientes</span>
             </div>
             <div class="table-wrapper">
-                <table>
+                <table id="clientesTable">
                     <thead>
                         <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Reservas</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
-                    <tbody id="tablaClientes"><tr><td colspan="7">⏳ Cargando...</td</td</tbody>
-                ~
+                    <tbody id="tablaClientes">
+                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -130,10 +131,9 @@
         // ==================================================
         let clientesData = [];
         let clientesFiltrados = [];
-        let reservasPorCliente = new Map();
         
         // ==================================================
-        // PARSEAR CSV (mismo que en dashboard y reservas)
+        // PARSEAR CSV
         // ==================================================
         function parseCSV(csvText) {
             const filas = [];
@@ -181,7 +181,7 @@
         }
         
         // ==================================================
-        // CARGAR CLIENTES DESDE LA PLANILLA
+        // CARGAR CLIENTES
         // ==================================================
         async function cargarClientes() {
             const tbody = document.getElementById('tablaClientes');
@@ -190,7 +190,7 @@
             
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="7">⏳ Cargando...<tr></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -199,29 +199,24 @@
                 
                 // Mapa de clientes únicos por email
                 const clientesMap = new Map();
-                reservasPorCliente.clear();
+                const reservasCount = new Map();
                 
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
                     if (fila.length < 3 || !fila[0]) continue;
                     
-                    const id = fila[1] || `R-${i}`;
-                    const nombre = fila[2] || '';
-                    const apellido = fila[3] || '';
                     const email = fila[4] || '';
-                    const telefono = fila[5] || '';
-                    
                     if (!email) continue;
                     
+                    const nombre = fila[2] || '';
+                    const apellido = fila[3] || '';
+                    const telefono = fila[5] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim() || 'Sin nombre';
                     
-                    // Contar reservas por cliente
-                    if (!reservasPorCliente.has(email)) {
-                        reservasPorCliente.set(email, 0);
-                    }
-                    reservasPorCliente.set(email, reservasPorCliente.get(email) + 1);
+                    // Contar reservas por email
+                    reservasCount.set(email, (reservasCount.get(email) || 0) + 1);
                     
-                    // Guardar cliente único
+                    // Guardar solo una vez por email
                     if (!clientesMap.has(email)) {
                         clientesMap.set(email, {
                             email: email,
@@ -231,15 +226,13 @@
                     }
                 }
                 
-                // Convertir mapa a array
+                // Convertir a array y agregar total de reservas
                 clientesData = Array.from(clientesMap.values()).map(cliente => ({
                     ...cliente,
-                    totalReservas: reservasPorCliente.get(cliente.email) || 0
+                    totalReservas: reservasCount.get(cliente.email) || 0
                 }));
                 
-                // Ordenar por nombre
                 clientesData.sort((a, b) => a.nombre.localeCompare(b.nombre));
-                
                 clientesFiltrados = [...clientesData];
                 renderizarTabla();
                 
@@ -247,34 +240,35 @@
                 if (totalSpan) totalSpan.textContent = `${clientesData.length} clientes`;
                 
                 console.log(`📊 Clientes cargados: ${clientesData.length}`);
+                console.log('📋 Lista:', clientesData.map(c => `${c.nombre} (${c.email}) - ${c.totalReservas} reservas`));
                 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="7">❌ Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
         // ==================================================
-        // RENDERIZAR TABLA DE CLIENTES
+        // RENDERIZAR TABLA
         // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaClientes');
             if (!tbody) return;
             
             if (clientesFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7">📋 No hay clientes</td</td';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td></tr>';
                 return;
             }
             
             tbody.innerHTML = clientesFiltrados.map((cliente, index) => `
                 <tr>
                     <td>${index + 1}</td>
-                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td
-                    <td style="font-size:11px">${escapeHtml(cliente.email)}</td
-                    <td>${escapeHtml(cliente.telefono)}</td
-                    <td><span class="badge" style="background:#eef2ff; color:#667eea;">${cliente.totalReservas} reserva(s)</span></td
-                    <td><span class="badge badge-activo">Activo</span></td
-                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td
+                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
+                    <td style="font-size:11px">${escapeHtml(cliente.email)}</td>
+                    <td>${escapeHtml(cliente.telefono)}</td>
+                    <td><span class="badge" style="background:#eef2ff; color:#667eea;">${cliente.totalReservas} reserva(s)</span></td>
+                    <td><span class="badge badge-activo">Activo</span></td>
+                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td>
                 </tr>
             `).join('');
         }
@@ -300,7 +294,7 @@
         }
         
         // ==================================================
-        // VER RESERVAS DEL CLIENTE (MODAL)
+        // VER RESERVAS DEL CLIENTE
         // ==================================================
         async function verReservasCliente(email) {
             try {
@@ -321,7 +315,7 @@
                     const excursionesRaw = fila[8] || '';
                     const excursion = excursionesRaw.split('\n')[0] || excursionesRaw.split(' | ')[0] || 'Sin excursión';
                     
-                    reservas.push({ id, fecha: fecha || 'Sin fecha', excursion: excursion.substring(0, 50) });
+                    reservas.push({ id, fecha: fecha || 'Sin fecha', excursion: excursion.substring(0, 60) });
                 }
                 
                 let reservasHtml = '';
