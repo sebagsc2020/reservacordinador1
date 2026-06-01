@@ -37,7 +37,6 @@
         .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .status-message { padding: 12px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: 500; }
         .status-message.error { background: #fee; color: #c0392b; border-left: 4px solid #e74c3c; }
-        .status-message.success { background: #d4edda; color: #155724; border-left: 4px solid #27ae60; }
         #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s; }
         #preloader.oculto { opacity: 0; visibility: hidden; }
         .cronometro { width: 75px; height: 75px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid white; border-radius: 50%; animation: girar 1s linear infinite; margin: 0 auto 20px; }
@@ -76,14 +75,6 @@
     </div>
 
     <script>
-        // ==================================================
-        // CONFIGURACIÓN - WHATSAPP DEL ADMIN
-        // ==================================================
-        const ADMIN_WHATSAPP = "5493518692251"; // Tu número (sin el +)
-        
-        // URL del Google Apps Script (para guardar en Sheets)
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9P1Zg1ruh-8vAzMaa9DwpGjCdhUPVJqRkgX2_0Q9o01nKDs9bUY4i7gHfySQWwnrM/exec';
-        
         window.addEventListener('load', () => { setTimeout(() => { document.getElementById('preloader').classList.add('oculto'); }, 1000); });
 
         function establecerFechaSistema() {
@@ -183,67 +174,9 @@
             else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
         }
 
-        // ==================================================
-        // FUNCIÓN PARA ENVIAR WHATSAPP AL ADMIN
-        // ==================================================
-        function abrirWhatsAppAdmin(reservaData) {
-            const mensaje = `🏔️ *NUEVA RESERVA RECIBIDA* 🏔️
-
-🆔 *ID:* ${reservaData.id}
-📅 *Fecha:* ${reservaData.fecha}
-👤 *Cliente:* ${reservaData.nombre}
-📧 *Email:* ${reservaData.email}
-📞 *Teléfono:* ${reservaData.telefono}
-📍 *Destino:* ${reservaData.pais} - ${reservaData.ciudad}
-✨ *Excursiones:*
-${reservaData.excursionesLista.map((e, i) => `   ${i+1}. ${e}`).join('\n')}
-👥 *Personas:* ${reservaData.personas}
-💳 *Forma de pago:* ${reservaData.formaPago}
-🚐 *Lugar de encuentro:* ${reservaData.lugar}
-
-📌 *Acción requerida:* Contactar al cliente para coordinar pago y detalles.`;
-            
-            const mensajeCodificado = encodeURIComponent(mensaje);
-            return `https://wa.me/${ADMIN_WHATSAPP}?text=${mensajeCodificado}`;
-        }
-
-        // ==================================================
-        // FUNCIÓN PARA ENVIAR WHATSAPP AL PASAJERO
-        // ==================================================
-        function abrirWhatsAppPasajero(reservaData, telefonoPasajero) {
-            // Limpiar número (solo dígitos)
-            let telefonoLimpio = telefonoPasajero.replace(/\D/g, '');
-            if (telefonoLimpio.length === 10) {
-                telefonoLimpio = '54' + telefonoLimpio;
-            }
-            
-            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
-
-✅ *¡Gracias por reservar, ${reservaData.nombre}!*
-
-🆔 *N° de reserva:* ${reservaData.id}
-📅 *Fecha de reserva:* ${reservaData.fecha}
-
-📍 *DESTINO:*
-   ${reservaData.pais} - ${reservaData.ciudad}
-
-✨ *EXCURSIONES SELECCIONADAS:*
-${reservaData.excursionesLista.map((e, i) => `   ${i+1}. ${e}`).join('\n')}
-
-👥 *Personas:* ${reservaData.personas}
-💳 *Forma de pago:* ${reservaData.formaPago}
-🚐 *Punto de encuentro:* ${reservaData.lugar}
-
-📌 *PRÓXIMOS PASOS:*
-• En las próximas horas recibirás un mensaje con los detalles de pago.
-• Punto de encuentro exacto será confirmado.
-
-🏔️ *¡Gracias por confiar en Aventura Total!*`;
-            
-            const mensajeCodificado = encodeURIComponent(mensaje);
-            return `https://wa.me/${telefonoLimpio}?text=${mensajeCodificado}`;
-        }
-
+        // URL del Google Apps Script
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9P1Zg1ruh-8vAzMaa9DwpGjCdhUPVJqRkgX2_0Q9o01nKDs9bUY4i7gHfySQWwnrM/exec';
+        
         const form = document.getElementById('excursionForm');
         const statusMessage = document.getElementById('statusMessage');
 
@@ -275,61 +208,19 @@ ${reservaData.excursionesLista.map((e, i) => `   ${i+1}. ${e}`).join('\n')}
             }
             
             // Preparar datos
-            const nombre = document.getElementById('nombre').value;
-            const apellido = document.getElementById('apellido').value;
-            const email = document.getElementById('email').value;
-            const telefonoPasajero = document.getElementById('telefono').value;
-            const paisTexto = paisSelect.options[paisSelect.selectedIndex].text;
-            const ciudad = categoriaSelect.value;
-            const fechaSistema = document.getElementById('fecha').value;
-            const personas = document.getElementById('personas').value;
-            const lugar = document.getElementById('mensaje').value || 'No especificado';
-            const idReserva = 'RES-' + Date.now();
-            
-            const reservaData = {
-                id: idReserva,
-                fecha: fechaSistema,
-                nombre: `${nombre} ${apellido}`.trim(),
-                email: email,
-                telefono: telefonoPasajero,
-                pais: paisTexto,
-                ciudad: ciudad,
-                excursionesLista: excursionesSeleccionadas,
-                personas: personas,
-                formaPago: formaPago,
-                lugar: lugar
-            };
-            
-            // ==================================================
-            // ABRIR WHATSAPPS (se abren en nuevas pestañas)
-            // ==================================================
-            
-            // 1. WhatsApp para el ADMIN (tú)
-            const adminUrl = abrirWhatsAppAdmin(reservaData);
-            window.open(adminUrl, '_blank');
-            
-            // 2. WhatsApp para el PASAJERO
-            if (telefonoPasajero && telefonoPasajero.trim() !== '') {
-                const pasajeroUrl = abrirWhatsAppPasajero(reservaData, telefonoPasajero);
-                window.open(pasajeroUrl, '_blank');
-            }
-            
-            // ==================================================
-            // ENVIAR A GOOGLE SHEETS
-            // ==================================================
             const formData = new URLSearchParams();
-            formData.append('id', idReserva);
-            formData.append('nombre', nombre);
-            formData.append('apellido', apellido);
-            formData.append('email', email);
-            formData.append('telefono', telefonoPasajero);
-            formData.append('pais', paisTexto);
-            formData.append('ciudad', ciudad);
+            formData.append('id', 'RES-' + Date.now());
+            formData.append('nombre', document.getElementById('nombre').value);
+            formData.append('apellido', document.getElementById('apellido').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('telefono', document.getElementById('telefono').value);
+            formData.append('pais', paisSelect.options[paisSelect.selectedIndex].text);
+            formData.append('ciudad', categoriaSelect.value);
             formData.append('excursiones', excursionesSeleccionadas.join('\n'));
-            formData.append('fecha', fechaSistema);
-            formData.append('personas', personas);
+            formData.append('fecha', document.getElementById('fecha').value);
+            formData.append('personas', document.getElementById('personas').value);
             formData.append('formaPago', formaPago);
-            formData.append('lugar', lugar);
+            formData.append('lugar', document.getElementById('mensaje').value || 'No especificado');
             
             const submitBtn = document.querySelector('.submit-btn');
             submitBtn.disabled = true;
@@ -343,31 +234,11 @@ ${reservaData.excursionesLista.map((e, i) => `   ${i+1}. ${e}`).join('\n')}
                     body: formData
                 });
                 localStorage.setItem('ultimaReserva', formData.toString());
-                
-                statusMessage.textContent = '✅ Reserva enviada correctamente. Se abrirá WhatsApp para confirmación.';
-                statusMessage.className = 'status-message success';
-                statusMessage.style.display = 'block';
-                
-                // Limpiar formulario
-                form.reset();
-                document.getElementById('privacidad').checked = false;
-                categoriaGroup.style.display = 'none';
-                excursionGroup.style.display = 'none';
-                establecerFechaSistema();
-                
-                setTimeout(() => {
-                    window.location.href = 'gracias.html';
-                }, 3000);
-                
+                window.location.href = 'gracias.html';
             } catch (error) {
                 console.error('Error:', error);
-                statusMessage.textContent = '⚠️ Hubo un error, pero tu reserva fue registrada. Te contactaremos.';
-                statusMessage.className = 'status-message error';
-                statusMessage.style.display = 'block';
-                
-                setTimeout(() => {
-                    window.location.href = 'gracias.html?status=local';
-                }, 3000);
+                localStorage.setItem('ultimaReserva', formData.toString());
+                window.location.href = 'gracias.html?status=local';
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '📩 Enviar Reserva';
