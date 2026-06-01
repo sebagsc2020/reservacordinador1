@@ -130,9 +130,6 @@
     </div>
 
     <script>
-        // ==================================================
-        // URL DE TU WEB APP
-        // ==================================================
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzqKJ3jifH5AV2G4HKnfUgfvhY07yqa20p8jsnQDgFvVHS2c0TOBxyZjY66yMaGLPlew/exec';
         
         window.addEventListener('load', () => { setTimeout(() => { document.getElementById('preloader').classList.add('oculto'); }, 1000); });
@@ -147,26 +144,163 @@
         }
         establecerFechaSistema();
 
+        // Todas las excursiones de Argentina ordenadas alfabéticamente por ciudad
         const excursionesData = {
             argentina: {
-                "🎭 Villa Carlos Paz": [
-                    "✔️ Full Day Alta Gracia y Villa General Belgrano",
-                    "✔️ Valle de Calamuchita y La Cumbrecita",
-                    "✔️ Vuelta al Valle de Punilla",
-                    "✔️ Paseo en catamarán por el Dique San Roque",
-                    "✔️ Caminata guiada al Cerro Champaquí",
-                    "✔️ Altas Cumbres y Mina Clavero",
-                    "✔️ Parque Nacional Quebrada del Condorito",
-                    "✔️ City tour nocturno por Villa Carlos Paz",
-                    "✔️ Ascenso al Cerro de la Cruz",
-                    "✔️ Excursión a Capilla del Monte y Los Terrones",
-                    "✔️ Travesía en vehículos 4x4 al Cerro Los Gigantes"
+                "🎿 Bariloche": [
+                    "✔️ Excursión al Cerro Catedral y centro de esquí",
+                    "✔️ Excursión al Cerro Tronador y el Glaciar Negro",
+                    "✔️ Excursión de día completo a El Bolsón y Lago Puelo",
+                    "✔️ Excursión terrestre al Circuito Grande y Valle Encantado",
+                    "✔️ Excursión terrestre de día completo a San Martín de los Andes por los Siete Lagos",
+                    "✔️ Navegación a la Isla Victoria y el Bosque de Arrayanes",
+                    "✔️ Navegación a Puerto Blest y Cascada de los Cántaros",
+                    "✔️ Navegación por el Brazo Tristeza y caminata por la selva valdiviana",
+                    "✔️ Travesía en vehículos 4x4 al Cerro López",
+                    "✔️ Excursión de medio día por el Circuito Chico y Cerro Campanario"
                 ],
-                "🏖️ Mar del Plata": ["✔️ Aquarium", "✔️ City Tour Histórico", "✔️ Puerto y Banquina", "✔️ Sierra de los Padres", "✔️ Fábricas de Alfajores", "✔️ Gruta de Lourdes", "✔️ Noche de Teatros", "✔️ Torre Tanque"],
-                "🎿 Bariloche": ["✔️ Cerro Campanario", "✔️ Cerro Catedral", "✔️ Cerro Otto", "✔️ Circuito Chico", "✔️ Circuito Grande", "✔️ El Bolsón", "✔️ Isla Victoria", "✔️ Ruta del Chocolate"],
-                "🍇 Mendoza": ["✔️ Alta Montaña", "✔️ Camino del Vino", "✔️ City Tour", "✔️ Fábricas de Chocolates", "✔️ Cerro Aconcagua", "✔️ San Rafael", "✔️ Termas de Cacheuta", "✔️ Valle de Uco"],
-                "☃️ Ushuaia": ["✔️ Centros Invernales", "✔️ City Tour", "✔️ Estancia Harberton", "✔️ Lagos Fagnano", "✔️ Glaciar Martial", "✔️ Canal Beagle", "✔️ Parque Nacional", "✔️ Tren del Fin del Mundo"],
-                "🚤 Cataratas del Iguazú": ["✔️ Ciudad del Este", "✔️ Duty Free", "✔️ Gran Aventura", "✔️ Hito Tres Fronteras", "✔️ Icebar", "✔️ Parque de las Aves", "✔️ Parque Nacional", "✔️ Ruinas San Ignacio"]
+                "❤️ Buenos Aires": [
+                    "✔️ City tour premium por los barrios históricos (San Telmo, La Boca, Recoleta y Palermo)",
+                    "✔️ Excursión a la ciudad de La Plata y la República de los Niños",
+                    "✔️ Excursión al Bioparque Temaikèn en Belén de Escobar",
+                    "✔️ Excursión de día completo al Delta del Tigre con paseo en lancha",
+                    "✔️ Excursión de día de campo en una estancia tradicional de San Antonio de Areco",
+                    "✔️ Navegación al atardecer por el Río de la Plata con barra libre",
+                    "✔️ Paseo guiado arquitectónico por el Palacio Barolo y la Avenida de Mayo",
+                    "✔️ Recorrido gastronómico de pulperías e historia en San Telmo y casco histórico",
+                    "✔️ Recorrido nocturno de tango con cena y show en vivo",
+                    "✔️ Tour temático de fútbol con visita a las canchas de Boca Juniors y River Plate"
+                ],
+                "⚒️ Catamarca": [
+                    "✔️ City tour por San Fernando del Valle de Catamarca y Gruta de la Virgen del Valle",
+                    "✔️ Excursión a Andalgalá y las minas de Rodocrosita (Rosa del Inca)",
+                    "✔️ Excursión a Antofagasta de la Sierra y Volcán Galán",
+                    "✔️ Excursión a los Seis Miles y el Balcón del Pissis",
+                    "✔️ Excursión al Pucará de Aconquija y sitios arqueológicos",
+                    "✔️ Excursión de día completo al Campo de Piedra Pómez en vehículos 4x4",
+                    "✔️ Excursión al Valle Viejo y el Camino de los Artesanos en Belén",
+                    "✔️ Recorrido por la Cuesta del Portezuelo y el dique Las Pirquitas",
+                    "✔️ Recorrido por la Ruta del Adobe y Termas de Fiambalá",
+                    "✔️ Travesía por las dunas de Tatón y Medanitos"
+                ],
+                "🚤 Cataratas del Iguazú": [
+                    "✔️ Excursión al Parque de las Aves (Foz do Iguaçu)",
+                    "✔️ Excursión combinada a las Ruinas de San Ignacio y Minas de Wanda",
+                    "✔️ Excursión de día completo a los Saltos del Moconá",
+                    "✔️ Excursión de día completo al lado argentino de las Cataratas del Iguazú",
+                    "✔️ Excursión de medio día al lado brasileño de las Cataratas del Iguazú",
+                    "✔️ Excursión flotada ecológica por el Río Iguazú Superior",
+                    "✔️ Paseo náutico de gran aventura bajo los saltos de agua",
+                    "✔️ Recorrido nocturno por las Cataratas con Luna Llena",
+                    "✔️ Travesía en vehículos 4x4 por el Sendero Yacaratiá en la selva misionera",
+                    "✔️ Visita al hito de las Tres Fronteras y GüiráOga (Refugio de animales)"
+                ],
+                "🏔️ Jujuy": [
+                    "✔️ Caminata con llamas en Salinas Grandes o Purmamarca",
+                    "✔️ City tour por San Salvador de Jujuy y visita a las Termas de Reyes",
+                    "✔️ Excursión a la Laguna de Pozuelos y la Puna Jujeña",
+                    "✔️ Excursión a las Salinas Grandes por la Cuesta del Lipán",
+                    "✔️ Excursión al Hornocal (Serranía del Hornocal o Cerro de los 14 Colores)",
+                    "✔️ Excursión de aventura al Parque Nacional Calilegua",
+                    "✔️ Recorrido por la Quebrada de Humahuaca (Purmamarca, Tilcara y Humahuaca)",
+                    "✔️ Recorrido por los Pueblos Celestiales (Caspalá y Santa Ana)",
+                    "✔️ Recorrido por el Valle de la Luna de Cusi Cusi",
+                    "✔️ Trekking guiado a las Termas del Jordán en San Francisco"
+                ],
+                "🏖️ Mar del Plata": [
+                    "✔️ Aquarium", "✔️ City Tour Histórico", "✔️ Fábricas de Alfajores",
+                    "✔️ Gruta de Lourdes", "✔️ Noche de Teatros", "✔️ Puerto y Banquina",
+                    "✔️ Sierra de los Padres", "✔️ Torre Tanque"
+                ],
+                "🍷 Mendoza": [
+                    "✔️ Cabalgata al atardecer por los caminos del vino",
+                    "✔️ Caminata guiada por el Parque Provincial Aconcagua",
+                    "✔️ City tour por la ciudad de Mendoza y Parque General San Martín",
+                    "✔️ Circuito de bodegas y olivícolas en Luján de Cuyo o Maipú",
+                    "✔️ Excursión a las Termas de Cacheuta y Potrerillos",
+                    "✔️ Excursión al Cañón del Atuel y San Rafael",
+                    "✔️ Excursión de Alta Montaña por la Cordillera de los Andes",
+                    "✔️ Excursión de día completo a San Rafael y Embalse Los Reyunos",
+                    "✔️ Recorrido de bodegas y viñedos con degustación en el Valle de Uco",
+                    "✔️ Travesía en vehículos 4x4 a la Reserva Natural Villavicencio"
+                ],
+                "🌄 Merlo (San Luis)": [
+                    "✔️ Caminata astronómica nocturna bajo el cielo de Merlo",
+                    "✔️ Cascadas de San Luis y Salto del Tabaquillo",
+                    "✔️ Circuito Chico y Mirador del Sol",
+                    "✔️ Circuito Sur (Carpintería, Los Molles y Cortaderas)",
+                    "✔️ Excursión al Parque Nacional Sierra de las Quijadas",
+                    "✔️ Excursión de día completo al Bajo de Véliz",
+                    "✔️ Filo de la Sierra de los Comechingones",
+                    "✔️ Recorrido por Pasos Malos y Arroyo El Rincón",
+                    "✔️ Ruta de los Sabores y visita a los Olivares de Merlo",
+                    "✔️ Visita guiada a las minas de tungsteno"
+                ],
+                "🏔️ Salta": [
+                    "✔️ Caminata guiada por la Quebrada de San Lorenzo",
+                    "✔️ City tour por la ciudad de Salta y visita al Cerro San Bernardo",
+                    "✔️ Excursión a Purmamarca, Salinas Grandes y Cuesta del Lipán",
+                    "✔️ Excursión a San Antonio de los Cobres por la ruta del Tren a las Nubes",
+                    "✔️ Excursión al Dique Cabra Corral con actividades de turismo aventura",
+                    "✔️ Excursión combinada a Humahuaca, Tilcara y Purmamarca (Quebrada de Humahuaca)",
+                    "✔️ Excursión de día completo a Cafayate y Bodegas con Quebrada de las Conchas",
+                    "✔️ Excursión de día completo a Iruya y pueblos históricos",
+                    "✔️ Recorrido por Cachi a través de la Cuesta del Obispo y Parque Nacional Los Cardones",
+                    "✔️ Travesía en vehículos 4x4 a las Cuevas de Acsibi en Seclantás"
+                ],
+                "🏜️ San Juan": [
+                    "✔️ Excursión a los templos religiosos de la Difunta Correa y San Expedito",
+                    "✔️ Excursión al Dique Punta Negra con paseo en catamarán o kayak",
+                    "✔️ Excursión al Parque Nacional El Leoncito y Observatorio Astronómico CESCO",
+                    "✔️ Excursión de día completo a Jáchal, Huaco y los Antiguos Molinos Harineros",
+                    "✔️ Excursión de día completo al Parque Provincial Ischigualasto (Valle de la Luna)",
+                    "✔️ Recorrido por el Circuito San Juan Capital y el Auditorio Juan Victoria",
+                    "✔️ Recorrido por el Valle de Calingasta y el Cerro Alcázar",
+                    "✔️ Ruta del Vino de San Juan y visita a bodegas del Valle de Tulum",
+                    "✔️ Travesía al Parque Nacional San Guillermo y avistaje de fauna andina",
+                    "✔️ Visita guiada a la Quebrada de Zonda y el Jardín de los Poetas"
+                ],
+                "🗿 Talampaya": [
+                    "✔️ Caminata nocturna por el Cañón de Talampaya bajo la Luna Llena",
+                    "✔️ Excursión al Cañón de Talampaya (Circuito clásico en vehículos del parque)",
+                    "✔️ Excursión al Cañón de Talampaya con almuerzo y degustación de vinos riojanos",
+                    "✔️ Excursión combinada al Cañón de Talampaya y los Cajones de Shimpa",
+                    "✔️ Excursión combinada al Cañón de Talampaya y el Parque Provincial Ischigualasto",
+                    "✔️ Excursión guiada al Cañón de Arco Iris",
+                    "✔️ Recorrido de aventura en vehículos 4x4 por el Cañón de Ciudad Perdida",
+                    "✔️ Recorrido histórico y arqueológico a los Petroglifos del Cañón",
+                    "✔️ Travesía de senderismo al Gran Chañar y vistas panorámicas",
+                    "✔️ Trekking guiado al circuito Quebrada de Don Eduardo"
+                ],
+                "🏔️ Ushuaia": [
+                    "✔️ Caminata con raquetas de nieve y almuerzo en un centro invernal del Valle de Tierra Mayor",
+                    "✔️ Excursión de aventura con canoas y caminata en el Parque Nacional",
+                    "✔️ Excursión de día completo al Cabo San Pablo y el naufragio del barco Desdémona",
+                    "✔️ Excursión de día completo al Parque Nacional Tierra del Fuego con Tren del Fin del Mundo",
+                    "✔️ Excursión en vehículos 4x4 a los Lagos Fagnano y Escondido",
+                    "✔️ Navegación histórica a la Estancia Harberton y la Pingüinera de Isla Martillo",
+                    "✔️ Navegación por el Canal Beagle hasta la Isla de los Lobos y el Faro Les Éclaireurs",
+                    "✔️ Sobrevuelo en helicóptero por la ciudad de Ushuaia y la Cordillera de los Andes",
+                    "✔️ Trekking de ascenso al Glaciar Martial con vistas panorámicas de la bahía",
+                    "✔️ Trekking guiado a la Laguna Esmeralda y el Glaciar Ojo del Albino"
+                ],
+                "☃️ Ushuaia (Viejo)": [ // Mantenido por compatibilidad, pero no se usa
+                    "✔️ Centros Invernales", "✔️ City Tour", "✔️ Estancia Harberton", "✔️ Lagos Fagnano",
+                    "✔️ Glaciar Martial", "✔️ Canal Beagle", "✔️ Parque Nacional", "✔️ Tren del Fin del Mundo"
+                ],
+                "🎭 Villa Carlos Paz": [
+                    "✔️ Altas Cumbres y Mina Clavero",
+                    "✔️ Ascenso al Cerro de la Cruz",
+                    "✔️ Caminata guiada al Cerro Champaquí",
+                    "✔️ City tour nocturno por Villa Carlos Paz",
+                    "✔️ Excursión a Capilla del Monte y Los Terrones",
+                    "✔️ Full Day Alta Gracia y Villa General Belgrano",
+                    "✔️ Parque Nacional Quebrada del Condorito",
+                    "✔️ Paseo en catamarán por el Dique San Roque",
+                    "✔️ Travesía en vehículos 4x4 al Cerro Los Gigantes",
+                    "✔️ Valle de Calamuchita y La Cumbrecita",
+                    "✔️ Vuelta al Valle de Punilla"
+                ]
             },
             brasil: {
                 "🏖️ Balneário Camboriú": ["✔️ Barco Pirata", "✔️ Bombinhas", "✔️ City Tour", "✔️ Oceanic Aquarium", "✔️ Cristo Luz", "✔️ Beto Carrero", "✔️ Parque Unipraias"],
@@ -190,11 +324,17 @@
             categoriaSelect.innerHTML = '<option value="">Selecciona una ciudad</option>';
             checkboxExcursiones.innerHTML = '';
             contadorSeleccionados.innerHTML = '<span class="sin-seleccion">✨ Selecciona al menos una excursión</span>';
-            if (pais) {
+            if (pais && excursionesData[pais]) {
                 categoriaGroup.style.display = 'block';
                 categoriaSelect.disabled = false;
                 excursionGroup.style.display = 'none';
-                Object.keys(excursionesData[pais]).forEach(ciudad => {
+                // Ordenar las ciudades alfabéticamente por su nombre (ignorando el emoji)
+                const ciudades = Object.keys(excursionesData[pais]).sort((a, b) => {
+                    const nombreA = a.replace(/^[^\w]+/, ''); // Elimina emoji inicial
+                    const nombreB = b.replace(/^[^\w]+/, '');
+                    return nombreA.localeCompare(nombreB);
+                });
+                ciudades.forEach(ciudad => {
                     const option = document.createElement('option');
                     option.value = ciudad;
                     option.textContent = ciudad;
@@ -212,7 +352,7 @@
             const ciudad = this.value;
             checkboxExcursiones.innerHTML = '';
             contadorSeleccionados.innerHTML = '<span class="sin-seleccion">✨ Selecciona al menos una excursión</span>';
-            if (ciudad && pais) {
+            if (ciudad && pais && excursionesData[pais] && excursionesData[pais][ciudad]) {
                 excursionGroup.style.display = 'block';
                 const excursiones = excursionesData[pais][ciudad];
                 excursiones.forEach((excursion, index) => {
