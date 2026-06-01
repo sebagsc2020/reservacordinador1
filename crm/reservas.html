@@ -10,7 +10,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        /* Sidebar más angosta */
         .sidebar { width: 160px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
         .sidebar-logo { text-align: center; padding: 0 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
         .sidebar-logo .logo-icon { font-size: 28px; } .sidebar-logo h2 { font-size: 14px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
@@ -21,7 +20,7 @@
         .sidebar-footer { position: absolute; bottom: 15px; left: 8px; right: 8px; }
         .btn-logout-sidebar { width: 100%; padding: 6px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 10px; border: none; }
         
-        .main-content { margin-left: 160px; flex: 1; padding: 20px; min-width: 0; background: #f0f2f5; }
+        .main-content { margin-left: 160px; flex: 1; padding: 20px; min-width: 0; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .header h1 { font-size: 22px; color: #1a1a2e; }
         .user-info { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 15px; border-radius: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 13px; }
@@ -43,18 +42,10 @@
         .checkbox-group label { display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer; }
         .checkbox-group input { cursor: pointer; }
         
-        /* CONTENEDOR DE TABLA CON SCROLL HORIZONTAL */
-        .table-container { 
-            background: white; 
-            border-radius: 12px; 
-            padding: 12px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            overflow-x: auto;
-        }
+        .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .table-header h3 { font-size: 15px; }
         
-        /* TABLA CON ANCHOS FIJOS EN PÍXELES - PARA FORZAR SCROLL */
         .reservas-tabla {
             width: 1300px;
             border-collapse: collapse;
@@ -82,19 +73,18 @@
         
         .reservas-tabla tr:hover td { background: #f8f9ff; }
         
-        /* ANCHOS FIJOS PARA CADA COLUMNA */
-        .reservas-tabla th:nth-child(1), .reservas-tabla td:nth-child(1) { width: 90px; }  /* ID */
-        .reservas-tabla th:nth-child(2), .reservas-tabla td:nth-child(2) { width: 80px; }  /* Fecha */
-        .reservas-tabla th:nth-child(3), .reservas-tabla td:nth-child(3) { width: 130px; } /* Cliente */
-        .reservas-tabla th:nth-child(4), .reservas-tabla td:nth-child(4) { width: 150px; } /* Email */
-        .reservas-tabla th:nth-child(5), .reservas-tabla td:nth-child(5) { width: 90px; }  /* Teléfono */
-        .reservas-tabla th:nth-child(6), .reservas-tabla td:nth-child(6) { width: 200px; } /* Excursiones */
-        .reservas-tabla th:nth-child(7), .reservas-tabla td:nth-child(7) { width: 100px; } /* Ciudad */
-        .reservas-tabla th:nth-child(8), .reservas-tabla td:nth-child(8) { width: 45px; }  /* Pax */
-        .reservas-tabla th:nth-child(9), .reservas-tabla td:nth-child(9) { width: 85px; }  /* Pago */
-        .reservas-tabla th:nth-child(10), .reservas-tabla td:nth-child(10) { width: 110px; } /* Lugar */
-        .reservas-tabla th:nth-child(11), .reservas-tabla td:nth-child(11) { width: 80px; } /* Estado */
-        .reservas-tabla th:nth-child(12), .reservas-tabla td:nth-child(12) { width: 70px; } /* Acciones */
+        .reservas-tabla th:nth-child(1), .reservas-tabla td:nth-child(1) { width: 90px; }
+        .reservas-tabla th:nth-child(2), .reservas-tabla td:nth-child(2) { width: 80px; }
+        .reservas-tabla th:nth-child(3), .reservas-tabla td:nth-child(3) { width: 130px; }
+        .reservas-tabla th:nth-child(4), .reservas-tabla td:nth-child(4) { width: 150px; }
+        .reservas-tabla th:nth-child(5), .reservas-tabla td:nth-child(5) { width: 90px; }
+        .reservas-tabla th:nth-child(6), .reservas-tabla td:nth-child(6) { width: 200px; }
+        .reservas-tabla th:nth-child(7), .reservas-tabla td:nth-child(7) { width: 100px; }
+        .reservas-tabla th:nth-child(8), .reservas-tabla td:nth-child(8) { width: 45px; }
+        .reservas-tabla th:nth-child(9), .reservas-tabla td:nth-child(9) { width: 85px; }
+        .reservas-tabla th:nth-child(10), .reservas-tabla td:nth-child(10) { width: 110px; }
+        .reservas-tabla th:nth-child(11), .reservas-tabla td:nth-child(11) { width: 80px; }
+        .reservas-tabla th:nth-child(12), .reservas-tabla td:nth-child(12) { width: 70px; }
         
         .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
         .badge-pendiente { background: #fff3cd; color: #856404; }
@@ -175,7 +165,7 @@
                 <h3>Lista de Reservas</h3>
                 <span id="totalReservasSpan" class="total-reservas">0 reservas</span>
             </div>
-            <table class="reservas-tabla" id="reservasTable">
+            <table class="reservas-tabla">
                 <thead>
                     <tr>
                         <th>ID</th><th>Fecha</th><th>Cliente</th><th>Email</th><th>Teléfono</th>
@@ -184,7 +174,7 @@
                     </tr>
                 </thead>
                 <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
-            </table>
+            ~
         </div>
     </div>
 
@@ -207,99 +197,52 @@
             estado: { header: 'Estado', ancho: 25, getter: (r) => r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado') }
         };
         
-        // ==================================================
-        // VERIFICAR AUTENTICACIÓN
-        // ==================================================
-        if (sessionStorage.getItem('crm_logged') !== 'true') { 
-            window.location.href = 'index.html'; 
-        }
+        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
+        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         
-        function logout() { 
-            sessionStorage.clear(); 
-            window.location.href = 'index.html'; 
-        }
+        let reservasData = [], reservasFiltradas = [];
         
-        // ==================================================
-        // VARIABLES GLOBALES
-        // ==================================================
-        let reservasData = [];
-        let reservasFiltradas = [];
-        
-        // ==================================================
-        // PARSEAR CSV
-        // ==================================================
         function parseCSV(csvText) {
             const filas = [];
-            let filaActual = [];
-            let celdaActual = '';
-            let dentroComillas = false;
-            
+            let filaActual = [], celdaActual = '', dentroComillas = false;
             for (let i = 0; i < csvText.length; i++) {
-                const char = csvText[i];
-                const nextChar = csvText[i + 1];
-                
+                const char = csvText[i], nextChar = csvText[i + 1];
                 if (dentroComillas) {
                     if (char === '"') {
-                        if (nextChar === '"') {
-                            celdaActual += '"';
-                            i++;
-                        } else {
-                            dentroComillas = false;
-                        }
-                    } else {
-                        celdaActual += char;
-                    }
+                        if (nextChar === '"') { celdaActual += '"'; i++; }
+                        else { dentroComillas = false; }
+                    } else { celdaActual += char; }
                 } else {
-                    if (char === '"') {
-                        dentroComillas = true;
-                    } else if (char === ',') {
-                        filaActual.push(celdaActual.trim());
-                        celdaActual = '';
-                    } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
-                        filaActual.push(celdaActual.trim());
-                        filas.push(filaActual);
-                        filaActual = [];
-                        celdaActual = '';
+                    if (char === '"') { dentroComillas = true; }
+                    else if (char === ',') { filaActual.push(celdaActual.trim()); celdaActual = ''; }
+                    else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
+                        filaActual.push(celdaActual.trim()); filas.push(filaActual);
+                        filaActual = []; celdaActual = '';
                         if (char === '\r') i++;
-                    } else {
-                        celdaActual += char;
-                    }
+                    } else { celdaActual += char; }
                 }
             }
             if (celdaActual.trim() || filaActual.length > 0) {
-                filaActual.push(celdaActual.trim());
-                filas.push(filaActual);
+                filaActual.push(celdaActual.trim()); filas.push(filaActual);
             }
             return filas.filter(fila => fila.some(celda => celda !== ''));
         }
         
-        // ==================================================
-        // FORMATEAR FECHA
-        // ==================================================
         function formatearFecha(fechaStr) {
             if (!fechaStr) return '';
             if (fechaStr.includes('/')) return fechaStr;
             if (fechaStr.includes('GMT')) {
                 try {
                     const fecha = new Date(fechaStr);
-                    if (!isNaN(fecha.getTime())) {
-                        return `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
-                    }
+                    if (!isNaN(fecha.getTime())) return `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
                 } catch(e) {}
             }
             const partes = fechaStr.split('-');
-            if (partes.length === 3 && partes[0].length === 4) {
-                return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
-            if (fechaStr.includes(' ')) {
-                return fechaStr.split(' ')[0];
-            }
+            if (partes.length === 3 && partes[0].length === 4) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            if (fechaStr.includes(' ')) return fechaStr.split(' ')[0];
             return fechaStr;
         }
         
-        // ==================================================
-        // DIVIDIR EXCURSIONES
-        // ==================================================
         function dividirExcursiones(texto) {
             if (!texto) return [];
             let partes = [];
@@ -311,12 +254,8 @@
             return partes.map(p => p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(p => p);
         }
         
-        // ==================================================
-        // GESTIÓN DE ESTADOS Y EXCLUIDOS
-        // ==================================================
         function cargarEstadosGuardados() {
-            try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } 
-            catch(e) { return {}; }
+            try { return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); } catch(e) { return {}; }
         }
         
         function guardarEstado(id, estado) {
@@ -326,21 +265,14 @@
         }
         
         function cargarExcluidos() {
-            try { return JSON.parse(localStorage.getItem('reservasExcluidas') || '[]'); } 
-            catch(e) { return []; }
+            try { return JSON.parse(localStorage.getItem('reservasExcluidas') || '[]'); } catch(e) { return []; }
         }
         
         function guardarExcluido(id) {
             const excluidos = cargarExcluidos();
-            if (!excluidos.includes(id)) {
-                excluidos.push(id);
-                localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
-            }
+            if (!excluidos.includes(id)) { excluidos.push(id); localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos)); }
         }
         
-        // ==================================================
-        // CARGAR RESERVAS
-        // ==================================================
         async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
             const totalSpan = document.getElementById('totalReservasSpan');
@@ -379,26 +311,17 @@
                     const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     let estado = estadosGuardados[id];
-                    if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
-                        estado = 'confirmado';
-                    }
-                    
+                    if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) estado = 'confirmado';
                     let fechaFormateada = '';
-                    if (timestamp) {
-                        fechaFormateada = formatearFecha(timestamp);
-                    } else if (fecha) {
-                        fechaFormateada = formatearFecha(fecha);
-                    }
+                    if (timestamp) fechaFormateada = formatearFecha(timestamp);
+                    else if (fecha) fechaFormateada = formatearFecha(fecha);
                     
                     reservasData.push({
-                        id: id, fecha: fechaFormateada, nombre: nombreCompleto, email: email,
-                        telefono: telefono, ciudad: ciudad, excursionesLista: listaExcursiones,
-                        personas: personas, formaPago: formaPago || 'No especificado',
-                        lugar: lugar || 'No especificado', estado: estado
+                        id, fecha: fechaFormateada, nombre: nombreCompleto, email, telefono,
+                        ciudad, excursionesLista: listaExcursiones, personas: personas,
+                        formaPago: formaPago || 'No especificado', lugar: lugar || 'No especificado', estado
                     });
                 }
-                
-                console.log(`📊 Cargadas ${reservasData.length} reservas`);
                 
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
@@ -409,16 +332,12 @@
                 reservasFiltradas = [...reservasData];
                 renderizarTabla();
                 if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
-                
             } catch (error) {
                 console.error('Error:', error);
                 tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message} </td</td`;
             }
         }
         
-        // ==================================================
-        // RENDERIZAR TABLA - Versión corregida
-        // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
             const totalSpan = document.getElementById('totalReservasSpan');
@@ -450,45 +369,40 @@
                 }
                 excursionesHtml += '</ul>';
                 
-                html += '<table>';
-                html += `<td class="id-reserva"><strong>${escapeHtml(r.id)}</strong></td>`;
-                html += `<td style="font-size:10px">${escapeHtml(r.fecha)}</td`;
+                html += '<tr>';
+                html += `<td><strong>${escapeHtml(r.id)}</strong></td`;
+                html += `<td>${escapeHtml(r.fecha)}</td`;
                 html += `<td>${escapeHtml(r.nombre)}</td`;
-                html += `<td style="font-size:10px; word-break:break-all;">${escapeHtml(r.email)}</td`;
-                html += `<td>${escapeHtml(r.telephone)}</td`;
+                html += `<td style="word-break:break-all;">${escapeHtml(r.email)}</td`;
+                html += `<td>${escapeHtml(r.telefono)}</td`;
                 html += `<td>${excursionesHtml}</td`;
                 html += `<td>${escapeHtml(r.ciudad)}</td`;
                 html += `<td>${escapeHtml(r.personas)}</td`;
-                html += `<td style="font-size:10px">${escapeHtml(r.formaPago)}</td`;
-                html += `<td style="font-size:10px">${escapeHtml(r.lugar)}</td`;
-                html += `<td><span class="badge ${estadoClass}">${estadoText}</span></td>`;
+                html += `<td>${escapeHtml(r.formaPago)}</td`;
+                html += `<td>${escapeHtml(r.lugar)}</td`;
+                html += `<td><span class="badge ${estadoClass}">${estadoText}</span></td`;
                 html += `<td class="col-acciones">
                             <div class="acciones-container">
                                 <div class="acciones-fila">
-                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')" title="Confirmar">✅</button>
-                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')" title="Pendiente">⏳</button>
+                                    <button class="btn-accion btn-confirmar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'confirmado')">✅</button>
+                                    <button class="btn-accion btn-pendiente" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pendiente')">⏳</button>
                                 </div>
                                 <div class="acciones-fila">
-                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')" title="Pagado">💰</button>
-                                    <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')" title="Excluir">🗑️</button>
+                                    <button class="btn-accion btn-pagar" onclick="cambiarEstado('${escapeHtml(r.id)}', 'pagado')">💰</button>
+                                    <button class="btn-accion btn-excluir" onclick="excluirReserva('${escapeHtml(r.id)}')">🗑️</button>
                                 </div>
                             </div>
                         </td`;
                 html += '</tr>';
             }
-            
             tbody.innerHTML = html;
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
         }
         
-        // ==================================================
-        // FILTRAR RESERVAS
-        // ==================================================
         function filtrarReservas() {
             const busquedaGeneral = document.getElementById('busquedaReserva');
             const busquedaCiudad = document.getElementById('busquedaCiudad');
             const busquedaExcursion = document.getElementById('busquedaExcursion');
-            
             const textoGeneral = busquedaGeneral ? busquedaGeneral.value.toLowerCase().trim() : '';
             const textoCiudad = busquedaCiudad ? busquedaCiudad.value.toLowerCase().trim() : '';
             const textoExcursion = busquedaExcursion ? busquedaExcursion.value.toLowerCase().trim() : '';
@@ -507,40 +421,17 @@
             renderizarTabla();
         }
         
-        // ==================================================
-        // OBTENER COLUMNAS SELECCIONADAS PARA PDF
-        // ==================================================
         function getColumnasSeleccionadas() {
             const checkboxes = document.querySelectorAll('#columnasSelector input:checked');
             const seleccionadas = [];
-            for (const cb of checkboxes) {
-                if (columnasPDF[cb.value]) {
-                    seleccionadas.push({
-                        key: cb.value,
-                        header: columnasPDF[cb.value].header,
-                        ancho: columnasPDF[cb.value].ancho,
-                        getter: columnasPDF[cb.value].getter,
-                        esLista: columnasPDF[cb.value].esLista || false
-                    });
-                }
-            }
+            for (const cb of checkboxes) if (columnasPDF[cb.value]) seleccionadas.push({ key: cb.value, header: columnasPDF[cb.value].header, ancho: columnasPDF[cb.value].ancho, getter: columnasPDF[cb.value].getter, esLista: columnasPDF[cb.value].esLista || false });
             return seleccionadas;
         }
         
-        // ==================================================
-        // GENERAR PDF
-        // ==================================================
         async function generarPDF() {
-            if (reservasFiltradas.length === 0) {
-                alert('⚠️ No hay reservas para exportar.');
-                return;
-            }
-            
+            if (reservasFiltradas.length === 0) { alert('⚠️ No hay reservas para exportar.'); return; }
             const columnas = getColumnasSeleccionadas();
-            if (columnas.length === 0) {
-                alert('⚠️ Selecciona al menos una columna para el PDF.');
-                return;
-            }
+            if (columnas.length === 0) { alert('⚠️ Selecciona al menos una columna para el PDF.'); return; }
             
             const ciudadFiltro = document.getElementById('busquedaCiudad').value.trim();
             const excursionFiltro = document.getElementById('busquedaExcursion').value.trim();
@@ -606,9 +497,6 @@
             } finally { btnPDF.textContent = textoOriginal; btnPDF.disabled = false; }
         }
         
-        // ==================================================
-        // EXPORTAR A EXCEL
-        // ==================================================
         function exportarExcel() {
             if (reservasFiltradas.length === 0) { alert('⚠️ No hay reservas para exportar.'); return; }
             const ciudadFiltro = document.getElementById('busquedaCiudad').value.trim();
@@ -634,50 +522,23 @@
             } finally { btnExcel.textContent = textoOriginal; btnExcel.disabled = false; }
         }
         
-        // ==================================================
-        // FUNCIONES DE ACCIONES
-        // ==================================================
         function cambiarEstado(id, nuevoEstado) {
             const reserva = reservasData.find(r => r.id === id);
-            if (reserva) {
-                reserva.estado = nuevoEstado;
-                guardarEstado(id, nuevoEstado);
-                const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
-                if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
-                renderizarTabla();
-            }
+            if (reserva) { reserva.estado = nuevoEstado; guardarEstado(id, nuevoEstado); const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id); if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado; renderizarTabla(); }
         }
         
         function excluirReserva(id) {
-            if (confirm(`⚠️ ¿Estás seguro de excluir la reserva ${id}?`)) {
-                guardarExcluido(id);
-                cargarReservas();
-                alert(`✅ Reserva ${id} excluida.`);
-            }
+            if (confirm(`⚠️ ¿Estás seguro de excluir la reserva ${id}?`)) { guardarExcluido(id); cargarReservas(); alert(`✅ Reserva ${id} excluida.`); }
         }
         
-        function escapeHtml(text) { 
-            if (!text) return ''; 
-            const div = document.createElement('div'); 
-            div.textContent = text; 
-            return div.innerHTML; 
-        }
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
         
-        // ==================================================
-        // INICIALIZAR
-        // ==================================================
-        window.cambiarEstado = cambiarEstado;
-        window.excluirReserva = excluirReserva;
-        window.filtrarReservas = filtrarReservas;
-        window.cargarReservas = cargarReservas;
-        window.generarPDF = generarPDF;
-        window.exportarExcel = exportarExcel;
-        window.logout = logout;
+        window.cambiarEstado = cambiarEstado; window.excluirReserva = excluirReserva; window.filtrarReservas = filtrarReservas;
+        window.cargarReservas = cargarReservas; window.generarPDF = generarPDF; window.exportarExcel = exportarExcel; window.logout = logout;
         
         const busquedaInput = document.getElementById('busquedaReserva');
         const busquedaCiudadInput = document.getElementById('busquedaCiudad');
         const busquedaExcursionInput = document.getElementById('busquedaExcursion');
-        
         if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
         if (busquedaCiudadInput) busquedaCiudadInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
         if (busquedaExcursionInput) busquedaExcursionInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
