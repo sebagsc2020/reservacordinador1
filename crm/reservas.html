@@ -6,21 +6,25 @@
     <title>Reservas - CRM Aventura Total</title>
     <!-- Incluir jsPDF para generar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Incluir SheetJS para generar Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        .sidebar { width: 200px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
-        .sidebar-logo { text-align: center; padding: 0 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
-        .sidebar-logo .logo-icon { font-size: 32px; } .sidebar-logo h2 { font-size: 16px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
-        .nav-menu { list-style: none; padding: 0 12px; } .nav-menu li { margin-bottom: 3px; }
-        .nav-menu a { display: flex; align-items: center; gap: 8px; padding: 8px 10px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; font-size: 12px; }
+        /* Sidebar más angosta - de 200px a 160px */
+        .sidebar { width: 160px; background: #1a1a2e; color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-logo { text-align: center; padding: 0 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+        .sidebar-logo .logo-icon { font-size: 28px; } .sidebar-logo h2 { font-size: 14px; margin-top: 5px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 8px; } .nav-menu li { margin-bottom: 3px; }
+        .nav-menu a { display: flex; align-items: center; gap: 6px; padding: 6px 8px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; font-size: 11px; }
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
-        .sidebar-footer { position: absolute; bottom: 15px; left: 12px; right: 12px; }
-        .btn-logout-sidebar { width: 100%; padding: 8px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 11px; border: none; }
+        .nav-icon { font-size: 14px; width: 22px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 15px; left: 8px; right: 8px; }
+        .btn-logout-sidebar { width: 100%; padding: 6px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 10px; border: none; }
         
-        .main-content { margin-left: 200px; flex: 1; padding: 20px; min-width: 0; }
+        /* Ajuste del contenido principal */
+        .main-content { margin-left: 160px; flex: 1; padding: 20px; min-width: 0; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .header h1 { font-size: 22px; color: #1a1a2e; }
         .user-info { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 15px; border-radius: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 13px; }
@@ -28,22 +32,21 @@
         
         .filters-bar { background: white; padding: 12px 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .filter-input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 12px; flex: 1; min-width: 160px; }
-        .btn-filtrar, .btn-recargar, .btn-pdf { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-filtrar, .btn-recargar, .btn-pdf, .btn-excel { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
         .btn-pdf { background: #e74c3c; color: white; }
+        .btn-excel { background: #0f9d58; color: white; }
         
         .table-container { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .table-header h3 { font-size: 15px; }
         .table-wrapper { overflow-x: auto; }
         
-        /* Tabla con ancho fijo para cada columna */
         table { 
             width: 100%; 
             border-collapse: collapse; 
             font-size: 11px; 
-            table-layout: auto;
             min-width: 1200px;
         }
         th, td { 
@@ -64,18 +67,18 @@
         tr:hover td { background: #f8f9ff; }
         
         /* Anchos específicos para cada columna */
-        th:nth-child(1), td:nth-child(1) { min-width: 100px; } /* ID */
-        th:nth-child(2), td:nth-child(2) { min-width: 80px; }  /* Fecha */
-        th:nth-child(3), td:nth-child(3) { min-width: 130px; } /* Cliente */
-        th:nth-child(4), td:nth-child(4) { min-width: 140px; } /* Email */
-        th:nth-child(5), td:nth-child(5) { min-width: 90px; }  /* Teléfono */
-        th:nth-child(6), td:nth-child(6) { min-width: 180px; } /* Excursiones */
-        th:nth-child(7), td:nth-child(7) { min-width: 100px; } /* Ciudad */
-        th:nth-child(8), td:nth-child(8) { min-width: 40px; }  /* Pax */
-        th:nth-child(9), td:nth-child(9) { min-width: 90px; }  /* Pago */
-        th:nth-child(10), td:nth-child(10) { min-width: 100px; } /* Lugar */
-        th:nth-child(11), td:nth-child(11) { min-width: 80px; } /* Estado */
-        th:nth-child(12), td:nth-child(12) { min-width: 70px; } /* Acciones */
+        th:nth-child(1), td:nth-child(1) { min-width: 100px; }
+        th:nth-child(2), td:nth-child(2) { min-width: 70px; }
+        th:nth-child(3), td:nth-child(3) { min-width: 130px; }
+        th:nth-child(4), td:nth-child(4) { min-width: 140px; }
+        th:nth-child(5), td:nth-child(5) { min-width: 90px; }
+        th:nth-child(6), td:nth-child(6) { min-width: 180px; }
+        th:nth-child(7), td:nth-child(7) { min-width: 100px; }
+        th:nth-child(8), td:nth-child(8) { min-width: 40px; }
+        th:nth-child(9), td:nth-child(9) { min-width: 90px; }
+        th:nth-child(10), td:nth-child(10) { min-width: 100px; }
+        th:nth-child(11), td:nth-child(11) { min-width: 80px; }
+        th:nth-child(12), td:nth-child(12) { min-width: 70px; }
         
         .badge { padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
         .badge-pendiente { background: #fff3cd; color: #856404; }
@@ -130,6 +133,7 @@
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
             <button class="btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
+            <button class="btn-excel" onclick="exportarExcel()">📊 Exportar Excel</button>
         </div>
 
         <div class="table-container">
@@ -244,7 +248,6 @@
             if (partes.length === 3 && partes[0].length === 4) {
                 return `${partes[2]}/${partes[1]}/${partes[0]}`;
             }
-            // Si es timestamp largo, extraer solo la fecha
             if (fechaStr.includes(' ')) {
                 return fechaStr.split(' ')[0];
             }
@@ -337,7 +340,6 @@
                         estado = 'confirmado';
                     }
                     
-                    // Formatear fecha correctamente
                     let fechaFormateada = '';
                     if (timestamp) {
                         fechaFormateada = formatearFecha(timestamp);
@@ -361,9 +363,6 @@
                 }
                 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
-                if (reservasData.length > 0) {
-                    console.log('📝 Primera reserva:', reservasData[0]);
-                }
                 
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
@@ -382,7 +381,7 @@
         }
         
         // ==================================================
-        // RENDERIZAR TABLA - VERSIÓN CORREGIDA
+        // RENDERIZAR TABLA
         // ==================================================
         function renderizarTabla() {
             const tbody = document.getElementById('tablaReservas');
@@ -417,15 +416,15 @@
                 
                 html += '<tr>';
                 html += `<td><strong>${escapeHtml(r.id)}</strong></td>`;
-                html += `<td>${escapeHtml(r.fecha)}</td>`;
-                html += `<td>${escapeHtml(r.nombre)}</td>`;
-                html += `<td>${escapeHtml(r.email)}</td>`;
-                html += `<td>${escapeHtml(r.telefono)}</td>`;
-                html += `<td>${excursionesHtml}</td>`;
-                html += `<td>${escapeHtml(r.ciudad)}</td>`;
-                html += `<td>${escapeHtml(r.personas)}</td>`;
-                html += `<td>${escapeHtml(r.formaPago)}</td>`;
-                html += `<td>${escapeHtml(r.lugar)}</td>`;
+                html += `<td>${escapeHtml(r.fecha)}</td`;
+                html += `<td>${escapeHtml(r.nombre)}</td`;
+                html += `<td>${escapeHtml(r.email)}</td`;
+                html += `<td>${escapeHtml(r.telefono)}</td`;
+                html += `<td>${excursionesHtml}</td`;
+                html += `<td>${escapeHtml(r.ciudad)}</td`;
+                html += `<td>${escapeHtml(r.personas)}</td`;
+                html += `<td>${escapeHtml(r.formaPago)}</td`;
+                html += `<td>${escapeHtml(r.lugar)}</td`;
                 html += `<td><span class="badge ${estadoClass}">${estadoText}</span></td>`;
                 html += `<td class="col-acciones">
                             <div class="acciones-container">
@@ -477,11 +476,11 @@
         }
         
         // ==================================================
-        // GENERAR PDF
+        // GENERAR PDF CON LÍNEAS DE CUADRÍCULA
         // ==================================================
         async function generarPDF() {
             if (reservasFiltradas.length === 0) {
-                alert('⚠️ No hay reservas para exportar. Aplica un filtro de ciudad primero.');
+                alert('⚠️ No hay reservas para exportar. Aplica un filtro primero.');
                 return;
             }
             
@@ -503,13 +502,17 @@
                 const margin = 10;
                 let y = margin + 10;
                 const pageWidth = doc.internal.pageSize.getWidth();
-                const colWidths = [25, 45, 25, 50, 15, 40];
+                // 11 columnas: ID, Fecha, Cliente, Email, Teléfono, Excursiones, Ciudad, Pax, Pago, Lugar, Estado
+                const colWidths = [25, 20, 35, 40, 25, 45, 25, 10, 20, 30, 20];
+                const headers = ['ID', 'Fecha', 'Cliente', 'Email', 'Teléfono', 'Excursiones', 'Ciudad', 'Pax', 'Pago', 'Lugar', 'Estado'];
                 
+                // Título
                 doc.setFontSize(16);
                 doc.setFont('helvetica', 'bold');
                 doc.text(tituloPDF, pageWidth / 2, y, { align: 'center' });
                 y += 10;
                 
+                // Fecha de generación
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
                 doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, margin, y);
@@ -517,34 +520,40 @@
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, margin, y);
                 y += 12;
                 
-                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Lugar'];
+                // Dibujar encabezados con fondo y líneas
                 let x = margin;
                 doc.setFillColor(102, 126, 234);
+                doc.setDrawColor(0, 0, 0);
+                doc.setLineWidth(0.1);
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
+                doc.setFontSize(8);
                 doc.setTextColor(255, 255, 255);
                 
                 for (let i = 0; i < headers.length; i++) {
-                    doc.rect(x, y, colWidths[i], 8, 'F');
+                    doc.rect(x, y, colWidths[i], 8, 'FD');
                     doc.text(headers[i], x + 2, y + 5);
                     x += colWidths[i];
                 }
                 y += 8;
                 
+                // Datos de las reservas con líneas de cuadrícula
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(0, 0, 0);
+                doc.setDrawColor(200, 200, 200);
                 
                 for (const reserva of reservasFiltradas) {
+                    // Verificar si necesitamos nueva página
                     if (y > 180) {
                         doc.addPage();
                         y = margin + 10;
                         x = margin;
                         doc.setFillColor(102, 126, 234);
+                        doc.setDrawColor(0, 0, 0);
                         doc.setFont('helvetica', 'bold');
                         doc.setTextColor(255, 255, 255);
                         for (let i = 0; i < headers.length; i++) {
-                            doc.rect(x, y, colWidths[i], 8, 'F');
+                            doc.rect(x, y, colWidths[i], 8, 'FD');
                             doc.text(headers[i], x + 2, y + 5);
                             x += colWidths[i];
                         }
@@ -552,23 +561,35 @@
                         doc.setFont('helvetica', 'normal');
                         doc.setFontSize(8);
                         doc.setTextColor(0, 0, 0);
+                        doc.setDrawColor(200, 200, 200);
                     }
                     
+                    // Preparar datos
+                    const excursionesTexto = reserva.excursionesLista.join(', ').substring(0, 55);
                     const datos = [
                         reserva.id,
-                        reserva.nombre,
+                        reserva.fecha,
+                        reserva.nombre.substring(0, 30),
+                        reserva.email.substring(0, 35),
                         reserva.telefono,
-                        reserva.excursionesLista.join(', ').substring(0, 60),
+                        excursionesTexto,
+                        reserva.ciudad.substring(0, 25),
                         reserva.personas,
-                        reserva.lugar.substring(0, 35)
+                        reserva.formaPago.substring(0, 15),
+                        reserva.lugar.substring(0, 28),
+                        reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado')
                     ];
                     
                     x = margin;
+                    const rowHeight = 8;
+                    
+                    // Dibujar cada celda con borde
                     for (let i = 0; i < datos.length; i++) {
-                        doc.text(String(datos[i]), x + 2, y + 4);
+                        doc.rect(x, y, colWidths[i], rowHeight);
+                        doc.text(String(datos[i]), x + 2, y + 5);
                         x += colWidths[i];
                     }
-                    y += 8;
+                    y += rowHeight;
                 }
                 
                 doc.save(`reservas_${ciudadFiltro || 'todas'}_${Date.now()}.pdf`);
@@ -579,6 +600,73 @@
             } finally {
                 btnPDF.textContent = textoOriginal;
                 btnPDF.disabled = false;
+            }
+        }
+        
+        // ==================================================
+        // EXPORTAR A EXCEL
+        // ==================================================
+        function exportarExcel() {
+            if (reservasFiltradas.length === 0) {
+                alert('⚠️ No hay reservas para exportar. Aplica un filtro primero.');
+                return;
+            }
+            
+            const ciudadFiltro = document.getElementById('busquedaCiudad').value.trim();
+            let nombreArchivo = `reservas_${ciudadFiltro || 'todas'}_${Date.now()}.xlsx`;
+            
+            const btnExcel = document.querySelector('.btn-excel');
+            const textoOriginal = btnExcel.textContent;
+            btnExcel.textContent = '⏳ Generando...';
+            btnExcel.disabled = true;
+            
+            try {
+                // Preparar datos para Excel
+                const datosExcel = [];
+                
+                // Encabezados
+                datosExcel.push(['ID', 'Fecha', 'Cliente', 'Email', 'Teléfono', 'Excursiones', 'Ciudad', 'Pax', 'Forma de Pago', 'Lugar', 'Estado']);
+                
+                // Datos
+                for (const reserva of reservasFiltradas) {
+                    const excursionesTexto = reserva.excursionesLista.join(', ');
+                    const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
+                    
+                    datosExcel.push([
+                        reserva.id,
+                        reserva.fecha,
+                        reserva.nombre,
+                        reserva.email,
+                        reserva.telefono,
+                        excursionesTexto,
+                        reserva.ciudad,
+                        reserva.personas,
+                        reserva.formaPago,
+                        reserva.lugar,
+                        estadoTexto                    ]);
+                }
+                
+                // Crear libro de Excel
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(datosExcel);
+                
+                // Ajustar anchos de columnas
+                ws['!cols'] = [
+                    {wch:15}, {wch:12}, {wch:25}, {wch:30}, {wch:15},
+                    {wch:40}, {wch:20}, {wch:6}, {wch:18}, {wch:25}, {wch:12}
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, ws, 'Reservas');
+                
+                // Descargar archivo
+                XLSX.writeFile(wb, nombreArchivo);
+                
+            } catch (error) {
+                console.error('Error Excel:', error);
+                alert('❌ Error al generar el archivo Excel.');
+            } finally {
+                btnExcel.textContent = textoOriginal;
+                btnExcel.disabled = false;
             }
         }
         
@@ -619,6 +707,7 @@
         window.filtrarReservas = filtrarReservas;
         window.cargarReservas = cargarReservas;
         window.generarPDF = generarPDF;
+        window.exportarExcel = exportarExcel;
         window.logout = logout;
         
         const busquedaInput = document.getElementById('busquedaReserva');
