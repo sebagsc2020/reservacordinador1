@@ -429,7 +429,7 @@
         }
         
         // ==================================================
-        // GENERAR PDF (solo 6 columnas, excursiones en lista vertical)
+        // GENERAR PDF (7 columnas, excursiones en lista vertical)
         // ==================================================
         async function generarPDF() {
             if (reservasFiltradas.length === 0) {
@@ -445,9 +445,15 @@
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-                const margin = 10;
-                let y = margin + 10;
+                const marginLeft = 8;
+                const marginRight = 8;
+                let y = marginLeft + 10;
                 const pageWidth = doc.internal.pageSize.getWidth();
+                const usableWidth = pageWidth - marginLeft - marginRight;
+                
+                // 7 columnas: ID, Cliente, Teléfono, Excursiones, Pax, Estado, Lugar
+                const colWidths = [28, 48, 28, 55, 12, 22, 40];
+                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar'];
                 
                 // Título
                 doc.setFontSize(16);
@@ -459,18 +465,14 @@
                 // Fecha y total
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
-                doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, margin, y);
+                doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, marginLeft, y);
                 y += 6;
-                doc.text(`Total de reservas: ${reservasFiltradas.length}`, margin, y);
+                doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
                 y += 12;
                 
-                // 6 columnas: ID, Cliente, Teléfono, Excursiones, Pax, Estado
-                const colWidths = [30, 55, 30, 70, 15, 25];
-                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado'];
-                
                 // Encabezados (fondo blanco, texto negro, con borde)
-                let x = margin;
-                doc.setFillColor(255, 255, 255); // Blanco
+                let x = marginLeft;
+                doc.setFillColor(255, 255, 255);
                 doc.setDrawColor(0, 0, 0);
                 doc.setLineWidth(0.1);
                 doc.setFont('helvetica', 'bold');
@@ -479,7 +481,7 @@
                 
                 for (let i = 0; i < headers.length; i++) {
                     doc.rect(x, y, colWidths[i], 10);
-                    doc.text(headers[i], x + 3, y + 6);
+                    doc.text(headers[i], x + 2, y + 6);
                     x += colWidths[i];
                 }
                 y += 10;
@@ -494,8 +496,8 @@
                     // Verificar si necesitamos nueva página
                     if (y > 180) {
                         doc.addPage();
-                        y = margin + 10;
-                        x = margin;
+                        y = marginLeft + 10;
+                        x = marginLeft;
                         doc.setFillColor(255, 255, 255);
                         doc.setDrawColor(0, 0, 0);
                         doc.setFont('helvetica', 'bold');
@@ -503,7 +505,7 @@
                         doc.setTextColor(0, 0, 0);
                         for (let i = 0; i < headers.length; i++) {
                             doc.rect(x, y, colWidths[i], 10);
-                            doc.text(headers[i], x + 3, y + 6);
+                            doc.text(headers[i], x + 2, y + 6);
                             x += colWidths[i];
                         }
                         y += 10;
@@ -525,40 +527,46 @@
                     
                     // Calcular altura de fila según las excursiones
                     const lineasExcursiones = excursionesTexto.split('\n').length;
-                    const alturaFila = Math.max(10, lineasExcursiones * 5 + 4);
+                    const alturaFila = Math.max(10, lineasExcursiones * 4.5 + 4);
                     
-                    x = margin;
+                    x = marginLeft;
                     
                     // ID
                     doc.rect(x, y, colWidths[0], alturaFila);
-                    doc.text(String(reserva.id), x + 3, y + 5);
+                    doc.text(String(reserva.id), x + 2, y + 5);
                     x += colWidths[0];
                     
                     // Cliente
                     doc.rect(x, y, colWidths[1], alturaFila);
-                    const nombreCliente = reserva.nombre.length > 35 ? reserva.nombre.substring(0, 32) + '...' : reserva.nombre;
-                    doc.text(nombreCliente, x + 3, y + 5);
+                    const nombreCliente = reserva.nombre.length > 30 ? reserva.nombre.substring(0, 27) + '...' : reserva.nombre;
+                    doc.text(nombreCliente, x + 2, y + 5);
                     x += colWidths[1];
                     
                     // Teléfono
                     doc.rect(x, y, colWidths[2], alturaFila);
-                    doc.text(reserva.telefono, x + 3, y + 5);
+                    doc.text(reserva.telefono, x + 2, y + 5);
                     x += colWidths[2];
                     
                     // Excursiones (multilínea)
                     doc.rect(x, y, colWidths[3], alturaFila);
-                    const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 6);
-                    doc.text(lineas, x + 3, y + 5);
+                    const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 4);
+                    doc.text(lineas, x + 2, y + 5);
                     x += colWidths[3];
                     
                     // Pax
                     doc.rect(x, y, colWidths[4], alturaFila);
-                    doc.text(reserva.personas, x + 3, y + 5);
+                    doc.text(reserva.personas, x + 2, y + 5);
                     x += colWidths[4];
                     
                     // Estado
                     doc.rect(x, y, colWidths[5], alturaFila);
-                    doc.text(estadoTexto, x + 3, y + 5);
+                    doc.text(estadoTexto, x + 2, y + 5);
+                    x += colWidths[5];
+                    
+                    // Lugar
+                    doc.rect(x, y, colWidths[6], alturaFila);
+                    const lugarTexto = reserva.lugar.length > 35 ? reserva.lugar.substring(0, 32) + '...' : reserva.lugar;
+                    doc.text(lugarTexto, x + 2, y + 5);
                     
                     y += alturaFila;
                 }
