@@ -142,8 +142,8 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaReservas"><tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
-                </table>
+                    <tbody id="tablaReservas"><td><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td</tbody>
+                ~
             </div>
         </div>
     </div>
@@ -156,14 +156,19 @@
         const SHEET_NAME = 'Hoja 1';
         const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
         
-        // ANCHOS DE COLUMNAS PARA PDF (en mm) - VALORES MÁS ANCHOS
+        // ANCHOS DE COLUMNAS PARA PDF (en mm)
         const columnasPDF = {
             id: { header: 'ID', ancho: 30, getter: (r) => r.id },
             fecha: { header: 'Fecha', ancho: 28, getter: (r) => r.fecha },
             cliente: { header: 'Cliente', ancho: 50, getter: (r) => r.nombre },
             email: { header: 'Email', ancho: 55, getter: (r) => r.email },
             telefono: { header: 'Teléfono', ancho: 32, getter: (r) => r.telefono },
-            excursiones: { header: 'Excursiones', ancho: 65, getter: (r) => r.excursionesLista.join(', ').substring(0, 80) },
+            excursiones: { 
+                header: 'Excursiones', 
+                ancho: 65, 
+                getter: (r) => r.excursionesLista,  // Devuelve el array directamente
+                esLista: true 
+            },
             ciudad: { header: 'Ciudad', ancho: 35, getter: (r) => r.ciudad },
             pax: { header: 'Pax', ancho: 15, getter: (r) => r.personas },
             pago: { header: 'Pago', ancho: 30, getter: (r) => r.formaPago },
@@ -310,7 +315,7 @@
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px;">⏳ Cargando...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -374,7 +379,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = `</table><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message} </td</td`;
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:20px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
@@ -466,7 +471,8 @@
                         key: cb.value,
                         header: columnasPDF[cb.value].header,
                         ancho: columnasPDF[cb.value].ancho,
-                        getter: columnasPDF[cb.value].getter
+                        getter: columnasPDF[cb.value].getter,
+                        esLista: columnasPDF[cb.value].esLista || false
                     });
                 }
             }
@@ -499,7 +505,6 @@
             
             try {
                 const { jsPDF } = window.jspdf;
-                // A4 Horizontal (landscape)
                 const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                 const marginLeft = 15;
                 const marginRight = 15;
@@ -507,7 +512,7 @@
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const maxWidth = pageWidth - marginLeft - marginRight;
                 
-                // Calcular si las columnas entran, si no, escalar proporcionalmente
+                // Calcular anchos
                 let totalAncho = 0;
                 for (const col of columnas) totalAncho += col.ancho;
                 
@@ -520,25 +525,27 @@
                 // Título
                 doc.setFontSize(18);
                 doc.setFont('helvetica', 'bold');
+                doc.setTextColor(0, 0, 0); // Negro
                 doc.text(tituloPDF, pageWidth / 2, y, { align: 'center' });
                 y += 12;
                 
                 // Fecha y total
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
+                doc.setTextColor(0, 0, 0); // Negro
                 doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, marginLeft, y);
                 y += 7;
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
                 y += 12;
                 
-                // Encabezados con fondo
+                // Encabezados - Fondo gris claro, texto negro
                 let x = marginLeft;
-                doc.setFillColor(102, 126, 234);
+                doc.setFillColor(230, 230, 230); // Gris claro
                 doc.setDrawColor(0, 0, 0);
                 doc.setLineWidth(0.1);
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(9);
-                doc.setTextColor(255, 255, 255);
+                doc.setTextColor(0, 0, 0); // Negro
                 
                 for (let i = 0; i < columnas.length; i++) {
                     doc.rect(x, y, anchosFinales[i], 10, 'FD');
@@ -550,7 +557,7 @@
                 // Datos
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(8);
-                doc.setTextColor(0, 0, 0);
+                doc.setTextColor(0, 0, 0); // Negro
                 doc.setDrawColor(200, 200, 200);
                 
                 for (const reserva of reservasFiltradas) {
@@ -559,11 +566,11 @@
                         doc.addPage();
                         y = 20;
                         x = marginLeft;
-                        doc.setFillColor(102, 126, 234);
+                        doc.setFillColor(230, 230, 230);
                         doc.setDrawColor(0, 0, 0);
                         doc.setFont('helvetica', 'bold');
                         doc.setFontSize(9);
-                        doc.setTextColor(255, 255, 255);
+                        doc.setTextColor(0, 0, 0);
                         for (let i = 0; i < columnas.length; i++) {
                             doc.rect(x, y, anchosFinales[i], 10, 'FD');
                             doc.text(columnas[i].header, x + 3, y + 6);
@@ -577,19 +584,39 @@
                     }
                     
                     x = marginLeft;
-                    let alturaFila = 10;
                     
-                    // Calcular altura de fila basada en contenido multilínea
+                    // Calcular altura de fila basada en contenido (especialmente para excursiones en lista)
+                    let alturaFila = 10;
                     for (let i = 0; i < columnas.length; i++) {
-                        const texto = columnas[i].getter(reserva) || '';
-                        const lineas = doc.splitTextToSize(String(texto), anchosFinales[i] - 4);
+                        let texto;
+                        if (columnas[i].esLista) {
+                            const lista = columnas[i].getter(reserva);
+                            if (Array.isArray(lista) && lista.length > 0) {
+                                texto = lista.map((item, idx) => `${idx+1}. ${item}`).join('\n');
+                            } else {
+                                texto = 'Sin excursiones';
+                            }
+                        } else {
+                            texto = String(columnas[i].getter(reserva) || '');
+                        }
+                        const lineas = doc.splitTextToSize(texto, anchosFinales[i] - 4);
                         alturaFila = Math.max(alturaFila, lineas.length * 4 + 4);
                     }
                     
                     for (let i = 0; i < columnas.length; i++) {
-                        const texto = columnas[i].getter(reserva) || '';
+                        let texto;
+                        if (columnas[i].esLista) {
+                            const lista = columnas[i].getter(reserva);
+                            if (Array.isArray(lista) && lista.length > 0) {
+                                texto = lista.map((item, idx) => `${idx+1}. ${item}`).join('\n');
+                            } else {
+                                texto = 'Sin excursiones';
+                            }
+                        } else {
+                            texto = String(columnas[i].getter(reserva) || '');
+                        }
                         doc.rect(x, y, anchosFinales[i], alturaFila);
-                        const lineas = doc.splitTextToSize(String(texto), anchosFinales[i] - 4);
+                        const lineas = doc.splitTextToSize(texto, anchosFinales[i] - 4);
                         doc.text(lineas, x + 3, y + 5);
                         x += anchosFinales[i];
                     }
