@@ -16,7 +16,6 @@
             width: 100%;
             max-width: 100%;
             overflow-x: hidden !important;
-            overflow-y: auto;
         }
 
         body {
@@ -28,53 +27,61 @@
             align-items: center;
             padding: 16px;
             margin: 0;
-            width: 100%;
             overflow-x: hidden;
         }
 
-        /* Contenedor principal - completamente responsivo */
         .pdf-generator {
             background: rgba(255, 255, 255, 0.98);
-            border-radius: 28px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 480px;
+            max-width: 460px;
             overflow: hidden;
+            backdrop-filter: blur(2px);
         }
 
-        /* Header */
         .generator-header {
-            background: linear-gradient(135deg, #0b2b3d 0%, #1a4a6f 100%);
-            padding: 20px 16px;
+            background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+            padding: 22px 16px;
             text-align: center;
+            position: relative;
+        }
+
+        .generator-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
         }
 
         .logo-icon {
-            font-size: 36px;
+            font-size: 38px;
             margin-bottom: 6px;
             display: inline-block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
         .generator-header h1 {
             color: white;
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: -0.3px;
             margin-bottom: 2px;
         }
 
         .generator-header p {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.75);
             font-size: 11px;
             font-weight: 400;
         }
 
-        /* Contenido */
         .generator-content {
             padding: 24px 20px;
         }
 
-        /* Estados y animaciones */
         .status-card {
             text-align: center;
             width: 100%;
@@ -89,7 +96,7 @@
             height: 44px;
             border: 3px solid #e2e8f0;
             border-top-color: #1a4a6f;
-            border-right-color: #2c7da0;
+            border-right-color: #667eea;
             border-radius: 50%;
             animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             margin: 0 auto;
@@ -101,26 +108,26 @@
 
         .status-title {
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             color: #0f172a;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .status-subtitle {
-            font-size: 13px;
+            font-size: 12px;
             color: #475569;
             line-height: 1.4;
         }
 
-        /* Info card - SIN SCROLL, con word-break */
         .info-card {
-            background: #f8fafc;
-            border-radius: 16px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 20px;
             padding: 14px;
             margin: 16px 0;
             border: 1px solid #e2e8f0;
             width: 100%;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
 
         .info-row {
@@ -130,7 +137,6 @@
             gap: 12px;
             padding: 8px 0;
             border-bottom: 1px solid #e2e8f0;
-            flex-wrap: wrap;
         }
 
         .info-row:last-child {
@@ -139,14 +145,14 @@
         }
 
         .info-label {
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
             background: #eef2ff;
-            padding: 2px 10px;
-            border-radius: 20px;
+            padding: 3px 10px;
+            border-radius: 30px;
             display: inline-block;
         }
 
@@ -162,27 +168,26 @@
         }
 
         .titulo-destacado {
-            background: linear-gradient(135deg, #1a4a6f, #2c7da0);
+            background: linear-gradient(135deg, #1a4a6f, #667eea);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
             font-weight: 800;
         }
 
-        /* Botones */
         .btn-cerrar {
             background: linear-gradient(135deg, #1e293b, #0f172a);
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 40px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             margin-top: 12px;
             width: 100%;
-            max-width: 160px;
+            max-width: 150px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
@@ -191,13 +196,7 @@
             box-shadow: 0 6px 16px rgba(0,0,0,0.15);
         }
 
-        /* Iconos de estado */
-        .success-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-
-        .error-icon {
+        .success-icon, .error-icon {
             font-size: 48px;
             margin-bottom: 10px;
         }
@@ -210,7 +209,6 @@
             color: #dc2626;
         }
 
-        /* Badge */
         .badge {
             display: inline-block;
             background: #e2e8f0;
@@ -219,10 +217,8 @@
             font-size: 11px;
             color: #475569;
             margin-top: 8px;
-            word-break: break-word;
         }
 
-        /* Progress bar */
         .progress-bar {
             width: 100%;
             height: 3px;
@@ -235,7 +231,7 @@
         .progress-fill {
             width: 60%;
             height: 100%;
-            background: linear-gradient(90deg, #1a4a6f, #2c7da0);
+            background: linear-gradient(90deg, #1a4a6f, #667eea, #764ba2);
             animation: pulse 1s ease infinite;
         }
 
@@ -244,92 +240,25 @@
             50% { opacity: 0.6; }
         }
 
-        /* RESPONSIVE - MÓVILES */
         @media (max-width: 500px) {
-            .pdf-generator {
-                max-width: 100%;
-                border-radius: 20px;
-            }
-            
-            .generator-header {
-                padding: 16px 12px;
-            }
-            
-            .generator-content {
-                padding: 20px 16px;
-            }
-            
-            .info-card {
-                padding: 12px;
-                margin: 14px 0;
-            }
-            
-            .info-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-                padding: 10px 0;
-            }
-            
-            .info-label {
-                font-size: 11px;
-                padding: 2px 8px;
-            }
-            
-            .info-value {
-                text-align: left;
-                font-size: 13px;
-                max-width: 100%;
-                width: 100%;
-                word-break: break-all;
-            }
-            
-            .status-title {
-                font-size: 16px;
-            }
-            
-            .status-subtitle {
-                font-size: 12px;
-            }
-            
-            .btn-cerrar {
-                max-width: 100%;
-                padding: 10px 16px;
-            }
-            
-            .success-icon, .error-icon {
-                font-size: 42px;
-            }
+            .pdf-generator { max-width: 100%; border-radius: 20px; }
+            .generator-header { padding: 16px 12px; }
+            .generator-content { padding: 20px 16px; }
+            .info-card { padding: 12px; margin: 14px 0; }
+            .info-row { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 0; }
+            .info-label { font-size: 10px; padding: 2px 8px; }
+            .info-value { text-align: left; font-size: 12px; max-width: 100%; width: 100%; word-break: break-all; }
+            .status-title { font-size: 16px; }
+            .btn-cerrar { max-width: 100%; }
         }
 
-        /* Pantallas muy pequeñas */
         @media (max-width: 360px) {
-            .generator-content {
-                padding: 16px 12px;
-            }
-            
-            .info-card {
-                padding: 10px;
-            }
-            
-            .info-value {
-                font-size: 12px;
-            }
+            .generator-content { padding: 16px 12px; }
+            .info-card { padding: 10px; }
         }
 
-        /* Evitar cualquier desbordamiento */
-        * {
-            max-width: 100%;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-        }
-        
-        .pdf-generator,
-        .generator-content,
-        .status-card,
-        .info-card {
-            overflow: hidden !important;
-        }
+        * { max-width: 100%; overflow-wrap: break-word; }
+        .pdf-generator, .generator-content, .status-card, .info-card { overflow: hidden !important; }
     </style>
 </head>
 <body>
@@ -358,7 +287,6 @@
         (function() {
             const container = document.getElementById('statusContainer');
             
-            // Leer datos desde localStorage
             let filtroExcursion = '';
             let reservasFiltradas = [];
             
@@ -380,9 +308,7 @@
                         <div class="status-title error-text">Error de datos</div>
                         <div class="status-subtitle">${e.message}</div>
                         <div class="info-card" style="background: #fef2f2; border-color: #fecaca;">
-                            <div style="font-size: 12px; color: #991b1b;">
-                                📌 Usá el botón "Generar PDF" desde el panel de reservas
-                            </div>
+                            <div style="font-size: 12px; color: #991b1b;">📌 Usá el botón "Generar PDF" desde el panel de reservas</div>
                         </div>
                         <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
                     </div>
@@ -390,7 +316,6 @@
                 return;
             }
             
-            // Limpiar localStorage después de leer
             localStorage.removeItem('filtroExcursionPDF');
             localStorage.removeItem('reservasFiltradasPDF');
             
@@ -410,14 +335,13 @@
             const totalPasajeros = reservasFiltradas.reduce((sum, r) => sum + (parseInt(r.personas) || 0), 0);
             const titulo = (filtroExcursion && filtroExcursion !== '') ? filtroExcursion : 'EXCURSIONES';
             
-            // Actualizar UI con información
             container.innerHTML = `
                 <div class="status-card">
                     <div class="spinner-container">
                         <div class="spinner"></div>
                     </div>
                     <div class="status-title">Generando reporte</div>
-                    <div class="status-subtitle">Creando PDF en formato A4 horizontal</div>
+                    <div class="status-subtitle">Creando PDF profesional en A4 horizontal</div>
                     <div class="info-card">
                         <div class="info-row">
                             <span class="info-label">📄 Título</span>
@@ -444,165 +368,254 @@
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
                 const margin = 12;
-                let y = margin + 10;
+                let y = margin + 8;
                 
-                // HEADER
-                doc.setDrawColor(42, 82, 110);
-                doc.setLineWidth(0.5);
-                doc.line(margin, margin, pageWidth - margin, margin);
+                // ============================================
+                // HEADER MODERNO CON BANDA DECORATIVA
+                // ============================================
+                // Banda superior decorativa
+                doc.setFillColor(15, 43, 61);
+                doc.rect(0, 0, pageWidth, 5, 'F');
                 
-                doc.setFontSize(18);
+                doc.setFillColor(26, 74, 111);
+                doc.rect(0, 5, pageWidth, 2, 'F');
+                
+                // Logo y título principal
+                doc.setFontSize(22);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(26, 74, 111);
                 doc.text(titulo, pageWidth / 2, y, { align: 'center' });
-                y += 8;
+                y += 9;
                 
-                doc.setFontSize(9);
+                // Línea decorativa bajo título
+                doc.setDrawColor(102, 126, 234);
+                doc.setLineWidth(0.8);
+                doc.line(pageWidth / 2 - 25, y - 3, pageWidth / 2 + 25, y - 3);
+                
+                // Información de fecha y total
+                doc.setFontSize(8.5);
                 doc.setFont('helvetica', 'normal');
                 doc.setTextColor(100, 116, 139);
                 const fechaStr = `Generado: ${new Date().toLocaleString('es-AR')}`;
                 doc.text(fechaStr, margin, y);
-                doc.text(`Total: ${reservasFiltradas.length}`, pageWidth - margin, y, { align: 'right' });
-                y += 8;
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Total: ${reservasFiltradas.length} reservas`, pageWidth - margin, y, { align: 'right' });
+                y += 10;
                 
-                doc.setDrawColor(203, 213, 225);
-                doc.line(margin, y, pageWidth - margin, y);
-                y += 6;
-                
+                // Línea de datos de empresa (estilo formulario)
                 doc.setFontSize(9);
-                doc.setFont('courier', 'normal');
+                doc.setFont('helvetica', 'normal');
                 doc.setTextColor(71, 85, 105);
-                doc.text('EMPRESA: ____________________          NOMBRE: ____________________          TEL: ____________________', margin, y);
+                
+                // Cuadro de empresa
+                doc.setDrawColor(203, 213, 225);
+                doc.setLineWidth(0.3);
+                doc.rect(margin, y, 45, 7);
+                doc.text('EMPRESA', margin + 2, y + 4.5);
+                doc.rect(margin + 45, y, 55, 7);
+                
+                doc.rect(margin + 100, y, 45, 7);
+                doc.text('NOMBRE', margin + 102, y + 4.5);
+                doc.rect(margin + 145, y, 50, 7);
+                
+                doc.rect(margin + 195, y, 35, 7);
+                doc.text('TEL', margin + 197, y + 4.5);
+                doc.rect(margin + 230, y, 35, 7);
                 y += 12;
                 
-                // TABLA
-                const colWidths = [32, 48, 30, 70, 12, 22, 35, 25];
-                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar', 'Obs.'];
+                // ============================================
+                // TABLA CON DISEÑO MODERNO
+                // ============================================
+                const colWidths = [28, 42, 28, 72, 12, 20, 32, 24];
+                const headers = ['ID', 'CLIENTE', 'TELÉFONO', 'EXCURSIONES', 'PAX', 'ESTADO', 'LUGAR', 'OBS'];
                 
                 let x = margin;
-                doc.setFillColor(240, 248, 255);
-                doc.setDrawColor(100, 116, 139);
+                
+                // Header de tabla con gradiente
+                doc.setFillColor(26, 74, 111);
+                doc.setDrawColor(26, 74, 111);
                 doc.setLineWidth(0.2);
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(8);
-                doc.setTextColor(30, 41, 59);
+                doc.setFontSize(7.5);
+                doc.setTextColor(255, 255, 255);
                 
                 for (let i = 0; i < headers.length; i++) {
-                    doc.rect(x, y, colWidths[i], 9, 'FD');
-                    doc.text(headers[i], x + 2, y + 6);
+                    doc.rect(x, y, colWidths[i], 8, 'FD');
+                    doc.text(headers[i], x + 2, y + 5.5);
                     x += colWidths[i];
                 }
-                y += 9;
+                y += 8;
                 
+                // Datos
                 doc.setFont('helvetica', 'normal');
-                doc.setFontSize(7.5);
+                doc.setFontSize(7);
                 doc.setTextColor(51, 65, 85);
                 doc.setDrawColor(203, 213, 225);
+                doc.setFillColor(255, 255, 255);
+                
+                let rowCount = 0;
                 
                 for (const reserva of reservasFiltradas) {
-                    if (y > pageHeight - 28) {
+                    if (y > pageHeight - 30) {
                         doc.addPage();
-                        y = margin + 10;
+                        y = margin + 8;
                         x = margin;
-                        doc.setFillColor(240, 248, 255);
-                        doc.setDrawColor(100, 116, 139);
+                        
+                        // Re-dibujar header en nueva página
+                        doc.setFillColor(26, 74, 111);
+                        doc.setDrawColor(26, 74, 111);
                         doc.setFont('helvetica', 'bold');
-                        doc.setFontSize(8);
+                        doc.setFontSize(7.5);
+                        doc.setTextColor(255, 255, 255);
                         for (let i = 0; i < headers.length; i++) {
-                            doc.rect(x, y, colWidths[i], 9, 'FD');
-                            doc.text(headers[i], x + 2, y + 6);
+                            doc.rect(x, y, colWidths[i], 8, 'FD');
+                            doc.text(headers[i], x + 2, y + 5.5);
                             x += colWidths[i];
                         }
-                        y += 9;
+                        y += 8;
                         doc.setFont('helvetica', 'normal');
-                        doc.setFontSize(7.5);
+                        doc.setFontSize(7);
+                        doc.setTextColor(51, 65, 85);
                         doc.setDrawColor(203, 213, 225);
+                    }
+                    
+                    // Color alternado para filas
+                    const isEven = rowCount % 2 === 0;
+                    if (isEven) {
+                        doc.setFillColor(248, 250, 252);
+                    } else {
+                        doc.setFillColor(255, 255, 255);
                     }
                     
                     let excursionesTexto = '';
                     if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
                         excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
                     } else {
-                        excursionesTexto = 'Sin excursiones';
+                        excursionesTexto = '—';
                     }
                     
                     const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
                     const lineasExcursiones = excursionesTexto.split('\n').length;
-                    const alturaFila = Math.max(8, Math.min(50, lineasExcursiones * 3.5 + 3));
+                    const alturaFila = Math.max(8, Math.min(45, lineasExcursiones * 3.2 + 3));
                     
                     x = margin;
                     
-                    doc.rect(x, y, colWidths[0], alturaFila);
-                    doc.text(String(reserva.id || '').substring(0, 14), x + 2, y + 4.5);
+                    // ID
+                    doc.rect(x, y, colWidths[0], alturaFila, isEven ? 'FD' : 'F');
+                    doc.text(String(reserva.id || '').substring(0, 12), x + 2, y + 4.5);
                     x += colWidths[0];
                     
-                    doc.rect(x, y, colWidths[1], alturaFila);
-                    const nombreCliente = (reserva.nombre || 'No especificado').substring(0, 32);
+                    // Cliente
+                    doc.rect(x, y, colWidths[1], alturaFila, isEven ? 'FD' : 'F');
+                    const nombreCliente = (reserva.nombre || 'No especificado').substring(0, 28);
                     doc.text(nombreCliente, x + 2, y + 4.5);
                     x += colWidths[1];
                     
-                    doc.rect(x, y, colWidths[2], alturaFila);
+                    // Teléfono
+                    doc.rect(x, y, colWidths[2], alturaFila, isEven ? 'FD' : 'F');
                     doc.text(reserva.telefono || '', x + 2, y + 4.5);
                     x += colWidths[2];
                     
-                    doc.rect(x, y, colWidths[3], alturaFila);
+                    // Excursiones (con manejo de líneas múltiples)
+                    doc.rect(x, y, colWidths[3], alturaFila, isEven ? 'FD' : 'F');
                     const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 3);
                     doc.text(lineas, x + 1.5, y + 4.5);
                     x += colWidths[3];
                     
-                    doc.rect(x, y, colWidths[4], alturaFila);
+                    // Pax
+                    doc.rect(x, y, colWidths[4], alturaFila, isEven ? 'FD' : 'F');
                     doc.text(String(reserva.personas || 0), x + 2, y + 4.5);
                     x += colWidths[4];
                     
-                    doc.rect(x, y, colWidths[5], alturaFila);
+                    // Estado (con color según estado)
+                    doc.rect(x, y, colWidths[5], alturaFila, isEven ? 'FD' : 'F');
+                    if (estadoTexto === 'Pagado') {
+                        doc.setTextColor(22, 163, 74);
+                    } else if (estadoTexto === 'Pendiente') {
+                        doc.setTextColor(234, 88, 12);
+                    } else {
+                        doc.setTextColor(37, 99, 235);
+                    }
                     doc.text(estadoTexto, x + 2, y + 4.5);
+                    doc.setTextColor(51, 65, 85);
                     x += colWidths[5];
                     
-                    doc.rect(x, y, colWidths[6], alturaFila);
-                    const lugarTexto = (reserva.lugar || 'No especificado').substring(0, 25);
+                    // Lugar
+                    doc.rect(x, y, colWidths[6], alturaFila, isEven ? 'FD' : 'F');
+                    const lugarTexto = (reserva.lugar || 'No especificado').substring(0, 22);
                     doc.text(lugarTexto, x + 2, y + 4.5);
                     x += colWidths[6];
                     
-                    doc.rect(x, y, colWidths[7], alturaFila);
+                    // Observaciones
+                    doc.rect(x, y, colWidths[7], alturaFila, isEven ? 'FD' : 'F');
                     doc.text('', x + 2, y + 4.5);
                     
                     y += alturaFila;
+                    rowCount++;
                 }
                 
-                y += 5;
+                // ============================================
+                // TOTAL GENERAL CON DISEÑO DESTACADO
+                // ============================================
+                y += 6;
                 const totalX = margin + colWidths[0] + colWidths[1] + colWidths[2];
                 
-                doc.setFillColor(248, 250, 252);
-                doc.setDrawColor(71, 85, 105);
-                doc.setLineWidth(0.3);
+                doc.setFillColor(240, 248, 255);
+                doc.setDrawColor(26, 74, 111);
+                doc.setLineWidth(0.4);
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(8.5);
                 doc.setTextColor(15, 23, 42);
                 
-                doc.rect(margin, y, colWidths[0], 9);
-                doc.rect(margin + colWidths[0], y, colWidths[1], 9);
-                doc.rect(margin + colWidths[0] + colWidths[1], y, colWidths[2], 9);
-                doc.rect(totalX, y, colWidths[3], 9);
+                // Celdas vacías izquierda
+                doc.rect(margin, y, colWidths[0], 9, 'FD');
+                doc.rect(margin + colWidths[0], y, colWidths[1], 9, 'FD');
+                doc.rect(margin + colWidths[0] + colWidths[1], y, colWidths[2], 9, 'FD');
+                
+                // Celda "TOTAL GENERAL"
+                doc.rect(totalX, y, colWidths[3], 9, 'FD');
                 doc.text('TOTAL GENERAL', totalX + 3, y + 6);
-                doc.rect(totalX + colWidths[3], y, colWidths[4], 9);
+                
+                // Celda del total de pasajeros (destacada)
+                doc.rect(totalX + colWidths[3], y, colWidths[4], 9, 'FD');
+                doc.setFontSize(10);
+                doc.setTextColor(26, 74, 111);
                 doc.text(String(totalPasajeros), totalX + colWidths[3] + 3, y + 6);
                 
-                y += 12;
+                // Celdas vacías derecha
+                doc.setFontSize(8.5);
+                doc.setTextColor(15, 23, 42);
+                doc.rect(totalX + colWidths[3] + colWidths[4], y, colWidths[5], 9, 'FD');
+                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5], y, colWidths[6], 9, 'FD');
+                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, colWidths[7], 9, 'FD');
                 
+                y += 14;
+                
+                // ============================================
+                // FOOTER PROFESIONAL
+                // ============================================
                 doc.setDrawColor(203, 213, 225);
-                doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
+                doc.setLineWidth(0.5);
+                doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+                
                 doc.setFontSize(7);
                 doc.setFont('helvetica', 'italic');
                 doc.setTextColor(148, 163, 184);
-                doc.text('Aventura Total - Sistema de Gestión de Reservas', pageWidth / 2, pageHeight - 6, { align: 'center' });
+                doc.text('Aventura Total - Sistema Profesional de Gestión de Reservas', pageWidth / 2, pageHeight - 7, { align: 'center' });
                 
+                // Pequeña línea decorativa en footer
+                doc.setDrawColor(102, 126, 234);
+                doc.setLineWidth(0.3);
+                doc.line(pageWidth / 2 - 30, pageHeight - 4, pageWidth / 2 + 30, pageHeight - 4);
+                
+                // Guardar PDF
                 const nombreArchivo = (filtroExcursion && filtroExcursion !== '') 
                     ? `reporte_${filtroExcursion.replace(/[^a-z0-9]/gi, '_').toLowerCase().substring(0, 35)}.pdf`
                     : `reporte_reservas_${Date.now()}.pdf`;
                 
                 doc.save(nombreArchivo);
                 
-                // VERSIÓN ÉXITO - COMPACTA Y SIN SCROLL
+                // Mostrar éxito
                 container.innerHTML = `
                     <div class="status-card">
                         <div class="success-icon">✅</div>
@@ -627,7 +640,7 @@
                             </div>
                             <div class="info-row">
                                 <span class="info-label">📐 Formato</span>
-                                <span class="info-value">A4 Horizontal</span>
+                                <span class="info-value">A4 Horizontal Premium</span>
                             </div>
                         </div>
                         <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
