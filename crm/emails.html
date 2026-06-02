@@ -123,8 +123,10 @@
             <div class="mensaje-exito" id="mensajeExito">✅ Mensaje listo para enviar</div>
         </div>
 
-        <div class="historial-table"><h3>📋 Historial</h3>
-            <table><thead><tr><th>Fecha</th><th>Cliente</th><th>Número</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="historialWhatsApp"></tbody></table>
+        <div class="historial-table"><h3>📋 Historial de Mensajes</h3>
+            <div id="historialContainer">
+                <div style="text-align:center; padding:30px;">⏳ Cargando historial...</div>
+            </div>
         </div>
     </div>
 
@@ -132,15 +134,18 @@
         if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
-        // 🔥 MISMA URL QUE EN RESERVAS.HTML
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
+        
+        // URL del Google Apps Script para guardar historial
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
         let listaClientes = [];
         let listaReservas = [];
         let clienteActual = null;
         let reservaActual = null;
+        let historialMensajes = [];
 
         const PLANTILLAS = {
             confirmacion: `✅ ¡Hola [NOMBRE]!\n\nTu reserva en Aventura Total ha sido CONFIRMADA.\n\n📍 Detalles:\n• Excursiones:\n[EXCURSIONES]\n• Personas: [PERSONAS]\n• Forma de Pago: [PAGO]\n• Lugar: [LUGAR]\n\n🏔️ ¡Gracias por confiar en nosotros!`,
@@ -151,11 +156,9 @@
             personalizado: `Hola [NOMBRE], escribí tu mensaje personalizado aquí.`
         };
 
-        // 🔥 FUNCIÓN CORREGIDA - Lista TODAS las excursiones
         function formatearExcursiones(excursionesRaw) {
             if (!excursionesRaw) return 'No especificadas';
             
-            // Separar por saltos de línea o por " | "
             let lista = [];
             if (excursionesRaw.includes('\n')) {
                 lista = excursionesRaw.split('\n');
@@ -165,7 +168,6 @@
                 lista = [excursionesRaw];
             }
             
-            // Limpiar y formatear cada excursión
             const excursionesFormateadas = lista.map((exc, idx) => {
                 let excursionesLimpia = exc.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
                 if (excursionesLimpia) {
@@ -184,7 +186,6 @@
             resultado = resultado.replace(/\[NOMBRE\]/g, nombre || '[CLIENTE]');
             
             if (reserva) {
-                // 🔥 Reemplazar [EXCURSIONES] con la lista completa
                 const excursionesTexto = formatearExcursiones(reserva.excursiones);
                 resultado = resultado.replace(/\[EXCURSIONES\]/g, excursionesTexto);
                 resultado = resultado.replace(/\[FECHA\]/g, reserva.fecha || '[FECHA]');
@@ -198,7 +199,6 @@
                 resultado = resultado.replace(/\[PAGO\]/g, '[PAGO]');
                 resultado = resultado.replace(/\[LUGAR\]/g, '[LUGAR]');
             }
-            
             return resultado;
         }
 
@@ -220,13 +220,9 @@
         }
 
         function seleccionarCliente(cliente) {
-            console.log('📌 Seleccionando cliente:', cliente);
             clienteActual = cliente;
-            
             const reservasCliente = listaReservas.filter(r => r.email && r.email.toLowerCase() === cliente.email.toLowerCase());
             reservaActual = reservasCliente.length > 0 ? reservasCliente[reservasCliente.length - 1] : null;
-            
-            console.log('📌 Reserva encontrada:', reservaActual);
             
             document.getElementById('whatsappNumero').value = cliente.telefono || '';
             document.getElementById('whatsappCliente').value = cliente.nombre || '';
@@ -247,6 +243,69 @@
             const resultadosDiv = document.getElementById('resultadosBusqueda');
             if (resultadosDiv) resultadosDiv.classList.remove('show');
             document.getElementById('buscadorCliente').value = '';
+        }
+
+        // 🔥 Guardar mensaje en el historial (Google Sheets)
+        async function guardarHistorial(cliente, numero, mensaje) {
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=guardarHistorial&cliente=' + encodeURIComponent(cliente) + '&numero=' + encodeURIComponent(numero) + '&mensaje=' + encodeURIComponent(mensaje)
+                });
+                console.log('✅ Historial guardado');
+            } catch (error) {
+                console.error('Error al guardar historial:', error);
+            }
+        }
+
+        // 🔥 Cargar historial desde Google Sheets
+        async function cargarHistorial() {
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=obtenerHistorial');
+                const data = await response.json();
+                if (data.success && data.historial) {
+                    historialMensajes = data.historial;
+                    mostrarHistorial();
+                }
+            } catch (error) {
+                console.error('Error al cargar historial:', error);
+                // Fallback a localStorage
+                const localHistorial = JSON.parse(localStorage.getItem('historialWhatsApp') || '[]');
+                historialMensajes = localHistorial;
+                mostrarHistorial();
+            }
+        }
+
+        function mostrarHistorial() {
+            const container = document.getElementById('historialContainer');
+            if (!container) return;
+            
+            if (historialMensajes.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">📭 No hay mensajes enviados</div>';
+                return;
+            }
+            
+            const table = `
+                <table>
+                    <thead>
+                        <tr><th>Fecha</th><th>Cliente</th><th>Número</th><th>Estado</th><th>Acción</th></tr>
+                    </thead>
+                    <tbody>
+                        ${historialMensajes.slice(0, 20).map(h => `
+                            <tr>
+                                <td>${escapeHtml(h.fecha || h.fechaEnvio || '')}</td
+                                <td>${escapeHtml(h.cliente)}</td
+                                <td>${escapeHtml(h.numero)}</td
+                                <td><span class="badge-enviado">${h.estado || 'enviado'}</span></td
+                                <td><button class="btn-reenviar" onclick="reenviarMensaje('${escapeHtml(h.numero)}','${escapeHtml(h.cliente)}')">💬 Reenviar</button></td
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = table;
         }
 
         async function cargarDatos() {
@@ -321,6 +380,9 @@
                     } catch(e) {}
                 }
                 
+                // Cargar historial también
+                await cargarHistorial();
+                
             } catch (error) {
                 console.error('❌ Error:', error);
                 const resultadosDiv = document.getElementById('resultadosBusqueda');
@@ -368,14 +430,22 @@
             });
         }
 
-        function enviarWhatsApp() {
+        async function enviarWhatsApp() {
             const numero = document.getElementById('whatsappNumero').value.replace(/[^0-9]/g, '');
             const mensaje = document.getElementById('whatsappMensaje').value;
             const cliente = document.getElementById('whatsappCliente').value || 'Cliente';
             if (!numero) { alert('⚠️ Completá el número de WhatsApp del cliente'); return; }
             if (!mensaje) { alert('⚠️ Escribí un mensaje'); return; }
+            
+            // Guardar en historial primero
+            await guardarHistorial(cliente, numero, mensaje);
+            
+            // Abrir WhatsApp
             window.open('https://wa.me/' + numero + '?text=' + encodeURIComponent(mensaje), '_blank');
-            agregarHistorial(cliente, numero);
+            
+            // Actualizar historial
+            await cargarHistorial();
+            
             const exitoDiv = document.getElementById('mensajeExito');
             if (exitoDiv) { exitoDiv.classList.add('show'); setTimeout(() => exitoDiv.classList.remove('show'), 3000); }
         }
@@ -385,22 +455,6 @@
             const mensaje = document.getElementById('whatsappMensaje').value;
             if (!numero) { alert('⚠️ Seleccioná un cliente primero'); return; }
             window.open('https://web.whatsapp.com/send?phone=' + numero + '&text=' + encodeURIComponent(mensaje), '_blank');
-        }
-
-        function agregarHistorial(cliente, numero) {
-            const historial = JSON.parse(localStorage.getItem('historialWhatsApp') || '[]');
-            historial.unshift({ fecha: new Date().toLocaleString('es-AR'), cliente: cliente, numero: numero, estado: 'enviado' });
-            if (historial.length > 20) historial.pop();
-            localStorage.setItem('historialWhatsApp', JSON.stringify(historial));
-            mostrarHistorial();
-        }
-
-        function mostrarHistorial() {
-            const historial = JSON.parse(localStorage.getItem('historialWhatsApp') || '[]');
-            const histEl = document.getElementById('historialWhatsApp');
-            if (!histEl) return;
-            if (historial.length === 0) { histEl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;">No hay mensajes enviados</td</td'; return; }
-            histEl.innerHTML = historial.map(h => `<tr><td>${h.fecha}</td><td>${escapeHtml(h.cliente)}</td><td>${h.numero}</td><td><span class="badge-enviado">${h.estado}</span></td><td><button class="btn-reenviar" onclick="reenviarMensaje('${h.numero}','${escapeHtml(h.cliente)}')">💬 Reenviar</button></td></tr>`).join('');
         }
 
         function reenviarMensaje(numero, cliente) {
@@ -421,7 +475,7 @@
 
         cargarDatos();
         initBuscador();
-        setInterval(cargarDatos, 60000);
+        setInterval(() => { cargarDatos(); }, 60000);
     </script>
 </body>
 </html>
