@@ -112,18 +112,72 @@
 
         .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
 
-        .sync-status {
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: #f1f5f9;
-            display: inline-flex;
+        /* ===== PRELOADER POPUP ===== */
+        .preloader-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 6px;
+            z-index: 10000;
+            transition: opacity 0.3s ease;
         }
-        .sync-status.synced { background: #d4edda; color: #155724; }
-        .sync-status.syncing { background: #fff3cd; color: #856404; }
-        .sync-status.error { background: #fee; color: #c0392b; }
+        .preloader-popup.oculto {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .preloader-popup-contenido {
+            background: white;
+            border-radius: 24px;
+            padding: 35px 45px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: popupFadeIn 0.3s ease;
+        }
+        @keyframes popupFadeIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .preloader-popup-icono {
+            width: 70px;
+            height: 70px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-right: 4px solid #764ba2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .preloader-popup-titulo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .preloader-popup-subtitulo {
+            font-size: 14px;
+            color: #666;
+        }
+        .puntos::after {
+            content: '';
+            animation: puntosAnim 1.5s infinite;
+        }
+        @keyframes puntosAnim {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+        }
 
         @media (max-width: 1200px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) { 
@@ -133,6 +187,9 @@
             .main-content { margin-left: 60px; padding: 15px; }
             .cards-grid { grid-template-columns: 1fr; }
             .card-header { flex-direction: column; align-items: flex-start; }
+            .preloader-popup-contenido { padding: 25px 35px; }
+            .preloader-popup-icono { width: 55px; height: 55px; }
+            .preloader-popup-titulo { font-size: 18px; }
         }
     </style>
 </head>
@@ -157,7 +214,6 @@
             <div class="user-info">
                 <div class="user-avatar">A</div>
                 <span>Admin</span>
-                <div id="syncStatus" class="sync-status">🔄 Sincronizando...</div>
             </div>
         </div>
 
@@ -172,6 +228,15 @@
 
         <div id="cardsContainer" class="cards-grid">
             <div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>
+        </div>
+    </div>
+
+    <!-- PRELOADER POPUP -->
+    <div id="preloaderPopup" class="preloader-popup oculto">
+        <div class="preloader-popup-contenido">
+            <div class="preloader-popup-icono"></div>
+            <div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div>
+            <div class="preloader-popup-subtitulo">Cargando datos desde Google Sheets...</div>
         </div>
     </div>
 
@@ -196,45 +261,45 @@
         let reservasFiltradas = [];
         let estadosGlobales = {};
 
-        function actualizarStatusSync(estado, mensaje) {
-            const syncDiv = document.getElementById('syncStatus');
-            if (!syncDiv) return;
-            syncDiv.className = 'sync-status ' + estado;
-            syncDiv.innerHTML = mensaje;
-            if (estado === 'synced') {
-                setTimeout(function() { 
-                    if (syncDiv) syncDiv.innerHTML = '✅ Sincronizado'; 
-                }, 2000);
+        // Preloader Popup
+        const preloaderPopup = document.getElementById('preloaderPopup');
+        
+        function mostrarPreloader() {
+            if (preloaderPopup) {
+                preloaderPopup.classList.remove('oculto');
+            }
+        }
+        
+        function ocultarPreloader() {
+            if (preloaderPopup) {
+                setTimeout(() => {
+                    preloaderPopup.classList.add('oculto');
+                }, 300);
             }
         }
 
         async function guardarEstadoEnNube(id, nuevoEstado) {
             try {
-                actualizarStatusSync('syncing', '🔄 Guardando...');
                 await fetch(ESTADOS_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'action=guardar&id=' + encodeURIComponent(id) + '&estado=' + encodeURIComponent(nuevoEstado)
                 });
-                actualizarStatusSync('synced', '✅ Guardado');
                 return true;
             } catch (error) {
                 console.error('Error al guardar en nube:', error);
-                actualizarStatusSync('error', '⚠️ Sin conexión');
                 return false;
             }
         }
 
         async function cargarEstadosDesdeNube() {
             try {
-                actualizarStatusSync('syncing', '🔄 Cargando estados...');
                 const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener');
                 const data = await response.json();
                 if (data.success && data.estados) {
                     estadosGlobales = data.estados;
                     localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
-                    actualizarStatusSync('synced', '✅ Sincronizado');
                     return estadosGlobales;
                 } else {
                     throw new Error('No se pudieron obtener estados');
@@ -243,7 +308,6 @@
                 console.error('Error al cargar desde nube:', error);
                 const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
                 estadosGlobales = estadosLocal;
-                actualizarStatusSync('error', '⚠️ Offline');
                 return estadosLocal;
             }
         }
@@ -254,7 +318,7 @@
             if (!container) return;
 
             try {
-                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>';
+                mostrarPreloader();
 
                 await cargarEstadosDesdeNube();
 
@@ -349,6 +413,8 @@
             } catch (error) {
                 console.error('Error:', error);
                 container.innerHTML = '<div style="text-align:center; color:red; grid-column:1/-1; padding:50px;">❌ Error: ' + error.message + '</div>';
+            } finally {
+                ocultarPreloader();
             }
         }
 
@@ -406,12 +472,11 @@
             for (let idx = 0; idx < reservasFiltradas.length; idx++) {
                 const r = reservasFiltradas[idx];
                 let estadoText = '';
-                let estadoClass = '';
                 switch(r.estado) {
-                    case 'pendiente': estadoText = 'Pendiente'; estadoClass = 'estado-pendiente'; break;
-                    case 'confirmado': estadoText = 'Confirmado'; estadoClass = 'estado-confirmado'; break;
-                    case 'pagado': estadoText = 'Pagado'; estadoClass = 'estado-pagado'; break;
-                    default: estadoText = 'Confirmado'; estadoClass = 'estado-confirmado';
+                    case 'pendiente': estadoText = 'Pendiente'; break;
+                    case 'confirmado': estadoText = 'Confirmado'; break;
+                    case 'pagado': estadoText = 'Pagado'; break;
+                    default: estadoText = 'Confirmado';
                 }
 
                 let excursionesHtml = '<ul class="excursiones-lista-card">';
@@ -552,7 +617,7 @@
         }
 
         cargarReservas();
-        setInterval(cargarReservas, 30000);
+        setInterval(() => cargarReservas(), 30000);
     </script>
 </body>
 </html>
