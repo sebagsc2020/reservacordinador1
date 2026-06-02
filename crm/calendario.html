@@ -45,6 +45,7 @@
         .btn-ver-evento { background: #667eea; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .btn-apagar-evento { background: #e74c3c; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .btn-compartir-evento { background: #25D366; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
+        .btn-guardar-sheets { background: #4285f4; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .no-events { color: #999; text-align: center; padding: 20px; font-size: 13px; }
         
         /* Calendario de días del evento seleccionado */
@@ -75,6 +76,31 @@
         .modal-input { width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; font-family: inherit; }
         textarea.modal-input { resize: vertical; min-height: 80px; }
         .modal-save { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        
+        /* Preloader */
+        .preloader-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.3s ease;
+        }
+        .preloader-popup.oculto { opacity: 0; visibility: hidden; }
+        .preloader-popup-contenido { background: white; border-radius: 24px; padding: 35px 45px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: popupFadeIn 0.3s ease; }
+        @keyframes popupFadeIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .preloader-popup-icono { width: 70px; height: 70px; border: 4px solid #e2e8f0; border-top: 4px solid #667eea; border-right: 4px solid #764ba2; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .preloader-popup-titulo { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+        .preloader-popup-subtitulo { font-size: 14px; color: #666; }
+        .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
+        @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
         
         @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } .event-day-card { width: 100%; } }
     </style>
@@ -124,7 +150,10 @@
         <div id="eventoCalendarioContainer" class="event-calendar-container" style="display: none;">
             <div class="event-calendar-header">
                 <h3 id="eventoCalendarioTitulo">📅 Días del evento</h3>
-                <button class="btn-compartir-evento" id="btnCompartirEventoActual" style="background:#25D366;">📱 Compartir este evento</button>
+                <div>
+                    <button class="btn-guardar-sheets" id="btnGuardarEnSheets" style="background:#4285f4;">💾 Guardar en Google Sheets</button>
+                    <button class="btn-compartir-evento" id="btnCompartirEventoActual" style="background:#25D366;">📱 Compartir</button>
+                </div>
             </div>
             <div id="eventoInfoHeader" class="event-info-header"></div>
             <div id="eventDaysGrid" class="event-days-grid"></div>
@@ -147,6 +176,15 @@
         </div>
     </div>
 
+    <!-- Preloader -->
+    <div id="preloaderPopup" class="preloader-popup oculto">
+        <div class="preloader-popup-contenido">
+            <div class="preloader-popup-icono"></div>
+            <div class="preloader-popup-titulo">Guardando<span class="puntos"></span></div>
+            <div class="preloader-popup-subtitulo">Guardando evento en Google Sheets...</div>
+        </div>
+    </div>
+
     <script>
         // ---------- Gestión de sesión ----------
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
@@ -154,10 +192,18 @@
         }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
+        // 🔥 REEMPLAZAR CON LA URL DE TU GOOGLE APPS SCRIPT
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzZHJKTkdCrkU2JkxdejiwStEFjfljLUirz4Sh-H1X3jswmZHrwUi_T2NGjuED0pZP_g/exec';
+
         // ---------- Estructura de datos ----------
         let eventosRango = [];      // Eventos por rango { id, nombre, fechaInicio, fechaFin }
         let notasPorDia = {};       // Notas individuales: clave "YYYY-MM-DD" -> array de strings
         let eventoSeleccionado = null;  // Evento actualmente seleccionado
+
+        // Preloader
+        const preloaderPopup = document.getElementById('preloaderPopup');
+        function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
+        function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
 
         // ---------- Cargar/Guardar en localStorage ----------
         function cargarEventos() {
@@ -189,6 +235,40 @@
                 fechaFin: ev.fechaFin.toISOString()
             }))));
             localStorage.setItem('notasPorDiaCalendario', JSON.stringify(notasPorDia));
+        }
+
+        // ---------- Guardar evento en Google Sheets ----------
+        async function guardarEventoEnGoogleSheets() {
+            if (!eventoSeleccionado) {
+                alert("❌ Primero selecciona un evento.");
+                return;
+            }
+            
+            mostrarPreloader();
+            try {
+                const formData = new URLSearchParams();
+                formData.append('action', 'guardarEvento');
+                formData.append('id', eventoSeleccionado.id);
+                formData.append('nombre', eventoSeleccionado.nombre);
+                formData.append('fechaInicio', eventoSeleccionado.fechaInicio.toISOString().split('T')[0]);
+                formData.append('fechaFin', eventoSeleccionado.fechaFin.toISOString().split('T')[0]);
+                
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                
+                const result = await response.text();
+                console.log('Respuesta:', result);
+                
+                alert(`✅ Evento "${eventoSeleccionado.nombre}" guardado en Google Sheets`);
+            } catch (error) {
+                console.error('Error:', error);
+                alert("❌ Error al guardar en Google Sheets. Revisa la consola.");
+            } finally {
+                ocultarPreloader();
+            }
         }
 
         // ---------- Funciones para CREAR evento por RANGO ----------
@@ -264,6 +344,10 @@
             // Configurar botón compartir
             const btnCompartir = document.getElementById('btnCompartirEventoActual');
             btnCompartir.onclick = () => compartirEvento(eventoSeleccionado.id);
+            
+            // Configurar botón guardar en Sheets
+            const btnGuardar = document.getElementById('btnGuardarEnSheets');
+            btnGuardar.onclick = () => guardarEventoEnGoogleSheets();
             
             // Generar los días del evento
             const daysGrid = document.getElementById('eventDaysGrid');
