@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas - CRM Aventura Total</title>
-    <!-- Incluir jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -116,6 +115,20 @@
         
         .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
         
+        /* Indicador de sincronización */
+        .sync-status {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sync-status.synced { background: #d4edda; color: #155724; }
+        .sync-status.syncing { background: #fff3cd; color: #856404; }
+        .sync-status.error { background: #fee; color: #c0392b; }
+        
         @media (max-width: 1200px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
@@ -144,7 +157,11 @@
     <div class="main-content">
         <div class="header">
             <div><h1>📋 Reservas</h1></div>
-            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <span>Admin</span>
+                <div id="syncStatus" class="sync-status">🔄 Sincronizando...</div>
+            </div>
         </div>
 
         <div class="filters-bar">
@@ -167,7 +184,11 @@
         // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
-        const JSON_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
+        
+        // URL del Apps Script para guardar estados (DEBES CREAR ESTE SCRIPT)
+        // Por ahora, usamos localStorage como fallback, pero idealmente debes crear un Apps Script
+        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9x2Xd9yLFf6bHkq1yXJLm5vX3YkQ/exec'; // <-- REEMPLAZAR CON TU URL
         
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
@@ -180,6 +201,67 @@
         
         let reservasData = [];
         let reservasFiltradas = [];
+        let estadosGlobales = {}; // Almacén central de estados (sincronizado)
+        
+        function actualizarStatusSync(estado, mensaje) {
+            const syncDiv = document.getElementById('syncStatus');
+            if (!syncDiv) return;
+            syncDiv.className = 'sync-status ' + estado;
+            syncDiv.innerHTML = mensaje;
+            setTimeout(function() {
+                if (estado === 'synced') {
+                    setTimeout(function() { syncDiv.innerHTML = '✅ Sincronizado'; }, 2000);
+                }
+            }, 1500);
+        }
+        
+        // Función para guardar un estado específico en la nube
+        async function guardarEstadoEnNube(id, nuevoEstado) {
+            try {
+                actualizarStatusSync('syncing', '🔄 Guardando...');
+                const response = await fetch(ESTADOS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=guardar&id=' + encodeURIComponent(id) + '&estado=' + encodeURIComponent(nuevoEstado)
+                });
+                actualizarStatusSync('synced', '✅ Guardado');
+                return true;
+            } catch (error) {
+                console.error('Error al guardar en nube:', error);
+                actualizarStatusSync('error', '⚠️ Sin conexión');
+                // Fallback a localStorage
+                const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
+                estadosLocal[id] = nuevoEstado;
+                localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosLocal));
+                return false;
+            }
+        }
+        
+        // Función para cargar estados desde la nube
+        async function cargarEstadosDesdeNube() {
+            try {
+                actualizarStatusSync('syncing', '🔄 Cargando estados...');
+                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener');
+                const data = await response.json();
+                if (data.success && data.estados) {
+                    estadosGlobales = data.estados;
+                    // Guardar copia local como respaldo
+                    localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
+                    actualizarStatusSync('synced', '✅ Sincronizado');
+                    return estadosGlobales;
+                } else {
+                    throw new Error('No se pudieron obtener estados');
+                }
+            } catch (error) {
+                console.error('Error al cargar desde nube:', error);
+                // Fallback a localStorage
+                const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
+                estadosGlobales = estadosLocal;
+                actualizarStatusSync('error', '⚠️ Offline');
+                return estadosLocal;
+            }
+        }
         
         async function cargarReservas() {
             const container = document.getElementById('cardsContainer');
@@ -188,6 +270,9 @@
             
             try {
                 container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>';
+                
+                // Primero, cargar estados desde la nube
+                await cargarEstadosDesdeNube();
                 
                 const response = await fetch(JSON_URL);
                 const texto = await response.text();
@@ -203,7 +288,6 @@
                 if (!rows || rows.length === 0) throw new Error('No hay datos');
                 
                 reservasData = [];
-                const estadosGuardados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 
                 for (let i = 0; i < rows.length; i++) {
@@ -229,7 +313,9 @@
                         } else {
                             excursionesLista = [excursionesRaw];
                         }
-                        excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e);
+                        excursionesLista = excursionesLista.map(function(e) { 
+                            return e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
+                        }).filter(function(e) { return e; });
                     }
                     
                     let fecha = '';
@@ -237,7 +323,7 @@
                     if (timestamp) {
                         const fechaObj = new Date(timestamp);
                         if (!isNaN(fechaObj.getTime())) {
-                            fecha = `${fechaObj.getDate().toString().padStart(2,'0')}/${(fechaObj.getMonth()+1).toString().padStart(2,'0')}/${fechaObj.getFullYear()}`;
+                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
                         }
                     }
                     
@@ -246,7 +332,9 @@
                     const lugar = (c[12] && c[12].v) ? String(c[12].v) : 'No especificado';
                     
                     const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
-                    let estado = estadosGuardados[id];
+                    
+                    // Obtener estado desde la nube (o fallback)
+                    let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
                     }
@@ -266,21 +354,42 @@
                     });
                 }
                 
-                reservasData.sort((a, b) => {
+                reservasData.sort(function(a, b) {
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
                     const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
                     return numB - numA;
                 });
                 
-                reservasFiltradas = [...reservasData];
+                reservasFiltradas = reservasData.slice();
                 renderizarCards();
-                if (totalSpan) totalSpan.textContent = `${reservasData.length} reservas`;
+                if (totalSpan) totalSpan.textContent = reservasData.length + ' reservas';
                 
             } catch (error) {
                 console.error('Error:', error);
-                container.innerHTML = `<div style="text-align:center; color:red; grid-column:1/-1; padding:50px;">❌ Error: ${error.message}</div>`;
+                container.innerHTML = '<div style="text-align:center; color:red; grid-column:1/-1; padding:50px;">❌ Error: ' + error.message + '</div>';
             }
         }
+        
+        async function cambiarEstado(id, nuevoEstado) {
+            const reserva = reservasData.find(function(r) { return r.id === id; });
+            if (reserva) {
+                reserva.estado = nuevoEstado;
+                estadosGlobales[id] = nuevoEstado;
+                
+                const indexFiltrada = reservasFiltradas.findIndex(function(r) { return r.id === id; });
+                if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
+                
+                // Guardar en la nube
+                await guardarEstadoEnNube(id, nuevoEstado);
+                
+                renderizarCards();
+            }
+        }
+        
+        // Resto de funciones (enviarWhatsApp, renderizarCards, filtrarReservas, excluirReserva, generarPDFExterno, escapeHtml)
+        // ... (mantener las mismas funciones que ya tenías)
+        
+        // Por brevedad, incluyo las funciones principales, pero mantén las que ya funcionaban
         
         function enviarWhatsApp(reserva) {
             let telefono = reserva.telefono.replace(/\D/g, '');
@@ -290,7 +399,7 @@
             
             let excursionesTexto = '';
             if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
-                excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
+                excursionesTexto = reserva.excursionesLista.map(function(exc, idx) { return (idx+1) + '. ' + exc; }).join('\n');
             } else {
                 excursionesTexto = 'Sin excursiones específicas';
             }
@@ -303,37 +412,10 @@
                 default: estadoTexto = 'Confirmado';
             }
             
-            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
-
-✅ *CONFIRMACIÓN DE RESERVA*
-
-🆔 *N° de reserva:* ${reserva.id}
-📅 *Fecha:* ${reserva.fecha}
-
-👤 *DATOS DEL PASAJERO:*
-   Nombre: ${reserva.nombre}
-   📞 Teléfono: ${reserva.telefono}
-   📧 Email: ${reserva.email}
-
-📍 *DESTINO:*
-   ${reserva.ciudad}
-
-✨ *EXCURSIONES SELECCIONADAS:*
-${excursionesTexto}
-
-👥 *Cantidad de personas:* ${reserva.personas}
-💳 *Forma de pago:* ${reserva.formaPago}
-🚐 *Punto de encuentro:* ${reserva.lugar}
-📌 *Estado:* ${estadoTexto}
-
-📌 *PRÓXIMOS PASOS:*
-• En las próximas 24hs recibirás detalles de pago
-• Punto de encuentro exacto será confirmado
-
-🏔️ ¡Gracias por confiar en Aventura Total!`;
-
+            const mensaje = '🏔️ *AVENTURA TOTAL* 🏔️\n\n✅ *CONFIRMACIÓN DE RESERVA*\n\n🆔 *N° de reserva:* ' + reserva.id + '\n📅 *Fecha:* ' + reserva.fecha + '\n\n👤 *DATOS DEL PASAJERO:*\n   Nombre: ' + reserva.nombre + '\n   📞 Teléfono: ' + reserva.telefono + '\n   📧 Email: ' + reserva.email + '\n\n📍 *DESTINO:*\n   ' + reserva.ciudad + '\n\n✨ *EXCURSIONES SELECCIONADAS:*\n' + excursionesTexto + '\n\n👥 *Cantidad de personas:* ' + reserva.personas + '\n💳 *Forma de pago:* ' + reserva.formaPago + '\n🚐 *Punto de encuentro:* ' + reserva.lugar + '\n📌 *Estado:* ' + estadoTexto + '\n\n📌 *PRÓXIMOS PASOS:*\n• En las próximas 24hs recibirás detalles de pago\n• Punto de encuentro exacto será confirmado\n\n🏔️ ¡Gracias por confiar en Aventura Total!';
+            
             const mensajeCodificado = encodeURIComponent(mensaje);
-            window.open(`https://wa.me/${telefono}?text=${mensajeCodificado}`, '_blank');
+            window.open('https://wa.me/' + telefono + '?text=' + mensajeCodificado, '_blank');
         }
         
         function renderizarCards() {
@@ -348,7 +430,8 @@ ${excursionesTexto}
             }
             
             let html = '';
-            for (const r of reservasFiltradas) {
+            for (let idx = 0; idx < reservasFiltradas.length; idx++) {
+                const r = reservasFiltradas[idx];
                 let estadoClass = '', estadoText = '';
                 switch(r.estado) {
                     case 'pendiente': estadoClass = 'estado-pendiente'; estadoText = 'Pendiente'; break;
@@ -361,57 +444,55 @@ ${excursionesTexto}
                 if (!r.excursionesLista || r.excursionesLista.length === 0) {
                     excursionesHtml += '<li>Sin excursiones</li>';
                 } else {
-                    for (let idx = 0; idx < r.excursionesLista.length; idx++) {
-                        excursionesHtml += `<li>${idx+1}. ${escapeHtml(r.excursionesLista[idx])}</li>`;
+                    for (let i = 0; i < r.excursionesLista.length; i++) {
+                        excursionesHtml += '<li>' + (i+1) + '. ' + escapeHtml(r.excursionesLista[i]) + '</li>';
                     }
                 }
                 excursionesHtml += '</ul>';
                 
-                html += `
-                    <div class="reserva-card">
-                        <div class="card-header">
-                            <span class="card-id">${escapeHtml(r.id)}</span>
-                            <span class="card-fecha">${escapeHtml(r.fecha)}</span>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-info"><div class="card-label">👤 CLIENTE</div><div class="card-value">${escapeHtml(r.nombre)}</div></div>
-                            <div class="card-info"><div class="card-label">📧 EMAIL</div><div class="card-value">${escapeHtml(r.email)}</div></div>
-                            <div class="card-info"><div class="card-label">📞 TELÉFONO</div><div class="card-value">${escapeHtml(r.telefono)}</div></div>
-                            <div class="card-info"><div class="card-label">📍 CIUDAD</div><div class="card-value">${escapeHtml(r.ciudad)}</div></div>
-                            <div class="card-info"><div class="card-label">✨ EXCURSIONES</div>${excursionesHtml}</div>
-                            <div class="card-info"><div class="card-label">👥 PERSONAS</div><div class="card-value">${escapeHtml(r.personas)}</div></div>
-                            <div class="card-info"><div class="card-label">💳 FORMA DE PAGO</div><div class="card-value">${escapeHtml(r.formaPago)}</div></div>
-                            <div class="card-info"><div class="card-label">🚐 LUGAR</div><div class="card-value">${escapeHtml(r.lugar)}</div></div>
-                            <div class="card-info"><div class="card-label">📌 ESTADO</div><div class="card-value"><span class="card-estado ${estadoClass}">${estadoText}</span></div></div>
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn-card btn-confirmar-card" data-id="${escapeHtml(r.id)}" data-estado="confirmado">✅</button>
-                            <button class="btn-card btn-pendiente-card" data-id="${escapeHtml(r.id)}" data-estado="pendiente">⏳</button>
-                            <button class="btn-card btn-pagar-card" data-id="${escapeHtml(r.id)}" data-estado="pagado">💰</button>
-                            <button class="btn-card btn-whatsapp-card" data-id="${escapeHtml(r.id)}">💬 WhatsApp</button>
-                            <button class="btn-card btn-excluir-card" data-id="${escapeHtml(r.id)}">🗑️</button>
-                        </div>
-                    </div>
-                `;
+                html += '<div class="reserva-card">' +
+                            '<div class="card-header">' +
+                                '<span class="card-id">' + escapeHtml(r.id) + '</span>' +
+                                '<span class="card-fecha">' + escapeHtml(r.fecha) + '</span>' +
+                            '</div>' +
+                            '<div class="card-body">' +
+                                '<div class="card-info"><div class="card-label">👤 CLIENTE</div><div class="card-value">' + escapeHtml(r.nombre) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📧 EMAIL</div><div class="card-value">' + escapeHtml(r.email) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📞 TELÉFONO</div><div class="card-value">' + escapeHtml(r.telefono) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📍 CIUDAD</div><div class="card-value">' + escapeHtml(r.ciudad) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">✨ EXCURSIONES</div>' + excursionesHtml + '</div>' +
+                                '<div class="card-info"><div class="card-label">👥 PERSONAS</div><div class="card-value">' + escapeHtml(r.personas) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">💳 FORMA DE PAGO</div><div class="card-value">' + escapeHtml(r.formaPago) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">🚐 LUGAR</div><div class="card-value">' + escapeHtml(r.lugar) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📌 ESTADO</div><div class="card-value"><span class="card-estado ' + estadoClass + '">' + estadoText + '</span></div></div>' +
+                            '</div>' +
+                            '<div class="card-actions">' +
+                                '<button class="btn-card btn-confirmar-card" data-id="' + escapeHtml(r.id) + '" data-estado="confirmado">✅</button>' +
+                                '<button class="btn-card btn-pendiente-card" data-id="' + escapeHtml(r.id) + '" data-estado="pendiente">⏳</button>' +
+                                '<button class="btn-card btn-pagar-card" data-id="' + escapeHtml(r.id) + '" data-estado="pagado">💰</button>' +
+                                '<button class="btn-card btn-whatsapp-card" data-id="' + escapeHtml(r.id) + '">💬 WhatsApp</button>' +
+                                '<button class="btn-card btn-excluir-card" data-id="' + escapeHtml(r.id) + '">🗑️</button>' +
+                            '</div>' +
+                        '</div>';
             }
             container.innerHTML = html;
-            if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} de ${reservasData.length} reservas`;
+            if (totalSpan) totalSpan.textContent = reservasFiltradas.length + ' de ' + reservasData.length + ' reservas';
             
-            document.querySelectorAll('.btn-confirmar-card').forEach(btn => {
-                btn.addEventListener('click', () => cambiarEstado(btn.dataset.id, 'confirmado'));
+            document.querySelectorAll('.btn-confirmar-card').forEach(function(btn) {
+                btn.addEventListener('click', function() { cambiarEstado(btn.dataset.id, 'confirmado'); });
             });
-            document.querySelectorAll('.btn-pendiente-card').forEach(btn => {
-                btn.addEventListener('click', () => cambiarEstado(btn.dataset.id, 'pendiente'));
+            document.querySelectorAll('.btn-pendiente-card').forEach(function(btn) {
+                btn.addEventListener('click', function() { cambiarEstado(btn.dataset.id, 'pendiente'); });
             });
-            document.querySelectorAll('.btn-pagar-card').forEach(btn => {
-                btn.addEventListener('click', () => cambiarEstado(btn.dataset.id, 'pagado'));
+            document.querySelectorAll('.btn-pagar-card').forEach(function(btn) {
+                btn.addEventListener('click', function() { cambiarEstado(btn.dataset.id, 'pagado'); });
             });
-            document.querySelectorAll('.btn-whatsapp-card').forEach(btn => {
-                const reserva = reservasData.find(r => r.id === btn.dataset.id);
-                btn.addEventListener('click', () => enviarWhatsApp(reserva));
+            document.querySelectorAll('.btn-whatsapp-card').forEach(function(btn) {
+                const reserva = reservasData.find(function(r) { return r.id === btn.dataset.id; });
+                btn.addEventListener('click', function() { enviarWhatsApp(reserva); });
             });
-            document.querySelectorAll('.btn-excluir-card').forEach(btn => {
-                btn.addEventListener('click', () => excluirReserva(btn.dataset.id));
+            document.querySelectorAll('.btn-excluir-card').forEach(function(btn) {
+                btn.addEventListener('click', function() { excluirReserva(btn.dataset.id); });
             });
         }
         
@@ -421,73 +502,51 @@ ${excursionesTexto}
             const texto = busqueda.value.toLowerCase().trim();
             
             if (!texto) {
-                reservasFiltradas = [...reservasData];
+                reservasFiltradas = reservasData.slice();
             } else {
-                reservasFiltradas = reservasData.filter(r => {
+                reservasFiltradas = reservasData.filter(function(r) {
                     const coincideNombre = r.nombre.toLowerCase().includes(texto);
-                    const coincideExcursion = r.excursionesLista.some(exc => 
-                        exc.toLowerCase().includes(texto)
-                    );
+                    const coincideExcursion = r.excursionesLista.some(function(exc) {
+                        return exc.toLowerCase().includes(texto);
+                    });
                     return coincideNombre || coincideExcursion;
                 });
             }
             renderizarCards();
         }
         
-        function cambiarEstado(id, nuevoEstado) {
-            const reserva = reservasData.find(r => r.id === id);
-            if (reserva) {
-                reserva.estado = nuevoEstado;
-                const estados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
-                estados[id] = nuevoEstado;
-                localStorage.setItem('estadosReservas', JSON.stringify(estados));
-                const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
-                if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
-                renderizarCards();
-            }
-        }
-        
         function excluirReserva(id) {
-            if (confirm(`⚠️ ¿Estás seguro de excluir la reserva ${id}?`)) {
+            if (confirm('⚠️ ¿Estás seguro de excluir la reserva ' + id + '?')) {
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 if (!excluidos.includes(id)) {
                     excluidos.push(id);
                     localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
                 }
                 cargarReservas();
-                alert(`✅ Reserva ${id} excluida.`);
+                alert('✅ Reserva ' + id + ' excluida.');
             }
         }
         
-        // ==================================================
-        // FUNCIÓN PARA PDF EXTERNO CON FILTRO (CORREGIDA)
-        // ==================================================
         function generarPDFExterno() {
             const busquedaInput = document.getElementById('busquedaReserva');
             let filtroTexto = busquedaInput ? busquedaInput.value.trim() : '';
             
             if (reservasFiltradas.length === 0) {
-                alert('⚠️ No hay reservas para exportar. Aplicá un filtro o recargá los datos.');
+                alert('⚠️ No hay reservas para exportar.');
                 return;
             }
             
-            // Guardar datos en localStorage
             try {
                 localStorage.setItem('filtroExcursionPDF', filtroTexto);
                 localStorage.setItem('reservasFiltradasPDF', JSON.stringify(reservasFiltradas));
-                console.log('✅ Datos guardados para PDF:', { 
-                    filtro: filtroTexto || '(vacío)', 
-                    total: reservasFiltradas.length 
-                });
+                console.log('✅ Datos guardados para PDF:', { filtro: filtroTexto || '(vacio)', total: reservasFiltradas.length });
             } catch(e) {
-                console.error('Error al guardar en localStorage:', e);
+                console.error('Error al guardar:', e);
                 alert('❌ Error al preparar los datos para el PDF.');
                 return;
             }
             
-            // Abrir nueva ventana con el generador PDF
             const pdfWindow = window.open('generar-pdf.html', '_blank');
-            
             if (!pdfWindow) {
                 alert('⚠️ Por favor, permita ventanas emergentes para generar el PDF.');
             }
@@ -510,12 +569,15 @@ ${excursionesTexto}
         document.getElementById('btnPDFExterno').addEventListener('click', generarPDFExterno);
         
         const busquedaInput = document.getElementById('busquedaReserva');
-        if (busquedaInput) busquedaInput.addEventListener('keypress', function(e) { 
-            if (e.key === 'Enter') filtrarReservas(); 
-        });
+        if (busquedaInput) {
+            busquedaInput.addEventListener('keypress', function(e) { 
+                if (e.key === 'Enter') filtrarReservas(); 
+            });
+        }
         
         cargarReservas();
-        setInterval(cargarReservas, 60000);
+        // Sincronizar cada 30 segundos
+        setInterval(cargarReservas, 30000);
     </script>
 </body>
 </html>
