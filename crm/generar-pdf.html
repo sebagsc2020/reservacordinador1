@@ -3,241 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <title>Generador PDF - Aventura Total</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-            padding: 0.5in;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
             background: white;
-            color: #0f172a;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
         }
-        .reporte-pdf {
-            max-width: 100%;
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 20px auto;
         }
-        h1 {
-            font-size: 26px;
-            color: #1e4a6b;
-            border-left: 5px solid #2c7da0;
-            padding-left: 15px;
-            margin-bottom: 8px;
-            word-break: break-word;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-        .subtitulo {
-            color: #475569;
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-        .fecha-pdf {
-            color: #334155;
-            font-size: 12px;
-            margin-bottom: 24px;
-            border-bottom: 1px solid #cbd5e1;
-            padding-bottom: 8px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-            margin-top: 12px;
-        }
-        th {
-            background: #1e4a6b;
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+        .btn-cerrar {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: #667eea;
             color: white;
-            padding: 10px 8px;
-            text-align: left;
-            font-weight: 600;
-            border: 1px solid #2c5a7a;
-        }
-        td {
-            border: 1px solid #cbd5e1;
-            padding: 10px 8px;
-            vertical-align: top;
-            background: white;
-        }
-        .excursiones-lista {
-            margin: 0;
-            padding-left: 1.2rem;
-            list-style-type: decimal;
-            line-height: 1.4;
-        }
-        .excursiones-lista li {
-            margin-bottom: 5px;
-            page-break-inside: avoid;
-            break-inside: avoid;
-            white-space: normal;
-        }
-        tr {
-            page-break-inside: avoid;
-            break-inside: avoid;
-        }
-        .estado {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 30px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-        .estado-pagado { background: #15803d; color: white; }
-        .estado-confirmado { background: #2c7da0; color: white; }
-        .estado-pendiente { background: #b45309; color: white; }
-        .lugar {
-            background: #f1f5f9;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            display: inline-block;
-        }
-        .total-general-pdf {
-            margin-top: 24px;
-            text-align: right;
-            font-weight: 800;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
             font-size: 14px;
-            padding-top: 12px;
-            border-top: 2px solid #2c7da0;
         }
-        .filtro-aplicado {
-            background: #eef2ff;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            display: inline-block;
-            margin-bottom: 12px;
-            color: #1e40af;
-        }
-        @page {
-            size: A4;
-            margin: 0.6in;
+        .btn-cerrar:hover { background: #5a67d8; }
+        .info {
+            margin: 15px 0;
+            padding: 12px;
+            background: #f0f2f5;
+            border-radius: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="reporte-pdf" id="contenidoPDF">
-        <!-- El título H1 se asignará dinámicamente -->
-        <h1 id="tituloPrincipal">📋 Cargando...</h1>
-        <div class="fecha-pdf" id="fechaGeneracion"></div>
-        
-        <table id="tablaReservas">
-            <thead>
-                <tr><th>ID Cliente</th><th>Nombre</th><th>Teléfono</th><th>Excursiones</th><th>Pax</th><th>Estado</th><th>Lugar</th><th>Observaciones</th></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        
-        <div class="total-general-pdf">
-            TOTAL GENERAL: <span id="totalPax">0</span> pasajeros
-        </div>
-        <p style="font-size: 9px; text-align: center; margin-top: 28px; color: #475569;">
-            Aventura Total - Documento oficial de reservas
-        </p>
+    <div class="container" id="statusContainer">
+        <div class="spinner"></div>
+        <h2>⏳ Generando PDF...</h2>
+        <p>Procesando reservas, por favor espere...</p>
     </div>
-    
 
     <script>
-        // Leer el filtro desde localStorage (enviado desde el HTML original)
-        let filtroExcursion = localStorage.getItem('filtroExcursionPDF') || '';
-        
-        // Limpiar localStorage después de leer (opcional)
-        localStorage.removeItem('filtroExcursionPDF');
-        
-        // Configurar el título según el filtro
-        const tituloH1 = document.getElementById('tituloPrincipal');
-        if (filtroExcursion && filtroExcursion !== '') {
-            tituloH1.innerHTML = `📋 ${filtroExcursion}`;
-            // También mostrar un pequeño indicador
-            const subtitulo = document.createElement('div');
-            subtitulo.className = 'subtitulo';
-            subtitulo.innerHTML = `<span class="filtro-aplicado">🔍 Filtrado por: ${filtroExcursion}</span>`;
-            tituloH1.insertAdjacentElement('afterend', subtitulo);
-        } else {
-            tituloH1.innerHTML = `📋 EXCURSIONES`;
-        }
-        
-        // Mostrar fecha actual
-        const hoy = new Date();
-        const fechaFormateada = hoy.toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
-        document.getElementById('fechaGeneracion').innerHTML = `Generado: ${fechaFormateada} | Total de reservas: 10`;
-        
-        // Datos de reservas (los mismos del PDF original)
-        const reservas = [
-            { id: "RES-1780314686695", nombre: "Sebastián pablo González", tel: "5493518692251", excursiones: ["Navegación a la Isla Victoria y el Bosque de Arrayanes","Navegación a Puerto Blest y Cascada de los Cántaros","Navegación por el Brazo Tristeza y caminata por la selva valdiviana","Travesía en vehículos 4x4 al Centro de Alta Gracia"], pax: 2, estado: "Pagado", lugar: "En el hotel", obs: "—" },
-            { id: "RES-1780313538674", nombre: "Sebastián pablo González", tel: "5493518692251", excursiones: ["Navegación a la Isla Victoria","Circuito Chico"], pax: 2, estado: "Confirmado", lugar: "casa", obs: "—" },
-            { id: "RES-1780305909739", nombre: "Sebastián pablo González", tel: "5493518692251", excursiones: ["Cerro Campanario","Ruta del Chocolate","Isla Victoria"], pax: 3, estado: "Confirmado", lugar: "HM Plaza 201", obs: "—" },
-            { id: "RES-1780302137049", nombre: "Sebastián pablo González", tel: "5493518692251", excursiones: ["City Tour","Navegación Puerto Blest"], pax: 1, estado: "Pagado", lugar: "HM Plaza 103", obs: "—" },
-            { id: "RES-1780283794040", nombre: "Stella Carro", tel: "5493518692251", excursiones: ["Circuito Playas Norte","City Tour","Isla Anhatomirim","Playas del Sur","Ilha do Campeche"], pax: 2, estado: "Pendiente", lugar: "En el hotel", obs: "—" },
-            { id: "RES-1780283635866", nombre: "Teste Prefinal", tel: "5493518692251", excursiones: ["Cerro Campanario","Cerro Catedral","Cerro Otto","Circuito Chico","Circuito Grande","El Bolsón","Isla Victoria","Ruta del Chocolate"], pax: 2, estado: "Pendiente", lugar: "En el hotel", obs: "—" },
-            { id: "RES-1780283413602", nombre: "Sebastián gonzalez", tel: "5493518692251", excursiones: ["Aerosilla","Capilla del Monte","Circuito de la Cerveza","City Tour Local"], pax: 4, estado: "Pendiente", lugar: "teste 4", obs: "—" },
-            { id: "RES-1780282677773", nombre: "Sebastián gonzalez", tel: "5493518692251", excursiones: ["Aerosilla","Capilla del Monte","Circuito de la Cerveza"], pax: 3, estado: "Pagado", lugar: "en el hotel", obs: "—" },
-            { id: "RES-1780282385172", nombre: "Sebastián pablo González", tel: "5493518692251", excursiones: ["Aerosilla","Capilla del Monte"], pax: 2, estado: "Pendiente", lugar: "Por ahí", obs: "—" },
-            { id: "RES-1780282127706", nombre: "Sebastián pablo González", tel: "5493518692251", excursiones: ["Aerosilla"], pax: 1, estado: "Confirmado", lugar: "HM Plaza 201", obs: "—" }
-        ];
-        
-        // Si hay filtro, filtrar las reservas que contengan esa excursión
-        let reservasFiltradas = reservas;
-        if (filtroExcursion && filtroExcursion !== '') {
-            reservasFiltradas = reservas.filter(reserva => 
-                reserva.excursiones.some(exc => 
-                    exc.toLowerCase().includes(filtroExcursion.toLowerCase())
-                )
-            );
-        }
-        
-        // Calcular total de pasajeros de las reservas filtradas
-        let totalPax = 0;
-        reservasFiltradas.forEach(r => totalPax += r.pax);
-        document.getElementById('totalPax').innerText = totalPax;
-        
-        // Actualizar texto de total de reservas en fecha
-        document.getElementById('fechaGeneracion').innerHTML = `Generado: ${fechaFormateada} | Total de reservas: ${reservasFiltradas.length}`;
-        
-        // Generar filas de la tabla
-        const tbody = document.querySelector('#tablaReservas tbody');
-        reservasFiltradas.forEach(r => {
-            const tr = document.createElement('tr');
+        (function() {
+            const container = document.getElementById('statusContainer');
             
-            const ul = document.createElement('ul');
-            ul.className = 'excursiones-lista';
-            r.excursiones.forEach(exc => {
-                const li = document.createElement('li');
-                li.textContent = exc;
-                ul.appendChild(li);
-            });
+            // Leer datos desde localStorage
+            let filtroExcursion = '';
+            let reservasFiltradas = [];
             
-            let estadoClass = '';
-            if (r.estado === 'Pagado') estadoClass = 'estado-pagado';
-            else if (r.estado === 'Confirmado') estadoClass = 'estado-confirmado';
-            else estadoClass = 'estado-pendiente';
+            try {
+                filtroExcursion = localStorage.getItem('filtroExcursionPDF') || '';
+                const reservasJson = localStorage.getItem('reservasFiltradasPDF');
+                
+                if (!reservasJson) {
+                    throw new Error('No se encontraron datos de reservas');
+                }
+                
+                reservasFiltradas = JSON.parse(reservasJson);
+                console.log('Datos recibidos:', { filtro: filtroExcursion, total: reservasFiltradas.length });
+                
+            } catch(e) {
+                container.innerHTML = `
+                    <div class="error">
+                        <h2>❌ Error</h2>
+                        <p>${e.message}</p>
+                        <div class="info">
+                            📌 Usá el botón "Generar PDF (filtrado)" desde el panel de reservas.
+                        </div>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                    </div>
+                `;
+                return;
+            }
             
-            tr.innerHTML = `
-                <td>${r.id}</td>
-                <td>${r.nombre}</td>
-                <td>${r.tel}</td>
-                <td></td>
-                <td>${r.pax}</td>
-                <td><span class="estado ${estadoClass}">${r.estado}</span></td>
-                <td><span class="lugar">${r.lugar}</span></td>
-                <td>${r.obs}</td>
+            // Limpiar localStorage después de leer
+            localStorage.removeItem('filtroExcursionPDF');
+            localStorage.removeItem('reservasFiltradasPDF');
+            
+            if (reservasFiltradas.length === 0) {
+                container.innerHTML = `
+                    <div class="error">
+                        <h2>❌ No hay reservas</h2>
+                        <p>No hay reservas para exportar con el filtro actual.</p>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const totalPasajeros = reservasFiltradas.reduce((sum, r) => sum + (parseInt(r.personas) || 0), 0);
+            const titulo = (filtroExcursion && filtroExcursion !== '') ? filtroExcursion : 'EXCURSIONES';
+            
+            // Actualizar UI
+            container.innerHTML = `
+                <div class="spinner"></div>
+                <h2>⏳ Generando PDF...</h2>
+                <div class="info">
+                    📄 Título: <strong>${titulo}</strong><br>
+                    📋 Reservas: ${reservasFiltradas.length}<br>
+                    👥 Pasajeros: ${totalPasajeros}
+                </div>
             `;
-            tr.cells[3].appendChild(ul);
-            tbody.appendChild(tr);
-        });
-        
-        // Si no hay reservas después del filtro, mostrar mensaje
-        if (reservasFiltradas.length === 0) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="8" style="text-align:center; padding:40px;">⚠️ No hay reservas para la excursión: "${filtroExcursion}"</td>`;
-            tbody.appendChild(tr);
-        }
-        
-        // Auto-imprimir al cargar
-        window.onload = function() {
-            setTimeout(() => {
-                window.print();
-            }, 500);
-        };
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                const marginLeft = 8;
+                let y = marginLeft + 10;
+                const pageWidth = doc.internal.pageSize.getWidth();
+                
+                const colWidths = [35, 42, 25, 48, 12, 20, 35, 35];
+                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar', 'Observaciones'];
+                
+                // TÍTULO según filtro
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(0, 0, 0);
+                doc.text(titulo, pageWidth / 2, y, { align: 'center' });
+                y += 10;
+                
+                // Fecha
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, marginLeft, y);
+                y += 6;
+                doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
+                y += 8;
+                
+                // Línea empresa
+                doc.setFontSize(9);
+                doc.setFont('courier', 'normal');
+                doc.text('EMPRESA: ____________________          NOMBRE: ____________________          TEL: ____________________', marginLeft, y);
+                y += 10;
+                
+                // Encabezados
+                let x = marginLeft;
+                doc.setFillColor(240, 240, 240);
+                doc.setDrawColor(0, 0, 0);
+                doc.setLineWidth(0.1);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                
+                for (let i = 0; i < headers.length; i++) {
+                    doc.rect(x, y, colWidths[i], 10);
+                    doc.text(headers[i], x + 2, y + 6);
+                    x += colWidths[i];
+                }
+                y += 10;
+                
+                // Datos
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setDrawColor(200, 200, 200);
+                
+                for (const reserva of reservasFiltradas) {
+                    if (y > 180) {
+                        doc.addPage();
+                        y = marginLeft + 10;
+                        x = marginLeft;
+                        doc.setFillColor(240, 240, 240);
+                        doc.setDrawColor(0, 0, 0);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(9);
+                        for (let i = 0; i < headers.length; i++) {
+                            doc.rect(x, y, colWidths[i], 10);
+                            doc.text(headers[i], x + 2, y + 6);
+                            x += colWidths[i];
+                        }
+                        y += 10;
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(8);
+                        doc.setDrawColor(200, 200, 200);
+                    }
+                    
+                    let excursionesTexto = '';
+                    if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
+                        excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
+                    } else {
+                        excursionesTexto = 'Sin excursiones';
+                    }
+                    
+                    const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
+                    const lineasExcursiones = excursionesTexto.split('\n').length;
+                    const alturaFila = Math.max(10, Math.min(45, lineasExcursiones * 4.5 + 4));
+                    
+                    x = marginLeft;
+                    
+                    doc.rect(x, y, colWidths[0], alturaFila);
+                    doc.text(String(reserva.id || ''), x + 2, y + 5);
+                    x += colWidths[0];
+                    
+                    doc.rect(x, y, colWidths[1], alturaFila);
+                    const nombreCliente = (reserva.nombre || 'No especificado').substring(0, 35);
+                    doc.text(nombreCliente, x + 2, y + 5);
+                    x += colWidths[1];
+                    
+                    doc.rect(x, y, colWidths[2], alturaFila);
+                    doc.text(reserva.telefono || '', x + 2, y + 5);
+                    x += colWidths[2];
+                    
+                    doc.rect(x, y, colWidths[3], alturaFila);
+                    const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 4);
+                    doc.text(lineas, x + 2, y + 5);
+                    x += colWidths[3];
+                    
+                    doc.rect(x, y, colWidths[4], alturaFila);
+                    doc.text(String(reserva.personas || 0), x + 2, y + 5);
+                    x += colWidths[4];
+                    
+                    doc.rect(x, y, colWidths[5], alturaFila);
+                    doc.text(estadoTexto, x + 2, y + 5);
+                    x += colWidths[5];
+                    
+                    doc.rect(x, y, colWidths[6], alturaFila);
+                    const lugarTexto = (reserva.lugar || 'No especificado').substring(0, 30);
+                    doc.text(lugarTexto, x + 2, y + 5);
+                    x += colWidths[6];
+                    
+                    doc.rect(x, y, colWidths[7], alturaFila);
+                    doc.text('', x + 2, y + 5);
+                    
+                    y += alturaFila;
+                }
+                
+                // TOTAL GENERAL
+                y += 5;
+                const totalX = marginLeft + colWidths[0] + colWidths[1] + colWidths[2];
+                
+                doc.setFillColor(255, 255, 255);
+                doc.setDrawColor(0, 0, 0);
+                doc.setLineWidth(0.1);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                
+                doc.rect(marginLeft, y, colWidths[0], 10);
+                doc.rect(marginLeft + colWidths[0], y, colWidths[1], 10);
+                doc.rect(marginLeft + colWidths[0] + colWidths[1], y, colWidths[2], 10);
+                doc.rect(totalX, y, colWidths[3], 10);
+                doc.text('TOTAL GENERAL', totalX + 2, y + 6);
+                doc.rect(totalX + colWidths[3], y, colWidths[4], 10);
+                doc.text(String(totalPasajeros), totalX + colWidths[3] + 2, y + 6);
+                
+                // Guardar PDF
+                const nombreArchivo = (filtroExcursion && filtroExcursion !== '') 
+                    ? `reservas_${filtroExcursion.replace(/[^a-z0-9]/gi, '_').substring(0, 40)}.pdf`
+                    : `reservas_${Date.now()}.pdf`;
+                
+                doc.save(nombreArchivo);
+                
+                // Mostrar éxito
+                container.innerHTML = `
+                    <div class="success">
+                        <h2>✅ ¡PDF Generado!</h2>
+                        <p>El archivo se ha descargado correctamente.</p>
+                        <div class="info">
+                            📄 <strong>Título:</strong> ${titulo}<br>
+                            📋 <strong>Reservas:</strong> ${reservasFiltradas.length}<br>
+                            👥 <strong>Pasajeros:</strong> ${totalPasajeros}
+                        </div>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = `
+                    <div class="error">
+                        <h2>❌ Error al generar PDF</h2>
+                        <p>${error.message}</p>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                    </div>
+                `;
+            }
+        })();
     </script>
 </body>
 </html>
