@@ -187,9 +187,7 @@
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
 
         // URL del Apps Script para guardar estados (DEBES CREAR ESTE SCRIPT)
-        // Por ahora, usamos localStorage como fallback, pero idealmente debes crear un Apps Script
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9x2Xd9yLFf6bHkq1yXJLm5vX3YkQ/exec'; // <-- REEMPLAZAR CON TU URL
-        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec'; // <-- REEMPLAZAR CON TU URL
 
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
@@ -387,11 +385,6 @@
             }
         }
 
-        // Resto de funciones (enviarWhatsApp, renderizarCards, filtrarReservas, excluirReserva, generarPDFExterno, escapeHtml)
-        // ... (mantener las mismas funciones que ya tenías)
-
-        // Por brevedad, incluyo las funciones principales, pero mantén las que ya funcionaban
-
         function enviarWhatsApp(reserva) {
             let telefono = reserva.telefono.replace(/\D/g, '');
             if (telefono.length === 10) {
@@ -577,7 +570,6 @@
         }
 
         cargarReservas();
-        // Sincronizar cada 30 segundos
         setInterval(cargarReservas, 30000);
     </script>
 </body>
