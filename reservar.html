@@ -2,570 +2,496 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>🕐 Reserva tu Excursión | Aventura Total</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas - CRM Aventura Total</title>
+    <!-- Incluir jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 40px 20px; }
-        .form-container { max-width: 900px; margin: 0 auto; background: white; border-radius: 32px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; }
-        .form-header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 40px 30px; text-align: center; }
-        .form-header h1 { font-size: 32px; margin-bottom: 12px; }
-        .form-header p { font-size: 16px; opacity: 0.85; }
-        form { padding: 40px; }
-        .form-row { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
-        .form-group { flex: 1; min-width: 200px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a2e; font-size: 14px; }
-        label.required::after { content: " *"; color: #e74c3c; }
-        input, select { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 16px; font-size: 14px; transition: all 0.3s; background: white; }
-        input:focus, select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102,126,234,0.1); }
-        input:read-only { background: #f8fafc; cursor: not-allowed; }
-        select:disabled { opacity: 0.6; cursor: not-allowed; background: #f1f5f9; }
-        .checkbox-excursiones { display: grid; gap: 12px; margin-top: 8px; }
-        .checkbox-item { display: flex; align-items: center; padding: 12px 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; cursor: pointer; transition: all 0.2s; }
-        .checkbox-item:hover { background: #f1f5f9; border-color: #667eea; transform: translateX(4px); }
-        .checkbox-item.seleccionado { background: #eef2ff; border-color: #667eea; box-shadow: 0 2px 8px rgba(102,126,234,0.15); }
-        .checkbox-item input { width: 20px; height: 20px; margin-right: 12px; cursor: pointer; accent-color: #667eea; }
-        .checkbox-item label { margin: 0; cursor: pointer; flex: 1; font-weight: 500; color: #1e293b; }
-        .seleccionados-contador { text-align: center; font-size: 13px; color: #667eea; margin-top: 12px; font-weight: 600; padding: 8px; background: #f1f5f9; border-radius: 40px; }
-        .checkbox-privacidad { display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 14px 18px; border-radius: 16px; margin: 24px 0 20px 0; border: 1px solid #e2e8f0; }
-        .checkbox-privacidad input { width: 20px; height: 20px; cursor: pointer; accent-color: #667eea; }
-        .checkbox-privacidad label { margin: 0; cursor: pointer; font-weight: 500; }
-        .checkbox-privacidad a { color: #667eea; text-decoration: none; font-weight: 600; }
-        .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; border: none; border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 10px; box-shadow: 0 8px 25px rgba(39,174,96,0.3); }
-        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(39,174,96,0.4); }
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .status-message { padding: 12px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: 500; }
-        .status-message.error { background: #fee; color: #c0392b; border-left: 4px solid #e74c3c; }
-        .status-message.success { background: #d4edda; color: #155724; border-left: 4px solid #27ae60; }
-        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s; }
-        #preloader.oculto { opacity: 0; visibility: hidden; }
-        .cronometro { width: 75px; height: 75px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid white; border-radius: 50%; animation: girar 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes girar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .preloader-texto { color: white; font-size: 20px; font-weight: 700; text-align: center; }
-        .categoria-group, .excursion-group { animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 768px) { body { padding: 20px; } form { padding: 24px; } .form-header h1 { font-size: 24px; } }
-        .error-label { color: #e74c3c; font-size: 12px; margin-top: 5px; display: none; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+        
+        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
+        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; border: none; }
+        
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; }
+        .header h1 { font-size: 26px; color: #1a1a2e; }
+        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
+        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        
+        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
+        .btn-filtrar, .btn-recargar, .btn-pdf { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-filtrar { background: #667eea; color: white; }
+        .btn-recargar { background: #27ae60; color: white; }
+        .btn-pdf { background: #2c7da0; color: white; }
+        
+        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        
+        .reserva-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .reserva-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-id {
+            font-weight: 700;
+            font-size: 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+        .card-fecha {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+        
+        .card-body { padding: 15px; }
+        .card-info { margin-bottom: 12px; }
+        .card-label { font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .card-value { font-size: 13px; font-weight: 500; color: #333; word-break: break-word; }
+        
+        .excursiones-lista-card { margin: 0; padding-left: 16px; list-style: none; }
+        .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: #555; border-bottom: 1px dashed #eee; }
+        .excursiones-lista-card li:last-child { border-bottom: none; }
+        
+        .card-estado {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .estado-pendiente { background: #fff3cd; color: #856404; }
+        .estado-confirmado { background: #d4edda; color: #155724; }
+        .estado-pagado { background: #d1ecf1; color: #0c5460; }
+        
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+        .btn-card {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .btn-card:hover { transform: scale(0.98); opacity: 0.9; }
+        .btn-confirmar-card { background: #27ae60; color: white; }
+        .btn-pendiente-card { background: #ffc107; color: #856404; }
+        .btn-pagar-card { background: #3498db; color: white; }
+        .btn-whatsapp-card { background: #25D366; color: white; }
+        .btn-excluir-card { background: #e74c3c; color: white; }
+        
+        .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
+        
+        @media (max-width: 1200px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { 
+            .sidebar { width: 60px; } 
+            .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
+            .nav-menu a { justify-content: center; } 
+            .main-content { margin-left: 60px; padding: 15px; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <div id="preloader"><div class="preloader-content"><div class="cronometro"></div><div class="preloader-texto">CARGANDO<span class="puntos">...</span></div></div></div>
+    <nav class="sidebar">
+        <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2></div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+            <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
+            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
+            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
+        </ul>
+        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button></div>
+    </nav>
 
-    <div class="form-container">
-        <div class="form-header"><h1>🕐 Reserva tu Excursión</h1><p>Completa el formulario y obtén el mejor precio</p></div>
-        <form id="excursionForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="nombre" class="required">Nombre</label>
-                    <input type="text" id="nombre" name="nombre" required autocomplete="given-name" placeholder="Tu nombre">
-                </div>
-                <div class="form-group">
-                    <label for="apellido" class="required">Apellido</label>
-                    <input type="text" id="apellido" name="apellido" required autocomplete="family-name" placeholder="Tu apellido">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="email" class="required">Email</label>
-                    <input type="email" id="email" name="email" required autocomplete="email" placeholder="correo@ejemplo.com">
-                </div>
-                <div class="form-group">
-                    <label for="telefono" class="required">Teléfono</label>
-                    <input type="tel" id="telefono" name="telefono" required autocomplete="tel" placeholder="+54 900 000 000">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="pais" class="required">País</label>
-                <select id="pais" name="pais" required>
-                    <option value="">Selecciona un país</option>
-                    <option value="argentina">📌 Argentina</option>
-                    <option value="brasil">📌 Brasil</option>
-                    <option value="chile">📌 Chile</option>
-                </select>
-            </div>
-            <div class="form-group categoria-group" id="categoriaGroup" style="display: none;">
-                <label for="categoria" class="required">Ciudad</label>
-                <select id="categoria" name="categoria" disabled>
-                    <option value="">Selecciona una ciudad</option>
-                </select>
-            </div>
-            <div class="form-group excursion-group" id="excursionGroup" style="display: none;">
-                <label class="required">Excursiones (selecciona una o varias)</label>
-                <div class="checkbox-excursiones" id="checkboxExcursiones"></div>
-                <div class="seleccionados-contador" id="contadorSeleccionados">
-                    <span class="sin-seleccion">✨ Selecciona al menos una excursión</span>
-                </div>
-            </div>
-            <input type="hidden" id="fecha" name="fecha">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="fecha_mostrar" class="required">Fecha de reserva</label>
-                    <input type="text" id="fecha_mostrar" readonly placeholder="Fecha del sistema">
-                </div>
-                <div class="form-group">
-                    <label for="personas" class="required">Nº de personas</label>
-                    <input type="number" id="personas" name="personas" min="1" max="20" value="1" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="formaPago" class="required">Forma de Pago</label>
-                <select id="formaPago" name="formaPago" required>
-                    <option value="">Selecciona una forma de pago</option>
-                    <option value="💵 Efectivo">💵 Efectivo</option>
-                    <option value="💳 Débito/Crédito">💳 Débito/Crédito</option>
-                    <option value="🏦 Transferencia">🏦 Transferencia</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="mensaje">📍 ¿Dónde te buscamos?</label>
-                <input type="text" id="mensaje" name="lugar" placeholder="Hotel, dirección, etc.">
-            </div>
-            <div class="checkbox-privacidad">
-                <input type="checkbox" id="privacidad" name="privacidad" required>
-                <label for="privacidad">He leído y acepto la <a href="#" id="linkPrivacidad">política de privacidad</a></label>
-            </div>
-            <div id="statusMessage" class="status-message" style="display: none;"></div>
-            <button type="submit" class="submit-btn" id="submitBtn">📩 Enviar Reserva</button>
-        </form>
+    <div class="main-content">
+        <div class="header">
+            <div><h1>📋 Reservas</h1></div>
+            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+        </div>
+
+        <div class="filters-bar">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
+            <button class="btn-filtrar" id="btnFiltrar">🔍 Filtrar</button>
+            <button class="btn-recargar" id="btnRecargar">🔄 Recargar</button>
+            <button class="btn-pdf" id="btnPDFExterno">📄 Generar PDF</button>
+        </div>
+
+        <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
+
+        <div id="cardsContainer" class="cards-grid">
+            <div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>
+        </div>
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzqKJ3jifH5AV2G4HKnfUgfvhY07yqa20p8jsnQDgFvVHS2c0TOBxyZjY66yMaGLPlew/exec';
+        // ==================================================
+        // CONFIGURACIÓN - API JSON DE GOOGLE SHEETS
+        // ==================================================
+        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
+        const SHEET_NAME = 'Hoja 1';
+        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         
-        window.addEventListener('load', () => { setTimeout(() => { document.getElementById('preloader').classList.add('oculto'); }, 1000); });
-
-        function establecerFechaSistema() {
-            const hoy = new Date();
-            const año = hoy.getFullYear();
-            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-            const dia = String(hoy.getDate()).padStart(2, '0');
-            document.getElementById('fecha').value = `${dia}-${mes}-${año}`;
-            document.getElementById('fecha_mostrar').value = `${dia}/${mes}/${año}`;
+        if (sessionStorage.getItem('crm_logged') !== 'true') { 
+            window.location.href = 'index.html'; 
         }
-        establecerFechaSistema();
-
-        // Todas las excursiones de Argentina ordenadas alfabéticamente por ciudad
-        const excursionesData = {
-            argentina: {
-                "🎿 Bariloche": [
-                    "✔️ Cerro Catedral y centro de esquí",
-                    "✔️ Cerro Tronador y el Glaciar Negro",
-                    "✔️ Día completo El Bolsón y Lago Puelo",
-                    "✔️ Circuito Grande y Valle Encantado",
-                    "✔️ San Martín de los Andes por los Siete Lagos",
-                    "✔️ Isla Victoria y Bosque de Arrayanes",
-                    "✔️ Puerto Blest y Cascada de los Cántaros",
-                    "✔️ Brazo Tristeza",
-                    "✔️ Travesía 4x4 al Cerro López",
-                    "✔️ Circuito Chico y Cerro Campanario"
-                ],
-                "❤️ Buenos Aires": [
-                    "✔️ City tour premium por los barrios históricos",
-                    "✔️ La Plata y la República de los Niños",
-                    "✔️ Bioparque Temaikèn",
-                    "✔️ Delta del Tigre con paseo en lancha",
-                    "✔️ Día de campo en San Antonio de Areco",
-                    "✔️ Río de la Plata con barra libre",
-                    "✔️ Palacio Barolo y la Avenida de Mayo",
-                    "✔️ pulperías en San Telmo y casco histórico",
-                    "✔️ Sr. tango con cena y show en vivo",
-                    "✔️ Tour temático de fútbol"
-                ],
-                "⚒️ Catamarca": [
-                    "✔️ S F del Valle de Catamarca y Gruta",
-                    "✔️ Andalgalá y las minas de Rodocrosita",
-                    "✔️ Antofagasta de la Sierra y Volcán Galán",
-                    "✔️ Los Seis Miles y el Balcón del Pissis",
-                    "✔️ Pucará de Aconquijas",
-                    "✔️ Campo de Piedra Pómez en vehículos 4x4",
-                    "✔️ Valle Viejo y el Camino de los Artesanos",
-                    "✔️ Cuesta del Portezuelo y el dique Las Pirquitas",
-                    "✔️ Ruta del Adobe y Termas de Fiambalá",
-                    "✔️ Dunas de Tatón y Medanitos"
-                ],
-                "🚤 Cataratas del Iguazú": [
-                    "✔️ Parque de las Aves",
-                    "✔️ San Ignacio y Minas de Wanda",
-                    "✔️ Saltos del Moconá",
-                    "✔️ Cataratas del Iguazú - Argentina",
-                    "✔️ Cataratas del Iguazú - Brasil",
-                    "✔️ Flotada ecológica Iguazú Superior",
-                    "✔️ Gran aventura bajo los saltos de agua",
-                    "✔️ Cataratas con Luna Llena",
-                    "✔️ 4x4 Sendero Yacaratiá",
-                    "✔️ Hito de las Tres Fronteras"
-                ],
-                "🏔️ Jujuy": [
-                    "✔️ Llamas en Salinas Grandes o Purmamarca",
-                    "✔️ City tour Jujuy y Termas de Reyes",
-                    "✔️ Laguna de Pozuelos y Puna Jujeña",
-                    "✔️ Salinas Grandes por Cuesta del Lipán",
-                    "✔️ Hornocal",
-                    "✔️ Parque Nacional Calilegua",
-                    "✔️ Quebrada de Humahuaca",
-                    "✔️ Caspalá y Santa Ana",
-                    "✔️ Valle de la Luna de Cusi Cusi",
-                    "✔️ Termas del Jordán"
-                ],
-                "🏖️ Mar del Plata": [
-                    "✔️ Aquarium", "✔️ City Tour Histórico", "✔️ Fábricas de Alfajores",
-                    "✔️ Gruta de Lourdes", "✔️ Noche de Teatros", "✔️ Puerto y Banquina",
-                    "✔️ Sierra de los Padres", "✔️ Torre Tanque"
-                ],
-                "🍷 Mendoza": [
-                    "✔️ Cabalgata al atardecer por los caminos del vino",
-                    "✔️ Caminata guiada por el Parque Provincial Aconcagua",
-                    "✔️ City tour Mendoza y Parque General San Martín",
-                    "✔️ Bodegas y olivícolas",
-                    "✔️ Termas de Cacheuta y Potrerillos",
-                    "✔️ Cañón del Atuel y San Rafael",
-                    "✔️ Alta Montaña por la Cordillera de los Andes",
-                    "✔️ De día completo a San Rafael y Embalse Los Reyunos",
-                    "✔️ Bodegas y viñedos",
-                    "✔️ 4x4 a la Reserva Natural Villavicencio"
-                ],
-                "🌄 Merlo (San Luis)": [
-                    "✔️ Caminata astronómica nocturna",
-                    "✔️ Cascadas de San Luis y Salto del Tabaquillo",
-                    "✔️ Circuito Chico y Mirador del Sol",
-                    "✔️ Circuito Sur",
-                    "✔️ Parque Nacional Sierra de las Quijadas",
-                    "✔️ Día completo al Bajo de Véliz",
-                    "✔️ Filo de la Sierra de los Comechingones",
-                    "✔️ Pasos Malos y Arroyo El Rincón",
-                    "✔️ Ruta de los Sabores y visita a los Olivares",
-                    "✔️ Minas de tungsteno"
-                ],
-                "🏔️ Salta": [
-                    "✔️ Caminata guiada por la Quebrada de San Lorenzo",
-                    "✔️ City tour Salta y Cerro San Bernardo",
-                    "✔️ Purmamarca, Salinas Grandes y Cuesta del Lipán",
-                    "✔️ San Antonio de los Cobres por Tren a las Nubes",
-                    "✔️ Dique Cabra Corral + turismo aventura",
-                    "✔️ Excursión combinada a Humahuaca, Tilcara y Purmamarca",
-                    "✔️ Cafayate y Bodegas con Quebrada de las Conchas",
-                    "✔️ Iruya y pueblos históricos",
-                    "✔️ Cuesta del Obispo y PN Los Cardones",
-                    "✔️ 4x4 a las Cuevas de Acsibi"
-                ],
-                "🏜️ San Juan": [
-                    "✔️ Difunta Correa y San Expedito",
-                    "✔️ Dique Punta Negra con paseo náutico",
-                    "✔️ Parque Nacional El Leoncito",
-                    "✔️ Jáchal, Huaco y los Molinos Harineros",
-                    "✔️ Parque Provincial Ischigualasto",
-                    "✔️ San Juan Capital y Auditorio Juan Victoria",
-                    "✔️ Valle de Calingasta y el Cerro Alcázar",
-                    "✔️ Ruta del Vino de San Juan y bodegas de Tulum",
-                    "✔️ Parque Nacional San Guillermo",
-                    "✔️ Quebrada de Zonda y el Jardín de los Poetas"
-                ],
-                "🗿 Talampaya": [
-                    "✔️ Caminata nocturna por el Cañón de Talampaya",
-                    "✔️ Cañón de Talampaya (Circuito clásico)",
-                    "✔️ Cañón de Talampaya con almuerzo y degustación de vinos riojanos",
-                    "✔️ Cañón de Talampaya y los Cajones de Shimpa",
-                    "✔️ Cañón de Talampaya y Parque Ischigualasto",
-                    "✔️ Excursión guiada al Cañón de Arco Iris",
-                    "✔️ 4x4 por el Cañón de Ciudad Perdida",
-                    "✔️ Petroglifos del Cañón",
-                    "✔️ Travesía al Gran Chañar",
-                    "✔️ Trekking Quebrada de Don Eduardo"
-                ],
-                "🏔️ Ushuaia": [
-                    "✔️ Caminata con raquetas",
-                    "✔️ Canoas y caminata en el Parque Nacional",
-                    "✔️ Cabo San Pablo y el naufragio del barco Desdémona",
-                    "✔️ Parque Nacional Tierra del Fuego / Tren del Fin del Mundo",
-                    "✔️ 4x4 a los Lagos Fagnano y Escondido",
-                    "✔️ Estancia Harberton y la Pingüinera de Isla Martillo",
-                    "✔️ Canal Beagle, Isla de los Lobos y Faro Les Éclaireurs",
-                    "✔️ Sobrevuelo en helicóptero",
-                    "✔️ Trekking Glaciar Martial",
-                    "✔️ Trekking Laguna Esmeralda y Glaciar Ojo del Albino"
-                ],
-                "🎭 Villa Carlos Paz": [
-                    "✔️ Altas Cumbres y Mina Clavero",
-                    "✔️ Ascenso al Cerro de la Cruz",
-                    "✔️ Caminata Cerro Champaquí",
-                    "✔️ City tour nocturno",
-                    "✔️ Excursión a Capilla del Monte y Los Terrones",
-                    "✔️ Full Day Alta Gracia y Villa General Belgrano",
-                    "✔️ Parque Nacional Quebrada del Condorito",
-                    "✔️ Catamarán por el Dique San Roque",
-                    "✔️ 4x4 al Cerro Los Gigantes",
-                    "✔️ Valle de Calamuchita y La Cumbrecita",
-                    "✔️ Vuelta al Valle de Punilla"
-                ]
-            },
-            brasil: {
-                "🏖️ Balneário Camboriú": [
-                    "✔️ Beto Carrero World",
-                    "✔️ Parque Unipraias",
-                    "✔️ Complejo Turístico Cristo Luz",
-                    "✔️ Florianópolis y playas del norte",
-                    "✔️ Blumenau y Pomerode (Ruta Alemana)",
-                    "✔️ Barco Pirata y Laranjeiras",
-                    "✔️ Bombas y Bombinhas",
-                    "✔️ Laranjeiras Terrestre",
-                    "✔️ Oceanic Aquarium y Barra Sul",
-                    "✔️ Compras en Brusque y centros textiles"
-                    "✔️ Eclipse Disco",
-                    "✔️ Green Valley Disco",
-                    "✔️ Fiesta Bahiana",
-                    "✔️ Porto Belo Barco Pirata ",
-                ],
-                "🌊 Bombinhas": [
-                    "✔️ Beto Carrero World",
-                    "✔️ Catamarán por Bombas, Bombinhas y Sepultura",
-                    "✔️ Buceo Reserva Biológica Marina del Arvoredo",
-                    "✔️ Trekking Morro del Macaco",
-                    "✔️ Balneario Camboriú y Parque Unipraias",
-                    "✔️ 4x4 por Quatro Ilhas, Mariscal y Zimbros",
-                    "✔️ Paseo de compras en Porto Belo",
-                    "✔️ Retiro dos Padres y senderos de la costa",
-                    "✔️ Excursión cultural a la Ruta Alemana",
-                    "✔️ Kayak y paddle surf, Bahía de Zimbros"
-                    "✔️ Eclipse Disco",
-                    "✔️ Green Valley Disco",
-                    "✔️ Fiesta Bahiana",
-                ],
-                "🏖️ Florianópolis": [
-                    "✔️ Camboriú y Parque Unipraias",
-                    "✔️ Barco Pirata a la Isla de Anhatomirim",
-                    "✔️ City tour Florianópolis y Mercado Público",
-                    "✔️ Eampeche, Armação y Pântano do Sul",
-                    "✔️ Isla de Campeche",
-                    "✔️ Jurerê Internacional, Canasvieiras y Ingleses",
-                    "✔️ Senderismo a la Playa de Lagoinha do Leste",
-                    "✔️ Santo Antônio de Lisboa",
-                    "✔️ Carrero World",
-                    "✔️ Joaquina y Lagoa da Conceição"
-                    "✔️ Eclipse Disco",
-                    "✔️ Green Valley Disco",
-                    "✔️ Fiesta Bahiana",
-                ],
-                "🏖️ Itapema": [
-                    "✔️ Carrero World",
-                    "✔️ Mirador del Encanto y las playas de Itapema",
-                    "✔️ Bombas y Bombinhas",
-                    "✔️ Brusque y Nova Trento",
-                    "✔️ Balneario Camboriú y Parque Unipraias",
-                    "✔️ Florianópolis y sus playas del norte",
-                    "✔️ Porto Belo y su reserva ecológica",
-                    "✔️ Barrio de Canto da Praia",
-                    "✔️ Morro del Gavilán (Morro do Gavião)",
-                    "✔️ Catamarán por la Costa Esmeralda"
-                    "✔️ Eclipse Disco",
-                    "✔️ Green Valley Disco",
-                    "✔️ Fiesta Bahiana",
-                ],
-                "🏖️ Maceió": [
-                    "✔️ Playa de Maragogi y sus piscinas naturales",
-                    "✔️ Playa de Francés, Playa de Gunga y Barra de São Miguel",
-                    "✔️ Playa de Antunes y el Camino de Moisés",
-                    "✔️ Ccatamarán por la desembocadura del Río São Francisco",
-                    "✔️ Dunas y playas de Piaçabuçu",
-                    "✔️ Playas de Hibiscus y Ipioca (Litoral Norte)",
-                    "✔️ Playa de Carro Quebrado y Capitán Nikolas",
-                    "✔️ City tour Maceió y el barrio de Jaraguá",
-                    "✔️ Piscinas naturales de Pajuçara en jangada",
-                    "✔️ San Miguel de los Milagros"
-                ],
-                "🏖️ Río de Janeiro": [
-                    "✔️ Cristo Redentor y el Pan de Azúcar",
-                    "✔️ Catamarán por la Bahía de Guanabara",
-                    "✔️ Estadio Maracaná y el Sambódromo",
-                    "✔️ Arraial do Cabo",
-                    "✔️ Búzios con paseo en barco y almuerzo",
-                    "✔️ Pedra da Gávea",
-                    "✔️ Centro de Río, Escalera Selarón y Santa Teresa",
-                    "✔️ Parque Nacional de la Tijuca",
-                    "✔️ Petrópolis",
-                    "✔️ Parque Bondinho y miradores de la ciudad"
-                ],
-                "🗼 Torres": [
-                    "✔️ Centro de Torres y el río Mampituba",
-                    "✔️ Morro del Faro",
-                    "✔️ Parque Nacional de Aparados da Serra",
-                    "✔️ Viñedos y bodegas de la Sierra Gaúcha",
-                    "✔️ Parque Nacional de la Serra Geral",
-                    "✔️ Isla de los Lobos",
-                    "✔️ Avistaje de ballenas francas",
-                    "✔️ Parque Estatal de la Guarita y los acantilados",
-                    "✔️ Ruta gastronómica del pescado y frutos de mar",
-                    "✔️ 4x4 por las dunas de la Playa de Itapeva"
-                ]
-            },
-            chile: {
-                "⛰️ Santiago de Chile": ["✔️ City Tour", "✔️ Sky Costanera", "✔️ Viña del Mar", "✔️ Viñedos del Maipo", "✔️ Cajón del Maipo", "✔️ Cerro San Cristóbal", "✔️ Valle Nevado"]
-            }
-        };
-
-        const paisSelect = document.getElementById('pais');
-        const categoriaSelect = document.getElementById('categoria');
-        const categoriaGroup = document.getElementById('categoriaGroup');
-        const excursionGroup = document.getElementById('excursionGroup');
-        const checkboxExcursiones = document.getElementById('checkboxExcursiones');
-        const contadorSeleccionados = document.getElementById('contadorSeleccionados');
-
-        paisSelect.addEventListener('change', function() {
-            const pais = this.value;
-            categoriaSelect.innerHTML = '<option value="">Selecciona una ciudad</option>';
-            checkboxExcursiones.innerHTML = '';
-            contadorSeleccionados.innerHTML = '<span class="sin-seleccion">✨ Selecciona al menos una excursión</span>';
-            if (pais && excursionesData[pais]) {
-                categoriaGroup.style.display = 'block';
-                categoriaSelect.disabled = false;
-                excursionGroup.style.display = 'none';
-                // Ordenar las ciudades alfabéticamente por su nombre (ignorando el emoji)
-                const ciudades = Object.keys(excursionesData[pais]).sort((a, b) => {
-                    const nombreA = a.replace(/^[^\w]+/, ''); // Elimina emoji inicial
-                    const nombreB = b.replace(/^[^\w]+/, '');
-                    return nombreA.localeCompare(nombreB);
-                });
-                ciudades.forEach(ciudad => {
-                    const option = document.createElement('option');
-                    option.value = ciudad;
-                    option.textContent = ciudad;
-                    categoriaSelect.appendChild(option);
-                });
-            } else {
-                categoriaGroup.style.display = 'none';
-                excursionGroup.style.display = 'none';
-                categoriaSelect.disabled = true;
-            }
-        });
-
-        categoriaSelect.addEventListener('change', function() {
-            const pais = paisSelect.value;
-            const ciudad = this.value;
-            checkboxExcursiones.innerHTML = '';
-            contadorSeleccionados.innerHTML = '<span class="sin-seleccion">✨ Selecciona al menos una excursión</span>';
-            if (ciudad && pais && excursionesData[pais] && excursionesData[pais][ciudad]) {
-                excursionGroup.style.display = 'block';
-                const excursiones = excursionesData[pais][ciudad];
-                excursiones.forEach((excursion, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'checkbox-item';
-                    const id = `exc_${Date.now()}_${index}`;
-                    div.innerHTML = `<input type="checkbox" id="${id}" value="${excursion}"><label for="${id}">${excursion}</label>`;
-                    const checkbox = div.querySelector('input');
-                    checkbox.addEventListener('change', function() {
-                        if (this.checked) div.classList.add('seleccionado');
-                        else div.classList.remove('seleccionado');
-                        actualizarContador();
-                    });
-                    div.addEventListener('click', (e) => {
-                        if (e.target !== checkbox && e.target.tagName !== 'LABEL') {
-                            checkbox.checked = !checkbox.checked;
-                            checkbox.dispatchEvent(new Event('change'));
-                        }
-                    });
-                    checkboxExcursiones.appendChild(div);
-                });
-            } else {
-                excursionGroup.style.display = 'none';
-            }
-        });
-
-        function actualizarContador() {
-            const total = document.querySelectorAll('#checkboxExcursiones input:checked').length;
-            if (total === 0) contadorSeleccionados.innerHTML = '<span class="sin-seleccion">✨ Selecciona al menos una excursión</span>';
-            else if (total === 1) contadorSeleccionados.innerHTML = '✅ <strong>1 excursión seleccionada</strong>';
-            else contadorSeleccionados.innerHTML = `✅ <strong>${total} excursiones seleccionadas</strong>`;
+        
+        function logout() { 
+            sessionStorage.clear(); 
+            window.location.href = 'index.html'; 
         }
-
-        const form = document.getElementById('excursionForm');
-        const statusMessage = document.getElementById('statusMessage');
-
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            statusMessage.style.display = 'none';
-            
-            if (!document.getElementById('privacidad').checked) {
-                statusMessage.textContent = '⚠️ Debes aceptar la política de privacidad';
-                statusMessage.className = 'status-message error';
-                statusMessage.style.display = 'block';
-                return;
-            }
-            
-            const excursionesSeleccionadas = Array.from(document.querySelectorAll('#checkboxExcursiones input:checked')).map(cb => cb.value);
-            if (excursionesSeleccionadas.length === 0) {
-                statusMessage.textContent = '⚠️ Debes seleccionar al menos una excursión';
-                statusMessage.className = 'status-message error';
-                statusMessage.style.display = 'block';
-                return;
-            }
-            
-            const formaPago = document.getElementById('formaPago').value;
-            if (!formaPago) {
-                statusMessage.textContent = '⚠️ Debes seleccionar una forma de pago';
-                statusMessage.className = 'status-message error';
-                statusMessage.style.display = 'block';
-                return;
-            }
-            
-            // Preparar datos
-            const formData = new URLSearchParams();
-            formData.append('id', 'RES-' + Date.now());
-            formData.append('nombre', document.getElementById('nombre').value);
-            formData.append('apellido', document.getElementById('apellido').value);
-            formData.append('email', document.getElementById('email').value);
-            formData.append('telefono', document.getElementById('telefono').value);
-            formData.append('pais', paisSelect.options[paisSelect.selectedIndex].text);
-            formData.append('ciudad', categoriaSelect.value);
-            formData.append('excursiones', excursionesSeleccionadas.join('\n'));
-            formData.append('fecha', document.getElementById('fecha').value);
-            formData.append('personas', document.getElementById('personas').value);
-            formData.append('formaPago', formaPago);
-            formData.append('lugar', document.getElementById('mensaje').value || 'No especificado');
-            
-            console.log('📤 Enviando datos a:', GOOGLE_SCRIPT_URL);
-            
-            const submitBtn = document.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Enviando...';
+        
+        let reservasData = [];
+        let reservasFiltradas = [];
+        
+        async function cargarReservas() {
+            const container = document.getElementById('cardsContainer');
+            const totalSpan = document.getElementById('totalReservasSpan');
+            if (!container) return;
             
             try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData
+                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>';
+                
+                const response = await fetch(JSON_URL);
+                const texto = await response.text();
+                
+                let jsonStr = texto;
+                jsonStr = jsonStr.replace("/*O_o*/", "");
+                jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
+                jsonStr = jsonStr.slice(0, -2);
+                
+                const data = JSON.parse(jsonStr);
+                const rows = data.table.rows;
+                
+                if (!rows || rows.length === 0) throw new Error('No hay datos');
+                
+                reservasData = [];
+                const estadosGuardados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
+                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const c = rows[i].c;
+                    if (!c || c.length < 5) continue;
+                    
+                    const id = (c[1] && c[1].v) ? String(c[1].v) : '';
+                    if (!id || excluidos.includes(id)) continue;
+                    
+                    const nombre = (c[2] && c[2].v) ? String(c[2].v) : '';
+                    const apellido = (c[3] && c[3].v) ? String(c[3].v) : '';
+                    const email = (c[4] && c[4].v) ? String(c[4].v) : '';
+                    const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
+                    const ciudad = (c[7] && c[7].v) ? String(c[7].v) : '';
+                    
+                    let excursionesLista = [];
+                    const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
+                    if (excursionesRaw) {
+                        if (excursionesRaw.includes('\n')) {
+                            excursionesLista = excursionesRaw.split('\n');
+                        } else if (excursionesRaw.includes(' | ')) {
+                            excursionesLista = excursionesRaw.split(' | ');
+                        } else {
+                            excursionesLista = [excursionesRaw];
+                        }
+                        excursionesLista = excursionesLista.map(function(e) { 
+                            return e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
+                        }).filter(function(e) { return e; });
+                    }
+                    
+                    let fecha = '';
+                    const timestamp = (c[0] && c[0].v) ? c[0].v : null;
+                    if (timestamp) {
+                        const fechaObj = new Date(timestamp);
+                        if (!isNaN(fechaObj.getTime())) {
+                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
+                        }
+                    }
+                    
+                    const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
+                    const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
+                    const lugar = (c[12] && c[12].v) ? String(c[12].v) : 'No especificado';
+                    
+                    const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
+                    let estado = estadosGuardados[id];
+                    if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
+                        estado = 'confirmado';
+                    }
+                    
+                    reservasData.push({
+                        id: id,
+                        fecha: fecha,
+                        nombre: nombreCompleto,
+                        email: email,
+                        telefono: telefono,
+                        ciudad: ciudad,
+                        excursionesLista: excursionesLista,
+                        personas: parseInt(personas) || 1,
+                        formaPago: formaPago,
+                        lugar: lugar,
+                        estado: estado
+                    });
+                }
+                
+                reservasData.sort(function(a, b) {
+                    const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
+                    const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
+                    return numB - numA;
                 });
                 
-                localStorage.setItem('ultimaReserva', formData.toString());
-                
-                statusMessage.textContent = '✅ Reserva enviada correctamente. Serás redirigido...';
-                statusMessage.className = 'status-message success';
-                statusMessage.style.display = 'block';
-                
-                setTimeout(() => {
-                    window.location.href = 'gracias.html';
-                }, 2000);
+                reservasFiltradas = reservasData.slice();
+                renderizarCards();
+                if (totalSpan) totalSpan.textContent = reservasData.length + ' reservas';
                 
             } catch (error) {
                 console.error('Error:', error);
-                localStorage.setItem('ultimaReserva', formData.toString());
-                
-                statusMessage.textContent = '⚠️ Hubo un error, pero tu reserva fue registrada. Te contactaremos.';
-                statusMessage.className = 'status-message error';
-                statusMessage.style.display = 'block';
-                
-                setTimeout(() => {
-                    window.location.href = 'gracias.html?status=local';
-                }, 2000);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '📩 Enviar Reserva';
+                container.innerHTML = '<div style="text-align:center; color:red; grid-column:1/-1; padding:50px;">❌ Error: ' + error.message + '</div>';
             }
-        });
-
-        document.getElementById('linkPrivacidad').addEventListener('click', (e) => {
-            e.preventDefault();
-            alert("🔒 Política de Privacidad - La agencia recopila únicamente los datos necesarios para la prestación del servicio.\n\nLos datos no se venden ni se ceden comercialmente.\n\nDerechos: Acceder, Rectificar, Cancelar u Oponerse.");
-        });
+        }
+        
+        function enviarWhatsApp(reserva) {
+            let telefono = reserva.telefono.replace(/\D/g, '');
+            if (telefono.length === 10) {
+                telefono = '54' + telefono;
+            }
+            
+            let excursionesTexto = '';
+            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
+                excursionesTexto = reserva.excursionesLista.map(function(exc, idx) { return (idx+1) + '. ' + exc; }).join('\n');
+            } else {
+                excursionesTexto = 'Sin excursiones específicas';
+            }
+            
+            let estadoTexto = '';
+            switch(reserva.estado) {
+                case 'pendiente': estadoTexto = 'Pendiente'; break;
+                case 'confirmado': estadoTexto = 'Confirmado'; break;
+                case 'pagado': estadoTexto = 'Pagado'; break;
+                default: estadoTexto = 'Confirmado';
+            }
+            
+            const mensaje = '🏔️ *AVENTURA TOTAL* 🏔️\n\n✅ *CONFIRMACIÓN DE RESERVA*\n\n🆔 *N° de reserva:* ' + reserva.id + '\n📅 *Fecha:* ' + reserva.fecha + '\n\n👤 *DATOS DEL PASAJERO:*\n   Nombre: ' + reserva.nombre + '\n   📞 Teléfono: ' + reserva.telefono + '\n   📧 Email: ' + reserva.email + '\n\n📍 *DESTINO:*\n   ' + reserva.ciudad + '\n\n✨ *EXCURSIONES SELECCIONADAS:*\n' + excursionesTexto + '\n\n👥 *Cantidad de personas:* ' + reserva.personas + '\n💳 *Forma de pago:* ' + reserva.formaPago + '\n🚐 *Punto de encuentro:* ' + reserva.lugar + '\n📌 *Estado:* ' + estadoTexto + '\n\n📌 *PRÓXIMOS PASOS:*\n• En las próximas 24hs recibirás detalles de pago\n• Punto de encuentro exacto será confirmado\n\n🏔️ ¡Gracias por confiar en Aventura Total!';
+            
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            window.open('https://wa.me/' + telefono + '?text=' + mensajeCodificado, '_blank');
+        }
+        
+        function renderizarCards() {
+            const container = document.getElementById('cardsContainer');
+            const totalSpan = document.getElementById('totalReservasSpan');
+            if (!container) return;
+            
+            if (reservasFiltradas.length === 0) {
+                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">📋 No hay reservas</div>';
+                if (totalSpan) totalSpan.textContent = '0 reservas';
+                return;
+            }
+            
+            let html = '';
+            for (let idx = 0; idx < reservasFiltradas.length; idx++) {
+                const r = reservasFiltradas[idx];
+                let estadoClass = '', estadoText = '';
+                switch(r.estado) {
+                    case 'pendiente': estadoClass = 'estado-pendiente'; estadoText = 'Pendiente'; break;
+                    case 'confirmado': estadoClass = 'estado-confirmado'; estadoText = 'Confirmado'; break;
+                    case 'pagado': estadoClass = 'estado-pagado'; estadoText = 'Pagado'; break;
+                    default: estadoClass = 'estado-confirmado'; estadoText = 'Confirmado';
+                }
+                
+                let excursionesHtml = '<ul class="excursiones-lista-card">';
+                if (!r.excursionesLista || r.excursionesLista.length === 0) {
+                    excursionesHtml += '<li>Sin excursiones</li>';
+                } else {
+                    for (let i = 0; i < r.excursionesLista.length; i++) {
+                        excursionesHtml += '<li>' + (i+1) + '. ' + escapeHtml(r.excursionesLista[i]) + '</li>';
+                    }
+                }
+                excursionesHtml += '</ul>';
+                
+                html += '<div class="reserva-card">' +
+                            '<div class="card-header">' +
+                                '<span class="card-id">' + escapeHtml(r.id) + '</span>' +
+                                '<span class="card-fecha">' + escapeHtml(r.fecha) + '</span>' +
+                            '</div>' +
+                            '<div class="card-body">' +
+                                '<div class="card-info"><div class="card-label">👤 CLIENTE</div><div class="card-value">' + escapeHtml(r.nombre) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📧 EMAIL</div><div class="card-value">' + escapeHtml(r.email) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📞 TELÉFONO</div><div class="card-value">' + escapeHtml(r.telefono) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📍 CIUDAD</div><div class="card-value">' + escapeHtml(r.ciudad) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">✨ EXCURSIONES</div>' + excursionesHtml + '</div>' +
+                                '<div class="card-info"><div class="card-label">👥 PERSONAS</div><div class="card-value">' + escapeHtml(r.personas) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">💳 FORMA DE PAGO</div><div class="card-value">' + escapeHtml(r.formaPago) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">🚐 LUGAR</div><div class="card-value">' + escapeHtml(r.lugar) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📌 ESTADO</div><div class="card-value"><span class="card-estado ' + estadoClass + '">' + estadoText + '</span></div></div>' +
+                            '</div>' +
+                            '<div class="card-actions">' +
+                                '<button class="btn-card btn-confirmar-card" data-id="' + escapeHtml(r.id) + '" data-estado="confirmado">✅</button>' +
+                                '<button class="btn-card btn-pendiente-card" data-id="' + escapeHtml(r.id) + '" data-estado="pendiente">⏳</button>' +
+                                '<button class="btn-card btn-pagar-card" data-id="' + escapeHtml(r.id) + '" data-estado="pagado">💰</button>' +
+                                '<button class="btn-card btn-whatsapp-card" data-id="' + escapeHtml(r.id) + '">💬 WhatsApp</button>' +
+                                '<button class="btn-card btn-excluir-card" data-id="' + escapeHtml(r.id) + '">🗑️</button>' +
+                            '</div>' +
+                        '</div>';
+            }
+            container.innerHTML = html;
+            if (totalSpan) totalSpan.textContent = reservasFiltradas.length + ' de ' + reservasData.length + ' reservas';
+            
+            document.querySelectorAll('.btn-confirmar-card').forEach(function(btn) {
+                btn.addEventListener('click', function() { cambiarEstado(btn.dataset.id, 'confirmado'); });
+            });
+            document.querySelectorAll('.btn-pendiente-card').forEach(function(btn) {
+                btn.addEventListener('click', function() { cambiarEstado(btn.dataset.id, 'pendiente'); });
+            });
+            document.querySelectorAll('.btn-pagar-card').forEach(function(btn) {
+                btn.addEventListener('click', function() { cambiarEstado(btn.dataset.id, 'pagado'); });
+            });
+            document.querySelectorAll('.btn-whatsapp-card').forEach(function(btn) {
+                const reserva = reservasData.find(function(r) { return r.id === btn.dataset.id; });
+                btn.addEventListener('click', function() { enviarWhatsApp(reserva); });
+            });
+            document.querySelectorAll('.btn-excluir-card').forEach(function(btn) {
+                btn.addEventListener('click', function() { excluirReserva(btn.dataset.id); });
+            });
+        }
+        
+        function filtrarReservas() {
+            const busqueda = document.getElementById('busquedaReserva');
+            if (!busqueda) return;
+            const texto = busqueda.value.toLowerCase().trim();
+            
+            if (!texto) {
+                reservasFiltradas = reservasData.slice();
+            } else {
+                reservasFiltradas = reservasData.filter(function(r) {
+                    const coincideNombre = r.nombre.toLowerCase().includes(texto);
+                    const coincideExcursion = r.excursionesLista.some(function(exc) {
+                        return exc.toLowerCase().includes(texto);
+                    });
+                    return coincideNombre || coincideExcursion;
+                });
+            }
+            renderizarCards();
+        }
+        
+        function cambiarEstado(id, nuevoEstado) {
+            const reserva = reservasData.find(function(r) { return r.id === id; });
+            if (reserva) {
+                reserva.estado = nuevoEstado;
+                const estados = JSON.parse(localStorage.getItem('estadosReservas') || '{}');
+                estados[id] = nuevoEstado;
+                localStorage.setItem('estadosReservas', JSON.stringify(estados));
+                const indexFiltrada = reservasFiltradas.findIndex(function(r) { return r.id === id; });
+                if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
+                renderizarCards();
+            }
+        }
+        
+        function excluirReserva(id) {
+            if (confirm('⚠️ ¿Estás seguro de excluir la reserva ' + id + '?')) {
+                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
+                if (!excluidos.includes(id)) {
+                    excluidos.push(id);
+                    localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos));
+                }
+                cargarReservas();
+                alert('✅ Reserva ' + id + ' excluida.');
+            }
+        }
+        
+        // ==================================================
+        // FUNCIÓN PARA PDF EXTERNO CON FILTRO (CORREGIDA)
+        // ==================================================
+        function generarPDFExterno() {
+            const busquedaInput = document.getElementById('busquedaReserva');
+            let filtroTexto = busquedaInput ? busquedaInput.value.trim() : '';
+            
+            if (reservasFiltradas.length === 0) {
+                alert('⚠️ No hay reservas para exportar. Aplicá un filtro o recargá los datos.');
+                return;
+            }
+            
+            // Guardar datos en localStorage
+            try {
+                localStorage.setItem('filtroExcursionPDF', filtroTexto);
+                localStorage.setItem('reservasFiltradasPDF', JSON.stringify(reservasFiltradas));
+                console.log('✅ Datos guardados para PDF:', { 
+                    filtro: filtroTexto || '(vacio)', 
+                    total: reservasFiltradas.length 
+                });
+            } catch(e) {
+                console.error('Error al guardar en localStorage:', e);
+                alert('❌ Error al preparar los datos para el PDF.');
+                return;
+            }
+            
+            // Abrir nueva ventana con el generador PDF
+            const pdfWindow = window.open('generar-pdf.html', '_blank');
+            
+            if (!pdfWindow) {
+                alert('⚠️ Por favor, permita ventanas emergentes para generar el PDF.');
+            }
+        }
+        
+        function escapeHtml(text) { 
+            if (!text) return ''; 
+            const div = document.createElement('div'); 
+            div.textContent = text; 
+            return div.innerHTML; 
+        }
+        
+        window.logout = logout;
+        window.filtrarReservas = filtrarReservas;
+        window.cargarReservas = cargarReservas;
+        window.generarPDFExterno = generarPDFExterno;
+        
+        document.getElementById('btnFiltrar').addEventListener('click', filtrarReservas);
+        document.getElementById('btnRecargar').addEventListener('click', cargarReservas);
+        document.getElementById('btnPDFExterno').addEventListener('click', generarPDFExterno);
+        
+        const busquedaInput = document.getElementById('busquedaReserva');
+        if (busquedaInput) {
+            busquedaInput.addEventListener('keypress', function(e) { 
+                if (e.key === 'Enter') filtrarReservas(); 
+            });
+        }
+        
+        cargarReservas();
+        setInterval(cargarReservas, 60000);
     </script>
 </body>
 </html>
