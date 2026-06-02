@@ -134,8 +134,8 @@
                 </div>
             </div>
             <div class="card">
-                <div class="card-title"><span class="icon">📅</span> Pronóstico 7 Días</div>
-                <div class="forecast-grid" id="pronostico7dias"></div>
+                <div class="card-title"><span class="icon">📅</span> Pronóstico 8 Días</div>
+                <div class="forecast-grid" id="pronostico8dias"></div>
             </div>
         </div>
         
@@ -270,14 +270,14 @@
                     }
                 }
                 
-                // Pronóstico 7 días
-                const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+                // Pronóstico 8 días
+                const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
                 let p = '';
                 for (let i = 0; i < 7; i++) {
                     const f = new Date(dt.pronostico[i].fecha + 'T00:00:00');
                     p += `<div class="forecast-card${i===0?' hoy':''}"><div class="forecast-dia">${dias[f.getDay()]} ${f.getDate()}/${f.getMonth()+1}</div><div class="forecast-icono">${dt.icono}</div><div class="forecast-max">${dt.pronostico[i].max}°</div><div class="forecast-min">${dt.pronostico[i].min}°</div><div class="forecast-rain">🌧️ ${dt.pronostico[i].lluvia}mm</div></div>`;
                 }
-                document.getElementById('pronostico7dias').innerHTML = p;
+                document.getElementById('pronostico8dias').innerHTML = p;
                 
                 // Alertas
                 const alertas = [];
