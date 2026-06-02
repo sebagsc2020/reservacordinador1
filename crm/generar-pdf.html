@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Generador PDF - Aventura Total</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -18,52 +19,50 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
         }
 
-        /* Contenedor principal */
+        /* Contenedor principal - completamente responsivo */
         .pdf-generator {
             background: rgba(255, 255, 255, 0.98);
-            border-radius: 32px;
+            border-radius: 28px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             width: 100%;
-            max-width: 520px;
+            max-width: 500px;
             overflow: hidden;
             backdrop-filter: blur(2px);
-            transition: all 0.3s ease;
         }
 
         /* Header */
         .generator-header {
             background: linear-gradient(135deg, #0b2b3d 0%, #1a4a6f 100%);
-            padding: 28px 32px;
+            padding: 24px 20px;
             text-align: center;
         }
 
         .logo-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
+            font-size: 40px;
+            margin-bottom: 8px;
             display: inline-block;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
         }
 
         .generator-header h1 {
             color: white;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
             letter-spacing: -0.3px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .generator-header p {
             color: rgba(255,255,255,0.8);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 400;
         }
 
-        /* Contenido */
+        /* Contenido - sin scroll */
         .generator-content {
-            padding: 32px;
+            padding: 28px 24px;
         }
 
         /* Estados y animaciones */
@@ -72,13 +71,13 @@
         }
 
         .spinner-container {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .spinner {
-            width: 56px;
-            height: 56px;
-            border: 4px solid #e2e8f0;
+            width: 48px;
+            height: 48px;
+            border: 3px solid #e2e8f0;
             border-top-color: #1a4a6f;
             border-right-color: #2c7da0;
             border-radius: 50%;
@@ -91,51 +90,60 @@
         }
 
         .status-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             color: #0f172a;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .status-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: #475569;
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
-        /* Info card */
+        /* Info card - completamente adaptativa */
         .info-card {
             background: #f8fafc;
             border-radius: 20px;
-            padding: 20px;
+            padding: 16px;
             margin: 20px 0;
             border: 1px solid #e2e8f0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 8px;
             padding: 10px 0;
             border-bottom: 1px solid #e2e8f0;
         }
 
         .info-row:last-child {
             border-bottom: none;
+            padding-bottom: 0;
         }
 
         .info-label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            flex-shrink: 0;
         }
 
         .info-value {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             color: #0f172a;
+            text-align: right;
+            word-break: break-word;
+            flex: 1;
         }
 
         .titulo-destacado {
@@ -151,15 +159,15 @@
             background: linear-gradient(135deg, #1e293b, #0f172a);
             color: white;
             border: none;
-            padding: 12px 28px;
+            padding: 12px 24px;
             border-radius: 40px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 16px;
+            margin-top: 12px;
             width: 100%;
-            max-width: 200px;
+            max-width: 180px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
@@ -169,15 +177,23 @@
             background: linear-gradient(135deg, #0f172a, #020617);
         }
 
-        /* Estado éxito */
+        /* Estado éxito - completamente adaptativo */
         .success-icon {
-            font-size: 56px;
-            margin-bottom: 16px;
+            font-size: 52px;
+            margin-bottom: 12px;
         }
 
         .error-icon {
-            font-size: 56px;
-            margin-bottom: 16px;
+            font-size: 52px;
+            margin-bottom: 12px;
+        }
+
+        .success-text {
+            color: #059669;
+        }
+
+        .error-text {
+            color: #dc2626;
         }
 
         /* Badge */
@@ -186,18 +202,19 @@
             background: #e2e8f0;
             padding: 4px 12px;
             border-radius: 30px;
-            font-size: 12px;
+            font-size: 11px;
             color: #475569;
             margin-top: 8px;
+            word-break: break-word;
         }
 
         /* Loader de progreso */
         .progress-bar {
             width: 100%;
-            height: 4px;
+            height: 3px;
             background: #e2e8f0;
             border-radius: 4px;
-            margin-top: 20px;
+            margin-top: 16px;
             overflow: hidden;
         }
 
@@ -212,6 +229,75 @@
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.6; }
+        }
+
+        /* Ajustes para móviles */
+        @media (max-width: 480px) {
+            .pdf-generator {
+                max-width: 100%;
+                border-radius: 20px;
+            }
+            
+            .generator-header {
+                padding: 20px 16px;
+            }
+            
+            .generator-content {
+                padding: 20px 16px;
+            }
+            
+            .info-card {
+                padding: 12px;
+                margin: 16px 0;
+            }
+            
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            .info-label {
+                font-size: 11px;
+            }
+            
+            .info-value {
+                text-align: left;
+                font-size: 13px;
+            }
+            
+            .status-title {
+                font-size: 16px;
+            }
+            
+            .status-subtitle {
+                font-size: 12px;
+            }
+            
+            .btn-cerrar {
+                max-width: 100%;
+            }
+        }
+
+        /* Para pantallas muy pequeñas */
+        @media (max-width: 360px) {
+            .generator-content {
+                padding: 16px 12px;
+            }
+            
+            .info-card {
+                padding: 10px;
+            }
+        }
+
+        /* Evitar scroll horizontal en cualquier dispositivo */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        .pdf-generator * {
+            max-width: 100%;
         }
     </style>
 </head>
@@ -261,10 +347,10 @@
                 container.innerHTML = `
                     <div class="status-card">
                         <div class="error-icon">⚠️</div>
-                        <div class="status-title" style="color: #dc2626;">Error de datos</div>
+                        <div class="status-title error-text">Error de datos</div>
                         <div class="status-subtitle">${e.message}</div>
                         <div class="info-card" style="background: #fef2f2; border-color: #fecaca;">
-                            <div style="font-size: 13px; color: #991b1b;">
+                            <div style="font-size: 12px; color: #991b1b;">
                                 📌 Asegurate de usar el botón "Generar PDF" desde el panel de reservas
                             </div>
                         </div>
@@ -282,7 +368,7 @@
                 container.innerHTML = `
                     <div class="status-card">
                         <div class="error-icon">📭</div>
-                        <div class="status-title" style="color: #dc2626;">Sin reservas</div>
+                        <div class="status-title error-text">Sin reservas</div>
                         <div class="status-subtitle">No hay reservas para exportar con el filtro actual</div>
                         <div class="badge">Filtro: ${filtroExcursion || 'ninguno'}</div>
                         <button class="btn-cerrar" onclick="window.close()">Cerrar ventana</button>
@@ -301,7 +387,7 @@
                         <div class="spinner"></div>
                     </div>
                     <div class="status-title">Generando reporte</div>
-                    <div class="status-subtitle">Creando documento PDF en formato A4</div>
+                    <div class="status-subtitle">Creando documento PDF en formato A4 horizontal</div>
                     <div class="info-card">
                         <div class="info-row">
                             <span class="info-label">📄 Título</span>
@@ -324,29 +410,26 @@
             
             try {
                 const { jsPDF } = window.jspdf;
-                // FORMATO VERTICAL A4 (portrait)
-                const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                // FORMATO HORIZONTAL LANDSCAPE A4
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
-                const margin = 15;
+                const margin = 12;
                 let y = margin + 10;
                 
                 // ============================================
                 // HEADER PROFESIONAL
                 // ============================================
-                // Logo decorativo (línea superior)
                 doc.setDrawColor(42, 82, 110);
                 doc.setLineWidth(0.5);
                 doc.line(margin, margin, pageWidth - margin, margin);
                 
-                // Título principal
                 doc.setFontSize(18);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(26, 74, 111);
                 doc.text(titulo, pageWidth / 2, y, { align: 'center' });
                 y += 8;
                 
-                // Subtítulo / fecha
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
                 doc.setTextColor(100, 116, 139);
@@ -359,14 +442,12 @@
                 })}`;
                 doc.text(fechaStr, margin, y);
                 doc.text(`Total de reservas: ${reservasFiltradas.length}`, pageWidth - margin, y, { align: 'right' });
-                y += 10;
+                y += 8;
                 
-                // Línea divisoria
                 doc.setDrawColor(203, 213, 225);
                 doc.line(margin, y, pageWidth - margin, y);
                 y += 6;
                 
-                // Línea de empresa (formato profesional)
                 doc.setFontSize(9);
                 doc.setFont('courier', 'normal');
                 doc.setTextColor(71, 85, 105);
@@ -376,7 +457,7 @@
                 // ============================================
                 // TABLA DE DATOS
                 // ============================================
-                const colWidths = [30, 45, 28, 42, 12, 22, 30, 25];
+                const colWidths = [32, 48, 30, 70, 12, 22, 35, 25];
                 const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar', 'Obs.'];
                 
                 let x = margin;
@@ -387,7 +468,6 @@
                 doc.setFontSize(8);
                 doc.setTextColor(30, 41, 59);
                 
-                // Encabezados con fondo
                 for (let i = 0; i < headers.length; i++) {
                     doc.rect(x, y, colWidths[i], 9, 'FD');
                     doc.text(headers[i], x + 2, y + 6);
@@ -395,20 +475,16 @@
                 }
                 y += 9;
                 
-                // Datos
                 doc.setFont('helvetica', 'normal');
-                doc.setFontSize(7);
+                doc.setFontSize(7.5);
                 doc.setTextColor(51, 65, 85);
                 doc.setDrawColor(203, 213, 225);
                 
                 for (const reserva of reservasFiltradas) {
-                    // Verificar espacio en página
-                    if (y > pageHeight - 35) {
+                    if (y > pageHeight - 28) {
                         doc.addPage();
                         y = margin + 10;
                         x = margin;
-                        
-                        // Re-dibujar encabezados en nueva página
                         doc.setFillColor(240, 248, 255);
                         doc.setDrawColor(100, 116, 139);
                         doc.setFont('helvetica', 'bold');
@@ -420,7 +496,7 @@
                         }
                         y += 9;
                         doc.setFont('helvetica', 'normal');
-                        doc.setFontSize(7);
+                        doc.setFontSize(7.5);
                         doc.setDrawColor(203, 213, 225);
                     }
                     
@@ -433,66 +509,55 @@
                     
                     const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
                     const lineasExcursiones = excursionesTexto.split('\n').length;
-                    const alturaFila = Math.max(8, Math.min(40, lineasExcursiones * 3.2 + 3));
+                    const alturaFila = Math.max(8, Math.min(50, lineasExcursiones * 3.5 + 3));
                     
                     x = margin;
                     
-                    // ID
                     doc.rect(x, y, colWidths[0], alturaFila);
-                    doc.text(String(reserva.id || '').substring(0, 12), x + 2, y + 4);
+                    doc.text(String(reserva.id || '').substring(0, 14), x + 2, y + 4.5);
                     x += colWidths[0];
                     
-                    // Cliente
                     doc.rect(x, y, colWidths[1], alturaFila);
-                    const nombreCliente = (reserva.nombre || 'No especificado').substring(0, 28);
-                    doc.text(nombreCliente, x + 2, y + 4);
+                    const nombreCliente = (reserva.nombre || 'No especificado').substring(0, 32);
+                    doc.text(nombreCliente, x + 2, y + 4.5);
                     x += colWidths[1];
                     
-                    // Teléfono
                     doc.rect(x, y, colWidths[2], alturaFila);
-                    doc.text(reserva.telefono || '', x + 2, y + 4);
+                    doc.text(reserva.telefono || '', x + 2, y + 4.5);
                     x += colWidths[2];
                     
-                    // Excursiones
                     doc.rect(x, y, colWidths[3], alturaFila);
                     const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 3);
-                    doc.text(lineas, x + 1.5, y + 4);
+                    doc.text(lineas, x + 1.5, y + 4.5);
                     x += colWidths[3];
                     
-                    // Pax
                     doc.rect(x, y, colWidths[4], alturaFila);
-                    doc.text(String(reserva.personas || 0), x + 2, y + 4);
+                    doc.text(String(reserva.personas || 0), x + 2, y + 4.5);
                     x += colWidths[4];
                     
-                    // Estado
                     doc.rect(x, y, colWidths[5], alturaFila);
-                    doc.text(estadoTexto, x + 2, y + 4);
+                    doc.text(estadoTexto, x + 2, y + 4.5);
                     x += colWidths[5];
                     
-                    // Lugar
                     doc.rect(x, y, colWidths[6], alturaFila);
-                    const lugarTexto = (reserva.lugar || 'No especificado').substring(0, 20);
-                    doc.text(lugarTexto, x + 2, y + 4);
+                    const lugarTexto = (reserva.lugar || 'No especificado').substring(0, 25);
+                    doc.text(lugarTexto, x + 2, y + 4.5);
                     x += colWidths[6];
                     
-                    // Observaciones
                     doc.rect(x, y, colWidths[7], alturaFila);
-                    doc.text('', x + 2, y + 4);
+                    doc.text('', x + 2, y + 4.5);
                     
                     y += alturaFila;
                 }
                 
-                // ============================================
-                // TOTAL GENERAL
-                // ============================================
-                y += 6;
+                y += 5;
                 const totalX = margin + colWidths[0] + colWidths[1] + colWidths[2];
                 
                 doc.setFillColor(248, 250, 252);
                 doc.setDrawColor(71, 85, 105);
                 doc.setLineWidth(0.3);
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(8);
+                doc.setFontSize(8.5);
                 doc.setTextColor(15, 23, 42);
                 
                 doc.rect(margin, y, colWidths[0], 9);
@@ -506,30 +571,26 @@
                 doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5], y, colWidths[6], 9);
                 doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, colWidths[7], 9);
                 
-                y += 14;
+                y += 12;
                 
-                // ============================================
-                // FOOTER PROFESIONAL
-                // ============================================
                 doc.setDrawColor(203, 213, 225);
-                doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+                doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
                 doc.setFontSize(7);
                 doc.setFont('helvetica', 'italic');
                 doc.setTextColor(148, 163, 184);
-                doc.text('Aventura Total - Sistema de Gestión de Reservas', pageWidth / 2, pageHeight - 8, { align: 'center' });
+                doc.text('Aventura Total - Sistema de Gestión de Reservas', pageWidth / 2, pageHeight - 6, { align: 'center' });
                 
-                // Guardar PDF
                 const nombreArchivo = (filtroExcursion && filtroExcursion !== '') 
                     ? `reporte_${filtroExcursion.replace(/[^a-z0-9]/gi, '_').toLowerCase().substring(0, 35)}.pdf`
                     : `reporte_reservas_${Date.now()}.pdf`;
                 
                 doc.save(nombreArchivo);
                 
-                // Mostrar éxito
+                // Mostrar éxito - COMPLETAMENTE ADAPTATIVO SIN SCROLL
                 container.innerHTML = `
                     <div class="status-card">
                         <div class="success-icon">✅</div>
-                        <div class="status-title" style="color: #059669;">¡Reporte generado!</div>
+                        <div class="status-title success-text">¡Reporte generado!</div>
                         <div class="status-subtitle">El PDF se ha descargado correctamente</div>
                         <div class="info-card">
                             <div class="info-row">
@@ -546,7 +607,11 @@
                             </div>
                             <div class="info-row">
                                 <span class="info-label">📁 Archivo</span>
-                                <span class="info-value" style="font-size: 11px;">${nombreArchivo}</span>
+                                <span class="info-value" style="font-size: 11px; word-break: break-all;">${nombreArchivo}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📐 Formato</span>
+                                <span class="info-value">A4 Horizontal</span>
                             </div>
                         </div>
                         <button class="btn-cerrar" onclick="window.close()">Cerrar ventana</button>
@@ -558,10 +623,10 @@
                 container.innerHTML = `
                     <div class="status-card">
                         <div class="error-icon">❌</div>
-                        <div class="status-title" style="color: #dc2626;">Error al generar PDF</div>
+                        <div class="status-title error-text">Error al generar PDF</div>
                         <div class="status-subtitle">${error.message}</div>
                         <div class="info-card" style="background: #fef2f2;">
-                            <div style="font-size: 13px; color: #991b1b;">
+                            <div style="font-size: 12px; color: #991b1b;">
                                 Verificá la conexión y volvé a intentar
                             </div>
                         </div>
