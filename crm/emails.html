@@ -115,7 +115,7 @@
                 <div class="form-group"><label>👤 Cliente:</label><input type="text" id="whatsappCliente" readonly placeholder="Seleccionar cliente"></div>
             </div>
             <div id="clienteDetalleDiv" style="display:none;"></div>
-            <div class="form-group"><label>💬 Mensaje:</label><textarea id="whatsappMensaje" placeholder="Escribe tu mensaje...&#10;&#10;Puedes usar:&#10;[NOMBRE] - Nombre del cliente&#10;[EXCURSION] - Excursión seleccionada&#10;[FECHA] - Fecha de la reserva&#10;[PERSONAS] - Cantidad de personas&#10;[PAGO] - Forma de pago&#10;[LUGAR] - Punto de encuentro"></textarea></div>
+            <div class="form-group"><label>💬 Mensaje:</label><textarea id="whatsappMensaje" placeholder="Escribe tu mensaje...&#10;&#10;Puedes usar:&#10;[NOMBRE] - Nombre del cliente&#10;[EXCURSIONES] - Lista de excursiones&#10;[FECHA] - Fecha de la reserva&#10;[PERSONAS] - Cantidad de personas&#10;[PAGO] - Forma de pago&#10;[LUGAR] - Punto de encuentro"></textarea></div>
             <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
                 <button class="btn-enviar" onclick="enviarWhatsApp()">💬 Enviar</button>
                 <button class="btn-web" onclick="abrirWhatsAppWeb()">🌐 Web</button>
@@ -143,7 +143,7 @@
         let reservaActual = null;
 
         const PLANTILLAS = {
-            confirmacion: `✅ ¡Hola [NOMBRE]!\n\nTu reserva en Aventura Total ha sido CONFIRMADA.\n\n📍 Detalles:\n• Excursión: [EXCURSION]\n• Fecha: [FECHA]\n• Personas: [PERSONAS]\n• Forma de Pago: [PAGO]\n• Lugar: [LUGAR]\n\n🏔️ ¡Gracias por confiar en nosotros!`,
+            confirmacion: `✅ ¡Hola [NOMBRE]!\n\nTu reserva en Aventura Total ha sido CONFIRMADA.\n\n📍 Detalles:\n• Excursiones:\n[EXCURSIONES]\n• Fecha: [FECHA]\n• Personas: [PERSONAS]\n• Forma de Pago: [PAGO]\n• Lugar: [LUGAR]\n\n🏔️ ¡Gracias por confiar en nosotros!`,
             recordatorio: `🔔 ¡Hola [NOMBRE]!\n\nTenés un pago pendiente por tu reserva.\n\n💳 Podés abonar por:\n• Efectivo\n• Débito/Crédito\n• Transferencia\n\n🏔️ Aventura Total`,
             salida: `🚌 ¡Hola [NOMBRE]!\n\n¡Mañana es tu excursión! 🌟\n\n🎒 Llevá:\n• Ropa cómoda\n• Protector solar\n• Agua\n• Cámara\n\n📍 Punto de encuentro: [LUGAR]\n\n🏔️ Aventura Total`,
             agradecimiento: `🙏 ¡Hola [NOMBRE]!\n\n¿Disfrutaste la excursión?\n\n⭐ ¡Dejanos una reseña!\n\n🎉 10% OFF en tu próxima reserva.\n\n🏔️ Aventura Total`,
@@ -151,20 +151,54 @@
             personalizado: `Hola [NOMBRE], escribí tu mensaje personalizado aquí.`
         };
 
+        // 🔥 FUNCIÓN CORREGIDA - Lista TODAS las excursiones
+        function formatearExcursiones(excursionesRaw) {
+            if (!excursionesRaw) return 'No especificadas';
+            
+            // Separar por saltos de línea o por " | "
+            let lista = [];
+            if (excursionesRaw.includes('\n')) {
+                lista = excursionesRaw.split('\n');
+            } else if (excursionesRaw.includes(' | ')) {
+                lista = excursionesRaw.split(' | ');
+            } else {
+                lista = [excursionesRaw];
+            }
+            
+            // Limpiar y formatear cada excursión
+            const excursionesFormateadas = lista.map((exc, idx) => {
+                let excursionesLimpia = exc.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
+                if (excursionesLimpia) {
+                    return `   ${idx+1}. ${excursionesLimpia}`;
+                }
+                return null;
+            }).filter(exc => exc);
+            
+            if (excursionesFormateadas.length === 0) return 'No especificadas';
+            return excursionesFormateadas.join('\n');
+        }
+
         function reemplazarVariables(texto, nombre, reserva) {
             if (!texto) return '';
             let resultado = texto;
             resultado = resultado.replace(/\[NOMBRE\]/g, nombre || '[CLIENTE]');
+            
             if (reserva) {
-                let excursionesRaw = reserva.excursiones || '';
-                let primeraExcursion = excursionesRaw.split('\n')[0] || excursionesRaw;
-                primeraExcursion = primeraExcursion.replace(/^✔️\s*/, '').trim();
-                resultado = resultado.replace(/\[EXCURSION\]/g, primeraExcursion || '[EXCURSION]');
+                // 🔥 Reemplazar [EXCURSIONES] con la lista completa
+                const excursionesTexto = formatearExcursiones(reserva.excursiones);
+                resultado = resultado.replace(/\[EXCURSIONES\]/g, excursionesTexto);
                 resultado = resultado.replace(/\[FECHA\]/g, reserva.fecha || '[FECHA]');
                 resultado = resultado.replace(/\[PERSONAS\]/g, reserva.personas || '[PERSONAS]');
                 resultado = resultado.replace(/\[PAGO\]/g, reserva.formaPago || '[PAGO]');
                 resultado = resultado.replace(/\[LUGAR\]/g, reserva.lugar || '[LUGAR]');
+            } else {
+                resultado = resultado.replace(/\[EXCURSIONES\]/g, '[EXCURSIONES]');
+                resultado = resultado.replace(/\[FECHA\]/g, '[FECHA]');
+                resultado = resultado.replace(/\[PERSONAS\]/g, '[PERSONAS]');
+                resultado = resultado.replace(/\[PAGO\]/g, '[PAGO]');
+                resultado = resultado.replace(/\[LUGAR\]/g, '[LUGAR]');
             }
+            
             return resultado;
         }
 
@@ -199,11 +233,10 @@
             
             const detalleDiv = document.getElementById('clienteDetalleDiv');
             if (detalleDiv && reservaActual) {
-                let excursionesPreview = (reservaActual.excursiones || '').split('\n')[0] || '';
-                excursionesPreview = excursionesPreview.replace(/^✔️\s*/, '').substring(0, 50);
+                const excursionesPreview = formatearExcursiones(reservaActual.excursiones).split('\n')[0] || 'No especificada';
                 detalleDiv.style.display = 'block';
                 detalleDiv.className = 'cliente-detalle';
-                detalleDiv.innerHTML = `<strong>📋 Última reserva:</strong><br>🕐 ${excursionesPreview || 'No especificada'}<br>📅 ${reservaActual.fecha || 'No especificada'} | 👥 ${reservaActual.personas || '1'} pax<br>💳 ${reservaActual.formaPago || 'No especificada'} | 📍 ${reservaActual.lugar || 'No especificado'}`;
+                detalleDiv.innerHTML = `<strong>📋 Última reserva:</strong><br>🕐 ${excursionesPreview}<br>📅 ${reservaActual.fecha || 'No especificada'} | 👥 ${reservaActual.personas || '1'} pax<br>💳 ${reservaActual.formaPago || 'No especificada'} | 📍 ${reservaActual.lugar || 'No especificado'}`;
             } else if (detalleDiv) {
                 detalleDiv.style.display = 'none';
             }
@@ -366,7 +399,7 @@
             const historial = JSON.parse(localStorage.getItem('historialWhatsApp') || '[]');
             const histEl = document.getElementById('historialWhatsApp');
             if (!histEl) return;
-            if (historial.length === 0) { histEl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;">No hay mensajes enviados</td></tr>'; return; }
+            if (historial.length === 0) { histEl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;">No hay mensajes enviados</td</td'; return; }
             histEl.innerHTML = historial.map(h => `<tr><td>${h.fecha}</td><td>${escapeHtml(h.cliente)}</td><td>${h.numero}</td><td><span class="badge-enviado">${h.estado}</span></td><td><button class="btn-reenviar" onclick="reenviarMensaje('${h.numero}','${escapeHtml(h.cliente)}')">💬 Reenviar</button></td></tr>`).join('');
         }
 
