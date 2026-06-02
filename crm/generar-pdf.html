@@ -277,7 +277,7 @@
                 let y = margin + 8;
                 
                 // ============================================
-                // HEADER - TÍTULO ALINEADO A LA IZQUIERDA
+                // HEADER
                 // ============================================
                 doc.setDrawColor(42, 82, 110);
                 doc.setLineWidth(0.5);
@@ -290,16 +290,19 @@
                 doc.text(titulo, margin, y);
                 y += 9;
                 
-                // Fecha y total de reservas (ambos alineados a la izquierda)
+                // Fecha
                 doc.setFontSize(8.5);
                 doc.setFont('helvetica', 'normal');
                 doc.setTextColor(100, 116, 139);
                 const fechaStr = `Generado: ${new Date().toLocaleString('es-AR')}`;
                 doc.text(fechaStr, margin, y);
-                y += 5;
+                y += 6;
+                
+                // Total de reservas y TOTAL GENERAL en la misma línea
                 doc.setFont('helvetica', 'bold');
-                doc.text(`Total: ${reservasFiltradas.length} reservas`, margin, y);
-                y += 8;
+                doc.setTextColor(26, 74, 111);
+                doc.text(`Total: ${reservasFiltradas.length} reservas - TOTAL GENERAL ${totalPasajeros}`, margin, y);
+                y += 10;
                 
                 // Línea divisoria
                 doc.setDrawColor(203, 213, 225);
@@ -307,7 +310,7 @@
                 y += 8;
                 
                 // ============================================
-                // TABLA - SIN RELLENO EN CELDAS
+                // TABLA
                 // ============================================
                 const colWidths = [28, 42, 28, 72, 12, 20, 32, 24];
                 const headers = ['ID', 'CLIENTE', 'TELÉFONO', 'EXCURSIONES', 'PAX', 'ESTADO', 'LUGAR', 'OBS'];
@@ -320,7 +323,6 @@
                 doc.setFontSize(7.5);
                 doc.setTextColor(30, 41, 59);
                 
-                // Solo encabezados con relleno
                 for (let i = 0; i < headers.length; i++) {
                     doc.rect(x, y, colWidths[i], 8, 'FD');
                     doc.text(headers[i], x + 2, y + 5.5);
@@ -328,13 +330,10 @@
                 }
                 y += 8;
                 
-                // Datos - SIN RELLENO (solo borde)
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(7);
                 doc.setTextColor(51, 65, 85);
                 doc.setDrawColor(203, 213, 225);
-                
-                let rowCount = 0;
                 
                 for (const reserva of reservasFiltradas) {
                     if (y > pageHeight - 30) {
@@ -358,7 +357,6 @@
                         doc.setDrawColor(203, 213, 225);
                     }
                     
-                    // Filtrar excursiones según búsqueda
                     let excursionesTexto = '';
                     if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
                         if (hayFiltro) {
@@ -426,32 +424,13 @@
                     doc.text('', x + 2, y + 4.5);
                     
                     y += alturaFila;
-                    rowCount++;
                 }
                 
-                // TOTAL GENERAL - SIN RELLENO
-                y += 6;
-                const totalX = margin + colWidths[0] + colWidths[1] + colWidths[2];
+                // ============================================
+                // SIN FILA DE TOTAL GENERAL (eliminada)
+                // ============================================
                 
-                doc.setDrawColor(71, 85, 105);
-                doc.setLineWidth(0.3);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(8.5);
-                doc.setTextColor(15, 23, 42);
-                
-                doc.rect(margin, y, colWidths[0], 9);
-                doc.rect(margin + colWidths[0], y, colWidths[1], 9);
-                doc.rect(margin + colWidths[0] + colWidths[1], y, colWidths[2], 9);
-                doc.rect(totalX, y, colWidths[3], 9);
-                doc.text('TOTAL GENERAL', totalX + 3, y + 6);
-                doc.rect(totalX + colWidths[3], y, colWidths[4], 9);
-                doc.setTextColor(26, 74, 111);
-                doc.text(String(totalPasajeros), totalX + colWidths[3] + 3, y + 6);
-                doc.rect(totalX + colWidths[3] + colWidths[4], y, colWidths[5], 9);
-                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5], y, colWidths[6], 9);
-                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, colWidths[7], 9);
-                
-                y += 14;
+                y += 10;
                 
                 // FOOTER
                 doc.setDrawColor(203, 213, 225);
