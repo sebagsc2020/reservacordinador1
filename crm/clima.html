@@ -135,7 +135,7 @@
             </div>
             <div class="card">
                 <div class="card-title"><span class="icon">📅</span> Pronóstico 8 Días</div>
-                <div class="forecast-grid" id="pronostico8dias"></div>
+                <div class="forecast-grid" id="pronostico7dias"></div>
             </div>
         </div>
         
@@ -271,13 +271,13 @@
                 }
                 
                 // Pronóstico 8 días
-                const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+                const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
                 let p = '';
                 for (let i = 0; i < 7; i++) {
                     const f = new Date(dt.pronostico[i].fecha + 'T00:00:00');
                     p += `<div class="forecast-card${i===0?' hoy':''}"><div class="forecast-dia">${dias[f.getDay()]} ${f.getDate()}/${f.getMonth()+1}</div><div class="forecast-icono">${dt.icono}</div><div class="forecast-max">${dt.pronostico[i].max}°</div><div class="forecast-min">${dt.pronostico[i].min}°</div><div class="forecast-rain">🌧️ ${dt.pronostico[i].lluvia}mm</div></div>`;
                 }
-                document.getElementById('pronostico8dias').innerHTML = p;
+                document.getElementById('pronostico7dias').innerHTML = p;
                 
                 // Alertas
                 const alertas = [];
@@ -314,10 +314,10 @@
         function compartirPorWhatsApp() {
             if (!datosClimaActual) { alert('⚠️ Esperá que carguen los datos'); return; }
             const d = datosClimaActual, fecha = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-            let m = `🌤️ *REPORTE METEOROLÓGICO*\n📍 ${d.ciudad}\n📅 ${fecha}\n\n🌡️ *Ahora:* ${d.temp}°C - ${d.desc}\n📈 Máx: ${d.maxima}° | Mín: ${d.minima}°\n💧 Hum: ${d.humedad}% | 💨 Viento: ${d.viento} km/h\n🌧️ Lluvia: ${d.lluvia}mm | ☀️ UV: ${d.uv}\n\n📅 *Próximos días:*\n`;
-            const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+            let m = `⚠️ *INFORME METEOROLÓGICO*\n📍 ${d.ciudad}\n📅 ${fecha}\n\n🌡️ *Ahora:* ${d.temp}°C - ${d.desc}\n📈 Máx: ${d.maxima}° | Mín: ${d.minima}°\n💧 Hum: ${d.humedad}% | 💨 Viento: ${d.viento} km/h\n🌧️ Lluvia: ${d.lluvia}mm | ☀️ UV: ${d.uv}\n\n📅 *Próximos días:*\n`;
+            const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
             d.pronostico.slice(0,5).forEach((p,i) => { const f = new Date(p.fecha+'T00:00:00'); m += `   ${dias[f.getDay()]}: ${p.max}° / ${p.min}° | 🌧️ ${p.lluvia}mm\n`; });
-            m += `\n🏔️ Aventura Total`;
+            m += `\n⚠️ Aventura Total`;
             window.open('https://wa.me/?text='+encodeURIComponent(m), '_blank');
         }
         
