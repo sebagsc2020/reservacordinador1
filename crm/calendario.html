@@ -22,7 +22,6 @@
         .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
-        /* Panel de creación de evento por rango */
         .create-event-panel { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
         .create-event-panel h3 { margin-bottom: 15px; color: #1a1a2e; font-size: 16px; }
         .range-selector { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 15px; }
@@ -34,7 +33,6 @@
         .btn-crear-evento { padding: 8px 20px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
         .btn-compartir-todos { padding: 8px 20px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; margin-left: 10px; }
         
-        /* Lista de eventos creados */
         .events-list { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
         .events-list h3 { margin-bottom: 15px; color: #1a1a2e; font-size: 16px; }
         .event-item-list { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; flex-wrap: wrap; gap: 10px; }
@@ -47,7 +45,6 @@
         .btn-compartir-evento { background: #25D366; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .no-events { color: #999; text-align: center; padding: 20px; font-size: 13px; }
         
-        /* Calendario de días del evento */
         .event-calendar-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-top: 20px; }
         .event-calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
         .event-calendar-header h3 { font-size: 18px; color: #1a1a2e; }
@@ -65,7 +62,6 @@
         .btn-agregar-nota-cal:hover { background: #d5dbdb; }
         .sin-eventos-seleccionado { text-align: center; padding: 40px; color: #999; background: white; border-radius: 15px; }
         
-        /* Modal para notas individuales */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.show { display: flex; }
         .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 400px; width: 90%; }
@@ -75,6 +71,20 @@
         .modal-input { width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; font-family: inherit; }
         textarea.modal-input { resize: vertical; min-height: 80px; }
         .modal-save { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        
+        /* Preloader */
+        .preloader-popup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.3s ease;
+        }
+        .preloader-popup.oculto { opacity: 0; visibility: hidden; }
+        .preloader-popup-contenido { background: white; border-radius: 24px; padding: 35px 45px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: popupFadeIn 0.3s ease; }
+        @keyframes popupFadeIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .preloader-popup-icono { width: 70px; height: 70px; border: 4px solid #e2e8f0; border-top: 4px solid #667eea; border-right: 4px solid #764ba2; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .preloader-popup-titulo { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+        .preloader-popup-subtitulo { font-size: 14px; color: #666; }
+        .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
+        @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
         
         @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } .event-day-card { width: 100%; } }
     </style>
@@ -100,7 +110,6 @@
             <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
         </div>
 
-        <!-- Panel para CREAR evento por rango de fechas -->
         <div class="create-event-panel">
             <h3>➕ Crear nuevo evento por rango de fechas</h3>
             <div class="range-selector">
@@ -112,15 +121,13 @@
             </div>
         </div>
 
-        <!-- Lista de eventos creados con botones para VER, APAGAR y COMPARTIR -->
         <div class="events-list">
             <h3>📋 Eventos activos</h3>
             <div id="listaEventosContainer">
-                <div class="no-events">No hay eventos creados. Crea uno usando el panel superior.</div>
+                <div class="no-events">📭 Cargando eventos...</div>
             </div>
         </div>
 
-        <!-- Calendario de días del evento seleccionado -->
         <div id="eventoCalendarioContainer" class="event-calendar-container" style="display: none;">
             <div class="event-calendar-header">
                 <h3 id="eventoCalendarioTitulo">📅 Días del evento</h3>
@@ -132,7 +139,6 @@
         <div id="sinEventoSeleccionado" class="sin-eventos-seleccionado">👈 Selecciona un evento de la lista para ver sus días</div>
     </div>
 
-    <!-- Modal para agregar/editar nota individual por día -->
     <div class="modal-overlay" id="modalNota">
         <div class="modal-content">
             <div class="modal-header">
@@ -147,52 +153,130 @@
         </div>
     </div>
 
+    <div id="preloaderPopup" class="preloader-popup oculto">
+        <div class="preloader-popup-contenido">
+            <div class="preloader-popup-icono"></div>
+            <div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div>
+            <div class="preloader-popup-subtitulo">Cargando datos desde la nube...</div>
+        </div>
+    </div>
+
     <script>
-        // ---------- Gestión de sesión ----------
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             // window.location.href = 'index.html'; 
         }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
-        // ---------- Estructura de datos ----------
-        let eventosRango = [];      // Eventos por rango { id, nombre, fechaInicio, fechaFin }
-        let notasPorDia = {};       // Notas individuales: clave "YYYY-MM-DD" -> array de strings
-        let eventoSeleccionado = null;  // Evento actualmente seleccionado
+        // 🔥 URL DEL GOOGLE APPS SCRIPT (REEMPLAZAR CON TU URL)
+        const SCRIPT_URL = 'https://script.google.com/macros/s/TU_URL_AQUI/exec';
+        
+        let eventosRango = [];
+        let notasPorDia = {};
+        let eventoSeleccionado = null;
 
-        // ---------- Cargar/Guardar en localStorage ----------
-        function cargarEventos() {
-            const storedEventos = localStorage.getItem('eventosRangoCalendario');
-            if (storedEventos) {
-                eventosRango = JSON.parse(storedEventos);
-                eventosRango.forEach(ev => {
-                    ev.fechaInicio = new Date(ev.fechaInicio);
-                    ev.fechaFin = new Date(ev.fechaFin);
+        // Preloader
+        const preloaderPopup = document.getElementById('preloaderPopup');
+        function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
+        function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
+
+        async function cargarEventosDesdeNube() {
+            mostrarPreloader();
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=obtenerEventos'
                 });
-            } else {
-                eventosRango = [];
+                const data = await response.json();
+                if (data.success && data.eventos) {
+                    eventosRango = data.eventos.map(ev => ({
+                        ...ev,
+                        fechaInicio: new Date(ev.fechaInicio),
+                        fechaFin: new Date(ev.fechaFin),
+                        id: parseInt(ev.id) || ev.id
+                    }));
+                }
+                
+                const responseNotas = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=obtenerNotas'
+                });
+                const dataNotas = await responseNotas.json();
+                if (dataNotas.success && dataNotas.notas) {
+                    notasPorDia = {};
+                    dataNotas.notas.forEach(nota => {
+                        if (!notasPorDia[nota.fechaKey]) notasPorDia[nota.fechaKey] = [];
+                        notasPorDia[nota.fechaKey].push(nota.nota);
+                    });
+                }
+                
+                renderizarListaEventos();
+                if (eventoSeleccionado) {
+                    const eventoActualizado = eventosRango.find(ev => ev.id === eventoSeleccionado.id);
+                    if (eventoActualizado) {
+                        eventoSeleccionado = eventoActualizado;
+                        mostrarCalendarioEvento();
+                    } else {
+                        ocultarCalendarioEvento();
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar eventos:', error);
+            } finally {
+                ocultarPreloader();
             }
-            
-            const storedNotas = localStorage.getItem('notasPorDiaCalendario');
-            if (storedNotas) {
-                notasPorDia = JSON.parse(storedNotas);
-            } else {
-                notasPorDia = {};
-            }
-            
-            renderizarListaEventos();
         }
 
-        function guardarEventos() {
-            localStorage.setItem('eventosRangoCalendario', JSON.stringify(eventosRango.map(ev => ({
-                ...ev,
-                fechaInicio: ev.fechaInicio.toISOString(),
-                fechaFin: ev.fechaFin.toISOString()
-            }))));
-            localStorage.setItem('notasPorDiaCalendario', JSON.stringify(notasPorDia));
+        async function guardarEventoEnNube(evento) {
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=guardarEvento&id=${evento.id}&nombre=${encodeURIComponent(evento.nombre)}&fechaInicio=${evento.fechaInicio.toISOString()}&fechaFin=${evento.fechaFin.toISOString()}`
+                });
+            } catch (error) {
+                console.error('Error al guardar evento:', error);
+            }
         }
 
-        // ---------- Funciones para CREAR evento por RANGO ----------
-        function crearEventoRango() {
+        async function eliminarEventoEnNube(id) {
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=eliminarEvento&id=${id}`
+                });
+            } catch (error) {
+                console.error('Error al eliminar evento:', error);
+            }
+        }
+
+        async function guardarNotaEnNube(fechaKey, nota, eventoId) {
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=guardarNota&fechaKey=${fechaKey}&nota=${encodeURIComponent(nota)}&eventoId=${eventoId || ''}`
+                });
+            } catch (error) {
+                console.error('Error al guardar nota:', error);
+            }
+        }
+
+        async function eliminarNotaEnNube(fechaKey, nota) {
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=eliminarNota&fechaKey=${fechaKey}&nota=${encodeURIComponent(nota)}`
+                });
+            } catch (error) {
+                console.error('Error al eliminar nota:', error);
+            }
+        }
+
+        async function crearEventoRango() {
             const fechaInicioStr = document.getElementById('eventoFechaInicio').value;
             const fechaFinStr = document.getElementById('eventoFechaFin').value;
             const nombre = document.getElementById('eventoNombre').value.trim();
@@ -220,36 +304,31 @@
                 fechaInicio: fechaInicio,
                 fechaFin: fechaFin
             };
-            eventosRango.push(nuevoEvento);
-            guardarEventos();
+            
+            await guardarEventoEnNube(nuevoEvento);
+            await cargarEventosDesdeNube();
             
             document.getElementById('eventoFechaInicio').value = '';
             document.getElementById('eventoFechaFin').value = '';
             document.getElementById('eventoNombre').value = '';
             
-            renderizarListaEventos();
             alert(`✅ Evento "${nombre}" creado del ${formatearFecha(fechaInicio)} al ${formatearFecha(fechaFin)}`);
         }
 
-        // ---------- Funciones para APAGAR (eliminar) evento ----------
-        function eliminarEvento(id) {
+        async function eliminarEvento(id) {
             const evento = eventosRango.find(ev => ev.id === id);
             if (evento && confirm(`¿Eliminar el evento "${evento.nombre}"?`)) {
-                eventosRango = eventosRango.filter(ev => ev.id !== id);
+                await eliminarEventoEnNube(id);
+                await cargarEventosDesdeNube();
                 if (eventoSeleccionado && eventoSeleccionado.id === id) {
-                    eventoSeleccionado = null;
                     ocultarCalendarioEvento();
                 }
-                guardarEventos();
-                renderizarListaEventos();
             }
         }
 
-        // ---------- Función para VER evento (cargar solo los días del evento) ----------
         function verEvento(id) {
             const evento = eventosRango.find(ev => ev.id === id);
             if (!evento) return;
-            
             eventoSeleccionado = evento;
             mostrarCalendarioEvento();
         }
@@ -262,11 +341,9 @@
             document.getElementById('eventoCalendarioTitulo').innerHTML = `📅 ${escapeHtml(eventoSeleccionado.nombre)}`;
             document.getElementById('eventoInfoHeader').innerHTML = `📅 Del ${formatearFecha(eventoSeleccionado.fechaInicio)} al ${formatearFecha(eventoSeleccionado.fechaFin)}`;
             
-            // Configurar botón compartir
             const btnCompartir = document.getElementById('btnCompartirEventoActual');
             btnCompartir.onclick = () => compartirEvento(eventoSeleccionado.id);
             
-            // Generar los días del evento
             const daysGrid = document.getElementById('eventDaysGrid');
             let dias = [];
             let fechaActual = new Date(eventoSeleccionado.fechaInicio);
@@ -287,8 +364,8 @@
                     const notaCorta = nota.length > 30 ? nota.substring(0, 27) + '...' : nota;
                     notasHtml += `
                         <div class="nota-item-cal">
-                            <span class="nota-texto-cal" onclick="editarNota('${fechaKey}', ${idx}, '${fechaFormateada}')" title="Editar: ${escapeHtml(nota)}">📌 ${escapeHtml(notaCorta)}</span>
-                            <button class="eliminar-nota-cal" onclick="eliminarNota('${fechaKey}', ${idx})">✕</button>
+                            <span class="nota-texto-cal" onclick='editarNota("${fechaKey}", ${idx}, "${fechaFormateada}", "${escapeHtml(nota).replace(/"/g, '&quot;')}")'>📌 ${escapeHtml(notaCorta)}</span>
+                            <button class="eliminar-nota-cal" onclick="eliminarNota('${fechaKey}', '${escapeHtml(nota).replace(/'/g, "\\'")}')">✕</button>
                         </div>
                     `;
                 });
@@ -317,7 +394,6 @@
             return dias[fecha.getDay()];
         }
 
-        // ---------- Funciones para COMPARTIR por WhatsApp ----------
         function compartirEvento(id) {
             const evento = eventosRango.find(ev => ev.id === id);
             if (!evento) return;
@@ -380,66 +456,59 @@
             window.open(urlWhatsApp, '_blank');
         }
 
-        // ---------- Funciones para NOTAS INDIVIDUALES por día ----------
         let fechaNotaSeleccionada = null;
         let fechaNotaTexto = null;
+        let notaEditIndex = null;
+        let notaEditTexto = null;
         
         function abrirModalAgregarNota(fechaKey, fechaTexto) {
             fechaNotaSeleccionada = fechaKey;
             fechaNotaTexto = fechaTexto;
+            notaEditIndex = null;
+            notaEditTexto = null;
             document.getElementById('modalNotaFecha').innerText = fechaTexto;
             document.getElementById('notaTexto').value = '';
             document.getElementById('modalNotaTitle').innerText = '📝 Agregar nota';
             document.getElementById('modalNota').classList.add('show');
         }
         
-        function editarNota(fechaKey, index, fechaTexto) {
+        function editarNota(fechaKey, index, fechaTexto, notaActual) {
             fechaNotaSeleccionada = fechaKey;
             fechaNotaTexto = fechaTexto;
-            const notas = notasPorDia[fechaKey] || [];
+            notaEditIndex = index;
+            notaEditTexto = notaActual;
             document.getElementById('modalNotaFecha').innerText = fechaTexto;
-            document.getElementById('notaTexto').value = notas[index] || '';
+            document.getElementById('notaTexto').value = notaActual;
             document.getElementById('modalNotaTitle').innerText = '✏️ Editar nota';
             document.getElementById('modalNota').classList.add('show');
-            window.notaEditIndex = index;
         }
         
-        function guardarNota() {
+        async function guardarNota() {
             const texto = document.getElementById('notaTexto').value.trim();
             if (!texto) {
                 alert("Escribe algo para la nota.");
                 return;
             }
             
-            if (!notasPorDia[fechaNotaSeleccionada]) {
-                notasPorDia[fechaNotaSeleccionada] = [];
+            if (notaEditIndex !== null && notaEditTexto !== null) {
+                await eliminarNotaEnNube(fechaNotaSeleccionada, notaEditTexto);
             }
             
-            if (window.notaEditIndex !== undefined && notasPorDia[fechaNotaSeleccionada][window.notaEditIndex]) {
-                notasPorDia[fechaNotaSeleccionada][window.notaEditIndex] = texto;
-                delete window.notaEditIndex;
-            } else {
-                notasPorDia[fechaNotaSeleccionada].push(texto);
-            }
+            await guardarNotaEnNube(fechaNotaSeleccionada, texto, eventoSeleccionado ? eventoSeleccionado.id : null);
+            await cargarEventosDesdeNube();
             
-            guardarEventos();
             cerrarModalNota();
             if (eventoSeleccionado) {
                 mostrarCalendarioEvento();
             }
         }
         
-        function eliminarNota(fechaKey, index) {
-            if (notasPorDia[fechaKey] && notasPorDia[fechaKey][index]) {
-                if (confirm("¿Eliminar esta nota?")) {
-                    notasPorDia[fechaKey].splice(index, 1);
-                    if (notasPorDia[fechaKey].length === 0) {
-                        delete notasPorDia[fechaKey];
-                    }
-                    guardarEventos();
-                    if (eventoSeleccionado) {
-                        mostrarCalendarioEvento();
-                    }
+        async function eliminarNota(fechaKey, nota) {
+            if (confirm("¿Eliminar esta nota?")) {
+                await eliminarNotaEnNube(fechaKey, nota);
+                await cargarEventosDesdeNube();
+                if (eventoSeleccionado) {
+                    mostrarCalendarioEvento();
                 }
             }
         }
@@ -447,10 +516,10 @@
         function cerrarModalNota() {
             document.getElementById('modalNota').classList.remove('show');
             fechaNotaSeleccionada = null;
-            window.notaEditIndex = undefined;
+            notaEditIndex = null;
+            notaEditTexto = null;
         }
 
-        // ---------- Renderizar lista de eventos ----------
         function renderizarListaEventos() {
             const container = document.getElementById('listaEventosContainer');
             if (eventosRango.length === 0) {
@@ -462,7 +531,7 @@
                 <div class="event-item-list">
                     <div class="event-info">
                         <div class="event-name">🎯 ${escapeHtml(ev.nombre)}</div>
-                        <div class="event-dates">📅 ${formatearFecha(ev.fechaInicio)} → ${formatearFecha(ev.fechaFin)}</div>
+                        <div class="event-dates">📅 ${formatearFecha(new Date(ev.fechaInicio))} → ${formatearFecha(new Date(ev.fechaFin))}</div>
                     </div>
                     <div class="event-actions">
                         <button class="btn-ver-evento" onclick="verEvento(${ev.id})">👁️ Ver días</button>
@@ -473,7 +542,6 @@
             `).join('');
         }
         
-        // Helper: formatear fecha como DD/MM/YYYY
         function formatearFecha(fecha) {
             return `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
         }
@@ -489,7 +557,6 @@
             return div.innerHTML;
         }
         
-        // Cerrar modal con click fuera o ESC
         document.getElementById('modalNota').addEventListener('click', function(e) {
             if (e.target === this) cerrarModalNota();
         });
@@ -497,8 +564,8 @@
             if (e.key === 'Escape') cerrarModalNota();
         });
         
-        // Inicializar
-        cargarEventos();
+        cargarEventosDesdeNube();
+        setInterval(cargarEventosDesdeNube, 30000);
     </script>
 </body>
 </html>
