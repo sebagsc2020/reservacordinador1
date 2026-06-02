@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Generador PDF - Aventura Total</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -10,6 +10,13 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden !important;
+            overflow-y: auto;
         }
 
         body {
@@ -20,6 +27,9 @@
             justify-content: center;
             align-items: center;
             padding: 16px;
+            margin: 0;
+            width: 100%;
+            overflow-x: hidden;
         }
 
         /* Contenedor principal - completamente responsivo */
@@ -28,46 +38,46 @@
             border-radius: 28px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
             overflow: hidden;
-            backdrop-filter: blur(2px);
         }
 
         /* Header */
         .generator-header {
             background: linear-gradient(135deg, #0b2b3d 0%, #1a4a6f 100%);
-            padding: 24px 20px;
+            padding: 20px 16px;
             text-align: center;
         }
 
         .logo-icon {
-            font-size: 40px;
-            margin-bottom: 8px;
+            font-size: 36px;
+            margin-bottom: 6px;
             display: inline-block;
         }
 
         .generator-header h1 {
             color: white;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             letter-spacing: -0.3px;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .generator-header p {
             color: rgba(255,255,255,0.8);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 400;
         }
 
-        /* Contenido - sin scroll */
+        /* Contenido */
         .generator-content {
-            padding: 28px 24px;
+            padding: 24px 20px;
         }
 
         /* Estados y animaciones */
         .status-card {
             text-align: center;
+            width: 100%;
         }
 
         .spinner-container {
@@ -75,8 +85,8 @@
         }
 
         .spinner {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border: 3px solid #e2e8f0;
             border-top-color: #1a4a6f;
             border-right-color: #2c7da0;
@@ -102,25 +112,25 @@
             line-height: 1.4;
         }
 
-        /* Info card - completamente adaptativa */
+        /* Info card - SIN SCROLL, con word-break */
         .info-card {
             background: #f8fafc;
-            border-radius: 20px;
-            padding: 16px;
-            margin: 20px 0;
+            border-radius: 16px;
+            padding: 14px;
+            margin: 16px 0;
             border: 1px solid #e2e8f0;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+            width: 100%;
+            overflow: hidden;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 10px 0;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
             border-bottom: 1px solid #e2e8f0;
+            flex-wrap: wrap;
         }
 
         .info-row:last-child {
@@ -130,19 +140,24 @@
 
         .info-label {
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            flex-shrink: 0;
+            letter-spacing: 0.3px;
+            background: #eef2ff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
         }
 
         .info-value {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: #0f172a;
             text-align: right;
             word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 65%;
             flex: 1;
         }
 
@@ -159,7 +174,7 @@
             background: linear-gradient(135deg, #1e293b, #0f172a);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 40px;
             font-size: 14px;
             font-weight: 600;
@@ -167,25 +182,24 @@
             transition: all 0.2s ease;
             margin-top: 12px;
             width: 100%;
-            max-width: 180px;
+            max-width: 160px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .btn-cerrar:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-            background: linear-gradient(135deg, #0f172a, #020617);
         }
 
-        /* Estado éxito - completamente adaptativo */
+        /* Iconos de estado */
         .success-icon {
-            font-size: 52px;
-            margin-bottom: 12px;
+            font-size: 48px;
+            margin-bottom: 10px;
         }
 
         .error-icon {
-            font-size: 52px;
-            margin-bottom: 12px;
+            font-size: 48px;
+            margin-bottom: 10px;
         }
 
         .success-text {
@@ -200,7 +214,7 @@
         .badge {
             display: inline-block;
             background: #e2e8f0;
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 30px;
             font-size: 11px;
             color: #475569;
@@ -208,7 +222,7 @@
             word-break: break-word;
         }
 
-        /* Loader de progreso */
+        /* Progress bar */
         .progress-bar {
             width: 100%;
             height: 3px;
@@ -222,7 +236,6 @@
             width: 60%;
             height: 100%;
             background: linear-gradient(90deg, #1a4a6f, #2c7da0);
-            border-radius: 4px;
             animation: pulse 1s ease infinite;
         }
 
@@ -231,15 +244,15 @@
             50% { opacity: 0.6; }
         }
 
-        /* Ajustes para móviles */
-        @media (max-width: 480px) {
+        /* RESPONSIVE - MÓVILES */
+        @media (max-width: 500px) {
             .pdf-generator {
                 max-width: 100%;
                 border-radius: 20px;
             }
             
             .generator-header {
-                padding: 20px 16px;
+                padding: 16px 12px;
             }
             
             .generator-content {
@@ -248,22 +261,27 @@
             
             .info-card {
                 padding: 12px;
-                margin: 16px 0;
+                margin: 14px 0;
             }
             
             .info-row {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 4px;
+                gap: 6px;
+                padding: 10px 0;
             }
             
             .info-label {
                 font-size: 11px;
+                padding: 2px 8px;
             }
             
             .info-value {
                 text-align: left;
                 font-size: 13px;
+                max-width: 100%;
+                width: 100%;
+                word-break: break-all;
             }
             
             .status-title {
@@ -276,10 +294,15 @@
             
             .btn-cerrar {
                 max-width: 100%;
+                padding: 10px 16px;
+            }
+            
+            .success-icon, .error-icon {
+                font-size: 42px;
             }
         }
 
-        /* Para pantallas muy pequeñas */
+        /* Pantallas muy pequeñas */
         @media (max-width: 360px) {
             .generator-content {
                 padding: 16px 12px;
@@ -288,16 +311,24 @@
             .info-card {
                 padding: 10px;
             }
+            
+            .info-value {
+                font-size: 12px;
+            }
         }
 
-        /* Evitar scroll horizontal en cualquier dispositivo */
-        html, body {
-            overflow-x: hidden;
-            width: 100%;
+        /* Evitar cualquier desbordamiento */
+        * {
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
         }
         
-        .pdf-generator * {
-            max-width: 100%;
+        .pdf-generator,
+        .generator-content,
+        .status-card,
+        .info-card {
+            overflow: hidden !important;
         }
     </style>
 </head>
@@ -326,7 +357,6 @@
     <script>
         (function() {
             const container = document.getElementById('statusContainer');
-            const pdfGenerator = document.getElementById('pdfGenerator');
             
             // Leer datos desde localStorage
             let filtroExcursion = '';
@@ -351,10 +381,10 @@
                         <div class="status-subtitle">${e.message}</div>
                         <div class="info-card" style="background: #fef2f2; border-color: #fecaca;">
                             <div style="font-size: 12px; color: #991b1b;">
-                                📌 Asegurate de usar el botón "Generar PDF" desde el panel de reservas
+                                📌 Usá el botón "Generar PDF" desde el panel de reservas
                             </div>
                         </div>
-                        <button class="btn-cerrar" onclick="window.close()">Cerrar ventana</button>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
                     </div>
                 `;
                 return;
@@ -370,8 +400,8 @@
                         <div class="error-icon">📭</div>
                         <div class="status-title error-text">Sin reservas</div>
                         <div class="status-subtitle">No hay reservas para exportar con el filtro actual</div>
-                        <div class="badge">Filtro: ${filtroExcursion || 'ninguno'}</div>
-                        <button class="btn-cerrar" onclick="window.close()">Cerrar ventana</button>
+                        <div class="badge">Filtro: ${escapeHtml(filtroExcursion || 'ninguno')}</div>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
                     </div>
                 `;
                 return;
@@ -387,7 +417,7 @@
                         <div class="spinner"></div>
                     </div>
                     <div class="status-title">Generando reporte</div>
-                    <div class="status-subtitle">Creando documento PDF en formato A4 horizontal</div>
+                    <div class="status-subtitle">Creando PDF en formato A4 horizontal</div>
                     <div class="info-card">
                         <div class="info-row">
                             <span class="info-label">📄 Título</span>
@@ -398,7 +428,7 @@
                             <span class="info-value">${reservasFiltradas.length}</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">👥 Pasajeros totales</span>
+                            <span class="info-label">👥 Pasajeros</span>
                             <span class="info-value">${totalPasajeros}</span>
                         </div>
                     </div>
@@ -410,16 +440,13 @@
             
             try {
                 const { jsPDF } = window.jspdf;
-                // FORMATO HORIZONTAL LANDSCAPE A4
                 const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
                 const margin = 12;
                 let y = margin + 10;
                 
-                // ============================================
-                // HEADER PROFESIONAL
-                // ============================================
+                // HEADER
                 doc.setDrawColor(42, 82, 110);
                 doc.setLineWidth(0.5);
                 doc.line(margin, margin, pageWidth - margin, margin);
@@ -433,15 +460,9 @@
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
                 doc.setTextColor(100, 116, 139);
-                const fechaStr = `Generado: ${new Date().toLocaleString('es-AR', { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })}`;
+                const fechaStr = `Generado: ${new Date().toLocaleString('es-AR')}`;
                 doc.text(fechaStr, margin, y);
-                doc.text(`Total de reservas: ${reservasFiltradas.length}`, pageWidth - margin, y, { align: 'right' });
+                doc.text(`Total: ${reservasFiltradas.length}`, pageWidth - margin, y, { align: 'right' });
                 y += 8;
                 
                 doc.setDrawColor(203, 213, 225);
@@ -454,9 +475,7 @@
                 doc.text('EMPRESA: ____________________          NOMBRE: ____________________          TEL: ____________________', margin, y);
                 y += 12;
                 
-                // ============================================
-                // TABLA DE DATOS
-                // ============================================
+                // TABLA
                 const colWidths = [32, 48, 30, 70, 12, 22, 35, 25];
                 const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar', 'Obs.'];
                 
@@ -567,9 +586,6 @@
                 doc.text('TOTAL GENERAL', totalX + 3, y + 6);
                 doc.rect(totalX + colWidths[3], y, colWidths[4], 9);
                 doc.text(String(totalPasajeros), totalX + colWidths[3] + 3, y + 6);
-                doc.rect(totalX + colWidths[3] + colWidths[4], y, colWidths[5], 9);
-                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5], y, colWidths[6], 9);
-                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, colWidths[7], 9);
                 
                 y += 12;
                 
@@ -586,12 +602,12 @@
                 
                 doc.save(nombreArchivo);
                 
-                // Mostrar éxito - COMPLETAMENTE ADAPTATIVO SIN SCROLL
+                // VERSIÓN ÉXITO - COMPACTA Y SIN SCROLL
                 container.innerHTML = `
                     <div class="status-card">
                         <div class="success-icon">✅</div>
                         <div class="status-title success-text">¡Reporte generado!</div>
-                        <div class="status-subtitle">El PDF se ha descargado correctamente</div>
+                        <div class="status-subtitle">El PDF se descargó correctamente</div>
                         <div class="info-card">
                             <div class="info-row">
                                 <span class="info-label">📄 Título</span>
@@ -607,14 +623,14 @@
                             </div>
                             <div class="info-row">
                                 <span class="info-label">📁 Archivo</span>
-                                <span class="info-value" style="font-size: 11px; word-break: break-all;">${nombreArchivo}</span>
+                                <span class="info-value" style="font-size: 10px;">${nombreArchivo}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">📐 Formato</span>
                                 <span class="info-value">A4 Horizontal</span>
                             </div>
                         </div>
-                        <button class="btn-cerrar" onclick="window.close()">Cerrar ventana</button>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
                     </div>
                 `;
                 
@@ -626,11 +642,9 @@
                         <div class="status-title error-text">Error al generar PDF</div>
                         <div class="status-subtitle">${error.message}</div>
                         <div class="info-card" style="background: #fef2f2;">
-                            <div style="font-size: 12px; color: #991b1b;">
-                                Verificá la conexión y volvé a intentar
-                            </div>
+                            <div style="font-size: 12px; color: #991b1b;">Verificá la conexión y volvé a intentar</div>
                         </div>
-                        <button class="btn-cerrar" onclick="window.close()">Cerrar ventana</button>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
                     </div>
                 `;
             }
