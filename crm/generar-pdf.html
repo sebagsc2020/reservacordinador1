@@ -277,16 +277,17 @@
                 let y = margin + 8;
                 
                 // ============================================
-                // HEADER
+                // HEADER - TÍTULO ALINEADO A LA IZQUIERDA
                 // ============================================
                 doc.setDrawColor(42, 82, 110);
                 doc.setLineWidth(0.5);
                 doc.line(margin, margin, pageWidth - margin, margin);
                 
+                // TÍTULO ALINEADO A LA IZQUIERDA (no centrado)
                 doc.setFontSize(20);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(26, 74, 111);
-                doc.text(titulo, pageWidth / 2, y, { align: 'center' });
+                doc.text(titulo, margin, y);
                 y += 9;
                 
                 doc.setFontSize(8.5);
@@ -385,7 +386,6 @@
                     
                     x = margin;
                     
-                    // SIN RELLENO - solo borde (usar 'S' para solo borde, sin 'F')
                     doc.rect(x, y, colWidths[0], alturaFila);
                     doc.text(String(reserva.id || '').substring(0, 12), x + 2, y + 4.5);
                     x += colWidths[0];
@@ -401,8 +401,7 @@
                     
                     doc.rect(x, y, colWidths[3], alturaFila);
                     const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 3);
-                    // ALINEACIÓN IZQUIERDA para las excursiones
-                    doc.text(lineas, x + 1.5, y + 4.5, { align: 'left' });
+                    doc.text(lineas, x + 1.5, y + 4.5);
                     x += colWidths[3];
                     
                     doc.rect(x, y, colWidths[4], alturaFila);
@@ -447,7 +446,7 @@
                 doc.rect(margin + colWidths[0], y, colWidths[1], 9);
                 doc.rect(margin + colWidths[0] + colWidths[1], y, colWidths[2], 9);
                 doc.rect(totalX, y, colWidths[3], 9);
-                doc.text('TOTAL GENERAL', totalX + 3, y + 6);
+                doc.text('TOTAL PASAJEROS', totalX + 3, y + 6);
                 doc.rect(totalX + colWidths[3], y, colWidths[4], 9);
                 doc.setTextColor(26, 74, 111);
                 doc.text(String(totalPasajeros), totalX + colWidths[3] + 3, y + 6);
