@@ -42,26 +42,28 @@
         .event-item-list .event-name { font-weight: 600; color: #333; }
         .event-item-list .event-dates { font-size: 11px; color: #666; margin-top: 3px; }
         .event-actions { display: flex; gap: 8px; }
+        .btn-ver-evento { background: #667eea; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .btn-apagar-evento { background: #e74c3c; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .btn-compartir-evento { background: #25D366; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .no-events { color: #999; text-align: center; padding: 20px; font-size: 13px; }
         
-        /* Calendario */
-        .calendar-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow-x: auto; }
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
-        .month-nav button { background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin: 0 3px; font-size: 13px; }
-        .current-month { font-size: 20px; font-weight: 700; color: #1a1a2e; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; min-width: 600px; }
-        .calendar-day-header { text-align: center; font-weight: 600; padding: 10px; background: #f8f9fa; border-radius: 8px; font-size: 13px; color: #555; }
-        .calendar-day { background: #fefefe; border: 1px solid #e9ecef; border-radius: 10px; padding: 8px 6px; min-height: 110px; transition: all 0.2s; position: relative; }
-        .calendar-day.has-event { background: #e8f5e9; border-color: #27ae60; }
-        .day-number { font-weight: 700; font-size: 14px; margin-bottom: 5px; color: #1a1a2e; display: flex; justify-content: space-between; align-items: center; }
-        .event-badge { background: #27ae60; color: white; padding: 2px 6px; border-radius: 4px; font-size: 9px; display: inline-block; margin-top: 3px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
-        .nota-item { background: #fff3cd; border-left: 3px solid #ffc107; padding: 3px 5px; margin-top: 4px; border-radius: 4px; font-size: 9px; display: flex; justify-content: space-between; align-items: center; }
-        .nota-texto { flex: 1; cursor: pointer; }
-        .eliminar-nota { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 10px; margin-left: 4px; font-weight: bold; }
-        .btn-agregar-nota { background: #ecf0f1; border: none; border-radius: 12px; padding: 2px 6px; font-size: 9px; cursor: pointer; margin-top: 4px; width: 100%; }
-        .btn-agregar-nota:hover { background: #d5dbdb; }
+        /* Calendario de días del evento */
+        .event-calendar-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-top: 20px; }
+        .event-calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .event-calendar-header h3 { font-size: 18px; color: #1a1a2e; }
+        .event-info-header { font-size: 14px; color: #666; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; }
+        .event-days-grid { display: flex; flex-wrap: wrap; gap: 15px; }
+        .event-day-card { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; width: calc(33.33% - 10px); min-width: 200px; transition: all 0.2s; }
+        .event-day-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .event-day-card .day-header { font-weight: 700; font-size: 14px; color: #667eea; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
+        .event-day-card .day-date { font-size: 12px; color: #666; margin-bottom: 10px; }
+        .notas-lista { margin-top: 10px; }
+        .nota-item-cal { background: #fff3cd; border-left: 3px solid #ffc107; padding: 6px 8px; margin-top: 6px; border-radius: 4px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
+        .nota-texto-cal { flex: 1; cursor: pointer; }
+        .eliminar-nota-cal { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 10px; margin-left: 6px; }
+        .btn-agregar-nota-cal { background: #ecf0f1; border: none; border-radius: 12px; padding: 4px 8px; font-size: 10px; cursor: pointer; margin-top: 8px; width: 100%; }
+        .btn-agregar-nota-cal:hover { background: #d5dbdb; }
+        .sin-eventos-seleccionado { text-align: center; padding: 40px; color: #999; background: white; border-radius: 15px; }
         
         /* Modal para notas individuales */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -74,7 +76,7 @@
         textarea.modal-input { resize: vertical; min-height: 80px; }
         .modal-save { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
         
-        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } .calendar-grid { gap: 4px; } .calendar-day { min-height: 90px; padding: 6px 3px; } }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } .event-day-card { width: 100%; } }
     </style>
 </head>
 <body>
@@ -110,7 +112,7 @@
             </div>
         </div>
 
-        <!-- Lista de eventos creados con botones para APAGAR y COMPARTIR -->
+        <!-- Lista de eventos creados con botones para VER, APAGAR y COMPARTIR -->
         <div class="events-list">
             <h3>📋 Eventos activos</h3>
             <div id="listaEventosContainer">
@@ -118,14 +120,16 @@
             </div>
         </div>
 
-        <!-- Calendario visual -->
-        <div class="calendar-container">
-            <div class="calendar-header">
-                <div class="month-nav"><button onclick="cambiarMes(-1)">◀ Mes anterior</button><button onclick="cambiarMes(1)">Mes siguiente ▶</button></div>
-                <div class="current-month" id="currentMonthYear"></div>
+        <!-- Calendario de días del evento seleccionado -->
+        <div id="eventoCalendarioContainer" class="event-calendar-container" style="display: none;">
+            <div class="event-calendar-header">
+                <h3 id="eventoCalendarioTitulo">📅 Días del evento</h3>
+                <button class="btn-compartir-evento" id="btnCompartirEventoActual" style="background:#25D366;">📱 Compartir este evento</button>
             </div>
-            <div class="calendar-grid" id="calendarGrid"></div>
+            <div id="eventoInfoHeader" class="event-info-header"></div>
+            <div id="eventDaysGrid" class="event-days-grid"></div>
         </div>
+        <div id="sinEventoSeleccionado" class="sin-eventos-seleccionado">👈 Selecciona un evento de la lista para ver sus días</div>
     </div>
 
     <!-- Modal para agregar/editar nota individual por día -->
@@ -146,17 +150,17 @@
     <script>
         // ---------- Gestión de sesión ----------
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
-            // Descomentar en producción: window.location.href = 'index.html'; 
+            // window.location.href = 'index.html'; 
         }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
         // ---------- Estructura de datos ----------
         let eventosRango = [];      // Eventos por rango { id, nombre, fechaInicio, fechaFin }
         let notasPorDia = {};       // Notas individuales: clave "YYYY-MM-DD" -> array de strings
+        let eventoSeleccionado = null;  // Evento actualmente seleccionado
 
         // ---------- Cargar/Guardar en localStorage ----------
         function cargarEventos() {
-            // Cargar eventos de rango
             const storedEventos = localStorage.getItem('eventosRangoCalendario');
             if (storedEventos) {
                 eventosRango = JSON.parse(storedEventos);
@@ -165,25 +169,17 @@
                     ev.fechaFin = new Date(ev.fechaFin);
                 });
             } else {
-                eventosRango = [
-                    { id: Date.now() + 1, nombre: "Semana de aventura", fechaInicio: new Date(2026, 4, 25), fechaFin: new Date(2026, 4, 30) },
-                    { id: Date.now() + 2, nombre: "Excursión a la montaña", fechaInicio: new Date(2026, 5, 5), fechaFin: new Date(2026, 5, 8) }
-                ];
+                eventosRango = [];
             }
             
-            // Cargar notas individuales
             const storedNotas = localStorage.getItem('notasPorDiaCalendario');
             if (storedNotas) {
                 notasPorDia = JSON.parse(storedNotas);
             } else {
-                notasPorDia = {
-                    "2026-05-26": ["Recordar llevar equipo", "Confirmar transporte"],
-                    "2026-05-27": ["Comprar provisiones"]
-                };
+                notasPorDia = {};
             }
             
             renderizarListaEventos();
-            renderizarCalendario();
         }
 
         function guardarEventos() {
@@ -232,7 +228,6 @@
             document.getElementById('eventoNombre').value = '';
             
             renderizarListaEventos();
-            renderizarCalendario();
             alert(`✅ Evento "${nombre}" creado del ${formatearFecha(fechaInicio)} al ${formatearFecha(fechaFin)}`);
         }
 
@@ -241,10 +236,85 @@
             const evento = eventosRango.find(ev => ev.id === id);
             if (evento && confirm(`¿Eliminar el evento "${evento.nombre}"?`)) {
                 eventosRango = eventosRango.filter(ev => ev.id !== id);
+                if (eventoSeleccionado && eventoSeleccionado.id === id) {
+                    eventoSeleccionado = null;
+                    ocultarCalendarioEvento();
+                }
                 guardarEventos();
                 renderizarListaEventos();
-                renderizarCalendario();
             }
+        }
+
+        // ---------- Función para VER evento (cargar solo los días del evento) ----------
+        function verEvento(id) {
+            const evento = eventosRango.find(ev => ev.id === id);
+            if (!evento) return;
+            
+            eventoSeleccionado = evento;
+            mostrarCalendarioEvento();
+        }
+
+        function mostrarCalendarioEvento() {
+            if (!eventoSeleccionado) return;
+            
+            document.getElementById('sinEventoSeleccionado').style.display = 'none';
+            document.getElementById('eventoCalendarioContainer').style.display = 'block';
+            document.getElementById('eventoCalendarioTitulo').innerHTML = `📅 ${escapeHtml(eventoSeleccionado.nombre)}`;
+            document.getElementById('eventoInfoHeader').innerHTML = `📅 Del ${formatearFecha(eventoSeleccionado.fechaInicio)} al ${formatearFecha(eventoSeleccionado.fechaFin)}`;
+            
+            // Configurar botón compartir
+            const btnCompartir = document.getElementById('btnCompartirEventoActual');
+            btnCompartir.onclick = () => compartirEvento(eventoSeleccionado.id);
+            
+            // Generar los días del evento
+            const daysGrid = document.getElementById('eventDaysGrid');
+            let dias = [];
+            let fechaActual = new Date(eventoSeleccionado.fechaInicio);
+            
+            while (fechaActual <= eventoSeleccionado.fechaFin) {
+                dias.push(new Date(fechaActual));
+                fechaActual.setDate(fechaActual.getDate() + 1);
+            }
+            
+            daysGrid.innerHTML = dias.map(fecha => {
+                const fechaKey = formatoFechaKey(fecha);
+                const notas = notasPorDia[fechaKey] || [];
+                const fechaFormateada = formatearFecha(fecha);
+                const diaSemana = obtenerNombreDia(fecha);
+                
+                let notasHtml = '';
+                notas.forEach((nota, idx) => {
+                    const notaCorta = nota.length > 30 ? nota.substring(0, 27) + '...' : nota;
+                    notasHtml += `
+                        <div class="nota-item-cal">
+                            <span class="nota-texto-cal" onclick="editarNota('${fechaKey}', ${idx}, '${fechaFormateada}')" title="Editar: ${escapeHtml(nota)}">📌 ${escapeHtml(notaCorta)}</span>
+                            <button class="eliminar-nota-cal" onclick="eliminarNota('${fechaKey}', ${idx})">✕</button>
+                        </div>
+                    `;
+                });
+                
+                return `
+                    <div class="event-day-card">
+                        <div class="day-header">${diaSemana}</div>
+                        <div class="day-date">${fechaFormateada}</div>
+                        <div class="notas-lista">
+                            ${notasHtml || '<div style="font-size:10px; color:#999;">Sin notas</div>'}
+                            <button class="btn-agregar-nota-cal" onclick="abrirModalAgregarNota('${fechaKey}', '${fechaFormateada}')">+ Agregar nota</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function ocultarCalendarioEvento() {
+            document.getElementById('sinEventoSeleccionado').style.display = 'block';
+            document.getElementById('eventoCalendarioContainer').style.display = 'none';
+            eventoSeleccionado = null;
+        }
+        
+        function obtenerNombreDia(fecha) {
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            return dias[fecha.getDay()];
         }
 
         // ---------- Funciones para COMPARTIR por WhatsApp ----------
@@ -255,7 +325,6 @@
             let mensaje = `🏔️ *${evento.nombre}*\n📅 Del ${formatearFecha(evento.fechaInicio)} al ${formatearFecha(evento.fechaFin)}\n\n`;
             mensaje += `*Detalle por día:*\n`;
             
-            // Recorrer cada día del rango
             let fechaActual = new Date(evento.fechaInicio);
             while (fechaActual <= evento.fechaFin) {
                 const fechaKey = formatoFechaKey(fechaActual);
@@ -272,7 +341,6 @@
             }
             
             mensaje += `\n---\n📱 Enviado desde CRM Aventura Total`;
-            
             const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
             window.open(urlWhatsApp, '_blank');
         }
@@ -284,7 +352,6 @@
             }
             
             let mensaje = `🏔️ *TODOS LOS EVENTOS - CRM Aventura Total*\n\n`;
-            
             eventosRango.forEach(evento => {
                 mensaje += `━━━━━━━━━━━━━━━━━━━━━\n`;
                 mensaje += `🎯 *${evento.nombre}*\n`;
@@ -309,31 +376,31 @@
             });
             
             mensaje += `━━━━━━━━━━━━━━━━━━━━━\n📱 Enviado desde CRM Aventura Total`;
-            
             const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
             window.open(urlWhatsApp, '_blank');
         }
 
         // ---------- Funciones para NOTAS INDIVIDUALES por día ----------
         let fechaNotaSeleccionada = null;
+        let fechaNotaTexto = null;
         
-        function abrirModalAgregarNota(fechaKey, fechaObj) {
+        function abrirModalAgregarNota(fechaKey, fechaTexto) {
             fechaNotaSeleccionada = fechaKey;
-            document.getElementById('modalNotaFecha').innerText = formatearFecha(fechaObj);
+            fechaNotaTexto = fechaTexto;
+            document.getElementById('modalNotaFecha').innerText = fechaTexto;
             document.getElementById('notaTexto').value = '';
             document.getElementById('modalNotaTitle').innerText = '📝 Agregar nota';
             document.getElementById('modalNota').classList.add('show');
         }
         
-        function editarNota(fechaKey, index, fechaObj) {
+        function editarNota(fechaKey, index, fechaTexto) {
             fechaNotaSeleccionada = fechaKey;
+            fechaNotaTexto = fechaTexto;
             const notas = notasPorDia[fechaKey] || [];
-            document.getElementById('modalNotaFecha').innerText = formatearFecha(fechaObj);
+            document.getElementById('modalNotaFecha').innerText = fechaTexto;
             document.getElementById('notaTexto').value = notas[index] || '';
             document.getElementById('modalNotaTitle').innerText = '✏️ Editar nota';
             document.getElementById('modalNota').classList.add('show');
-            
-            // Guardar temporalmente el índice para edición
             window.notaEditIndex = index;
         }
         
@@ -348,7 +415,6 @@
                 notasPorDia[fechaNotaSeleccionada] = [];
             }
             
-            // Si estamos editando, reemplazar
             if (window.notaEditIndex !== undefined && notasPorDia[fechaNotaSeleccionada][window.notaEditIndex]) {
                 notasPorDia[fechaNotaSeleccionada][window.notaEditIndex] = texto;
                 delete window.notaEditIndex;
@@ -358,7 +424,9 @@
             
             guardarEventos();
             cerrarModalNota();
-            renderizarCalendario();
+            if (eventoSeleccionado) {
+                mostrarCalendarioEvento();
+            }
         }
         
         function eliminarNota(fechaKey, index) {
@@ -369,7 +437,9 @@
                         delete notasPorDia[fechaKey];
                     }
                     guardarEventos();
-                    renderizarCalendario();
+                    if (eventoSeleccionado) {
+                        mostrarCalendarioEvento();
+                    }
                 }
             }
         }
@@ -395,90 +465,12 @@
                         <div class="event-dates">📅 ${formatearFecha(ev.fechaInicio)} → ${formatearFecha(ev.fechaFin)}</div>
                     </div>
                     <div class="event-actions">
+                        <button class="btn-ver-evento" onclick="verEvento(${ev.id})">👁️ Ver días</button>
                         <button class="btn-compartir-evento" onclick="compartirEvento(${ev.id})">📱 Compartir</button>
                         <button class="btn-apagar-evento" onclick="eliminarEvento(${ev.id})">🔴 Apagar</button>
                     </div>
                 </div>
             `).join('');
-        }
-
-        // ---------- Verificar si una fecha está dentro de algún evento ----------
-        function obtenerEventoEnFecha(fecha) {
-            for (const ev of eventosRango) {
-                if (fecha >= ev.fechaInicio && fecha <= ev.fechaFin) {
-                    return ev;
-                }
-            }
-            return null;
-        }
-
-        // ---------- Renderizar calendario ----------
-        let currentYear = new Date().getFullYear();
-        let currentMonth = new Date().getMonth();
-
-        function renderizarCalendario() {
-            const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
-            const startDayOfWeek = firstDayOfMonth.getDay();
-            let startOffset = (startDayOfWeek === 0 ? 6 : startDayOfWeek - 1);
-            
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const totalCells = 42;
-            let calendarHTML = '';
-            
-            const weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-            weekdays.forEach(day => { calendarHTML += `<div class="calendar-day-header">${day}</div>`; });
-            
-            for (let i = 0; i < startOffset; i++) {
-                calendarHTML += `<div class="calendar-day"></div>`;
-            }
-            
-            for (let day = 1; day <= daysInMonth; day++) {
-                const fechaObj = new Date(currentYear, currentMonth, day);
-                const fechaKey = formatoFechaKey(fechaObj);
-                const evento = obtenerEventoEnFecha(fechaObj);
-                const hasEvent = evento !== null;
-                const notas = notasPorDia[fechaKey] || [];
-                
-                let dayHTML = `<div class="calendar-day ${hasEvent ? 'has-event' : ''}">
-                                <div class="day-number">
-                                    <span>${day}</span>
-                                </div>`;
-                
-                if (hasEvent) {
-                    dayHTML += `<div class="event-badge" title="${evento.nombre} - ${formatearFecha(evento.fechaInicio)} al ${formatearFecha(evento.fechaFin)}">🎯 ${escapeHtml(evento.nombre)}</div>`;
-                }
-                
-                // Mostrar notas individuales
-                notas.forEach((nota, idx) => {
-                    const notaCorta = nota.length > 25 ? nota.substring(0, 22) + '...' : nota;
-                    dayHTML += `<div class="nota-item">
-                                    <span class="nota-texto" onclick="editarNota('${fechaKey}', ${idx}, new Date(${currentYear}, ${currentMonth}, ${day}))" title="Editar: ${escapeHtml(nota)}">📌 ${escapeHtml(notaCorta)}</span>
-                                    <button class="eliminar-nota" onclick="eliminarNota('${fechaKey}', ${idx})">✕</button>
-                                </div>`;
-                });
-                
-                dayHTML += `<button class="btn-agregar-nota" onclick="abrirModalAgregarNota('${fechaKey}', new Date(${currentYear}, ${currentMonth}, ${day}))">+ Agregar nota</button>`;
-                dayHTML += `</div>`;
-                calendarHTML += dayHTML;
-            }
-            
-            for (let i = startOffset + daysInMonth; i < totalCells; i++) {
-                calendarHTML += `<div class="calendar-day"></div>`;
-            }
-            
-            document.getElementById('calendarGrid').innerHTML = calendarHTML;
-            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-            document.getElementById('currentMonthYear').innerText = `${monthNames[currentMonth]} ${currentYear}`;
-        }
-        
-        function cambiarMes(delta) {
-            let newMonth = currentMonth + delta;
-            let newYear = currentYear;
-            if (newMonth < 0) { newMonth = 11; newYear--; }
-            else if (newMonth > 11) { newMonth = 0; newYear++; }
-            currentMonth = newMonth;
-            currentYear = newYear;
-            renderizarCalendario();
         }
         
         // Helper: formatear fecha como DD/MM/YYYY
@@ -491,6 +483,7 @@
         }
         
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
