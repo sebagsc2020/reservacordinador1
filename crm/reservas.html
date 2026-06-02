@@ -44,93 +44,10 @@
         .acciones-container { display: flex; gap: 3px; justify-content: flex-start; flex-wrap: wrap; }
         .excursiones-lista { margin: 0; padding-left: 15px; list-style: none; }
         .excursiones-lista li { padding: 2px 0; font-size: 11px; }
-        
-        /* ===== PRELOADER ===== */
-        #preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        
-        #preloader.oculto {
-            opacity: 0;
-            visibility: hidden;
-        }
-        
-        .preloader-content {
-            text-align: center;
-        }
-        
-        .preloader-icon {
-            width: 80px;
-            height: 80px;
-            border: 4px solid rgba(255,255,255,0.2);
-            border-top: 4px solid #667eea;
-            border-right: 4px solid #764ba2;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .preloader-texto {
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-        }
-        
-        .preloader-subtexto {
-            color: rgba(255,255,255,0.7);
-            font-size: 13px;
-        }
-        
-        .puntos::after {
-            content: '';
-            animation: puntos 1.5s infinite;
-        }
-        
-        @keyframes puntos {
-            0% { content: ''; }
-            25% { content: '.'; }
-            50% { content: '..'; }
-            75% { content: '...'; }
-            100% { content: ''; }
-        }
-        
-        @media (max-width: 768px) { 
-            .sidebar { width: 60px; } 
-            .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
-            .nav-menu a { justify-content: center; } 
-            .main-content { margin-left: 60px; padding: 15px; }
-            .preloader-icon { width: 60px; height: 60px; }
-            .preloader-texto { font-size: 16px; }
-        }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } }
     </style>
 </head>
 <body>
-    <!-- PRELOADER -->
-    <div id="preloader">
-        <div class="preloader-content">
-            <div class="preloader-icon"></div>
-            <div class="preloader-texto">CARGANDO RESERVAS<span class="puntos"></span></div>
-            <div class="preloader-subtexto">Sincronizando con Google Sheets...</div>
-        </div>
-    </div>
-
     <nav class="sidebar">
         <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2></div>
         <ul class="nav-menu">
@@ -151,7 +68,7 @@
         <div class="filters-bar">
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o ciudad..." id="busquedaReserva">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
-            <button class="btn-recargar" onclick="recargarConPreloader()">🔄 Recargar</button>
+            <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
         </div>
 
         <div class="table-container">
@@ -177,23 +94,6 @@
         
         let reservasData = [];
         let reservasFiltradas = [];
-
-        // Preloader functions
-        const preloader = document.getElementById('preloader');
-        
-        function mostrarPreloader() {
-            if (preloader) {
-                preloader.classList.remove('oculto');
-            }
-        }
-        
-        function ocultarPreloader() {
-            if (preloader) {
-                setTimeout(() => {
-                    preloader.classList.add('oculto');
-                }, 500);
-            }
-        }
 
         function parseCSV(csvText) {
             const lineas = csvText.split('\n');
@@ -226,9 +126,11 @@
 
         function dividirExcursiones(texto) {
             if (!texto) return [];
+            // Separar por saltos de línea (como viene de Google Sheets cuando hay múltiples excursiones)
             if (texto.includes('\n')) {
                 return texto.split('\n').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
+            // Si no, devolver como array de un solo elemento
             return [texto.trim().replace(/^\d+\.\s*/, '')].filter(p => p);
         }
 
@@ -243,13 +145,9 @@
             localStorage.setItem('estadosReservas', JSON.stringify(estados));
         }
 
-        async function cargarReservas(mostrarPreloaderFlag = true) {
+        async function cargarReservas() {
             const tbody = document.getElementById('tablaReservas');
             if (!tbody) return;
-            
-            if (mostrarPreloaderFlag) {
-                mostrarPreloader();
-            }
             
             try {
                 tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td';
@@ -263,6 +161,10 @@
                 const filas = parseCSV(csvText);
                 if (filas.length === 0) throw new Error('No se encontraron datos');
                 
+                // Los encabezados están en la primera fila (timestamp, id, nombre, etc.)
+                const encabezados = filas[0];
+                console.log('📋 Encabezados:', encabezados);
+                
                 reservasData = [];
                 const estadosGuardados = cargarEstadosGuardados();
                 
@@ -270,18 +172,23 @@
                     const fila = filas[i];
                     if (fila.length < 5) continue;
                     
+                    // Mapeo CORRECTO según tus encabezados:
+                    // 0: timestamp, 1: id, 2: nombre, 3: apellido, 4: email, 5: telefono, 
+                    // 6: pais, 7: ciudad, 8: excursiones, 9: fecha, 10: personas, 11: formaPago, 12: lugar
+                    
                     const id = fila[1] || `R-${i}`;
                     const timestamp = fila[0] || '';
                     const nombre = fila[2] || '';
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
+                    // Las excursiones están en el índice 8
                     let excursionesRaw = fila[8] || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     
                     const reserva = {
                         id: id,
-                        fecha: formatearFecha(fila[9] || timestamp),
+                        fecha: formatearFecha(fila[9] || timestamp),  // fecha está en índice 9
                         nombre: nombreCompleto || nombre,
                         email: fila[4] || '',
                         telefono: fila[5] || '',
@@ -297,6 +204,9 @@
                 }
                 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
+                if (reservasData.length > 0) {
+                    console.log('🔍 Primera reserva:', reservasData[0]);
+                }
                 
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
@@ -307,9 +217,7 @@
                 renderizarTabla();
             } catch (error) {
                 console.error('Error:', error);
-                if (tbody) tbody.innerHTML = `<table><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</td`;
-            } finally {
-                ocultarPreloader();
+                if (tbody) tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</td`;
             }
         }
 
@@ -320,7 +228,7 @@
             if (totalSpan) totalSpan.textContent = `${reservasFiltradas.length} reservas`;
             
             if (reservasFiltradas.length === 0) {
-                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</td';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">📋 No hay reservas</td</td';
                 return;
             }
             
@@ -344,7 +252,7 @@
                 excursionesHtml += '</ul>';
                 
                 return `
-                    <table>
+                    <tr>
                         <td><strong>${escapeHtml(r.id)}</strong></td>
                         <td>${escapeHtml(r.fecha)}</td
                         <td>${escapeHtml(r.nombre)}</td
@@ -445,10 +353,6 @@
             if (modal) modal.remove();
         }
 
-        function recargarConPreloader() {
-            cargarReservas(true);
-        }
-
         function escapeHtml(text) { 
             if (!text) return ''; 
             const div = document.createElement('div'); 
@@ -459,9 +363,8 @@
         const busquedaInput = document.getElementById('busquedaReserva');
         if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
         
-        // Inicializar con preloader
-        cargarReservas(true);
-        setInterval(() => cargarReservas(false), 60000);
+        cargarReservas();
+        setInterval(cargarReservas, 60000);
     </script>
 </body>
 </html>
