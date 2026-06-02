@@ -130,18 +130,14 @@
             return fechaStr;
         }
 
-        // 🔥 FUNCIÓN CORREGIDA - Divide excursiones por saltos de línea
         function dividirExcursiones(texto) {
             if (!texto) return [];
-            // Separar por saltos de línea (como viene de Google Sheets)
             if (texto.includes('\n')) {
                 return texto.split('\n').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
-            // Si viene con " | "
             if (texto.includes(' | ')) {
                 return texto.split(' | ').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
-            // Si viene con coma
             if (texto.includes(',')) {
                 return texto.split(',').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
@@ -188,12 +184,8 @@
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
-                    // 🔥 Las excursiones están en el índice 8
                     let excursionesRaw = fila[8] || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
-                    
-                    console.log(`📝 Excursiones raw: ${excursionesRaw}`);
-                    console.log(`📝 Excursiones lista:`, listaExcursiones);
                     
                     const reserva = {
                         id: id,
@@ -284,7 +276,6 @@
             }).join('');
         }
 
-        // 🔥 FILTRO CORREGIDO - También busca dentro de las excursiones
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
             if (!busqueda) return;
@@ -342,7 +333,6 @@
                             <button onclick="cerrarModal()" style="background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
                         </div>
                         <p><strong>ID:</strong> ${escapeHtml(reserva.id)}</p>
-                        <p><strong>Fecha:</strong> ${escapeHtml(reserva.fecha)}</p>
                         <p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p>
                         <p><strong>Email:</strong> ${escapeHtml(reserva.email)}</p>
                         <p><strong>Teléfono:</strong> ${escapeHtml(reserva.telefono)}</p>
