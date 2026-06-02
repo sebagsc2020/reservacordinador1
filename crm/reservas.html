@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas - CRM Aventura Total</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
@@ -115,7 +114,6 @@
 
         .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
 
-        /* Indicador de sincronización */
         .sync-status {
             font-size: 11px;
             padding: 4px 10px;
@@ -179,16 +177,6 @@
     </div>
 
     <script>
-        // ==================================================
-        // CONFIGURACIÓN - API JSON DE GOOGLE SHEETS
-        // ==================================================
-        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const SHEET_NAME = 'Hoja 1';
-        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
-
-        // URL del Apps Script para guardar estados (DEBES CREAR ESTE SCRIPT)
-        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9x2Xd9yLFf6bHkq1yXJLm5vX3YkQ/exec'; // <-- REEMPLAZAR CON TU URL
-
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
         }
@@ -198,27 +186,33 @@
             window.location.href = 'index.html'; 
         }
 
+        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
+        const SHEET_NAME = 'Hoja 1';
+        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
+        
+        // 🔥 REEMPLAZÁ ESTA URL CON LA URL DE TU GOOGLE APPS SCRIPT
+        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
+        
         let reservasData = [];
         let reservasFiltradas = [];
-        let estadosGlobales = {}; // Almacén central de estados (sincronizado)
+        let estadosGlobales = {};
 
         function actualizarStatusSync(estado, mensaje) {
             const syncDiv = document.getElementById('syncStatus');
             if (!syncDiv) return;
             syncDiv.className = 'sync-status ' + estado;
             syncDiv.innerHTML = mensaje;
-            setTimeout(function() {
-                if (estado === 'synced') {
-                    setTimeout(function() { syncDiv.innerHTML = '✅ Sincronizado'; }, 2000);
-                }
-            }, 1500);
+            if (estado === 'synced') {
+                setTimeout(function() { 
+                    if (syncDiv) syncDiv.innerHTML = '✅ Sincronizado'; 
+                }, 2000);
+            }
         }
 
-        // Función para guardar un estado específico en la nube
         async function guardarEstadoEnNube(id, nuevoEstado) {
             try {
                 actualizarStatusSync('syncing', '🔄 Guardando...');
-                const response = await fetch(ESTADOS_SCRIPT_URL, {
+                await fetch(ESTADOS_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -229,15 +223,10 @@
             } catch (error) {
                 console.error('Error al guardar en nube:', error);
                 actualizarStatusSync('error', '⚠️ Sin conexión');
-                // Fallback a localStorage
-                const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
-                estadosLocal[id] = nuevoEstado;
-                localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosLocal));
                 return false;
             }
         }
 
-        // Función para cargar estados desde la nube
         async function cargarEstadosDesdeNube() {
             try {
                 actualizarStatusSync('syncing', '🔄 Cargando estados...');
@@ -245,7 +234,6 @@
                 const data = await response.json();
                 if (data.success && data.estados) {
                     estadosGlobales = data.estados;
-                    // Guardar copia local como respaldo
                     localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
                     actualizarStatusSync('synced', '✅ Sincronizado');
                     return estadosGlobales;
@@ -254,7 +242,6 @@
                 }
             } catch (error) {
                 console.error('Error al cargar desde nube:', error);
-                // Fallback a localStorage
                 const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
                 estadosGlobales = estadosLocal;
                 actualizarStatusSync('error', '⚠️ Offline');
@@ -270,7 +257,6 @@
             try {
                 container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>';
 
-                // Primero, cargar estados desde la nube
                 await cargarEstadosDesdeNube();
 
                 const response = await fetch(JSON_URL);
@@ -329,10 +315,8 @@
                     const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
                     const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
                     const lugar = (c[12] && c[12].v) ? String(c[12].v) : 'No especificado';
-
                     const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
 
-                    // Obtener estado desde la nube (o fallback)
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
@@ -374,13 +358,9 @@
             if (reserva) {
                 reserva.estado = nuevoEstado;
                 estadosGlobales[id] = nuevoEstado;
-
                 const indexFiltrada = reservasFiltradas.findIndex(function(r) { return r.id === id; });
                 if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
-
-                // Guardar en la nube
                 await guardarEstadoEnNube(id, nuevoEstado);
-
                 renderizarCards();
             }
         }
