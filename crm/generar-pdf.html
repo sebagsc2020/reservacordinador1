@@ -5,67 +5,242 @@
     <title>Generador PDF - Aventura Total</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(145deg, #f0f4f8 0%, #d9e2ec 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
         }
-        .container {
+
+        /* Contenedor principal */
+        .pdf-generator {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 520px;
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+            transition: all 0.3s ease;
+        }
+
+        /* Header */
+        .generator-header {
+            background: linear-gradient(135deg, #0b2b3d 0%, #1a4a6f 100%);
+            padding: 28px 32px;
             text-align: center;
-            padding: 40px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-width: 500px;
         }
+
+        .logo-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: inline-block;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .generator-header h1 {
+            color: white;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
+        }
+
+        .generator-header p {
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        /* Contenido */
+        .generator-content {
+            padding: 32px;
+        }
+
+        /* Estados y animaciones */
+        .status-card {
+            text-align: center;
+        }
+
+        .spinner-container {
+            margin-bottom: 24px;
+        }
+
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #e0e0e0;
-            border-top-color: #667eea;
+            width: 56px;
+            height: 56px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #1a4a6f;
+            border-right-color: #2c7da0;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 20px auto;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            margin: 0 auto;
         }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        .success { color: #27ae60; }
-        .error { color: #e74c3c; }
+
+        .status-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+
+        .status-subtitle {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        /* Info card */
+        .info-card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .titulo-destacado {
+            background: linear-gradient(135deg, #1a4a6f, #2c7da0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+
+        /* Botones */
         .btn-cerrar {
-            margin-top: 20px;
-            padding: 10px 25px;
-            background: #667eea;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
             color: white;
             border: none;
-            border-radius: 10px;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 14px;
+            transition: all 0.2s ease;
+            margin-top: 16px;
+            width: 100%;
+            max-width: 200px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .btn-cerrar:hover { background: #5a67d8; }
-        .info {
-            margin: 15px 0;
-            padding: 12px;
-            background: #f0f2f5;
-            border-radius: 10px;
-            font-size: 14px;
+
+        .btn-cerrar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #0f172a, #020617);
+        }
+
+        /* Estado éxito */
+        .success-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+        }
+
+        .error-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #475569;
+            margin-top: 8px;
+        }
+
+        /* Loader de progreso */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, #1a4a6f, #2c7da0);
+            border-radius: 4px;
+            animation: pulse 1s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
     </style>
 </head>
 <body>
-    <div class="container" id="statusContainer">
-        <div class="spinner"></div>
-        <h2>⏳ Generando PDF...</h2>
-        <p>Procesando reservas, por favor espere...</p>
+    <div class="pdf-generator" id="pdfGenerator">
+        <div class="generator-header">
+            <div class="logo-icon">🏔️</div>
+            <h1>Aventura Total</h1>
+            <p>Generador de reportes profesionales</p>
+        </div>
+        
+        <div class="generator-content" id="statusContainer">
+            <div class="status-card">
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                </div>
+                <div class="status-title">Preparando documento</div>
+                <div class="status-subtitle">Estamos procesando la información de tus reservas</div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         (function() {
             const container = document.getElementById('statusContainer');
+            const pdfGenerator = document.getElementById('pdfGenerator');
             
             // Leer datos desde localStorage
             let filtroExcursion = '';
@@ -80,17 +255,20 @@
                 }
                 
                 reservasFiltradas = JSON.parse(reservasJson);
-                console.log('Datos recibidos:', { filtro: filtroExcursion, total: reservasFiltradas.length });
+                console.log('✅ Datos recibidos:', { filtro: filtroExcursion, total: reservasFiltradas.length });
                 
             } catch(e) {
                 container.innerHTML = `
-                    <div class="error">
-                        <h2>❌ Error</h2>
-                        <p>${e.message}</p>
-                        <div class="info">
-                            📌 Usá el botón "Generar PDF (filtrado)" desde el panel de reservas.
+                    <div class="status-card">
+                        <div class="error-icon">⚠️</div>
+                        <div class="status-title" style="color: #dc2626;">Error de datos</div>
+                        <div class="status-subtitle">${e.message}</div>
+                        <div class="info-card" style="background: #fef2f2; border-color: #fecaca;">
+                            <div style="font-size: 13px; color: #991b1b;">
+                                📌 Asegurate de usar el botón "Generar PDF" desde el panel de reservas
+                            </div>
                         </div>
-                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar ventana</button>
                     </div>
                 `;
                 return;
@@ -102,10 +280,12 @@
             
             if (reservasFiltradas.length === 0) {
                 container.innerHTML = `
-                    <div class="error">
-                        <h2>❌ No hay reservas</h2>
-                        <p>No hay reservas para exportar con el filtro actual.</p>
-                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                    <div class="status-card">
+                        <div class="error-icon">📭</div>
+                        <div class="status-title" style="color: #dc2626;">Sin reservas</div>
+                        <div class="status-subtitle">No hay reservas para exportar con el filtro actual</div>
+                        <div class="badge">Filtro: ${filtroExcursion || 'ninguno'}</div>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar ventana</button>
                     </div>
                 `;
                 return;
@@ -114,86 +294,134 @@
             const totalPasajeros = reservasFiltradas.reduce((sum, r) => sum + (parseInt(r.personas) || 0), 0);
             const titulo = (filtroExcursion && filtroExcursion !== '') ? filtroExcursion : 'EXCURSIONES';
             
-            // Actualizar UI
+            // Actualizar UI con información
             container.innerHTML = `
-                <div class="spinner"></div>
-                <h2>⏳ Generando PDF...</h2>
-                <div class="info">
-                    📄 Título: <strong>${titulo}</strong><br>
-                    📋 Reservas: ${reservasFiltradas.length}<br>
-                    👥 Pasajeros: ${totalPasajeros}
+                <div class="status-card">
+                    <div class="spinner-container">
+                        <div class="spinner"></div>
+                    </div>
+                    <div class="status-title">Generando reporte</div>
+                    <div class="status-subtitle">Creando documento PDF en formato A4</div>
+                    <div class="info-card">
+                        <div class="info-row">
+                            <span class="info-label">📄 Título</span>
+                            <span class="info-value titulo-destacado">${escapeHtml(titulo)}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">📋 Reservas</span>
+                            <span class="info-value">${reservasFiltradas.length}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">👥 Pasajeros totales</span>
+                            <span class="info-value">${totalPasajeros}</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
                 </div>
             `;
             
             try {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-                const marginLeft = 8;
-                let y = marginLeft + 10;
+                // FORMATO VERTICAL A4 (portrait)
+                const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
                 const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 15;
+                let y = margin + 10;
                 
-                const colWidths = [35, 42, 25, 48, 12, 20, 35, 35];
-                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar', 'Observaciones'];
+                // ============================================
+                // HEADER PROFESIONAL
+                // ============================================
+                // Logo decorativo (línea superior)
+                doc.setDrawColor(42, 82, 110);
+                doc.setLineWidth(0.5);
+                doc.line(margin, margin, pageWidth - margin, margin);
                 
-                // TÍTULO según filtro
-                doc.setFontSize(16);
+                // Título principal
+                doc.setFontSize(18);
                 doc.setFont('helvetica', 'bold');
-                doc.setTextColor(0, 0, 0);
+                doc.setTextColor(26, 74, 111);
                 doc.text(titulo, pageWidth / 2, y, { align: 'center' });
-                y += 10;
-                
-                // Fecha
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, marginLeft, y);
-                y += 6;
-                doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
                 y += 8;
                 
-                // Línea empresa
+                // Subtítulo / fecha
                 doc.setFontSize(9);
-                doc.setFont('courier', 'normal');
-                doc.text('EMPRESA: ____________________          NOMBRE: ____________________          TEL: ____________________', marginLeft, y);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(100, 116, 139);
+                const fechaStr = `Generado: ${new Date().toLocaleString('es-AR', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })}`;
+                doc.text(fechaStr, margin, y);
+                doc.text(`Total de reservas: ${reservasFiltradas.length}`, pageWidth - margin, y, { align: 'right' });
                 y += 10;
                 
-                // Encabezados
-                let x = marginLeft;
-                doc.setFillColor(240, 240, 240);
-                doc.setDrawColor(0, 0, 0);
-                doc.setLineWidth(0.1);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
+                // Línea divisoria
+                doc.setDrawColor(203, 213, 225);
+                doc.line(margin, y, pageWidth - margin, y);
+                y += 6;
                 
+                // Línea de empresa (formato profesional)
+                doc.setFontSize(9);
+                doc.setFont('courier', 'normal');
+                doc.setTextColor(71, 85, 105);
+                doc.text('EMPRESA: ____________________          NOMBRE: ____________________          TEL: ____________________', margin, y);
+                y += 12;
+                
+                // ============================================
+                // TABLA DE DATOS
+                // ============================================
+                const colWidths = [30, 45, 28, 42, 12, 22, 30, 25];
+                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar', 'Obs.'];
+                
+                let x = margin;
+                doc.setFillColor(240, 248, 255);
+                doc.setDrawColor(100, 116, 139);
+                doc.setLineWidth(0.2);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.setTextColor(30, 41, 59);
+                
+                // Encabezados con fondo
                 for (let i = 0; i < headers.length; i++) {
-                    doc.rect(x, y, colWidths[i], 10);
+                    doc.rect(x, y, colWidths[i], 9, 'FD');
                     doc.text(headers[i], x + 2, y + 6);
                     x += colWidths[i];
                 }
-                y += 10;
+                y += 9;
                 
                 // Datos
                 doc.setFont('helvetica', 'normal');
-                doc.setFontSize(8);
-                doc.setDrawColor(200, 200, 200);
+                doc.setFontSize(7);
+                doc.setTextColor(51, 65, 85);
+                doc.setDrawColor(203, 213, 225);
                 
                 for (const reserva of reservasFiltradas) {
-                    if (y > 180) {
+                    // Verificar espacio en página
+                    if (y > pageHeight - 35) {
                         doc.addPage();
-                        y = marginLeft + 10;
-                        x = marginLeft;
-                        doc.setFillColor(240, 240, 240);
-                        doc.setDrawColor(0, 0, 0);
+                        y = margin + 10;
+                        x = margin;
+                        
+                        // Re-dibujar encabezados en nueva página
+                        doc.setFillColor(240, 248, 255);
+                        doc.setDrawColor(100, 116, 139);
                         doc.setFont('helvetica', 'bold');
-                        doc.setFontSize(9);
+                        doc.setFontSize(8);
                         for (let i = 0; i < headers.length; i++) {
-                            doc.rect(x, y, colWidths[i], 10);
+                            doc.rect(x, y, colWidths[i], 9, 'FD');
                             doc.text(headers[i], x + 2, y + 6);
                             x += colWidths[i];
                         }
-                        y += 10;
+                        y += 9;
                         doc.setFont('helvetica', 'normal');
-                        doc.setFontSize(8);
-                        doc.setDrawColor(200, 200, 200);
+                        doc.setFontSize(7);
+                        doc.setDrawColor(203, 213, 225);
                     }
                     
                     let excursionesTexto = '';
@@ -205,97 +433,150 @@
                     
                     const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
                     const lineasExcursiones = excursionesTexto.split('\n').length;
-                    const alturaFila = Math.max(10, Math.min(45, lineasExcursiones * 4.5 + 4));
+                    const alturaFila = Math.max(8, Math.min(40, lineasExcursiones * 3.2 + 3));
                     
-                    x = marginLeft;
+                    x = margin;
                     
+                    // ID
                     doc.rect(x, y, colWidths[0], alturaFila);
-                    doc.text(String(reserva.id || ''), x + 2, y + 5);
+                    doc.text(String(reserva.id || '').substring(0, 12), x + 2, y + 4);
                     x += colWidths[0];
                     
+                    // Cliente
                     doc.rect(x, y, colWidths[1], alturaFila);
-                    const nombreCliente = (reserva.nombre || 'No especificado').substring(0, 35);
-                    doc.text(nombreCliente, x + 2, y + 5);
+                    const nombreCliente = (reserva.nombre || 'No especificado').substring(0, 28);
+                    doc.text(nombreCliente, x + 2, y + 4);
                     x += colWidths[1];
                     
+                    // Teléfono
                     doc.rect(x, y, colWidths[2], alturaFila);
-                    doc.text(reserva.telefono || '', x + 2, y + 5);
+                    doc.text(reserva.telefono || '', x + 2, y + 4);
                     x += colWidths[2];
                     
+                    // Excursiones
                     doc.rect(x, y, colWidths[3], alturaFila);
-                    const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 4);
-                    doc.text(lineas, x + 2, y + 5);
+                    const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 3);
+                    doc.text(lineas, x + 1.5, y + 4);
                     x += colWidths[3];
                     
+                    // Pax
                     doc.rect(x, y, colWidths[4], alturaFila);
-                    doc.text(String(reserva.personas || 0), x + 2, y + 5);
+                    doc.text(String(reserva.personas || 0), x + 2, y + 4);
                     x += colWidths[4];
                     
+                    // Estado
                     doc.rect(x, y, colWidths[5], alturaFila);
-                    doc.text(estadoTexto, x + 2, y + 5);
+                    doc.text(estadoTexto, x + 2, y + 4);
                     x += colWidths[5];
                     
+                    // Lugar
                     doc.rect(x, y, colWidths[6], alturaFila);
-                    const lugarTexto = (reserva.lugar || 'No especificado').substring(0, 30);
-                    doc.text(lugarTexto, x + 2, y + 5);
+                    const lugarTexto = (reserva.lugar || 'No especificado').substring(0, 20);
+                    doc.text(lugarTexto, x + 2, y + 4);
                     x += colWidths[6];
                     
+                    // Observaciones
                     doc.rect(x, y, colWidths[7], alturaFila);
-                    doc.text('', x + 2, y + 5);
+                    doc.text('', x + 2, y + 4);
                     
                     y += alturaFila;
                 }
                 
+                // ============================================
                 // TOTAL GENERAL
-                y += 5;
-                const totalX = marginLeft + colWidths[0] + colWidths[1] + colWidths[2];
+                // ============================================
+                y += 6;
+                const totalX = margin + colWidths[0] + colWidths[1] + colWidths[2];
                 
-                doc.setFillColor(255, 255, 255);
-                doc.setDrawColor(0, 0, 0);
-                doc.setLineWidth(0.1);
+                doc.setFillColor(248, 250, 252);
+                doc.setDrawColor(71, 85, 105);
+                doc.setLineWidth(0.3);
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
+                doc.setFontSize(8);
+                doc.setTextColor(15, 23, 42);
                 
-                doc.rect(marginLeft, y, colWidths[0], 10);
-                doc.rect(marginLeft + colWidths[0], y, colWidths[1], 10);
-                doc.rect(marginLeft + colWidths[0] + colWidths[1], y, colWidths[2], 10);
-                doc.rect(totalX, y, colWidths[3], 10);
-                doc.text('TOTAL GENERAL', totalX + 2, y + 6);
-                doc.rect(totalX + colWidths[3], y, colWidths[4], 10);
-                doc.text(String(totalPasajeros), totalX + colWidths[3] + 2, y + 6);
+                doc.rect(margin, y, colWidths[0], 9);
+                doc.rect(margin + colWidths[0], y, colWidths[1], 9);
+                doc.rect(margin + colWidths[0] + colWidths[1], y, colWidths[2], 9);
+                doc.rect(totalX, y, colWidths[3], 9);
+                doc.text('TOTAL GENERAL', totalX + 3, y + 6);
+                doc.rect(totalX + colWidths[3], y, colWidths[4], 9);
+                doc.text(String(totalPasajeros), totalX + colWidths[3] + 3, y + 6);
+                doc.rect(totalX + colWidths[3] + colWidths[4], y, colWidths[5], 9);
+                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5], y, colWidths[6], 9);
+                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, colWidths[7], 9);
+                
+                y += 14;
+                
+                // ============================================
+                // FOOTER PROFESIONAL
+                // ============================================
+                doc.setDrawColor(203, 213, 225);
+                doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'italic');
+                doc.setTextColor(148, 163, 184);
+                doc.text('Aventura Total - Sistema de Gestión de Reservas', pageWidth / 2, pageHeight - 8, { align: 'center' });
                 
                 // Guardar PDF
                 const nombreArchivo = (filtroExcursion && filtroExcursion !== '') 
-                    ? `reservas_${filtroExcursion.replace(/[^a-z0-9]/gi, '_').substring(0, 40)}.pdf`
-                    : `reservas_${Date.now()}.pdf`;
+                    ? `reporte_${filtroExcursion.replace(/[^a-z0-9]/gi, '_').toLowerCase().substring(0, 35)}.pdf`
+                    : `reporte_reservas_${Date.now()}.pdf`;
                 
                 doc.save(nombreArchivo);
                 
                 // Mostrar éxito
                 container.innerHTML = `
-                    <div class="success">
-                        <h2>✅ ¡PDF Generado!</h2>
-                        <p>El archivo se ha descargado correctamente.</p>
-                        <div class="info">
-                            📄 <strong>Título:</strong> ${titulo}<br>
-                            📋 <strong>Reservas:</strong> ${reservasFiltradas.length}<br>
-                            👥 <strong>Pasajeros:</strong> ${totalPasajeros}
+                    <div class="status-card">
+                        <div class="success-icon">✅</div>
+                        <div class="status-title" style="color: #059669;">¡Reporte generado!</div>
+                        <div class="status-subtitle">El PDF se ha descargado correctamente</div>
+                        <div class="info-card">
+                            <div class="info-row">
+                                <span class="info-label">📄 Título</span>
+                                <span class="info-value titulo-destacado">${escapeHtml(titulo)}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📋 Reservas</span>
+                                <span class="info-value">${reservasFiltradas.length}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">👥 Pasajeros</span>
+                                <span class="info-value">${totalPasajeros}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📁 Archivo</span>
+                                <span class="info-value" style="font-size: 11px;">${nombreArchivo}</span>
+                            </div>
                         </div>
-                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar ventana</button>
                     </div>
                 `;
                 
             } catch (error) {
                 console.error('Error:', error);
                 container.innerHTML = `
-                    <div class="error">
-                        <h2>❌ Error al generar PDF</h2>
-                        <p>${error.message}</p>
-                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                    <div class="status-card">
+                        <div class="error-icon">❌</div>
+                        <div class="status-title" style="color: #dc2626;">Error al generar PDF</div>
+                        <div class="status-subtitle">${error.message}</div>
+                        <div class="info-card" style="background: #fef2f2;">
+                            <div style="font-size: 13px; color: #991b1b;">
+                                Verificá la conexión y volvé a intentar
+                            </div>
+                        </div>
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar ventana</button>
                     </div>
                 `;
             }
         })();
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
     </script>
 </body>
 </html>
