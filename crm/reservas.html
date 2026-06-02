@@ -31,8 +31,7 @@
         .btn-filtrar, .btn-recargar, .btn-pdf { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
-        .btn-pdf { background: #e74c3c; color: white; }
-        .btn-pdf-externo { background: #2c7da0; color: white; }
+        .btn-pdf { background: #2c7da0; color: white; }
         
         .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         
@@ -152,7 +151,7 @@
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
             <button class="btn-filtrar" id="btnFiltrar">🔍 Filtrar</button>
             <button class="btn-recargar" id="btnRecargar">🔄 Recargar</button>
-            <button class="btn-pdf btn-pdf-externo" id="btnPDFExterno">📄 Generar PDF </button>
+            <button class="btn-pdf" id="btnPDFExterno">📄 Generar PDF</button>
         </div>
 
         <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
@@ -460,179 +459,8 @@ ${excursionesTexto}
             }
         }
         
-        async function generarPDF() {
-            if (reservasFiltradas.length === 0) {
-                alert('⚠️ No hay reservas para exportar.');
-                return;
-            }
-            
-            const totalPasajeros = reservasFiltradas.reduce((sum, r) => sum + (parseInt(r.personas) || 0), 0);
-            
-            const btnPDF = document.getElementById('btnPDF');
-            const textoOriginal = btnPDF.textContent;
-            btnPDF.textContent = '⏳ Generando...';
-            btnPDF.disabled = true;
-            
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-                const marginLeft = 8;
-                let y = marginLeft + 10;
-                const pageWidth = doc.internal.pageSize.getWidth();
-                
-                const colWidths = [35, 42, 25, 48, 12, 20, 35, 35];
-                const headers = ['ID', 'Cliente', 'Teléfono', 'Excursiones', 'Pax', 'Estado', 'Lugar', 'Observaciones'];
-                
-                // Título
-                doc.setFontSize(16);
-                doc.setFont('helvetica', 'bold');
-                doc.setTextColor(0, 0, 0);
-                doc.text('Reporte de Reservas', pageWidth / 2, y, { align: 'center' });
-                y += 10;
-                
-                // Fecha y total de reservas
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Generado: ${new Date().toLocaleString('es-AR')}`, marginLeft, y);
-                y += 6;
-                doc.text(`Total de reservas: ${reservasFiltradas.length}`, marginLeft, y);
-                y += 8;
-                
-                // === LÍNEA DE EMPRESA, NOMBRE Y TEL ===
-                doc.setFontSize(9);
-                doc.setFont('courier', 'normal');
-                doc.text('EMPRESA: ____________________          NOMBRE: ____________________          TEL: ____________________', marginLeft, y);
-                y += 10;
-                
-                // Encabezados
-                let x = marginLeft;
-                doc.setFillColor(255, 255, 255);
-                doc.setDrawColor(0, 0, 0);
-                doc.setLineWidth(0.1);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.setTextColor(0, 0, 0);
-                
-                for (let i = 0; i < headers.length; i++) {
-                    doc.rect(x, y, colWidths[i], 10);
-                    doc.text(headers[i], x + 2, y + 6);
-                    x += colWidths[i];
-                }
-                y += 10;
-                
-                // Datos
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(8);
-                doc.setTextColor(0, 0, 0);
-                doc.setDrawColor(200, 200, 200);
-                
-                for (const reserva of reservasFiltradas) {
-                    if (y > 180) {
-                        doc.addPage();
-                        y = marginLeft + 10;
-                        x = marginLeft;
-                        doc.setFillColor(255, 255, 255);
-                        doc.setDrawColor(0, 0, 0);
-                        doc.setFont('helvetica', 'bold');
-                        doc.setFontSize(9);
-                        doc.setTextColor(0, 0, 0);
-                        for (let i = 0; i < headers.length; i++) {
-                            doc.rect(x, y, colWidths[i], 10);
-                            doc.text(headers[i], x + 2, y + 6);
-                            x += colWidths[i];
-                        }
-                        y += 10;
-                        doc.setFont('helvetica', 'normal');
-                        doc.setFontSize(8);
-                        doc.setTextColor(0, 0, 0);
-                        doc.setDrawColor(200, 200, 200);
-                    }
-                    
-                    let excursionesTexto = '';
-                    if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
-                        excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
-                    } else {
-                        excursionesTexto = 'Sin excursiones';
-                    }
-                    
-                    const estadoTexto = reserva.estado === 'pendiente' ? 'Pendiente' : (reserva.estado === 'pagado' ? 'Pagado' : 'Confirmado');
-                    const lineasExcursiones = excursionesTexto.split('\n').length;
-                    const alturaFila = Math.max(10, lineasExcursiones * 4.5 + 4);
-                    
-                    x = marginLeft;
-                    
-                    doc.rect(x, y, colWidths[0], alturaFila);
-                    doc.text(String(reserva.id), x + 2, y + 5);
-                    x += colWidths[0];
-                    
-                    doc.rect(x, y, colWidths[1], alturaFila);
-                    const nombreCliente = reserva.nombre.length > 32 ? reserva.nombre.substring(0, 29) + '...' : reserva.nombre;
-                    doc.text(nombreCliente, x + 2, y + 5);
-                    x += colWidths[1];
-                    
-                    doc.rect(x, y, colWidths[2], alturaFila);
-                    doc.text(reserva.telefono, x + 2, y + 5);
-                    x += colWidths[2];
-                    
-                    doc.rect(x, y, colWidths[3], alturaFila);
-                    const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 4);
-                    doc.text(lineas, x + 2, y + 5);
-                    x += colWidths[3];
-                    
-                    doc.rect(x, y, colWidths[4], alturaFila);
-                    doc.text(String(reserva.personas), x + 2, y + 5);
-                    x += colWidths[4];
-                    
-                    doc.rect(x, y, colWidths[5], alturaFila);
-                    doc.text(estadoTexto, x + 2, y + 5);
-                    x += colWidths[5];
-                    
-                    doc.rect(x, y, colWidths[6], alturaFila);
-                    const lugarTexto = reserva.lugar.length > 28 ? reserva.lugar.substring(0, 25) + '...' : reserva.lugar;
-                    doc.text(lugarTexto, x + 2, y + 5);
-                    x += colWidths[6];
-                    
-                    doc.rect(x, y, colWidths[7], alturaFila);
-                    doc.text('', x + 2, y + 5);
-                    
-                    y += alturaFila;
-                }
-                
-                // === FILA DE TOTAL ===
-                y += 5;
-                const totalX = marginLeft + colWidths[0] + colWidths[1] + colWidths[2];
-                
-                doc.setFillColor(255, 255, 255);
-                doc.setDrawColor(0, 0, 0);
-                doc.setLineWidth(0.1);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.setTextColor(0, 0, 0);
-                
-                doc.rect(marginLeft, y, colWidths[0], 10);
-                doc.rect(marginLeft + colWidths[0], y, colWidths[1], 10);
-                doc.rect(marginLeft + colWidths[0] + colWidths[1], y, colWidths[2], 10);
-                doc.rect(totalX, y, colWidths[3], 10);
-                doc.text('TOTAL GENERAL', totalX + 2, y + 6);
-                doc.rect(totalX + colWidths[3], y, colWidths[4], 10);
-                doc.text(String(totalPasajeros), totalX + colWidths[3] + 2, y + 6);
-                doc.rect(totalX + colWidths[3] + colWidths[4], y, colWidths[5], 10);
-                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5], y, colWidths[6], 10);
-                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, colWidths[7], 10);
-                
-                doc.save(`reservas_${Date.now()}.pdf`);
-                
-            } catch (error) {
-                console.error('Error PDF:', error);
-                alert('❌ Error al generar el PDF.');
-            } finally {
-                btnPDF.textContent = textoOriginal;
-                btnPDF.disabled = false;
-            }
-        }
-        
         // ==================================================
-        // NUEVA FUNCIÓN PARA PDF EXTERNO CON FILTRO
+        // FUNCIÓN PARA PDF EXTERNO CON FILTRO
         // ==================================================
         function generarPDFExterno() {
             const busquedaInput = document.getElementById('busquedaReserva');
@@ -675,12 +503,10 @@ ${excursionesTexto}
         window.logout = logout;
         window.filtrarReservas = filtrarReservas;
         window.cargarReservas = cargarReservas;
-        window.generarPDF = generarPDF;
         window.generarPDFExterno = generarPDFExterno;
         
         document.getElementById('btnFiltrar').addEventListener('click', filtrarReservas);
         document.getElementById('btnRecargar').addEventListener('click', cargarReservas);
-        document.getElementById('btnPDF').addEventListener('click', generarPDF);
         document.getElementById('btnPDFExterno').addEventListener('click', generarPDFExterno);
         
         const busquedaInput = document.getElementById('busquedaReserva');
