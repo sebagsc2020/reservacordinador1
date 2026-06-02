@@ -132,12 +132,15 @@
 
         function dividirExcursiones(texto) {
             if (!texto) return [];
+            // Separar por saltos de línea (como viene de Google Sheets)
             if (texto.includes('\n')) {
                 return texto.split('\n').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
+            // Si viene con " | "
             if (texto.includes(' | ')) {
                 return texto.split(' | ').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
+            // Si viene con coma
             if (texto.includes(',')) {
                 return texto.split(',').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
