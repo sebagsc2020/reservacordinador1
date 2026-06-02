@@ -277,7 +277,7 @@
                 let y = margin + 8;
                 
                 // ============================================
-                // HEADER LIMPIO Y PROFESIONAL
+                // HEADER
                 // ============================================
                 doc.setDrawColor(42, 82, 110);
                 doc.setLineWidth(0.5);
@@ -309,7 +309,7 @@
                 y += 12;
                 
                 // ============================================
-                // TABLA
+                // TABLA - SIN RELLENO EN CELDAS
                 // ============================================
                 const colWidths = [28, 42, 28, 72, 12, 20, 32, 24];
                 const headers = ['ID', 'CLIENTE', 'TELÉFONO', 'EXCURSIONES', 'PAX', 'ESTADO', 'LUGAR', 'OBS'];
@@ -322,6 +322,7 @@
                 doc.setFontSize(7.5);
                 doc.setTextColor(30, 41, 59);
                 
+                // Solo encabezados con relleno
                 for (let i = 0; i < headers.length; i++) {
                     doc.rect(x, y, colWidths[i], 8, 'FD');
                     doc.text(headers[i], x + 2, y + 5.5);
@@ -329,11 +330,11 @@
                 }
                 y += 8;
                 
+                // Datos - SIN RELLENO (solo borde)
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(7);
                 doc.setTextColor(51, 65, 85);
                 doc.setDrawColor(203, 213, 225);
-                doc.setFillColor(255, 255, 255);
                 
                 let rowCount = 0;
                 
@@ -359,14 +360,7 @@
                         doc.setDrawColor(203, 213, 225);
                     }
                     
-                    const isEven = rowCount % 2 === 0;
-                    if (isEven) {
-                        doc.setFillColor(248, 250, 252);
-                    } else {
-                        doc.setFillColor(255, 255, 255);
-                    }
-                    
-                    // LÓGICA: filtrar excursiones según búsqueda
+                    // Filtrar excursiones según búsqueda
                     let excursionesTexto = '';
                     if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
                         if (hayFiltro) {
@@ -391,29 +385,31 @@
                     
                     x = margin;
                     
-                    doc.rect(x, y, colWidths[0], alturaFila, isEven ? 'FD' : 'F');
+                    // SIN RELLENO - solo borde (usar 'S' para solo borde, sin 'F')
+                    doc.rect(x, y, colWidths[0], alturaFila);
                     doc.text(String(reserva.id || '').substring(0, 12), x + 2, y + 4.5);
                     x += colWidths[0];
                     
-                    doc.rect(x, y, colWidths[1], alturaFila, isEven ? 'FD' : 'F');
+                    doc.rect(x, y, colWidths[1], alturaFila);
                     const nombreCliente = (reserva.nombre || 'No especificado').substring(0, 28);
                     doc.text(nombreCliente, x + 2, y + 4.5);
                     x += colWidths[1];
                     
-                    doc.rect(x, y, colWidths[2], alturaFila, isEven ? 'FD' : 'F');
+                    doc.rect(x, y, colWidths[2], alturaFila);
                     doc.text(reserva.telefono || '', x + 2, y + 4.5);
                     x += colWidths[2];
                     
-                    doc.rect(x, y, colWidths[3], alturaFila, isEven ? 'FD' : 'F');
+                    doc.rect(x, y, colWidths[3], alturaFila);
                     const lineas = doc.splitTextToSize(excursionesTexto, colWidths[3] - 3);
-                    doc.text(lineas, x + 1.5, y + 4.5);
+                    // ALINEACIÓN IZQUIERDA para las excursiones
+                    doc.text(lineas, x + 1.5, y + 4.5, { align: 'left' });
                     x += colWidths[3];
                     
-                    doc.rect(x, y, colWidths[4], alturaFila, isEven ? 'FD' : 'F');
+                    doc.rect(x, y, colWidths[4], alturaFila);
                     doc.text(String(reserva.personas || 0), x + 2, y + 4.5);
                     x += colWidths[4];
                     
-                    doc.rect(x, y, colWidths[5], alturaFila, isEven ? 'FD' : 'F');
+                    doc.rect(x, y, colWidths[5], alturaFila);
                     if (estadoTexto === 'Pagado') {
                         doc.setTextColor(22, 163, 74);
                     } else if (estadoTexto === 'Pendiente') {
@@ -425,37 +421,39 @@
                     doc.setTextColor(51, 65, 85);
                     x += colWidths[5];
                     
-                    doc.rect(x, y, colWidths[6], alturaFila, isEven ? 'FD' : 'F');
+                    doc.rect(x, y, colWidths[6], alturaFila);
                     const lugarTexto = (reserva.lugar || 'No especificado').substring(0, 22);
                     doc.text(lugarTexto, x + 2, y + 4.5);
                     x += colWidths[6];
                     
-                    doc.rect(x, y, colWidths[7], alturaFila, isEven ? 'FD' : 'F');
+                    doc.rect(x, y, colWidths[7], alturaFila);
                     doc.text('', x + 2, y + 4.5);
                     
                     y += alturaFila;
                     rowCount++;
                 }
                 
-                // TOTAL GENERAL
+                // TOTAL GENERAL - SIN RELLENO
                 y += 6;
                 const totalX = margin + colWidths[0] + colWidths[1] + colWidths[2];
                 
-                doc.setFillColor(248, 250, 252);
                 doc.setDrawColor(71, 85, 105);
                 doc.setLineWidth(0.3);
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(8.5);
                 doc.setTextColor(15, 23, 42);
                 
-                doc.rect(margin, y, colWidths[0], 9, 'FD');
-                doc.rect(margin + colWidths[0], y, colWidths[1], 9, 'FD');
-                doc.rect(margin + colWidths[0] + colWidths[1], y, colWidths[2], 9, 'FD');
-                doc.rect(totalX, y, colWidths[3], 9, 'FD');
-                doc.text('TOTAL GENERAL', totalX + 3, y + 6);
-                doc.rect(totalX + colWidths[3], y, colWidths[4], 9, 'FD');
+                doc.rect(margin, y, colWidths[0], 9);
+                doc.rect(margin + colWidths[0], y, colWidths[1], 9);
+                doc.rect(margin + colWidths[0] + colWidths[1], y, colWidths[2], 9);
+                doc.rect(totalX, y, colWidths[3], 9);
+                doc.text('TOTAL PASAJEROS', totalX + 3, y + 6);
+                doc.rect(totalX + colWidths[3], y, colWidths[4], 9);
                 doc.setTextColor(26, 74, 111);
                 doc.text(String(totalPasajeros), totalX + colWidths[3] + 3, y + 6);
+                doc.rect(totalX + colWidths[3] + colWidths[4], y, colWidths[5], 9);
+                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5], y, colWidths[6], 9);
+                doc.rect(totalX + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, colWidths[7], 9);
                 
                 y += 14;
                 
