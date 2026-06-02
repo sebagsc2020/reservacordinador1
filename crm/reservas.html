@@ -126,11 +126,9 @@
 
         function dividirExcursiones(texto) {
             if (!texto) return [];
-            // Separar por saltos de línea (como viene de Google Sheets cuando hay múltiples excursiones)
             if (texto.includes('\n')) {
                 return texto.split('\n').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
-            // Si no, devolver como array de un solo elemento
             return [texto.trim().replace(/^\d+\.\s*/, '')].filter(p => p);
         }
 
@@ -150,7 +148,7 @@
             if (!tbody) return;
             
             try {
-                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td';
+                tbody.innerHTML = '<td><td colspan="12" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 
                 if (!response.ok) {
@@ -161,10 +159,6 @@
                 const filas = parseCSV(csvText);
                 if (filas.length === 0) throw new Error('No se encontraron datos');
                 
-                // Los encabezados están en la primera fila (timestamp, id, nombre, etc.)
-                const encabezados = filas[0];
-                console.log('📋 Encabezados:', encabezados);
-                
                 reservasData = [];
                 const estadosGuardados = cargarEstadosGuardados();
                 
@@ -172,23 +166,18 @@
                     const fila = filas[i];
                     if (fila.length < 5) continue;
                     
-                    // Mapeo CORRECTO según tus encabezados:
-                    // 0: timestamp, 1: id, 2: nombre, 3: apellido, 4: email, 5: telefono, 
-                    // 6: pais, 7: ciudad, 8: excursiones, 9: fecha, 10: personas, 11: formaPago, 12: lugar
-                    
                     const id = fila[1] || `R-${i}`;
                     const timestamp = fila[0] || '';
                     const nombre = fila[2] || '';
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
-                    // Las excursiones están en el índice 8
                     let excursionesRaw = fila[8] || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
                     
                     const reserva = {
                         id: id,
-                        fecha: formatearFecha(fila[9] || timestamp),  // fecha está en índice 9
+                        fecha: formatearFecha(fila[9] || timestamp),
                         nombre: nombreCompleto || nombre,
                         email: fila[4] || '',
                         telefono: fila[5] || '',
@@ -204,9 +193,6 @@
                 }
                 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
-                if (reservasData.length > 0) {
-                    console.log('🔍 Primera reserva:', reservasData[0]);
-                }
                 
                 reservasData.sort((a, b) => { 
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
