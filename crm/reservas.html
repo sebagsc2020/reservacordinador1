@@ -81,7 +81,7 @@
         </div>
 
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o ciudad..." id="busquedaReserva">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, ciudad o excursión..." id="busquedaReserva">
             <button class="btn-filtrar" onclick="filtrarReservas()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarReservas()">🔄 Recargar</button>
         </div>
@@ -130,10 +130,20 @@
             return fechaStr;
         }
 
+        // 🔥 FUNCIÓN CORREGIDA - Divide excursiones por saltos de línea
         function dividirExcursiones(texto) {
             if (!texto) return [];
+            // Separar por saltos de línea (como viene de Google Sheets)
             if (texto.includes('\n')) {
                 return texto.split('\n').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
+            }
+            // Si viene con " | "
+            if (texto.includes(' | ')) {
+                return texto.split(' | ').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
+            }
+            // Si viene con coma
+            if (texto.includes(',')) {
+                return texto.split(',').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
             return [texto.trim().replace(/^\d+\.\s*/, '')].filter(p => p);
         }
@@ -178,8 +188,12 @@
                     const apellido = fila[3] || '';
                     const nombreCompleto = `${nombre} ${apellido}`.trim();
                     
+                    // 🔥 Las excursiones están en el índice 8
                     let excursionesRaw = fila[8] || '';
                     const listaExcursiones = dividirExcursiones(excursionesRaw);
+                    
+                    console.log(`📝 Excursiones raw: ${excursionesRaw}`);
+                    console.log(`📝 Excursiones lista:`, listaExcursiones);
                     
                     const reserva = {
                         id: id,
@@ -270,15 +284,20 @@
             }).join('');
         }
 
+        // 🔥 FILTRO CORREGIDO - También busca dentro de las excursiones
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
             if (!busqueda) return;
             const texto = busqueda.value.toLowerCase().trim();
-            if (!texto) reservasFiltradas = [...reservasData];
-            else reservasFiltradas = reservasData.filter(r => 
-                r.nombre.toLowerCase().includes(texto) || 
-                r.ciudad.toLowerCase().includes(texto)
-            );
+            if (!texto) {
+                reservasFiltradas = [...reservasData];
+            } else {
+                reservasFiltradas = reservasData.filter(r => 
+                    r.nombre.toLowerCase().includes(texto) || 
+                    r.ciudad.toLowerCase().includes(texto) ||
+                    r.excursionesLista.some(exc => exc.toLowerCase().includes(texto))
+                );
+            }
             renderizarTarjetas();
         }
 
