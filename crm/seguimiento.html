@@ -8,162 +8,33 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
         
-        /* ========== SIDEBAR MÁS ANGOSTA ========== */
-        .sidebar { 
-            width: 180px; 
-            background: #1a1a2e; 
-            color: white; 
-            padding: 20px 0; 
-            position: fixed; 
-            height: 100vh; 
-            overflow-y: auto; 
-            z-index: 100;
-        }
-        .sidebar-logo { 
-            text-align: center; 
-            padding: 0 12px 20px; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-            margin-bottom: 15px; 
-        }
-        .sidebar-logo .logo-icon { font-size: 32px; } 
-        .sidebar-logo h2 { font-size: 14px; margin-top: 5px; } 
-        .sidebar-logo h2 span { color: #667eea; }
+        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
+        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
+        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; border: none; }
         
-        .nav-menu { list-style: none; padding: 0 10px; } 
-        .nav-menu li { margin-bottom: 3px; }
-        .nav-menu a { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            padding: 8px 10px; 
-            color: rgba(255,255,255,0.7); 
-            text-decoration: none; 
-            border-radius: 8px; 
-            font-size: 12px; 
-        }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
-        .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 16px; width: 22px; text-align: center; }
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+        .header h1 { font-size: 26px; color: #1a1a2e; }
+        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
+        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
-        .sidebar-footer { 
-            position: absolute; 
-            bottom: 15px; 
-            left: 10px; 
-            right: 10px; 
-        }
-        .btn-logout-sidebar { 
-            width: 100%; 
-            padding: 8px; 
-            background: rgba(231,76,60,0.2); 
-            color: #e74c3c; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 11px; 
-            border: none; 
-        }
-        
-        /* ========== CONTENIDO PRINCIPAL ========== */
-        .main-content { 
-            margin-left: 180px; 
-            flex: 1; 
-            padding: 20px; 
-            min-width: 0;
-        }
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 20px; 
-            flex-wrap: wrap; 
-            gap: 15px; 
-        }
-        .header h1 { font-size: 22px; color: #1a1a2e; }
-        .header p { color: #999; font-size: 12px; margin-top: 4px; }
-        .user-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            background: white; 
-            padding: 6px 15px; 
-            border-radius: 40px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
-            font-size: 13px; 
-        }
-        .user-avatar { 
-            width: 30px; 
-            height: 30px; 
-            background: #667eea; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: 700; 
-            font-size: 12px;
-        }
-        
-        .btn-recargar { 
-            padding: 8px 18px; 
-            background: #27ae60; 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 12px; 
-            transition: all 0.2s; 
-        }
-        .btn-recargar:hover { background: #219a52; transform: translateY(-2px); }
-        
-        /* ========== MÉTRICAS ========== */
-        .metricas-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 25px; 
-        }
-        .metrica-card { 
-            background: white; 
-            padding: 15px; 
-            border-radius: 16px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-            text-align: center; 
-            transition: transform 0.2s; 
-        }
+        .metricas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .metrica-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; transition: transform 0.2s; }
         .metrica-card:hover { transform: translateY(-3px); }
-        .metrica-valor { font-size: 28px; font-weight: 800; color: #667eea; } 
-        .metrica-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 5px; }
+        .metrica-valor { font-size: 32px; font-weight: 800; color: #667eea; } 
+        .metrica-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        /* ========== KANBAN BOARD ========== */
-        .kanban-board { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 15px; 
-        }
-        .kanban-column { 
-            background: #f8f9fa; 
-            border-radius: 16px; 
-            padding: 15px; 
-            min-height: 400px; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        .kanban-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 15px; 
-            padding-bottom: 10px; 
-            border-bottom: 3px solid #e0e0e0; 
-        }
-        .kanban-title { font-size: 14px; font-weight: 700; } 
-        .kanban-count { 
-            padding: 2px 8px; 
-            border-radius: 20px; 
-            font-size: 11px; 
-            font-weight: 700; 
-        }
+        .kanban-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .kanban-column { background: #f8f9fa; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; }
+        .kanban-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e0e0e0; }
+        .kanban-title { font-size: 16px; font-weight: 700; } 
+        .kanban-count { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
         .kanban-column.pendiente .kanban-header { border-bottom-color: #ffc107; } 
         .kanban-column.pendiente .kanban-count { background: #ffc107; color: #856404; }
         .kanban-column.confirmado .kanban-header { border-bottom-color: #27ae60; } 
@@ -171,99 +42,82 @@
         .kanban-column.pagado .kanban-header { border-bottom-color: #3498db; } 
         .kanban-column.pagado .kanban-count { background: #3498db; color: white; }
         
-        .kanban-cards { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            max-height: 500px; 
-            overflow-y: auto; 
-            padding-right: 5px; 
-        }
-        .kanban-cards::-webkit-scrollbar { width: 4px; }
+        .kanban-cards { flex: 1; display: flex; flex-direction: column; gap: 12px; max-height: 500px; overflow-y: auto; padding-right: 5px; }
+        .kanban-cards::-webkit-scrollbar { width: 5px; }
         .kanban-cards::-webkit-scrollbar-track { background: #e0e0e0; border-radius: 10px; }
         .kanban-cards::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
         
-        .kanban-card { 
-            background: white; 
-            border-radius: 10px; 
-            padding: 12px; 
-            box-shadow: 0 1px 6px rgba(0,0,0,0.06); 
-            border-left: 3px solid #667eea; 
-            transition: all 0.2s; 
-            cursor: pointer; 
-        }
-        .kanban-card:hover { transform: translateX(2px); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .kanban-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #667eea; transition: all 0.2s; cursor: pointer; }
+        .kanban-card:hover { transform: translateX(3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .kanban-card.pendiente { border-left-color: #ffc107; } 
         .kanban-card.confirmado { border-left-color: #27ae60; }
         .kanban-card.pagado { border-left-color: #3498db; }
+        .kanban-card-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .kanban-card-id { font-size: 10px; font-weight: 700; color: #667eea; background: #f0f0ff; padding: 2px 8px; border-radius: 12px; } 
+        .kanban-card-fecha { font-size: 10px; color: #999; }
+        .kanban-card-cliente { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 5px; }
+        .kanban-card-excursion { font-size: 11px; color: #666; margin-bottom: 8px; }
+        .kanban-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+        .kanban-card-personas { background: #f0f0ff; color: #667eea; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+        .kanban-card-formapago { color: #888; }
         
-        .kanban-card-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
-        .kanban-card-id { 
-            font-size: 9px; 
-            font-weight: 700; 
-            color: #667eea; 
-            background: #f0f0ff; 
-            padding: 2px 6px; 
-            border-radius: 10px; 
-        } 
-        .kanban-card-fecha { font-size: 9px; color: #999; }
-        .kanban-card-cliente { font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
-        .kanban-card-excursion { font-size: 10px; color: #666; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .kanban-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 10px; }
-        .kanban-card-personas { background: #f0f0ff; color: #667eea; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
-        .kanban-card-formapago { color: #888; font-size: 9px; }
+        .btn-recargar { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .btn-recargar:hover { background: #219a52; transform: translateY(-2px); }
         
-        .loading-text { text-align: center; padding: 20px; color: #999; font-size: 12px; }
+        .loading-text { text-align: center; padding: 30px; color: #999; }
         
-        /* ========== BOTONES MODAL ========== */
-        .modal-buttons {
+        /* ===== PRELOADER POPUP ===== */
+        .preloader-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.3s ease;
         }
-        .btn-whatsapp {
-            flex: 1;
-            padding: 12px;
-            background: #25D366;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s;
+        .preloader-popup.oculto { opacity: 0; visibility: hidden; }
+        .preloader-popup-contenido {
+            background: white;
+            border-radius: 24px;
+            padding: 35px 45px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: popupFadeIn 0.3s ease;
         }
-        .btn-whatsapp:hover {
-            background: #1da851;
-            transform: translateY(-2px);
+        @keyframes popupFadeIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
-        .btn-cerrar {
-            flex: 1;
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s;
+        .preloader-popup-icono {
+            width: 70px;
+            height: 70px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-right: 4px solid #764ba2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
-        .btn-cerrar:hover {
-            background: #5a67d8;
-            transform: translateY(-2px);
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .preloader-popup-titulo { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+        .preloader-popup-subtitulo { font-size: 14px; color: #666; }
+        .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
+        @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
         
-        @media (max-width: 900px) { .kanban-board { grid-template-columns: 1fr; gap: 15px; } }
+        @media (max-width: 1100px) { .kanban-board { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) { 
             .sidebar { width: 60px; } 
             .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
-            .nav-menu a { justify-content: center; padding: 10px; }
-            .nav-icon { font-size: 18px; width: auto; }
-            .main-content { margin-left: 60px; padding: 12px; }
-            .metricas-grid { grid-template-columns: repeat(2, 1fr); }
-            .modal-buttons { flex-direction: column; }
+            .nav-menu a { justify-content: center; } 
+            .main-content { margin-left: 60px; padding: 15px; } 
+            .kanban-board { grid-template-columns: 1fr; }
+            .preloader-popup-contenido { padding: 25px 35px; }
         }
     </style>
 </head>
@@ -284,24 +138,21 @@
     
     <div class="main-content">
         <div class="header">
-            <div>
-                <h1>📈 Seguimiento</h1>
-                <p>Pipeline de reservas - Haz clic en cualquier tarjeta para ver detalles</p>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;">
+            <div><h1>📈 Seguimiento</h1><p style="color:#999;font-size:13px;">Pipeline de reservas - Estado actual</p></div>
+            <div style="display:flex;align-items:center;gap:15px;">
                 <button class="btn-recargar" onclick="cargarDatos()">🔄 Recargar</button>
                 <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
             </div>
         </div>
         
         <div class="metricas-grid">
-            <div class="metrica-card"><div class="metrica-valor" id="metricaTotal">0</div><div class="metrica-label">Total Reservas</div></div>
-            <div class="metrica-card"><div class="metrica-valor" id="metricaConfirmadas">0</div><div class="metrica-label">Confirmadas</div></div>
-            <div class="metrica-card"><div class="metrica-valor" id="metricaPendientes">0</div><div class="metrica-label">Pendientes</div></div>
-            <div class="metrica-card"><div class="metrica-valor" id="metricaPagadas">0</div><div class="metrica-label">Pagadas</div></div>
+            <div class="metrica-card"><div class="metrica-valor" id="metricaTotal">--</div><div class="metrica-label">Total Reservas</div></div>
+            <div class="metrica-card"><div class="metrica-valor" id="metricaConfirmadas">--</div><div class="metrica-label">Confirmadas</div></div>
+            <div class="metrica-card"><div class="metrica-valor" id="metricaPendientes">--</div><div class="metrica-label">Pendientes</div></div>
+            <div class="metrica-card"><div class="metrica-valor" id="metricaPagadas">--</div><div class="metrica-label">Pagadas</div></div>
         </div>
         
-        <div class="kanban-board">
+        <div class="kanban-board" id="kanbanBoard">
             <div class="kanban-column pendiente">
                 <div class="kanban-header"><span class="kanban-title">⏳ Pendientes</span><span class="kanban-count" id="countPendiente">0</span></div>
                 <div class="kanban-cards" id="kanbanPendiente"><div class="loading-text">Cargando...</div></div>
@@ -316,346 +167,241 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- PRELOADER POPUP -->
+    <div id="preloaderPopup" class="preloader-popup oculto">
+        <div class="preloader-popup-contenido">
+            <div class="preloader-popup-icono"></div>
+            <div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div>
+            <div class="preloader-popup-subtitulo">Cargando datos desde Google Sheets...</div>
+        </div>
+    </div>
+
     <script>
-        // ==================================================
-        // CONFIGURACIÓN - MISMA PLANILLA QUE RESERVAS
-        // ==================================================
+        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
+        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
-        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         
-        // ==================================================
-        // VERIFICAR AUTENTICACIÓN
-        // ==================================================
-        if (sessionStorage.getItem('crm_logged') !== 'true') { 
-            window.location.href = 'index.html'; 
-        }
+        // Misma URL del Google Apps Script que en reservas.html
+        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
-        function logout() { 
-            sessionStorage.clear(); 
-            window.location.href = 'index.html'; 
-        }
-        
-        // ==================================================
-        // VARIABLES GLOBALES
-        // ==================================================
         let reservasData = [];
+        let estadosGlobales = {};
+
+        // Preloader Popup
+        const preloaderPopup = document.getElementById('preloaderPopup');
         
-        // ==================================================
-        // PARSEAR CSV
-        // ==================================================
-        function parseCSV(csvText) {
-            const filas = [];
-            let filaActual = [];
-            let celdaActual = '';
-            let dentroComillas = false;
-            
-            for (let i = 0; i < csvText.length; i++) {
-                const char = csvText[i];
-                const nextChar = csvText[i + 1];
-                
-                if (dentroComillas) {
-                    if (char === '"') {
-                        if (nextChar === '"') {
-                            celdaActual += '"';
-                            i++;
-                        } else {
-                            dentroComillas = false;
-                        }
-                    } else {
-                        celdaActual += char;
-                    }
+        function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
+        function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
+
+        async function cargarEstadosDesdeNube() {
+            try {
+                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener');
+                const data = await response.json();
+                if (data.success && data.estados) {
+                    estadosGlobales = data.estados;
+                    localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
+                    return estadosGlobales;
                 } else {
-                    if (char === '"') {
-                        dentroComillas = true;
-                    } else if (char === ',') {
-                        filaActual.push(celdaActual.trim());
-                        celdaActual = '';
-                    } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
-                        filaActual.push(celdaActual.trim());
-                        filas.push(filaActual);
-                        filaActual = [];
-                        celdaActual = '';
-                        if (char === '\r') i++;
-                    } else {
-                        celdaActual += char;
-                    }
+                    throw new Error('No se pudieron obtener estados');
                 }
+            } catch (error) {
+                console.error('Error al cargar desde nube:', error);
+                const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
+                estadosGlobales = estadosLocal;
+                return estadosLocal;
             }
-            
-            if (celdaActual.trim() || filaActual.length > 0) {
-                filaActual.push(celdaActual.trim());
-                filas.push(filaActual);
-            }
-            
-            return filas.filter(fila => fila.some(celda => celda !== ''));
         }
-        
-        // ==================================================
-        // FORMATEAR FECHA
-        // ==================================================
+
+        function parseCSV(csvText) {
+            const lineas = csvText.split('\n');
+            const resultados = [];
+            for (let i = 0; i < lineas.length; i++) {
+                const linea = lineas[i].trim();
+                if (!linea) continue;
+                const fila = [];
+                let campo = '';
+                let enComillas = false;
+                for (let j = 0; j < linea.length; j++) {
+                    const char = linea[j];
+                    if (char === '"') { enComillas = !enComillas; } 
+                    else if (char === ',' && !enComillas) { fila.push(campo); campo = ''; } 
+                    else { campo += char; }
+                }
+                fila.push(campo);
+                resultados.push(fila.map(c => c.replace(/^"|"$/g, '').trim()));
+            }
+            return resultados;
+        }
+
         function formatearFecha(fechaStr) {
             if (!fechaStr) return '';
             if (fechaStr.includes('/')) return fechaStr;
-            
-            if (fechaStr.includes('GMT')) {
-                try {
-                    const fecha = new Date(fechaStr);
-                    if (!isNaN(fecha.getTime())) {
-                        return `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
-                    }
-                } catch(e) {}
-            }
-            
             const partes = fechaStr.split('-');
-            if (partes.length === 3 && partes[0].length === 4) {
-                return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
+            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
             return fechaStr;
         }
-        
-        // ==================================================
-        // DIVIDIR EXCURSIONES
-        // ==================================================
+
         function dividirExcursiones(texto) {
             if (!texto) return [];
-            let partes = [];
             if (texto.includes('\n')) {
-                partes = texto.split('\n');
-            } else if (texto.includes(' | ')) {
-                partes = texto.split(' | ');
-            } else if (texto.includes(', ')) {
-                partes = texto.split(', ');
-            } else if (texto.includes(',')) {
-                partes = texto.split(',');
-            } else {
-                partes = [texto];
+                return texto.split('\n').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
-            return partes.map(p => p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(p => p);
+            return [texto.trim().replace(/^\d+\.\s*/, '')].filter(p => p);
         }
-        
-        // ==================================================
-        // ESTADOS (mismo localStorage que reservas.html)
-        // ==================================================
-        function cargarEstadosGuardados() {
-            try { 
-                return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); 
-            } catch(e) { 
-                return {}; 
-            }
-        }
-        
-        // ==================================================
-        // CARGAR DATOS
-        // ==================================================
+
         async function cargarDatos() {
-            const pendienteContainer = document.getElementById('kanbanPendiente');
-            const confirmadoContainer = document.getElementById('kanbanConfirmado');
-            const pagadoContainer = document.getElementById('kanbanPagado');
-            
             try {
-                if (pendienteContainer) pendienteContainer.innerHTML = '<div class="loading-text">⏳ Cargando...</div>';
-                if (confirmadoContainer) confirmadoContainer.innerHTML = '<div class="loading-text">⏳ Cargando...</div>';
-                if (pagadoContainer) pagadoContainer.innerHTML = '<div class="loading-text">⏳ Cargando...</div>';
-                
-                console.log('📡 Cargando datos desde:', SHEET_CSV_URL);
-                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const csvText = await response.text();
-                const filas = parseCSV(csvText);
-                
-                if (filas.length < 2) {
-                    throw new Error('No se encontraron datos en la planilla');
-                }
-                
+                mostrarPreloader();
+
+                // Cargar estados desde la nube
+                await cargarEstadosDesdeNube();
+
+                const response = await fetch(JSON_URL);
+                const texto = await response.text();
+
+                let jsonStr = texto;
+                jsonStr = jsonStr.replace("/*O_o*/", "");
+                jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
+                jsonStr = jsonStr.slice(0, -2);
+
+                const data = JSON.parse(jsonStr);
+                const rows = data.table.rows;
+
+                if (!rows || rows.length === 0) throw new Error('No hay datos');
+
                 reservasData = [];
-                const estadosGuardados = cargarEstadosGuardados();
-                console.log('📦 Estados guardados:', estadosGuardados);
-                
-                for (let i = 1; i < filas.length; i++) {
-                    const fila = filas[i];
-                    if (fila.length < 3 || !fila[0]) continue;
-                    
-                    const id = fila[1] || `R-${i}`;
-                    const timestamp = fila[0] || '';
-                    const nombre = fila[2] || '';
-                    const apellido = fila[3] || '';
-                    const email = fila[4] || '';
-                    const telefono = fila[5] || '';
-                    const pais = fila[6] || '';
-                    const ciudad = fila[7] || '';
-                    const excursionesRaw = fila[8] || '';
-                    const fecha = fila[9] || '';
-                    const personas = fila[10] || '1';
-                    const formaPago = fila[11] || '';
-                    const lugar = fila[12] || '';
-                    
-                    const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
-                    const listaExcursiones = dividirExcursiones(excursionesRaw);
-                    const excursionPrimera = listaExcursiones.length > 0 ? listaExcursiones[0] : 'Sin excursiones';
-                    
-                    let estado = estadosGuardados[id];
+                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
+
+                for (let i = 0; i < rows.length; i++) {
+                    const c = rows[i].c;
+                    if (!c || c.length < 5) continue;
+
+                    const id = (c[1] && c[1].v) ? String(c[1].v) : '';
+                    if (!id || excluidos.includes(id)) continue;
+
+                    const nombre = (c[2] && c[2].v) ? String(c[2].v) : '';
+                    const apellido = (c[3] && c[3].v) ? String(c[3].v) : '';
+                    const email = (c[4] && c[4].v) ? String(c[4].v) : '';
+                    const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
+                    const ciudad = (c[7] && c[7].v) ? String(c[7].v) : '';
+
+                    let excursionesLista = [];
+                    const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
+                    if (excursionesRaw) {
+                        if (excursionesRaw.includes('\n')) {
+                            excursionesLista = excursionesRaw.split('\n');
+                        } else if (excursionesRaw.includes(' | ')) {
+                            excursionesLista = excursionesRaw.split(' | ');
+                        } else {
+                            excursionesLista = [excursionesRaw];
+                        }
+                        excursionesLista = excursionesLista.map(function(e) { 
+                            return e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
+                        }).filter(function(e) { return e; });
+                    }
+
+                    let fecha = '';
+                    const timestamp = (c[0] && c[0].v) ? c[0].v : null;
+                    if (timestamp) {
+                        const fechaObj = new Date(timestamp);
+                        if (!isNaN(fechaObj.getTime())) {
+                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
+                        }
+                    }
+
+                    const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
+                    const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
+                    const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
+
+                    // 🔥 Obtener estado desde la nube (misma fuente que reservas.html)
+                    let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
                     }
-                    
-                    const reserva = {
+
+                    reservasData.push({
                         id: id,
-                        fecha: formatearFecha(timestamp) || formatearFecha(fecha),
+                        fecha: fecha,
                         nombre: nombreCompleto,
                         email: email,
                         telefono: telefono,
-                        pais: pais,
                         ciudad: ciudad,
-                        excursion: excursionPrimera,
-                        excursionesLista: listaExcursiones,
-                        personas: personas,
-                        formaPago: formaPago || 'No especificado',
-                        lugar: lugar || 'No especificado',
+                        excursionesLista: excursionesLista,
+                        personas: parseInt(personas) || 1,
+                        formaPago: formaPago,
                         estado: estado
-                    };
-                    reservasData.push(reserva);
+                    });
                 }
-                
+
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
+
+                // Actualizar métricas
+                const total = reservasData.length;
+                const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
+                const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
+                const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
                 
-                reservasData.sort((a, b) => { 
-                    const numA = parseInt(a.id.replace(/\D/g, '')) || 0; 
-                    const numB = parseInt(b.id.replace(/\D/g, '')) || 0; 
-                    return numB - numA; 
-                });
+                document.getElementById('metricaTotal').textContent = total;
+                document.getElementById('metricaConfirmadas').textContent = confirmadas;
+                document.getElementById('metricaPendientes').textContent = pendientes;
+                document.getElementById('metricaPagadas').textContent = pagadas;
                 
-                actualizarDashboard();
+                document.getElementById('countPendiente').textContent = pendientes;
+                document.getElementById('countConfirmado').textContent = confirmadas;
+                document.getElementById('countPagado').textContent = pagadas;
+                
+                // Actualizar columnas Kanban
+                document.getElementById('kanbanPendiente').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pendiente'));
+                document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'confirmado'));
+                document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pagado'));
                 
             } catch (error) {
-                console.error('❌ Error:', error);
-                if (pendienteContainer) pendienteContainer.innerHTML = `<div class="loading-text">❌ Error: ${error.message}</div>`;
+                console.error('Error:', error);
+                document.getElementById('kanbanPendiente').innerHTML = '<div class="loading-text">Error al cargar datos</div>';
+            } finally {
+                ocultarPreloader();
             }
         }
-        
-        // ==================================================
-        // ACTUALIZAR DASHBOARD
-        // ==================================================
-        function actualizarDashboard() {
-            const total = reservasData.length;
-            const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
-            const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
-            const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
-            
-            document.getElementById('metricaTotal').textContent = total;
-            document.getElementById('metricaConfirmadas').textContent = confirmadas;
-            document.getElementById('metricaPendientes').textContent = pendientes;
-            document.getElementById('metricaPagadas').textContent = pagadas;
-            
-            document.getElementById('countPendiente').textContent = pendientes;
-            document.getElementById('countConfirmado').textContent = confirmadas;
-            document.getElementById('countPagado').textContent = pagadas;
-            
-            const pendientesList = reservasData.filter(r => r.estado === 'pendiente');
-            const confirmadosList = reservasData.filter(r => r.estado === 'confirmado');
-            const pagadosList = reservasData.filter(r => r.estado === 'pagado');
-            
-            document.getElementById('kanbanPendiente').innerHTML = renderizarTarjetas(pendientesList, 'pendiente');
-            document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(confirmadosList, 'confirmado');
-            document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(pagadosList, 'pagado');
-        }
-        
-        // ==================================================
-        // RENDERIZAR TARJETAS
-        // ==================================================
-        function renderizarTarjetas(reservas, estado) {
-            if (!reservas || reservas.length === 0) {
+
+        function renderizarTarjetas(reservas) {
+            if (reservas.length === 0) {
                 return '<div class="loading-text">📭 Sin reservas</div>';
             }
-            
-            return reservas.map(r => `
-                <div class="kanban-card ${estado}" onclick="verDetalle('${escapeHtml(r.id)}')">
-                    <div class="kanban-card-header">
-                        <span class="kanban-card-id">${escapeHtml(r.id)}</span>
-                        <span class="kanban-card-fecha">${escapeHtml(r.fecha)}</span>
+            return reservas.map(r => {
+                const excursionPrimera = r.excursionesLista && r.excursionesLista.length > 0 ? r.excursionesLista[0] : 'Sin excursiones';
+                const excursionesTexto = excursionPrimera + (r.excursionesLista && r.excursionesLista.length > 1 ? ` (+${r.excursionesLista.length-1} más)` : '');
+                
+                return `
+                    <div class="kanban-card ${r.estado}" onclick="verDetalle('${escapeHtml(r.id)}')">
+                        <div class="kanban-card-header">
+                            <span class="kanban-card-id">${escapeHtml(r.id)}</span>
+                            <span class="kanban-card-fecha">${escapeHtml(r.fecha)}</span>
+                        </div>
+                        <div class="kanban-card-cliente">${escapeHtml(r.nombre)}</div>
+                        <div class="kanban-card-excursion">${escapeHtml(excursionesTexto)}</div>
+                        <div class="kanban-card-footer">
+                            <span class="kanban-card-personas">👥 ${escapeHtml(r.personas)}</span>
+                            <span class="kanban-card-formapago">${escapeHtml(r.formaPago)}</span>
+                        </div>
                     </div>
-                    <div class="kanban-card-cliente">${escapeHtml(r.nombre)}</div>
-                    <div class="kanban-card-excursion" title="${escapeHtml(r.excursion)}">${escapeHtml(r.excursion.length > 40 ? r.excursion.substring(0, 40) + '...' : r.excursion)}</div>
-                    <div class="kanban-card-footer">
-                        <span class="kanban-card-personas">👥 ${escapeHtml(r.personas)}</span>
-                        <span class="kanban-card-formapago">${escapeHtml(r.formaPago)}</span>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
-        
-        // ==================================================
-        // FUNCIÓN PARA ENVIAR MENSAJE POR WHATSAPP
-        // ==================================================
-        function enviarPorWhatsApp(reserva) {
-            // Limpiar número de teléfono (solo dígitos)
-            let telefono = reserva.telefono.replace(/\D/g, '');
-            
-            // Si el número no tiene código país, agregar 54 para Argentina
-            if (telefono.length === 10) {
-                telefono = '54' + telefono;
-            }
-            
-            // Formatear lista de excursiones
-            let excursionesTexto = '';
-            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
-                excursionesTexto = reserva.excursionesLista.map((exc, idx) => `${idx+1}. ${exc}`).join('\n');
-            } else {
-                excursionesTexto = 'Sin excursiones específicas';
-            }
-            
-            // Crear mensaje
-            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
 
-✅ *CONFIRMACIÓN DE RESERVA*
-
-🆔 *N° de reserva:* ${reserva.id}
-📅 *Fecha:* ${reserva.fecha}
-
-👤 *DATOS DEL PASAJERO:*
-   Nombre: ${reserva.nombre}
-   📞 Teléfono: ${reserva.telefono}
-   📧 Email: ${reserva.email}
-
-📍 *DESTINO:*
-   ${reserva.pais} - ${reserva.ciudad}
-
-✨ *EXCURSIONES SELECCIONADAS:*
-${excursionesTexto}
-
-👥 *Cantidad de personas:* ${reserva.personas}
-💳 *Forma de pago:* ${reserva.formaPago}
-🚐 *Punto de encuentro:* ${reserva.lugar}
-
-📌 *PRÓXIMOS PASOS:*
-• En las próximas recibirás detalles de pago
-• Punto de encuentro exacto será confirmado
-
-🏔️ ¡Gracias por confiar en Aventura Total!`;
-
-            // Codificar mensaje para URL
-            const mensajeCodificado = encodeURIComponent(mensaje);
-            
-            // Abrir WhatsApp
-            window.open(`https://wa.me/${telefono}?text=${mensajeCodificado}`, '_blank');
-        }
-        
-        // ==================================================
-        // VER DETALLE DE RESERVA (CON BOTÓN WHATSAPP)
-        // ==================================================
         function verDetalle(id) {
             const reserva = reservasData.find(r => r.id === id);
             if (!reserva) return;
             
             let estadoText = '';
-            let estadoColor = '';
             switch(reserva.estado) {
-                case 'pendiente': estadoText = 'Pendiente'; estadoColor = '#ffc107'; break;
-                case 'confirmado': estadoText = 'Confirmado'; estadoColor = '#27ae60'; break;
-                case 'pagado': estadoText = 'Pagado'; estadoColor = '#3498db'; break;
-                default: estadoText = 'Confirmado'; estadoColor = '#667eea';
+                case 'pendiente': estadoText = 'Pendiente'; break;
+                case 'confirmado': estadoText = 'Confirmado'; break;
+                case 'pagado': estadoText = 'Pagado'; break;
+                default: estadoText = 'Confirmado';
             }
             
             let excursionesHtml = '<ul style="margin:5px 0 0 20px; padding:0;">';
@@ -675,65 +421,42 @@ ${excursionesTexto}
                             <h2 style="color:#667eea;">📋 Detalle de Reserva</h2>
                             <button onclick="cerrarModal()" style="background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
                         </div>
-                        
                         <p><strong>ID:</strong> ${escapeHtml(reserva.id)}</p>
                         <p><strong>Fecha:</strong> ${escapeHtml(reserva.fecha)}</p>
                         <p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p>
                         <p><strong>Email:</strong> ${escapeHtml(reserva.email)}</p>
                         <p><strong>Teléfono:</strong> ${escapeHtml(reserva.telefono)}</p>
-                        <p><strong>País:</strong> ${escapeHtml(reserva.pais)}</p>
                         <p><strong>Ciudad:</strong> ${escapeHtml(reserva.ciudad)}</p>
                         <p><strong>Personas:</strong> ${escapeHtml(reserva.personas)}</p>
                         <p><strong>Excursiones:</strong> ${excursionesHtml}</p>
                         <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
-                        <p><strong>Lugar:</strong> ${escapeHtml(reserva.lugar)}</p>
-                        <p><strong>Estado:</strong> <span style="background:${estadoColor}20; color:${estadoColor}; padding:4px 12px; border-radius:20px; font-weight:600;">${estadoText}</span></p>
-                        
-                        <div class="modal-buttons">
-                            <button class="btn-whatsapp" onclick="enviarWhatsAppDesdeModal('${escapeHtml(reserva.id)}')">📱 Enviar por WhatsApp</button>
-                            <button class="btn-cerrar" onclick="cerrarModal()">Cerrar</button>
-                        </div>
+                        <p><strong>Estado:</strong> <span style="background:#eef2ff; padding:3px 10px; border-radius:20px; font-weight:700;">${estadoText}</span></p>
+                        <button onclick="cerrarModal()" style="width:100%; padding:12px; background:#667eea; color:white; border:none; border-radius:12px; margin-top:15px; cursor:pointer;">Cerrar</button>
                     </div>
                 </div>
             `;
-            
             document.body.insertAdjacentHTML('beforeend', modalHtml);
         }
-        
-        // Función para enviar WhatsApp desde el modal
-        function enviarWhatsAppDesdeModal(id) {
-            const reserva = reservasData.find(r => r.id === id);
-            if (reserva) {
-                enviarPorWhatsApp(reserva);
-            }
-        }
-        
+
         function cerrarModal() {
             const modal = document.getElementById('modalDetalle');
             if (modal) modal.remove();
         }
-        
-        // ==================================================
-        // ESCAPAR HTML
-        // ==================================================
+
         function escapeHtml(text) { 
             if (!text) return ''; 
             const div = document.createElement('div'); 
             div.textContent = text; 
             return div.innerHTML; 
         }
-        
-        // ==================================================
-        // INICIALIZAR
-        // ==================================================
+
         window.verDetalle = verDetalle;
         window.cerrarModal = cerrarModal;
         window.cargarDatos = cargarDatos;
         window.logout = logout;
-        window.enviarWhatsAppDesdeModal = enviarWhatsAppDesdeModal;
-        
+
         cargarDatos();
-        setInterval(cargarDatos, 60000);
+        setInterval(cargarDatos, 30000);
     </script>
 </body>
 </html>
