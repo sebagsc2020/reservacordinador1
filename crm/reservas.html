@@ -48,21 +48,31 @@
         .card-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px;
+            padding: 12px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .card-id {
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             background: rgba(255,255,255,0.2);
             padding: 4px 10px;
             border-radius: 20px;
         }
+        .card-estado-header {
+            font-weight: 700;
+            font-size: 12px;
+            background: rgba(255,255,255,0.25);
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
         .card-fecha {
-            font-size: 11px;
-            opacity: 0.9;
+            font-size: 10px;
+            opacity: 0.85;
         }
 
         .card-body { padding: 15px; }
@@ -73,18 +83,6 @@
         .excursiones-lista-card { margin: 0; padding-left: 16px; list-style: none; }
         .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: #555; border-bottom: 1px dashed #eee; }
         .excursiones-lista-card li:last-child { border-bottom: none; }
-
-        .card-estado {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .estado-pendiente { background: #fff3cd; color: #856404; }
-        .estado-confirmado { background: #d4edda; color: #155724; }
-        .estado-pagado { background: #d1ecf1; color: #0c5460; }
 
         .card-actions {
             display: flex;
@@ -134,6 +132,7 @@
             .nav-menu a { justify-content: center; } 
             .main-content { margin-left: 60px; padding: 15px; }
             .cards-grid { grid-template-columns: 1fr; }
+            .card-header { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -190,7 +189,7 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         
-        // 🔥 REEMPLAZÁ ESTA URL CON LA URL DE TU GOOGLE APPS SCRIPT
+        // URL del Google Apps Script para guardar estados en la nube
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
         let reservasData = [];
@@ -406,12 +405,13 @@
             let html = '';
             for (let idx = 0; idx < reservasFiltradas.length; idx++) {
                 const r = reservasFiltradas[idx];
-                let estadoClass = '', estadoText = '';
+                let estadoText = '';
+                let estadoClass = '';
                 switch(r.estado) {
-                    case 'pendiente': estadoClass = 'estado-pendiente'; estadoText = 'Pendiente'; break;
-                    case 'confirmado': estadoClass = 'estado-confirmado'; estadoText = 'Confirmado'; break;
-                    case 'pagado': estadoClass = 'estado-pagado'; estadoText = 'Pagado'; break;
-                    default: estadoClass = 'estado-confirmado'; estadoText = 'Confirmado';
+                    case 'pendiente': estadoText = 'Pendiente'; estadoClass = 'estado-pendiente'; break;
+                    case 'confirmado': estadoText = 'Confirmado'; estadoClass = 'estado-confirmado'; break;
+                    case 'pagado': estadoText = 'Pagado'; estadoClass = 'estado-pagado'; break;
+                    default: estadoText = 'Confirmado'; estadoClass = 'estado-confirmado';
                 }
 
                 let excursionesHtml = '<ul class="excursiones-lista-card">';
@@ -426,7 +426,10 @@
 
                 html += '<div class="reserva-card">' +
                             '<div class="card-header">' +
-                                '<span class="card-id">' + escapeHtml(r.id) + '</span>' +
+                                '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">' +
+                                    '<span class="card-id">ID: ' + escapeHtml(r.id) + '</span>' +
+                                    '<span class="card-estado-header" style="font-weight: 700;">' + estadoText + '</span>' +
+                                '</div>' +
                                 '<span class="card-fecha">' + escapeHtml(r.fecha) + '</span>' +
                             '</div>' +
                             '<div class="card-body">' +
@@ -438,7 +441,6 @@
                                 '<div class="card-info"><div class="card-label">👥 PERSONAS</div><div class="card-value">' + escapeHtml(r.personas) + '</div></div>' +
                                 '<div class="card-info"><div class="card-label">💳 FORMA DE PAGO</div><div class="card-value">' + escapeHtml(r.formaPago) + '</div></div>' +
                                 '<div class="card-info"><div class="card-label">🚐 LUGAR</div><div class="card-value">' + escapeHtml(r.lugar) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label">📌 ESTADO</div><div class="card-value"><span class="card-estado ' + estadoClass + '">' + estadoText + '</span></div></div>' +
                             '</div>' +
                             '<div class="card-actions">' +
                                 '<button class="btn-card btn-confirmar-card" data-id="' + escapeHtml(r.id) + '" data-estado="confirmado">✅</button>' +
