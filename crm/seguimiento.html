@@ -282,11 +282,11 @@
         .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
         @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
         
-        /* Estilos para el botón de cobrar */
-        .btn-cobrar {
+        /* Estilos para botón de pago WhatsApp */
+        .btn-pagar-whatsapp {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, #009ee3 0%, #0077b3 100%);
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
             color: white;
             border: none;
             border-radius: 12px;
@@ -300,11 +300,11 @@
             justify-content: center;
             gap: 10px;
         }
-        .btn-cobrar:hover {
+        .btn-pagar-whatsapp:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,158,227,0.3);
+            box-shadow: 0 5px 15px rgba(37,211,102,0.3);
         }
-        .btn-cobrar:active {
+        .btn-pagar-whatsapp:active {
             transform: scale(0.98);
         }
         
@@ -595,64 +595,6 @@
             }
         }
 
-        function parseCSV(csvText) {
-            const lineas = csvText.split('\n');
-            const resultados = [];
-            for (let i = 0; i < lineas.length; i++) {
-                const linea = lineas[i].trim();
-                if (!linea) continue;
-                const fila = [];
-                let campo = '';
-                let enComillas = false;
-                for (let j = 0; j < linea.length; j++) {
-                    const char = linea[j];
-                    if (char === '"') { enComillas = !enComillas; } 
-                    else if (char === ',' && !enComillas) { fila.push(campo); campo = ''; } 
-                    else { campo += char; }
-                }
-                fila.push(campo);
-                resultados.push(fila.map(c => c.replace(/^"|"$/g, '').trim()));
-            }
-            return resultados;
-        }
-
-        function formatearFecha(fechaStr) {
-            if (!fechaStr) return '';
-            if (fechaStr.includes('/')) return fechaStr;
-            const partes = fechaStr.split('-');
-            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            return fechaStr;
-        }
-
-        function dividirExcursiones(texto) {
-            if (!texto) return [];
-            if (texto.includes('\n')) {
-                return texto.split('\n').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
-            }
-            return [texto.trim().replace(/^\d+\.\s*/, '')].filter(p => p);
-        }
-
-        // Función para abrir Mercado Pago con mensaje de advertencia
-        function abrirMercadoPago() {
-            // Mostrar mensaje de advertencia antes de redirigir
-            const confirmar = confirm('⚠️ ATENCIÓN ⚠️\n\nCaso no recuerde el monto total de su reserva, solicítelo vía WhatsApp.\n\n¿Desea continuar al link de pago?');
-            
-            if (confirmar) {
-                // Intentar abrir la app de Mercado Pago (deep link)
-                const mercadoPagoAppLink = 'mercadopago://' + MERCADO_PAGO_LINK.replace('https://', '');
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = mercadoPagoAppLink;
-                document.body.appendChild(iframe);
-                
-                // Si después de 2 segundos no se abrió la app, redirigir a la web
-                setTimeout(function() {
-                    document.body.removeChild(iframe);
-                    window.open(MERCADO_PAGO_LINK, '_blank');
-                }, 2000);
-            }
-        }
-
         async function cargarDatos() {
             try {
                 mostrarPreloader();
@@ -792,6 +734,37 @@
             }).join('');
         }
 
+        // Función para enviar link de pago por WhatsApp
+        function enviarLinkPagoWhatsApp(reserva) {
+            // Formatear teléfono
+            let telefono = reserva.telefono.replace(/\D/g, '');
+            if (telefono.length === 10) {
+                telefono = '54' + telefono;
+            }
+            
+            // Construir mensaje con el link de Mercado Pago
+            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
+
+💰 *SOLICITUD DE PAGO*
+
+Hola *${reserva.nombre}*, tu reserva *N° ${reserva.id}* está confirmada.
+
+🔗 *Link de pago (Mercado Pago):*
+${MERCADO_PAGO_LINK}
+
+⚠️ *IMPORTANTE:* Caso no recuerde el monto total de su reserva, solicítelo vía WhatsApp. Muchas Gracias.
+
+📌 Una vez realizado el pago, envianos el comprobante para confirmar.
+
+🏔️ ¡Gracias por confiar en Aventura Total!`;
+            
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            const urlWhatsApp = `https://wa.me/${telefono}?text=${mensajeCodificado}`;
+            
+            // Abrir WhatsApp
+            window.open(urlWhatsApp, '_blank');
+        }
+
         function verDetalle(id) {
             const reserva = reservasData.find(r => r.id === id);
             if (!reserva) return;
@@ -837,9 +810,9 @@
                             ⚠️ <strong>Importante:</strong> Caso no recuerde el monto total de su reserva, solicítelo vía WhatsApp. Muchas Gracias.
                         </div>
                         
-                        <!-- Botón Cobrar Mercado Pago -->
-                        <button class="btn-cobrar" onclick="abrirMercadoPago()">
-                            💰 Cobrar con Mercado Pago
+                        <!-- Botón Enviar link de pago por WhatsApp -->
+                        <button class="btn-pagar-whatsapp" onclick="enviarLinkPagoWhatsApp(reservasData.find(r => r.id === '${reserva.id}'))">
+                            💬 Enviar link de pago por WhatsApp
                         </button>
                         
                         <button onclick="cerrarModal()" style="width:100%; padding:12px; background:#667eea; color:white; border:none; border-radius:12px; margin-top:10px; cursor:pointer;">Cerrar</button>
@@ -866,7 +839,7 @@
         window.cerrarModal = cerrarModal;
         window.cargarDatos = cargarDatos;
         window.logout = logout;
-        window.abrirMercadoPago = abrirMercadoPago;
+        window.enviarLinkPagoWhatsApp = enviarLinkPagoWhatsApp;
 
         cargarDatos();
         setInterval(cargarDatos, 30000);
