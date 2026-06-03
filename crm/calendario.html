@@ -25,6 +25,7 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
+            box-sizing: border-box;
         }
         button {
             background-color: #4CAF50;
@@ -34,6 +35,10 @@
         }
         button:hover {
             background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
         .mensaje {
             margin-top: 20px;
@@ -55,6 +60,12 @@
             text-align: center;
             color: #333;
         }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -67,21 +78,21 @@
         <input type="datetime-local" id="fechaFin" placeholder="Fecha fin" />
         
         <button id="btnGuardar">💾 Guardar en Google Sheets</button>
-        
+        <div id="loading" class="loading" style="display:none;">⏳ Guardando...</div>
         <div id="mensaje" class="mensaje"></div>
     </div>
 
     <script>
-        // Función para guardar en Google Sheets
+        // ACTUALIZA ESTA URL CON LA QUE TE DIO GOOGLE AL REPUBLICAR
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMJ2pnekFjza6cEp6DglLMEVz5C49hwusa6u1V6Sw3N_40YKg1GOfPWYdSoqhpaA4baw/exec";
+        
         async function guardarEventoEnGoogleSheets(eventoData) {
-            const url = "https://script.google.com/macros/s/AKfycbx59hZWA65iCDri9ZSXgZ8LQQSE6b1oJ600OA5fOTqBO9Z86Uc870kZN5SMkCljY6rU0g/exec";
-            
-            // Validar datos mínimos
+            // Validar datos
             if (!eventoData.nombre || eventoData.nombre.trim() === "") {
                 throw new Error("El nombre del evento es obligatorio");
             }
             
-            // Preparar datos en formato JSON
+            // Preparar datos
             const datosAEnviar = {
                 eventos: [{
                     id: String(eventoData.id || Date.now()),
@@ -91,37 +102,44 @@
                 }]
             };
             
-            console.log("📤 Enviando datos:", datosAEnviar);
+            console.log("📤 Enviando a:", SCRIPT_URL);
+            console.log("📦 Datos:", datosAEnviar);
+            
+            // Timeout de 30 segundos
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
             
             try {
-                const response = await fetch(url, {
+                const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors', // 🔥 CRUCIAL: modo no-cors
+                    cache: 'no-cache',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(datosAEnviar)
+                    body: JSON.stringify(datosAEnviar),
+                    signal: controller.signal
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
+                clearTimeout(timeoutId);
                 
-                const resultado = await response.json();
-                console.log("✅ Respuesta:", resultado);
-                
-                if (resultado.status === "success") {
-                    return { exito: true, mensaje: `✅ Evento guardado correctamente. Filas añadidas: ${resultado.rows_added}` };
-                } else {
-                    throw new Error(resultado.message || "Error desconocido");
-                }
+                // En modo no-cors, no podemos leer la respuesta
+                // Asumimos éxito si no hay error
+                console.log("✅ Petición enviada (modo no-cors)");
+                return { exito: true, mensaje: "✅ Evento enviado a Google Sheets" };
                 
             } catch(error) {
+                clearTimeout(timeoutId);
+                
+                if (error.name === 'AbortError') {
+                    throw new Error("Tiempo de espera agotado (30 segundos)");
+                }
+                
                 console.error("❌ Error:", error);
-                return { exito: false, mensaje: `❌ Error: ${error.message}` };
+                throw new Error("Error de conexión: " + error.message);
             }
         }
         
-        // Mostrar mensaje en la página
         function mostrarMensaje(texto, tipo) {
             const mensajeDiv = document.getElementById('mensaje');
             mensajeDiv.textContent = texto;
@@ -133,11 +151,24 @@
             }, 5000);
         }
         
-        // Evento del botón guardar
+        function setLoading(visible) {
+            const btn = document.getElementById('btnGuardar');
+            const loadingDiv = document.getElementById('loading');
+            
+            if (visible) {
+                btn.disabled = true;
+                loadingDiv.style.display = 'block';
+                mostrarMensaje("⏳ Enviando a Google Sheets...", "exito");
+            } else {
+                btn.disabled = false;
+                loadingDiv.style.display = 'none';
+            }
+        }
+        
+        // Evento del botón
         document.getElementById('btnGuardar').onclick = async function(e) {
             e.preventDefault();
             
-            // Recoger datos del formulario
             const evento = {
                 id: document.getElementById('id').value,
                 nombre: document.getElementById('nombre').value,
@@ -145,31 +176,30 @@
                 fechaFin: document.getElementById('fechaFin').value
             };
             
-            // Validar
             if (!evento.nombre) {
                 mostrarMensaje("⚠️ Por favor, ingresa el nombre del evento", "error");
                 return;
             }
             
-            // Mostrar mensaje de carga
-            mostrarMensaje("⏳ Guardando en Google Sheets...", "exito");
+            setLoading(true);
             
-            // Guardar
-            const resultado = await guardarEventoEnGoogleSheets(evento);
-            
-            if (resultado.exito) {
+            try {
+                const resultado = await guardarEventoEnGoogleSheets(evento);
                 mostrarMensaje(resultado.mensaje, "exito");
-                // Limpiar campos (opcional)
+                
+                // Limpiar campos
                 document.getElementById('nombre').value = "";
                 document.getElementById('fechaInicio').value = "";
                 document.getElementById('fechaFin').value = "";
-            } else {
-                mostrarMensaje(resultado.mensaje, "error");
+                
+            } catch(error) {
+                mostrarMensaje("❌ " + error.message, "error");
+            } finally {
+                setLoading(false);
             }
         };
         
-        // Prueba automática al cargar la página (opcional)
-        console.log("📄 Página cargada. URL del script:", "https://script.google.com/macros/s/AKfycbxMJ2pnekFjza6cEp6DglLMEVz5C49hwusa6u1V6Sw3N_40YKg1GOfPWYdSoqhpaA4baw/exec");
+        console.log("📄 Página lista. URL:", SCRIPT_URL);
     </script>
 </body>
 </html>
