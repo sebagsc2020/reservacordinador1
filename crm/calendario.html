@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario Interactivo - CRM Aventura Total</title>
+    <title>Calendario - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -147,6 +147,20 @@
             background: #f1f3f5;
         }
         
+        .calendar-day.rango-inicio {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .calendar-day.rango-fin {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .calendar-day.rango-medio {
+            background: #e8f5e9;
+        }
+        
         .day-number {
             font-size: 14px;
             font-weight: 700;
@@ -171,11 +185,17 @@
             filter: brightness(0.95);
         }
         
+        .evento-rango {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+            border-left: 3px solid #fff;
+        }
+        
         .event-confirmado { background: #d4edda; color: #155724; border-left: 3px solid #28a745; }
         .event-pendiente { background: #fff3cd; color: #856404; border-left: 3px solid #ffc107; }
         .event-pagado { background: #d1ecf1; color: #0c5460; border-left: 3px solid #17a2b8; }
         
-        /* Modal para crear/editar evento */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -199,7 +219,7 @@
             padding: 30px;
             border-radius: 20px;
             width: 90%;
-            max-width: 500px;
+            max-width: 550px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             animation: slideDown 0.3s ease;
         }
@@ -241,6 +261,15 @@
             border-color: #667eea;
         }
         
+        .fecha-rango {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .fecha-rango div {
+            flex: 1;
+        }
+        
         .modal-content button {
             width: 100%;
             padding: 12px;
@@ -260,10 +289,6 @@
             transform: translateY(-2px);
         }
         
-        .modal-content button:active {
-            transform: translateY(0);
-        }
-        
         .close-modal {
             float: right;
             font-size: 28px;
@@ -277,7 +302,6 @@
             color: #333;
         }
         
-        /* Mensajes flotantes */
         .mensaje-flotante {
             position: fixed;
             bottom: 20px;
@@ -309,16 +333,14 @@
             }
         }
         
-        .event-detail {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
+        .info-rango {
+            background: #e7f3ff;
+            padding: 10px 15px;
             border-radius: 10px;
-            display: none;
-        }
-        
-        .event-detail.show {
-            display: block;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #0066cc;
+            text-align: center;
         }
         
         @media (max-width: 768px) {
@@ -326,8 +348,9 @@
             .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; }
             .nav-menu a { justify-content: center; padding: 12px; }
             .main-content { margin-left: 70px; padding: 15px; }
-            .calendar-day { min-height: 80px; font-size: 12px; }
+            .calendar-day { min-height: 80px; }
             .event-item { font-size: 9px; }
+            .fecha-rango { flex-direction: column; }
         }
     </style>
 </head>
@@ -354,8 +377,8 @@
     <div class="main-content">
         <div class="header">
             <div>
-                <h1>📅 Calendario de Eventos</h1>
-                <p style="color:#999;font-size:13px;">Haz clic en cualquier día para crear un evento</p>
+                <h1>📅 Calendario de Eventos por Rango</h1>
+                <p style="color:#999;font-size:13px;">Selecciona un rango de fechas para cada evento</p>
             </div>
             <div class="user-info">
                 <div class="user-avatar">A</div>
@@ -371,27 +394,41 @@
             </div>
             
             <div class="weekdays">
-                <div class="weekday">Domingo</div>
-                <div class="weekday">Lunes</div>
-                <div class="weekday">Martes</div>
-                <div class="weekday">Miércoles</div>
-                <div class="weekday">Jueves</div>
-                <div class="weekday">Viernes</div>
-                <div class="weekday">Sábado</div>
+                <div class="weekday">Dom</div>
+                <div class="weekday">Lun</div>
+                <div class="weekday">Mar</div>
+                <div class="weekday">Mié</div>
+                <div class="weekday">Jue</div>
+                <div class="weekday">Vie</div>
+                <div class="weekday">Sáb</div>
             </div>
             
             <div class="calendar-days" id="calendarDays"></div>
         </div>
     </div>
     
-    <!-- Modal para crear/editar evento -->
+    <!-- Modal para crear evento con RANGO de fechas -->
     <div id="eventModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="cerrarModal()">&times;</span>
-            <h2 id="modalTitulo">📝 Crear Nuevo Evento</h2>
-            <input type="date" id="eventoFecha" readonly style="background:#f8f9fa;">
-            <input type="text" id="eventoTitulo" placeholder="Título del evento *" required>
-            <input type="time" id="eventoHora" placeholder="Hora">
+            <h2 id="modalTitulo">📝 Crear Evento por Rango</h2>
+            
+            <div class="info-rango">
+                📅 Define el período del evento (fecha inicio y fecha fin)
+            </div>
+            
+            <div class="fecha-rango">
+                <div>
+                    <label>📅 Fecha Inicio *</label>
+                    <input type="date" id="eventoFechaInicio" required>
+                </div>
+                <div>
+                    <label>📅 Fecha Fin *</label>
+                    <input type="date" id="eventoFechaFin" required>
+                </div>
+            </div>
+            
+            <input type="text" id="eventoTitulo" placeholder="Nombre del evento *" required>
             <input type="text" id="eventoCliente" placeholder="Nombre del cliente">
             <input type="number" id="eventoPersonas" placeholder="Número de personas" min="1" value="1">
             <select id="eventoEstado">
@@ -400,7 +437,7 @@
                 <option value="pagado">🔵 Pagado</option>
             </select>
             <textarea id="eventoDescripcion" rows="3" placeholder="Descripción adicional..."></textarea>
-            <button onclick="guardarEvento()">💾 Guardar Evento en Google Sheets</button>
+            <button onclick="guardarEventoRango()">💾 Guardar Evento en Google Sheets</button>
         </div>
     </div>
     
@@ -422,27 +459,54 @@
         let mesActual = fechaActual.getMonth();
         let añoActual = fechaActual.getFullYear();
         
-        // Array de eventos (se cargarán desde localStorage)
+        // Array de eventos con RANGO de fechas
         let eventos = [];
         
         // Cargar eventos guardados
         function cargarEventos() {
-            const guardados = localStorage.getItem('eventos_calendario');
+            const guardados = localStorage.getItem('eventos_rango_calendario');
             if (guardados) {
                 eventos = JSON.parse(guardados);
             } else {
-                // Eventos de ejemplo
+                // Eventos de ejemplo con rango
                 eventos = [
-                    { id: '1', fecha: '2026-06-01', titulo: 'City Tour Local', cliente: 'Juan Pérez', hora: '09:00', personas: 4, estado: 'confirmado', descripcion: 'Tour por el centro histórico' },
-                    { id: '2', fecha: '2026-06-02', titulo: 'Barco Pirata', cliente: 'María García', hora: '14:00', personas: 2, estado: 'pendiente', descripcion: 'Paseo en barco' },
-                    { id: '3', fecha: '2026-06-03', titulo: 'Valle Nevado', cliente: 'Carlos López', hora: '08:00', personas: 6, estado: 'pagado', descripcion: 'Excursión a la montaña' }
+                    { 
+                        id: '1', 
+                        fechaInicio: '2026-06-01', 
+                        fechaFin: '2026-06-03',
+                        titulo: 'City Tour Local', 
+                        cliente: 'Juan Pérez', 
+                        personas: 4, 
+                        estado: 'confirmado', 
+                        descripcion: 'Tour por el centro histórico de 3 días' 
+                    },
+                    { 
+                        id: '2', 
+                        fechaInicio: '2026-06-05', 
+                        fechaFin: '2026-06-07',
+                        titulo: 'Barco Pirata', 
+                        cliente: 'María García', 
+                        personas: 2, 
+                        estado: 'pendiente', 
+                        descripcion: 'Paseo en barco - 2 días' 
+                    },
+                    { 
+                        id: '3', 
+                        fechaInicio: '2026-06-10', 
+                        fechaFin: '2026-06-15',
+                        titulo: 'Valle Nevado', 
+                        cliente: 'Carlos López', 
+                        personas: 6, 
+                        estado: 'pagado', 
+                        descripcion: 'Excursión a la montaña - 5 días' 
+                    }
                 ];
             }
         }
         
         // Guardar eventos en localStorage
         function guardarEventosLocal() {
-            localStorage.setItem('eventos_calendario', JSON.stringify(eventos));
+            localStorage.setItem('eventos_rango_calendario', JSON.stringify(eventos));
         }
         
         function mostrarMensaje(mensaje, tipo) {
@@ -453,26 +517,36 @@
             setTimeout(() => div.remove(), 5000);
         }
         
-        async function guardarEvento() {
-            const fecha = document.getElementById('eventoFecha').value;
+        // Verificar si una fecha está dentro del rango de un evento
+        function fechaEnRango(fecha, fechaInicio, fechaFin) {
+            return fecha >= fechaInicio && fecha <= fechaFin;
+        }
+        
+        async function guardarEventoRango() {
+            const fechaInicio = document.getElementById('eventoFechaInicio').value;
+            const fechaFin = document.getElementById('eventoFechaFin').value;
             const titulo = document.getElementById('eventoTitulo').value;
-            const hora = document.getElementById('eventoHora').value;
             const cliente = document.getElementById('eventoCliente').value;
             const personas = document.getElementById('eventoPersonas').value;
             const estado = document.getElementById('eventoEstado').value;
             const descripcion = document.getElementById('eventoDescripcion').value;
             
-            if (!fecha || !titulo) {
-                mostrarMensaje('⚠️ Por favor, completa el título y la fecha', 'error');
+            if (!fechaInicio || !fechaFin || !titulo) {
+                mostrarMensaje('⚠️ Completa: Fecha Inicio, Fecha Fin y Título', 'error');
+                return;
+            }
+            
+            if (fechaFin < fechaInicio) {
+                mostrarMensaje('⚠️ La fecha fin no puede ser anterior a la fecha inicio', 'error');
                 return;
             }
             
             const eventoId = Date.now().toString();
             const eventoData = {
                 id: eventoId,
-                fecha: fecha,
+                fechaInicio: fechaInicio,
+                fechaFin: fechaFin,
                 titulo: titulo,
-                hora: hora,
                 cliente: cliente || 'Cliente no especificado',
                 personas: parseInt(personas),
                 estado: estado,
@@ -482,7 +556,7 @@
             mostrarMensaje('⏳ Guardando en Google Sheets...', 'exito');
             
             try {
-                // Guardar en Google Sheets
+                // Guardar en Google Sheets (solo una vez por evento, con el rango)
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -491,8 +565,8 @@
                         eventos: [{
                             id: eventoId,
                             nombre: `${cliente || 'Evento'} - ${titulo}`,
-                            fechaInicio: fecha,
-                            fechaFin: fecha
+                            fechaInicio: fechaInicio,
+                            fechaFin: fechaFin
                         }]
                     })
                 });
@@ -506,7 +580,6 @@
                 
                 // Limpiar formulario
                 document.getElementById('eventoTitulo').value = '';
-                document.getElementById('eventoHora').value = '';
                 document.getElementById('eventoCliente').value = '';
                 document.getElementById('eventoPersonas').value = '1';
                 document.getElementById('eventoEstado').value = 'pendiente';
@@ -514,8 +587,7 @@
                 
             } catch(error) {
                 console.error('Error:', error);
-                mostrarMensaje('❌ Error al guardar, pero se guardó localmente', 'error');
-                // Aún así guardar localmente
+                mostrarMensaje('⚠️ Error en la nube, pero se guardó localmente', 'error');
                 eventos.push(eventoData);
                 guardarEventosLocal();
                 renderCalendar();
@@ -523,11 +595,14 @@
             }
         }
         
-        function abrirModalCrear(fecha) {
-            document.getElementById('modalTitulo').textContent = '📝 Crear Nuevo Evento';
-            document.getElementById('eventoFecha').value = fecha;
+        function abrirModalCrear() {
+            const hoy = new Date();
+            const fechaHoy = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+            
+            document.getElementById('modalTitulo').textContent = '📝 Crear Evento por Rango';
+            document.getElementById('eventoFechaInicio').value = fechaHoy;
+            document.getElementById('eventoFechaFin').value = fechaHoy;
             document.getElementById('eventoTitulo').value = '';
-            document.getElementById('eventoHora').value = '';
             document.getElementById('eventoCliente').value = '';
             document.getElementById('eventoPersonas').value = '1';
             document.getElementById('eventoEstado').value = 'pendiente';
@@ -536,10 +611,10 @@
         }
         
         function abrirModalEditar(evento) {
-            document.getElementById('modalTitulo').textContent = '✏️ Editar Evento';
-            document.getElementById('eventoFecha').value = evento.fecha;
+            document.getElementById('modalTitulo').textContent = '✏️ Editar Evento por Rango';
+            document.getElementById('eventoFechaInicio').value = evento.fechaInicio;
+            document.getElementById('eventoFechaFin').value = evento.fechaFin;
             document.getElementById('eventoTitulo').value = evento.titulo;
-            document.getElementById('eventoHora').value = evento.hora || '';
             document.getElementById('eventoCliente').value = evento.cliente || '';
             document.getElementById('eventoPersonas').value = evento.personas || 1;
             document.getElementById('eventoEstado').value = evento.estado;
@@ -548,19 +623,19 @@
             
             // Cambiar el botón para editar
             const btn = document.querySelector('#eventModal button');
-            const oldClick = btn.onclick;
             btn.onclick = async function() {
-                await actualizarEvento(evento.id);
+                await actualizarEventoRango(evento.id);
             };
         }
         
-        async function actualizarEvento(id) {
+        async function actualizarEventoRango(id) {
             const eventoIndex = eventos.findIndex(e => e.id === id);
             if (eventoIndex !== -1) {
                 eventos[eventoIndex] = {
                     ...eventos[eventoIndex],
+                    fechaInicio: document.getElementById('eventoFechaInicio').value,
+                    fechaFin: document.getElementById('eventoFechaFin').value,
                     titulo: document.getElementById('eventoTitulo').value,
-                    hora: document.getElementById('eventoHora').value,
                     cliente: document.getElementById('eventoCliente').value,
                     personas: parseInt(document.getElementById('eventoPersonas').value),
                     estado: document.getElementById('eventoEstado').value,
@@ -570,14 +645,17 @@
                 renderCalendar();
                 cerrarModal();
                 mostrarMensaje('✅ Evento actualizado', 'exito');
+                
+                // Restaurar botón
+                const btn = document.querySelector('#eventModal button');
+                btn.onclick = guardarEventoRango;
             }
         }
         
         function cerrarModal() {
             document.getElementById('eventModal').style.display = 'none';
-            // Restaurar el botón a su función original
             const btn = document.querySelector('#eventModal button');
-            btn.onclick = guardarEvento;
+            btn.onclick = guardarEventoRango;
         }
         
         function renderCalendar() {
@@ -593,11 +671,18 @@
             
             let html = '';
             
+            // Función para obtener eventos que cubren una fecha específica
+            function getEventosPorFecha(fechaStr) {
+                return eventos.filter(e => {
+                    return fechaStr >= e.fechaInicio && fechaStr <= e.fechaFin;
+                });
+            }
+            
             // Días del mes anterior
             for (let i = primerDia - 1; i >= 0; i--) {
                 const dia = diasMesAnterior - i;
                 const fechaStr = `${añoActual}-${String(mesActual).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
-                html += `<div class="calendar-day other-month" onclick="abrirModalCrear('${fechaStr}')">
+                html += `<div class="calendar-day other-month" onclick="abrirModalCrear()">
                     <div class="day-number">${dia}</div>
                 </div>`;
             }
@@ -606,16 +691,37 @@
             for (let dia = 1; dia <= diasEnMes; dia++) {
                 const fechaStr = `${añoActual}-${String(mesActual+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
                 const esHoy = fechaStr === hoyStr;
-                const eventosDelDia = eventos.filter(e => e.fecha === fechaStr);
+                const eventosDelDia = getEventosPorFecha(fechaStr);
                 
-                html += `<div class="calendar-day ${esHoy ? 'today' : ''}" onclick="abrirModalCrear('${fechaStr}')">
+                // Determinar si es inicio o fin de algún evento (para estilo visual)
+                let claseExtra = '';
+                eventos.forEach(e => {
+                    if (fechaStr === e.fechaInicio) claseExtra += ' rango-inicio';
+                    if (fechaStr === e.fechaFin) claseExtra += ' rango-fin';
+                    if (fechaStr > e.fechaInicio && fechaStr < e.fechaFin) claseExtra += ' rango-medio';
+                });
+                
+                html += `<div class="calendar-day ${esHoy ? 'today' : ''}${claseExtra}" onclick="abrirModalCrear()">
                     <div class="day-number">${dia}</div>`;
                 
+                // Mostrar eventos (solo mostrar uno por evento en cada día)
+                const eventosUnicos = [];
                 eventosDelDia.forEach(evento => {
+                    if (!eventosUnicos.find(e => e.id === evento.id)) {
+                        eventosUnicos.push(evento);
+                    }
+                });
+                
+                eventosUnicos.slice(0, 2).forEach(evento => {
+                    const duracion = evento.fechaInicio === evento.fechaFin ? '' : ` (${evento.fechaInicio} a ${evento.fechaFin})`;
                     html += `<div class="event-item event-${evento.estado}" onclick="event.stopPropagation(); abrirModalEditar(${JSON.stringify(evento).replace(/"/g, '&quot;')})">
-                        ${evento.hora ? evento.hora + ' - ' : ''}${evento.titulo}
+                        📌 ${evento.titulo}${duracion}
                     </div>`;
                 });
+                
+                if (eventosUnicos.length > 2) {
+                    html += `<div class="event-item" style="background:#e9ecef; text-align:center;">+${eventosUnicos.length-2} más</div>`;
+                }
                 
                 html += `</div>`;
             }
@@ -626,7 +732,7 @@
             if (diasRestantes < 7) {
                 for (let dia = 1; dia <= diasRestantes; dia++) {
                     const fechaStr = `${añoActual}-${String(mesActual+2).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
-                    html += `<div class="calendar-day other-month" onclick="abrirModalCrear('${fechaStr}')">
+                    html += `<div class="calendar-day other-month" onclick="abrirModalCrear()">
                         <div class="day-number">${dia}</div>
                     </div>`;
                 }
@@ -647,6 +753,30 @@
             }
             renderCalendar();
         }
+        
+        // Agregar botón flotante para crear evento
+        const btnFlotante = document.createElement('button');
+        btnFlotante.innerHTML = '+';
+        btnFlotante.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 99;
+            transition: all 0.3s ease;
+        `;
+        btnFlotante.onmouseover = () => btnFlotante.style.transform = 'scale(1.1)';
+        btnFlotante.onmouseout = () => btnFlotante.style.transform = 'scale(1)';
+        btnFlotante.onclick = () => abrirModalCrear();
+        document.body.appendChild(btnFlotante);
         
         // Inicializar
         cargarEventos();
