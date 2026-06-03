@@ -135,6 +135,14 @@
             gap: 10px; 
         }
         .header h1 { font-size: 26px; color: #1a1a2e; }
+        
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
         .user-info { 
             display: flex; 
             align-items: center; 
@@ -155,6 +163,29 @@
             justify-content: center; 
             color: white; 
             font-weight: 700; 
+        }
+        
+        .btn-reserva-manual {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn-reserva-manual:hover {
+            background: #c0392b;
+            transform: scale(1.02);
+        }
+        .btn-reserva-manual:active {
+            transform: scale(0.98);
         }
 
         .filters-bar { 
@@ -408,6 +439,11 @@
                 font-size: 20px;
             }
             
+            .user-area {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
             .user-info {
                 padding: 5px 12px;
                 font-size: 12px;
@@ -417,6 +453,11 @@
                 width: 28px;
                 height: 28px;
                 font-size: 12px;
+            }
+            
+            .btn-reserva-manual {
+                padding: 5px 12px;
+                font-size: 11px;
             }
             
             .cards-grid {
@@ -469,6 +510,15 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+            
+            .user-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn-reserva-manual {
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -505,9 +555,14 @@
     <div class="main-content">
         <div class="header">
             <div><h1>📋 Reservas</h1></div>
-            <div class="user-info">
-                <div class="user-avatar">A</div>
-                <span>Admin</span>
+            <div class="user-area">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span>Admin</span>
+                </div>
+                <button class="btn-reserva-manual" onclick="abrirReservaManual()">
+                    ➕ Reserva manual
+                </button>
             </div>
         </div>
 
@@ -535,6 +590,13 @@
     </div>
 
     <script>
+        // ==================================================
+        // FUNCIÓN PARA ABRIR RESERVA MANUAL
+        // ==================================================
+        function abrirReservaManual() {
+            window.open('https://sebagsc2020.github.io/reservacordinador1/reservar.html', '_blank');
+        }
+
         // ==================================================
         // MENÚ FLOTANTE
         // ==================================================
@@ -937,6 +999,7 @@
         window.filtrarReservas = filtrarReservas;
         window.cargarReservas = cargarReservas;
         window.generarPDFExterno = generarPDFExterno;
+        window.abrirReservaManual = abrirReservaManual;
 
         document.getElementById('btnFiltrar').addEventListener('click', filtrarReservas);
         document.getElementById('btnRecargar').addEventListener('click', cargarReservas);
