@@ -179,6 +179,35 @@
         .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
         @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
 
+        /* ===== BOTÓN FLOTANTE PARA CREAR EVENTO ===== */
+        .fab-create {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 99;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fab-create:hover {
+            background: #219a52;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+        .fab-create:active {
+            transform: scale(0.95);
+        }
+
         /* Scroll sidebar */
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: #1a1a2e; }
@@ -204,6 +233,13 @@
             .event-day-card { width: 100%; }
             .event-item-list { flex-direction: column; align-items: flex-start; }
             .event-actions { width: 100%; justify-content: flex-end; }
+            .fab-create {
+                bottom: 20px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 24px;
+            }
         }
     </style>
 </head>
@@ -281,6 +317,32 @@
             <div class="preloader-popup-icono"></div>
             <div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div>
             <div class="preloader-popup-subtitulo">Cargando datos desde la nube...</div>
+        </div>
+    </div>
+
+    <!-- Botón Flotante para crear evento (FAB) -->
+    <button class="fab-create" onclick="abrirModalCreacionRapida()" title="Crear nuevo evento">+</button>
+
+    <!-- Modal rápido para crear evento (versión simplificada) -->
+    <div class="modal-overlay" id="modalCreacionRapida">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 Crear evento rápido</h2>
+                <button class="modal-close" onclick="cerrarModalCreacionRapida()">✕</button>
+            </div>
+            <div class="date-group" style="margin-bottom: 10px;">
+                <label>📅 Desde</label>
+                <input type="date" id="rapidoFechaInicio">
+            </div>
+            <div class="date-group" style="margin-bottom: 10px;">
+                <label>📅 Hasta</label>
+                <input type="date" id="rapidoFechaFin">
+            </div>
+            <div class="date-group" style="margin-bottom: 10px;">
+                <label>🏷️ Nombre del evento</label>
+                <input type="text" id="rapidoNombre" placeholder="Ej: Semana de aventura..." autocomplete="off">
+            </div>
+            <button class="modal-save" onclick="crearEventoRapido()">✅ Crear evento</button>
         </div>
     </div>
 
@@ -392,6 +454,7 @@
             return div.innerHTML;
         }
 
+        // Crear evento desde el panel normal
         function crearEventoRango() {
             const fechaInicioStr = document.getElementById('eventoFechaInicio').value;
             const fechaFinStr = document.getElementById('eventoFechaFin').value;
@@ -428,6 +491,60 @@
             document.getElementById('eventoFechaFin').value = '';
             document.getElementById('eventoNombre').value = '';
 
+            renderizarListaEventos();
+            alert(`✅ Evento "${nombre}" creado del ${formatearFecha(fechaInicio)} al ${formatearFecha(fechaFin)}`);
+        }
+
+        // Crear evento desde el modal rápido (FAB)
+        function abrirModalCreacionRapida() {
+            // Preestablecer fechas: hoy y mañana
+            const hoy = new Date();
+            const manana = new Date(hoy);
+            manana.setDate(manana.getDate() + 1);
+            
+            document.getElementById('rapidoFechaInicio').value = hoy.toISOString().split('T')[0];
+            document.getElementById('rapidoFechaFin').value = manana.toISOString().split('T')[0];
+            document.getElementById('rapidoNombre').value = '';
+            document.getElementById('modalCreacionRapida').classList.add('show');
+        }
+
+        function cerrarModalCreacionRapida() {
+            document.getElementById('modalCreacionRapida').classList.remove('show');
+        }
+
+        function crearEventoRapido() {
+            const fechaInicioStr = document.getElementById('rapidoFechaInicio').value;
+            const fechaFinStr = document.getElementById('rapidoFechaFin').value;
+            const nombre = document.getElementById('rapidoNombre').value.trim();
+
+            if (!fechaInicioStr || !fechaFinStr) {
+                alert("❌ Selecciona ambas fechas.");
+                return;
+            }
+            if (!nombre) {
+                alert("❌ Escribe un nombre.");
+                return;
+            }
+
+            const fechaInicio = new Date(fechaInicioStr);
+            const fechaFin = new Date(fechaFinStr);
+
+            if (fechaInicio > fechaFin) {
+                alert("❌ La fecha Desde no puede ser mayor que Hasta.");
+                return;
+            }
+
+            const nuevoEvento = {
+                id: Date.now(),
+                nombre: nombre,
+                fechaInicio: fechaInicio,
+                fechaFin: fechaFin
+            };
+
+            eventosRango.push(nuevoEvento);
+            guardarEventos();
+            
+            cerrarModalCreacionRapida();
             renderizarListaEventos();
             alert(`✅ Evento "${nombre}" creado del ${formatearFecha(fechaInicio)} al ${formatearFecha(fechaFin)}`);
         }
@@ -627,7 +744,7 @@
         function renderizarListaEventos() {
             const container = document.getElementById('listaEventosContainer');
             if (eventosRango.length === 0) {
-                container.innerHTML = '<div class="no-events">📭 No hay eventos activos. Crea uno usando el panel superior.</div>';
+                container.innerHTML = '<div class="no-events">📭 No hay eventos activos. Crea uno usando el panel superior o el botón + verde.</div>';
                 return;
             }
             
@@ -659,6 +776,9 @@
         window.eliminarNota = eliminarNota;
         window.guardarNota = guardarNota;
         window.cerrarModalNota = cerrarModalNota;
+        window.abrirModalCreacionRapida = abrirModalCreacionRapida;
+        window.crearEventoRapido = crearEventoRapido;
+        window.cerrarModalCreacionRapida = cerrarModalCreacionRapida;
 
         cargarDatosLocales();
         renderizarListaEventos();
@@ -667,8 +787,16 @@
         document.getElementById('modalNota').addEventListener('click', function(e) {
             if (e.target === this) cerrarModalNota();
         });
+        
+        document.getElementById('modalCreacionRapida').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModalCreacionRapida();
+        });
+        
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') cerrarModalNota();
+            if (e.key === 'Escape') {
+                cerrarModalNota();
+                cerrarModalCreacionRapida();
+            }
         });
     </script>
 </body>
