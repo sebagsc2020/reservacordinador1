@@ -242,21 +242,22 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            min-width: 700px;
         }
         th {
             text-align: left;
             padding: 12px;
             background: #f8f9fa;
             color: #666;
-            font-size: 11px;
+            font-size: 12px;
             text-transform: uppercase;
             font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
         }
         td {
             padding: 12px;
             border-bottom: 1px solid #f0f0f0;
-            font-size: 12px;
+            font-size: 13px;
             color: #333;
         }
         tr:hover td {
@@ -266,7 +267,7 @@
         .badge {
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
             display: inline-block;
         }
@@ -274,16 +275,21 @@
             background: #d4edda;
             color: #155724;
         }
+        .badge-reservas {
+            background: #eef2ff;
+            color: #667eea;
+        }
         
         .btn-ver {
-            padding: 5px 12px;
+            padding: 6px 14px;
             background: #667eea;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             transition: background 0.2s;
+            font-weight: 500;
         }
         .btn-ver:active {
             transform: scale(0.96);
@@ -414,6 +420,11 @@
                 padding: 8px 6px;
                 font-size: 11px;
             }
+            
+            .btn-ver {
+                padding: 4px 10px;
+                font-size: 10px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -487,10 +498,18 @@
             <div class="table-wrapper">
                 <table id="clientesTable">
                     <thead>
-                        <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Reservas</th><th>Estado</th><th>Acciones</th></tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Reservas</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
                     </thead>
                     <tbody id="tablaClientes">
-                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td
+                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -640,7 +659,7 @@
             
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -691,7 +710,7 @@
                 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</tr`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
@@ -703,7 +722,7 @@
             if (!tbody) return;
             
             if (clientesFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td</tr';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td></tr>';
                 return;
             }
             
@@ -714,15 +733,15 @@
                 return div.innerHTML; 
             }
             
-            tbody.innerHTML = clientesFiltrados.map((cliente, index) => `
+            tbody.innerHTML = clientesFiltrados.map((cliente) => `
                 <tr>
-                    <td>${cliente.id}</td
-                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td
-                    <td style="font-size:11px">${escapeHtml(cliente.email)}</td
-                    <td>${escapeHtml(cliente.telefono)}</td
-                    <td><span class="badge" style="background:#eef2ff; color:#667eea;">${cliente.totalReservas} reserva(s)</span></td
-                    <td><span class="badge badge-activo">Activo</span></td
-                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td
+                    <td>${cliente.id}</td>
+                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
+                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td>
+                    <td>${escapeHtml(cliente.telefono || 'No registrado')}</td>
+                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td>
+                    <td><span class="badge badge-activo">Activo</span></td>
+                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td>
                 </tr>
             `).join('');
         }
@@ -860,6 +879,13 @@
                         </thead>
                         <tbody>
             `;
+            
+            function escapeHtml(text) { 
+                if (!text) return ''; 
+                const div = document.createElement('div'); 
+                div.textContent = text; 
+                return div.innerHTML; 
+            }
             
             // Agregar filas de clientes filtrados
             for (const cliente of clientesFiltrados) {
@@ -1012,13 +1038,6 @@
         function cerrarModalReservas() {
             const modal = document.getElementById('modalReservas');
             if (modal) modal.remove();
-        }
-        
-        function escapeHtml(text) { 
-            if (!text) return ''; 
-            const div = document.createElement('div'); 
-            div.textContent = text; 
-            return div.innerHTML; 
         }
         
         // ==================================================
