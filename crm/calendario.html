@@ -21,39 +21,54 @@
         .header h1 { font-size: 26px; color: #1a1a2e; }
         .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        
 
+        /* Panel de creación de evento por rango */
         .create-event-panel { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
         .create-event-panel h3 { margin-bottom: 15px; color: #1a1a2e; font-size: 16px; }
         .range-selector { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 15px; }
-        .date-group { display: flex; flex-direction: column; gap: 5px; }
-        .date-group label { font-size: 12px; font-weight: 600; color: #555; }
-        .date-group input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 13px; }
-        .event-name-group { flex: 2; min-width: 200px; }
+@@ -32,7 +33,8 @@
         .event-name-group input { width: 100%; }
         .btn-crear-evento { padding: 8px 20px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
         .btn-compartir-todos { padding: 8px 20px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; margin-left: 10px; }
+        
 
+        /* Lista de eventos creados */
         .events-list { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
         .events-list h3 { margin-bottom: 15px; color: #1a1a2e; font-size: 16px; }
         .event-item-list { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; flex-wrap: wrap; gap: 10px; }
-        .event-item-list .event-info { flex: 1; }
-        .event-item-list .event-name { font-weight: 600; color: #333; }
-        .event-item-list .event-dates { font-size: 11px; color: #666; margin-top: 3px; }
-        .event-actions { display: flex; gap: 8px; }
-        .btn-ver-evento { background: #667eea; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
+@@ -44,281 +46,159 @@
         .btn-apagar-evento { background: #e74c3c; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .btn-compartir-evento { background: #25D366; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .no-events { color: #999; text-align: center; padding: 20px; font-size: 13px; }
+        
 
+        /* Calendario */
+        .calendar-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow-x: auto; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .month-nav button { background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin: 0 3px; font-size: 13px; }
+        .current-month { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; min-width: 600px; }
+        .calendar-day-header { text-align: center; font-weight: 600; padding: 10px; background: #f8f9fa; border-radius: 8px; font-size: 13px; color: #555; }
+        .calendar-day { background: #fefefe; border: 1px solid #e9ecef; border-radius: 10px; padding: 8px 6px; min-height: 110px; transition: all 0.2s; position: relative; }
+        .calendar-day.has-event { background: #e8f5e9; border-color: #27ae60; }
+        .day-number { font-weight: 700; font-size: 14px; margin-bottom: 5px; color: #1a1a2e; display: flex; justify-content: space-between; align-items: center; }
+        .event-badge { background: #27ae60; color: white; padding: 2px 6px; border-radius: 4px; font-size: 9px; display: inline-block; margin-top: 3px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+        .nota-item { background: #fff3cd; border-left: 3px solid #ffc107; padding: 3px 5px; margin-top: 4px; border-radius: 4px; font-size: 9px; display: flex; justify-content: space-between; align-items: center; }
+        .nota-texto { flex: 1; cursor: pointer; }
+        .eliminar-nota { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 10px; margin-left: 4px; font-weight: bold; }
+        .btn-agregar-nota { background: #ecf0f1; border: none; border-radius: 12px; padding: 2px 6px; font-size: 9px; cursor: pointer; margin-top: 4px; width: 100%; }
+        .btn-agregar-nota:hover { background: #d5dbdb; }
+        /* Calendario de días del evento */
         .event-calendar-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-top: 20px; }
         .event-calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
         .event-calendar-header h3 { font-size: 18px; color: #1a1a2e; }
         .event-info-header { font-size: 14px; color: #666; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; }
         .event-days-grid { display: flex; flex-wrap: wrap; gap: 15px; }
         .event-day-card { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; width: calc(33.33% - 10px); min-width: 200px; transition: all 0.2s; }
+        .event-day-card .day-header { font-weight: 700; font-size: 14px; color: #667eea; margin-bottom: 10px; }
         .event-day-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .event-day-card .day-header { font-weight: 700; font-size: 14px; color: #667eea; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
-        .event-day-card .day-header { font-weight: 700; font-size: 14px; color: #667eea; margin-bottom: 10px; }
         .event-day-card .day-date { font-size: 12px; color: #666; margin-bottom: 10px; }
         .notas-lista { margin-top: 10px; }
         .nota-item-cal { background: #fff3cd; border-left: 3px solid #ffc107; padding: 6px 8px; margin-top: 6px; border-radius: 4px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
@@ -62,73 +77,100 @@
         .btn-agregar-nota-cal { background: #ecf0f1; border: none; border-radius: 12px; padding: 4px 8px; font-size: 10px; cursor: pointer; margin-top: 8px; width: 100%; }
         .btn-agregar-nota-cal:hover { background: #d5dbdb; }
         .sin-eventos-seleccionado { text-align: center; padding: 40px; color: #999; background: white; border-radius: 15px; }
+        
 
+        /* Modal para notas individuales */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
-@@ -68,25 +66,22 @@
+        .modal-overlay.show { display: flex; }
+        .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 400px; width: 90%; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .modal-header h2 { color: #667eea; font-size: 18px; }
         .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
-        .modal-input { width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; font-family: inherit; }
         .modal-input { width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
+@@ -74,7 +76,7 @@
         textarea.modal-input { resize: vertical; min-height: 80px; }
         .modal-save { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-
-        /* Preloader */
-        .preloader-popup {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.3s ease;
-        }
+        
         .preloader-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.3s; }
         .preloader-popup.oculto { opacity: 0; visibility: hidden; }
-        .preloader-popup-contenido { background: white; border-radius: 24px; padding: 35px 45px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: popupFadeIn 0.3s ease; }
         .preloader-popup-contenido { background: white; border-radius: 24px; padding: 35px 45px; text-align: center; animation: popupFadeIn 0.3s; }
         @keyframes popupFadeIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .preloader-popup-icono { width: 70px; height: 70px; border: 4px solid #e2e8f0; border-top: 4px solid #667eea; border-right: 4px solid #764ba2; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         .preloader-popup-icono { width: 70px; height: 70px; border: 4px solid #e2e8f0; border-top: 4px solid #667eea; border-right: 4px solid #764ba2; border-radius: 50%; animation: spin 1s infinite; margin: 0 auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .preloader-popup-titulo { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
         .preloader-popup-subtitulo { font-size: 14px; color: #666; }
         .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
         @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
-
-        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } .event-day-card { width: 100%; } }
+        
         @media (max-width: 768px) { .sidebar { width: 60px; } .main-content { margin-left: 60px; padding: 15px; } .event-day-card { width: 100%; } }
+
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } .calendar-grid { gap: 4px; } .calendar-day { min-height: 90px; padding: 6px 3px; } }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; } .nav-menu a { justify-content: center; } .main-content { margin-left: 60px; padding: 15px; } .event-day-card { width: 100%; } }
     </style>
 </head>
 <body>
-@@ -115,17 +110,15 @@
+    <nav class="sidebar">
+        <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2></div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
+            <li><a href="calendario.html" class="active"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
+            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
+        </ul>
+        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button></div>
+    </nav>
+
+    <div class="main-content">
+        <div class="header">
+            <div><h1>📅 Calendario de Eventos</h1></div>
+            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+        </div>
+
+        <div class="create-event-panel">
+            <h3>➕ Crear nuevo evento por rango de fechas</h3>
             <div class="range-selector">
                 <div class="date-group"><label>📅 Desde</label><input type="date" id="eventoFechaInicio"></div>
                 <div class="date-group"><label>📅 Hasta</label><input type="date" id="eventoFechaFin"></div>
-                <div class="date-group event-name-group"><label>🏷️ Nombre del evento</label><input type="text" id="eventoNombre" placeholder="Ej: Semana de trekking, Vacaciones..." autocomplete="off"></div>
                 <div class="date-group event-name-group"><label>🏷️ Nombre del evento</label><input type="text" id="eventoNombre" placeholder="Ej: Semana de trekking..." autocomplete="off"></div>
                 <button class="btn-crear-evento" onclick="crearEventoRango()">✅ Crear evento</button>
-                <button class="btn-compartir-todos" onclick="compartirTodosEventos()">📱 Compartir todos por WhatsApp</button>
                 <button class="btn-compartir-todos" onclick="compartirTodosEventos()">📱 Compartir todos</button>
+@@ -110,22 +112,24 @@
             </div>
         </div>
 
+        <!-- Lista de eventos creados con botones para APAGAR y COMPARTIR -->
+        <!-- Lista de eventos creados con botones para VER, APAGAR y COMPARTIR -->
         <div class="events-list">
             <h3>📋 Eventos activos</h3>
-            <div id="listaEventosContainer">
-                <div class="no-events">📭 Cargando eventos...</div>
-            </div>
             <div id="listaEventosContainer"><div class="no-events">📭 Cargando eventos...</div></div>
+            <div id="listaEventosContainer">
+                <div class="no-events">No hay eventos creados. Crea uno usando el panel superior.</div>
+            </div>
         </div>
 
+        <!-- Calendario visual -->
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="month-nav"><button onclick="cambiarMes(-1)">◀ Mes anterior</button><button onclick="cambiarMes(1)">Mes siguiente ▶</button></div>
+                <div class="current-month" id="currentMonthYear"></div>
+        <!-- Calendario de días del evento seleccionado -->
         <div id="eventoCalendarioContainer" class="event-calendar-container" style="display: none;">
-@@ -141,15 +134,10 @@
+            <div class="event-calendar-header">
+                <h3 id="eventoCalendarioTitulo">📅 Días del evento</h3>
+                <button class="btn-compartir-evento" id="btnCompartirEventoActual" style="background:#25D366;">📱 Compartir este evento</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+            <div id="eventoInfoHeader" class="event-info-header"></div>
+            <div id="eventDaysGrid" class="event-days-grid"></div>
+        </div>
+        <div id="sinEventoSeleccionado" class="sin-eventos-seleccionado">👈 Selecciona un evento de la lista para ver sus días</div>
+    </div>
 
     <div class="modal-overlay" id="modalNota">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalNotaTitle">📝 Agregar nota</h2>
-                <button class="modal-close" onclick="cerrarModalNota()">✕</button>
-            </div>
-            <div>
-                <p><strong>📅 Fecha:</strong> <span id="modalNotaFecha"></span></p>
-                <textarea id="notaTexto" class="modal-input" placeholder="Escribe aquí la nota para este día..." rows="3"></textarea>
-                <button class="modal-save" onclick="guardarNota()">💾 Guardar nota</button>
-            </div>
             <div class="modal-header"><h2 id="modalNotaTitle">📝 Agregar nota</h2><button class="modal-close" onclick="cerrarModalNota()">✕</button></div>
             <div><p><strong>📅 Fecha:</strong> <span id="modalNotaFecha"></span></p>
             <textarea id="notaTexto" class="modal-input" placeholder="Escribe aquí la nota..." rows="3"></textarea>
@@ -136,26 +178,32 @@
         </div>
     </div>
 
-@@ -162,56 +150,75 @@
+    <div id="preloaderPopup" class="preloader-popup oculto">
+        <div class="preloader-popup-contenido">
+            <div class="preloader-popup-icono"></div>
+            <div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div>
+            <div class="preloader-popup-subtitulo">Cargando datos desde la nube...</div>
+        </div>
     </div>
 
+    <!-- Modal para agregar/editar nota individual por día -->
+@@ -146,17 +150,17 @@
     <script>
+        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
+        // ---------- Gestión de sesión ----------
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
+            // Descomentar en producción: window.location.href = 'index.html'; 
             // window.location.href = 'index.html'; 
         }
-        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
-        // 🔥 URL DEL GOOGLE APPS SCRIPT (REEMPLAZAR CON TU URL)
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR1h85raiqTeGCJ2LTPVpu_jmZcK5J1ABQ5Yxbyfq1nL0SRDF1i_3GPfe3tPqu3i5WRA/exec';
         // 🔥 REEMPLAZAR CON TU URL DE GOOGLE APPS SCRIPT
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5VQlMlW8U28kS0Kky6-SDw1ysJkXcJ6-cSSkln6oVKQWYhMiCm3YVmL56GqstqJuP/exec';
-
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzZHJKTkdCrkU2JkxdejiwStEFjfljLUirz4Sh-H1X3jswmZHrwUi_T2NGjuED0pZP_g/exec';
+        
         let eventosRango = [];
         let notasPorDia = {};
         let eventoSeleccionado = null;
 
-        // Preloader
         const preloaderPopup = document.getElementById('preloaderPopup');
         function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
         function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
@@ -188,7 +236,7 @@
                         id: parseInt(ev.id) || ev.id
                     }));
                 }
-
+                
                 // Cargar notas
                 const responseNotas = await fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -211,27 +259,32 @@
                         notasPorDia[nota.fechaKey].push(nota.nota);
                     });
                 }
-
+                
                 console.log(`✅ Eventos cargados: ${eventosRango.length}`);
                 renderizarListaEventos();
                 
                 if (eventoSeleccionado) {
                     const eventoActualizado = eventosRango.find(ev => ev.id === eventoSeleccionado.id);
                     if (eventoActualizado) {
-@@ -222,79 +229,53 @@
+                        eventoSeleccionado = eventoActualizado;
+                        mostrarCalendarioEvento();
+                    } else {
+                        ocultarCalendarioEvento();
                     }
                 }
             } catch (error) {
-                console.error('Error al cargar eventos:', error);
                 console.error('❌ Error al cargar eventos:', error);
             } finally {
                 ocultarPreloader();
             }
         }
+        // ---------- Estructura de datos ----------
+        let eventosRango = [];      // Eventos por rango { id, nombre, fechaInicio, fechaFin }
+        let notasPorDia = {};       // Notas individuales: clave "YYYY-MM-DD" -> array de strings
+        let eventoSeleccionado = null;  // Evento actualmente seleccionado
 
         async function guardarEventoEnNube(evento) {
             try {
-                await fetch(SCRIPT_URL, {
                 const params = new URLSearchParams();
                 params.append('action', 'guardarEvento');
                 params.append('id', evento.id);
@@ -243,49 +296,26 @@
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `action=guardarEvento&id=${evento.id}&nombre=${encodeURIComponent(evento.nombre)}&fechaInicio=${evento.fechaInicio.toISOString()}&fechaFin=${evento.fechaFin.toISOString()}`
                     body: params
+        // ---------- Cargar/Guardar en localStorage ----------
+        function cargarEventos() {
+            // Cargar eventos de rango
+            const storedEventos = localStorage.getItem('eventosRangoCalendario');
+            if (storedEventos) {
+                eventosRango = JSON.parse(storedEventos);
+@@ -165,25 +169,17 @@
+                    ev.fechaFin = new Date(ev.fechaFin);
                 });
                 const result = await response.text();
                 console.log('📥 Respuesta guardar evento:', result);
             } catch (error) {
                 console.error('Error al guardar evento:', error);
-            }
-        }
-
-        async function eliminarEventoEnNube(id) {
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `action=eliminarEvento&id=${id}`
-                });
-            } catch (error) {
-                console.error('Error al eliminar evento:', error);
-            }
-        }
-
-        async function guardarNotaEnNube(fechaKey, nota, eventoId) {
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `action=guardarNota&fechaKey=${fechaKey}&nota=${encodeURIComponent(nota)}&eventoId=${eventoId || ''}`
-                });
-            } catch (error) {
-                console.error('Error al guardar nota:', error);
-            }
-        }
-
-        async function eliminarNotaEnNube(fechaKey, nota) {
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `action=eliminarNota&fechaKey=${fechaKey}&nota=${encodeURIComponent(nota)}`
-                });
-            } catch (error) {
-                console.error('Error al eliminar nota:', error);
+            } else {
+                eventosRango = [
+                    { id: Date.now() + 1, nombre: "Semana de aventura", fechaInicio: new Date(2026, 4, 25), fechaFin: new Date(2026, 4, 30) },
+                    { id: Date.now() + 2, nombre: "Excursión a la montaña", fechaInicio: new Date(2026, 5, 5), fechaFin: new Date(2026, 5, 8) }
+                ];
+                eventosRango = [];
             }
         }
 
@@ -295,12 +325,20 @@
             const nombre = document.getElementById('eventoNombre').value.trim();
 
             if (!fechaInicioStr || !fechaFinStr) {
-                alert("❌ Selecciona ambas fechas (desde y hasta).");
                 alert("❌ Selecciona ambas fechas.");
                 return;
+            // Cargar notas individuales
+            const storedNotas = localStorage.getItem('notasPorDiaCalendario');
+            if (storedNotas) {
+                notasPorDia = JSON.parse(storedNotas);
+            } else {
+                notasPorDia = {
+                    "2026-05-26": ["Recordar llevar equipo", "Confirmar transporte"],
+                    "2026-05-27": ["Comprar provisiones"]
+                };
+                notasPorDia = {};
             }
             if (!nombre) {
-                alert("❌ Escribe un nombre para el evento.");
                 alert("❌ Escribe un nombre.");
                 return;
             }
@@ -309,20 +347,38 @@
             const fechaFin = new Date(fechaFinStr);
 
             if (fechaInicio > fechaFin) {
-                alert("❌ La fecha 'Desde' no puede ser mayor que la fecha 'Hasta'.");
                 alert("❌ La fecha Desde no puede ser mayor que Hasta.");
                 return;
             }
+            renderizarListaEventos();
+            renderizarCalendario();
+        }
 
-@@ -317,11 +298,20 @@
+            const nuevoEvento = {
+                id: Date.now(),
+                nombre: nombre,
+                fechaInicio: fechaInicio,
+                fechaFin: fechaFin
+            };
+            
+            await guardarEventoEnNube(nuevoEvento);
+            await cargarEventosDesdeNube();
+            
+            document.getElementById('eventoFechaInicio').value = '';
+            document.getElementById('eventoFechaFin').value = '';
+        function guardarEventos() {
+@@ -232,7 +228,6 @@
+            document.getElementById('eventoNombre').value = '';
+            
+
+            renderizarListaEventos();
+            renderizarCalendario();
+            alert(`✅ Evento "${nombre}" creado del ${formatearFecha(fechaInicio)} al ${formatearFecha(fechaFin)}`);
+        }
 
         async function eliminarEvento(id) {
+@@ -241,12 +236,87 @@
             const evento = eventosRango.find(ev => ev.id === id);
-            if (evento && confirm(`¿Eliminar el evento "${evento.nombre}"?`)) {
-                await eliminarEventoEnNube(id);
-                await cargarEventosDesdeNube();
-                if (eventoSeleccionado && eventoSeleccionado.id === id) {
-                    ocultarCalendarioEvento();
             if (evento && confirm(`¿Eliminar "${evento.nombre}"?`)) {
                 mostrarPreloader();
                 try {
@@ -337,104 +393,156 @@
                     }
                 } finally {
                     ocultarPreloader();
+            if (evento && confirm(`¿Eliminar el evento "${evento.nombre}"?`)) {
+                eventosRango = eventosRango.filter(ev => ev.id !== id);
+                if (eventoSeleccionado && eventoSeleccionado.id === id) {
+                    eventoSeleccionado = null;
+                    ocultarCalendarioEvento();
                 }
+                guardarEventos();
+                renderizarListaEventos();
+                renderizarCalendario();
             }
         }
-@@ -398,62 +388,37 @@
+
+        // ---------- Función para VER evento (cargar solo los días del evento) ----------
+        function verEvento(id) {
             const evento = eventosRango.find(ev => ev.id === id);
             if (!evento) return;
+            
+            eventoSeleccionado = evento;
+            mostrarCalendarioEvento();
+        }
+@@ -331,9 +211,11 @@
+            document.getElementById('eventoCalendarioTitulo').innerHTML = `📅 ${escapeHtml(eventoSeleccionado.nombre)}`;
+            document.getElementById('eventoInfoHeader').innerHTML = `📅 Del ${formatearFecha(eventoSeleccionado.fechaInicio)} al ${formatearFecha(eventoSeleccionado.fechaFin)}`;
 
-            let mensaje = `🏔️ *${evento.nombre}*\n📅 Del ${formatearFecha(evento.fechaInicio)} al ${formatearFecha(evento.fechaFin)}\n\n`;
-            mensaje += `*Detalle por día:*\n`;
+            // Configurar botón compartir
+            const btnCompartir = document.getElementById('btnCompartirEventoActual');
+            btnCompartir.onclick = () => compartirEvento(eventoSeleccionado.id);
+
+            // Generar los días del evento
+            const daysGrid = document.getElementById('eventDaysGrid');
+            let dias = [];
+            let fechaActual = new Date(eventoSeleccionado.fechaInicio);
+@@ -354,8 +236,8 @@
+                    const notaCorta = nota.length > 30 ? nota.substring(0, 27) + '...' : nota;
+                    notasHtml += `
+                        <div class="nota-item-cal">
+                            <span class="nota-texto-cal" onclick='editarNota("${fechaKey}", ${idx}, "${fechaFormateada}", "${escapeHtml(nota).replace(/"/g, '&quot;')}")'>📌 ${escapeHtml(notaCorta)}</span>
+                            <button class="eliminar-nota-cal" onclick="eliminarNota('${fechaKey}', '${escapeHtml(nota).replace(/'/g, "\\'")}')">✕</button>
+                            <span class="nota-texto-cal" onclick="editarNota('${fechaKey}', ${idx}, '${fechaFormateada}')" title="Editar: ${escapeHtml(nota)}">📌 ${escapeHtml(notaCorta)}</span>
+                            <button class="eliminar-nota-cal" onclick="eliminarNota('${fechaKey}', ${idx})">✕</button>
+                        </div>
+                    `;
+                });
+@@ -384,127 +266,104 @@
+            return dias[fecha.getDay()];
+        }
+
+        // ---------- Funciones para COMPARTIR por WhatsApp ----------
+        function compartirEvento(id) {
+            const evento = eventosRango.find(ev => ev.id === id);
+            if (!evento) return;
             
             let mensaje = `🏔️ *${evento.nombre}*\n📅 Del ${formatearFecha(evento.fechaInicio)} al ${formatearFecha(evento.fechaFin)}\n\n*Detalle por día:*\n`;
+@@ -255,7 +325,6 @@
+            let mensaje = `🏔️ *${evento.nombre}*\n📅 Del ${formatearFecha(evento.fechaInicio)} al ${formatearFecha(evento.fechaFin)}\n\n`;
+            mensaje += `*Detalle por día:*\n`;
+
+            // Recorrer cada día del rango
             let fechaActual = new Date(evento.fechaInicio);
             while (fechaActual <= evento.fechaFin) {
                 const fechaKey = formatoFechaKey(fechaActual);
                 const notas = notasPorDia[fechaKey] || [];
                 mensaje += `\n📌 *${formatearFecha(fechaActual)}*:\n`;
-                if (notas.length === 0) {
-                    mensaje += `   Sin notas registradas\n`;
-                } else {
-                    notas.forEach(nota => {
-                        mensaje += `   • ${nota}\n`;
-                    });
-                }
                 if (notas.length === 0) mensaje += `   Sin notas\n`;
                 else notas.forEach(nota => mensaje += `   • ${nota}\n`);
                 fechaActual.setDate(fechaActual.getDate() + 1);
+@@ -272,7 +341,6 @@
             }
-            
-            mensaje += `\n---\n📱 Enviado desde CRM Aventura Total`;
-            const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
-            window.open(urlWhatsApp, '_blank');
             mensaje += `\n📱 Enviado desde CRM Aventura Total`;
             window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
-        }
 
-        function compartirTodosEventos() {
-            if (eventosRango.length === 0) {
-                alert("No hay eventos para compartir.");
-                return;
-            }
+            mensaje += `\n---\n📱 Enviado desde CRM Aventura Total`;
             
-            let mensaje = `🏔️ *TODOS LOS EVENTOS - CRM Aventura Total*\n\n`;
+            const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+            window.open(urlWhatsApp, '_blank');
+        }
+        
+        function compartirTodosEventos() {
             if (eventosRango.length === 0) { alert("No hay eventos."); return; }
             let mensaje = `🏔️ *TODOS LOS EVENTOS*\n\n`;
+@@ -284,7 +352,6 @@
+            }
+
+            let mensaje = `🏔️ *TODOS LOS EVENTOS - CRM Aventura Total*\n\n`;
+            
             eventosRango.forEach(evento => {
-                mensaje += `━━━━━━━━━━━━━━━━━━━━━\n`;
-                mensaje += `🎯 *${evento.nombre}*\n`;
-                mensaje += `📅 Del ${formatearFecha(evento.fechaInicio)} al ${formatearFecha(evento.fechaFin)}\n\n`;
-                mensaje += `*Detalle por día:*\n`;
-                
                 mensaje += `━━━━━━━━━━━━━━━━━━━━━\n🎯 *${evento.nombre}*\n📅 Del ${formatearFecha(evento.fechaInicio)} al ${formatearFecha(evento.fechaFin)}\n\n*Detalle por día:*\n`;
                 let fechaActual = new Date(evento.fechaInicio);
                 while (fechaActual <= evento.fechaFin) {
                     const fechaKey = formatoFechaKey(fechaActual);
                     const notas = notasPorDia[fechaKey] || [];
                     mensaje += `\n📌 *${formatearFecha(fechaActual)}*:\n`;
-                    if (notas.length === 0) {
-                        mensaje += `   Sin notas registradas\n`;
-                    } else {
-                        notas.forEach(nota => {
-                            mensaje += `   • ${nota}\n`;
-                        });
-                    }
                     if (notas.length === 0) mensaje += `   Sin notas\n`;
                     else notas.forEach(nota => mensaje += `   • ${nota}\n`);
                     fechaActual.setDate(fechaActual.getDate() + 1);
                 }
                 mensaje += `\n`;
+                mensaje += `━━━━━━━━━━━━━━━━━━━━━\n`;
+                mensaje += `🎯 *${evento.nombre}*\n`;
+@@ -309,31 +376,31 @@
             });
-            
+            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+
             mensaje += `━━━━━━━━━━━━━━━━━━━━━\n📱 Enviado desde CRM Aventura Total`;
+            
             const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
             window.open(urlWhatsApp, '_blank');
-            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
+        // ---------- Funciones para NOTAS INDIVIDUALES por día ----------
         let fechaNotaSeleccionada = null;
-@@ -485,31 +450,40 @@
+        let fechaNotaTexto = null;
+        let notaEditIndex = null;
+        let notaEditTexto = null;
+        
 
+        function abrirModalAgregarNota(fechaKey, fechaObj) {
+        function abrirModalAgregarNota(fechaKey, fechaTexto) {
+            fechaNotaSeleccionada = fechaKey;
+            document.getElementById('modalNotaFecha').innerText = formatearFecha(fechaObj);
+            fechaNotaTexto = fechaTexto;
+            notaEditIndex = null;
+            notaEditTexto = null;
+            document.getElementById('modalNotaFecha').innerText = fechaTexto;
+            document.getElementById('notaTexto').value = '';
+            document.getElementById('modalNotaTitle').innerText = '📝 Agregar nota';
+            document.getElementById('modalNota').classList.add('show');
+        }
+        
+        function editarNota(fechaKey, index, fechaTexto, notaActual) {
+
+        function editarNota(fechaKey, index, fechaObj) {
+        function editarNota(fechaKey, index, fechaTexto) {
+            fechaNotaSeleccionada = fechaKey;
+            fechaNotaTexto = fechaTexto;
+            notaEditIndex = index;
+            notaEditTexto = notaActual;
+            const notas = notasPorDia[fechaKey] || [];
+            document.getElementById('modalNotaFecha').innerText = formatearFecha(fechaObj);
+            document.getElementById('modalNotaFecha').innerText = fechaTexto;
+            document.getElementById('notaTexto').value = notaActual;
+            document.getElementById('notaTexto').value = notas[index] || '';
+            document.getElementById('modalNotaTitle').innerText = '✏️ Editar nota';
+            document.getElementById('modalNota').classList.add('show');
+        }
+        
         async function guardarNota() {
             const texto = document.getElementById('notaTexto').value.trim();
-            if (!texto) {
-                alert("Escribe algo para la nota.");
-                return;
-            }
-            
-            if (notaEditIndex !== null && notaEditTexto !== null) {
-                await eliminarNotaEnNube(fechaNotaSeleccionada, notaEditTexto);
-            }
-            
-            await guardarNotaEnNube(fechaNotaSeleccionada, texto, eventoSeleccionado ? eventoSeleccionado.id : null);
-            await cargarEventosDesdeNube();
             if (!texto) { alert("Escribe algo."); return; }
 
-            cerrarModalNota();
-            if (eventoSeleccionado) {
-                mostrarCalendarioEvento();
-            }
             mostrarPreloader();
             try {
                 if (notaEditIndex !== null && notaEditTexto !== null) {
@@ -453,15 +561,12 @@
                 cerrarModalNota();
                 if (eventoSeleccionado) mostrarCalendarioEvento();
             } finally { ocultarPreloader(); }
+            // Guardar temporalmente el índice para edición
+            window.notaEditIndex = index;
         }
-
+        
         async function eliminarNota(fechaKey, nota) {
             if (confirm("¿Eliminar esta nota?")) {
-                await eliminarNotaEnNube(fechaKey, nota);
-                await cargarEventosDesdeNube();
-                if (eventoSeleccionado) {
-                    mostrarCalendarioEvento();
-                }
                 mostrarPreloader();
                 try {
                     await fetch(SCRIPT_URL, {
@@ -472,32 +577,177 @@
                     await cargarEventosDesdeNube();
                     if (eventoSeleccionado) mostrarCalendarioEvento();
                 } finally { ocultarPreloader(); }
+
+@@ -348,7 +415,6 @@
+                notasPorDia[fechaNotaSeleccionada] = [];
+            }
+
+            // Si estamos editando, reemplazar
+            if (window.notaEditIndex !== undefined && notasPorDia[fechaNotaSeleccionada][window.notaEditIndex]) {
+                notasPorDia[fechaNotaSeleccionada][window.notaEditIndex] = texto;
+                delete window.notaEditIndex;
+@@ -358,7 +424,9 @@
+
+            guardarEventos();
+            cerrarModalNota();
+            renderizarCalendario();
+            if (eventoSeleccionado) {
+                mostrarCalendarioEvento();
             }
         }
+        
+        function cerrarModalNota() {
+            document.getElementById('modalNota').classList.remove('show');
+            fechaNotaSeleccionada = null;
+            notaEditIndex = null;
+            notaEditTexto = null;
+        }
 
-@@ -526,7 +500,6 @@
+        function renderizarListaEventos() {
+            const container = document.getElementById('listaEventosContainer');
+            if (eventosRango.length === 0) {
                 container.innerHTML = '<div class="no-events">📭 No hay eventos activos. Crea uno usando el panel superior.</div>';
                 return;
+        function eliminarNota(fechaKey, index) {
+@@ -369,7 +437,9 @@
+                        delete notasPorDia[fechaKey];
+                    }
+                    guardarEventos();
+                    renderizarCalendario();
+                    if (eventoSeleccionado) {
+                        mostrarCalendarioEvento();
+                    }
+                }
             }
-            
             container.innerHTML = eventosRango.map(ev => `
                 <div class="event-item-list">
                     <div class="event-info">
-@@ -557,15 +530,11 @@
-            return div.innerHTML;
+                        <div class="event-name">🎯 ${escapeHtml(ev.nombre)}</div>
+                        <div class="event-dates">📅 ${formatearFecha(new Date(ev.fechaInicio))} → ${formatearFecha(new Date(ev.fechaFin))}</div>
+        }
+@@ -395,91 +465,13 @@
+                        <div class="event-dates">📅 ${formatearFecha(ev.fechaInicio)} → ${formatearFecha(ev.fechaFin)}</div>
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn-ver-evento" onclick="verEvento(${ev.id})">👁️ Ver días</button>
+@@ -514,27 +373,108 @@
+                </div>
+            `).join('');
+        }
+        
+        function formatearFecha(fecha) {
+            return `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
+
+        // ---------- Verificar si una fecha está dentro de algún evento ----------
+        function obtenerEventoEnFecha(fecha) {
+            for (const ev of eventosRango) {
+                if (fecha >= ev.fechaInicio && fecha <= ev.fechaFin) {
+                    return ev;
+                }
+            }
+            return null;
+        }
+        
+        function formatoFechaKey(fecha) {
+            return `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}`;
+
+        // ---------- Renderizar calendario ----------
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+
+        function renderizarCalendario() {
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+            const startDayOfWeek = firstDayOfMonth.getDay();
+            let startOffset = (startDayOfWeek === 0 ? 6 : startDayOfWeek - 1);
+            
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const totalCells = 42;
+            let calendarHTML = '';
+            
+            const weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+            weekdays.forEach(day => { calendarHTML += `<div class="calendar-day-header">${day}</div>`; });
+            
+            for (let i = 0; i < startOffset; i++) {
+                calendarHTML += `<div class="calendar-day"></div>`;
+            }
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const fechaObj = new Date(currentYear, currentMonth, day);
+                const fechaKey = formatoFechaKey(fechaObj);
+                const evento = obtenerEventoEnFecha(fechaObj);
+                const hasEvent = evento !== null;
+                const notas = notasPorDia[fechaKey] || [];
+                
+                let dayHTML = `<div class="calendar-day ${hasEvent ? 'has-event' : ''}">
+                                <div class="day-number">
+                                    <span>${day}</span>
+                                </div>`;
+                
+                if (hasEvent) {
+                    dayHTML += `<div class="event-badge" title="${evento.nombre} - ${formatearFecha(evento.fechaInicio)} al ${formatearFecha(evento.fechaFin)}">🎯 ${escapeHtml(evento.nombre)}</div>`;
+                }
+                
+                // Mostrar notas individuales
+                notas.forEach((nota, idx) => {
+                    const notaCorta = nota.length > 25 ? nota.substring(0, 22) + '...' : nota;
+                    dayHTML += `<div class="nota-item">
+                                    <span class="nota-texto" onclick="editarNota('${fechaKey}', ${idx}, new Date(${currentYear}, ${currentMonth}, ${day}))" title="Editar: ${escapeHtml(nota)}">📌 ${escapeHtml(notaCorta)}</span>
+                                    <button class="eliminar-nota" onclick="eliminarNota('${fechaKey}', ${idx})">✕</button>
+                                </div>`;
+                });
+                
+                dayHTML += `<button class="btn-agregar-nota" onclick="abrirModalAgregarNota('${fechaKey}', new Date(${currentYear}, ${currentMonth}, ${day}))">+ Agregar nota</button>`;
+                dayHTML += `</div>`;
+                calendarHTML += dayHTML;
+            }
+            
+            for (let i = startOffset + daysInMonth; i < totalCells; i++) {
+                calendarHTML += `<div class="calendar-day"></div>`;
+            }
+            
+            document.getElementById('calendarGrid').innerHTML = calendarHTML;
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            document.getElementById('currentMonthYear').innerText = `${monthNames[currentMonth]} ${currentYear}`;
         }
 
+        function cambiarMes(delta) {
+            let newMonth = currentMonth + delta;
+            let newYear = currentYear;
+            if (newMonth < 0) { newMonth = 11; newYear--; }
+            else if (newMonth > 11) { newMonth = 0; newYear++; }
+            currentMonth = newMonth;
+            currentYear = newYear;
+            renderizarCalendario();
+        }
+
+        // Helper: formatear fecha como DD/MM/YYYY
+        function formatearFecha(fecha) {
+@@ -491,21 +483,22 @@
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        document.getElementById('modalNota').addEventListener('click', e => { if (e.target === this) cerrarModalNota(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModalNota(); });
+        
+        cargarEventosDesdeNube();
+        setInterval(cargarEventosDesdeNube, 30000);
+
+        // Cerrar modal con click fuera o ESC
         document.getElementById('modalNota').addEventListener('click', function(e) {
             if (e.target === this) cerrarModalNota();
         });
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') cerrarModalNota();
         });
-        document.getElementById('modalNota').addEventListener('click', e => { if (e.target === this) cerrarModalNota(); });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModalNota(); });
 
-        cargarEventosDesdeNube();
-        setInterval(cargarEventosDesdeNube, 30000);
+        // Inicializar
+        cargarEventos();
     </script>
 </body>
 </html>
