@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Calendario - CRM Aventura Total</title>
+    <title>Calendario Editable - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
@@ -256,6 +256,12 @@
             overflow-y: auto;
         }
         
+        .calendar-day.dragging-over {
+            background: #d4edda;
+            border-color: #28a745;
+            border-style: dashed;
+        }
+        
         .calendar-day.today { background: #fff3cd; border-color: #ffc107; }
         .calendar-day.other-month { opacity: 0.4; background: #f1f3f5; }
         .calendar-day.rango-inicio { background: #d4edda; border-color: #28a745; }
@@ -271,10 +277,20 @@
             margin-bottom: 3px;
             white-space: normal;
             word-break: break-word;
-            cursor: pointer;
+            cursor: grab;
+            transition: all 0.2s ease;
             background: #667eea;
             color: white;
             border-left: 3px solid #4a5fc1;
+        }
+        
+        .event-item:active {
+            cursor: grabbing;
+        }
+        
+        .event-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
         }
         
         .modal {
@@ -421,7 +437,7 @@
         <div class="header">
             <div>
                 <h1>📅 Calendario de Eventos</h1>
-                <p>Haz clic en cualquier día para crear un evento</p>
+                <p>🎯 Arrastra eventos para cambiar sus fechas | Haz clic en cualquier día para crear</p>
             </div>
             <div class="user-info">
                 <div class="user-avatar">A</div>
@@ -502,13 +518,15 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMJ2pnekFjza6cEp6DglLMEVz5C49hwusa6u1V6Sw3N_40YKg1GOfPWYdSoqhpaA4baw/exec";
         
         // ⚠️ IMPORTANTE: Reemplaza ESTA URL con la que obtengas al publicar tu hoja como CSV
-        // Ve a Archivo → Compartir → Publicar en la web → Selecciona "EventosCalendario" y "CSV"
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRE_HJe0tXPVESz1HrJP7haymZT2Yitp-4Gow4Ugogg-eGS2GvN1pv451L3m7NjU0qY02YYJkzIXKxB/pub?gid=1858664682&single=true&output=csv";
         
         let eventos = [];
         let mesActual = new Date().getMonth();
         let añoActual = new Date().getFullYear();
         let eventoAEliminarId = null;
+        
+        // Variables para drag & drop
+        let eventoDrag = null;
         
         // Menú móvil
         const menuToggle = document.getElementById('menuToggle');
@@ -545,12 +563,10 @@
             
             const resultados = [];
             
-            // Saltamos la primera línea (encabezados)
             for (let i = 1; i < lineas.length; i++) {
                 const linea = lineas[i].trim();
                 if (!linea) continue;
                 
-                // Parsear CSV respetando comillas
                 const valores = [];
                 let enComillas = false;
                 let valorActual = '';
@@ -568,7 +584,6 @@
                 }
                 valores.push(valorActual);
                 
-                // Limpiar comillas de cada valor
                 const limpiar = (v) => v ? v.replace(/^"|"$/g, '').trim() : '';
                 
                 const id = limpiar(valores[0]);
@@ -599,15 +614,13 @@
                 const response = await fetch(CSV_URL);
                 const csvText = await response.text();
                 
-                console.log("CSV recibido:", csvText.substring(0, 200)); // Debug
-                
                 const eventosCargados = parseCSV(csvText);
                 
                 if (eventosCargados.length > 0) {
                     eventos = eventosCargados;
                     renderizarListaEventos();
                     renderCalendar();
-                    mostrarMensaje(`✅ Cargados ${eventos.length} eventos desde Google Sheets`, 'exito');
+                    mostrarMensaje(`✅ Cargados ${eventos.length} eventos`, 'exito');
                     localStorage.setItem('eventos_backup', JSON.stringify(eventos));
                 } else {
                     mostrarMensaje('⚠️ No hay eventos en la hoja', 'error');
@@ -626,23 +639,22 @@
                 eventos = JSON.parse(backup);
                 renderizarListaEventos();
                 renderCalendar();
-                mostrarMensaje(`📱 Cargados ${eventos.length} eventos desde caché local`, 'exito');
+                mostrarMensaje(`📱 Cargados ${eventos.length} eventos desde caché`, 'exito');
             } else {
-                // Eventos de ejemplo
                 eventos = [
                     { id: '1', fechaInicio: '2026-06-01', fechaFin: '2026-06-03', titulo: 'City Tour', descripcion: 'Tour 3 días' },
                     { id: '2', fechaInicio: '2026-06-05', fechaFin: '2026-06-07', titulo: 'Barco Pirata', descripcion: '' },
-                    { id: '3', fechaInicio: '2026-06-10', fechaFin: '2026-06-15', titulo: 'Valle Nevado', descripcion: '5 días de aventura' }
+                    { id: '3', fechaInicio: '2026-06-10', fechaFin: '2026-06-15', titulo: 'Valle Nevado', descripcion: '5 días' }
                 ];
                 renderizarListaEventos();
                 renderCalendar();
-                mostrarMensage('📝 Cargados eventos de ejemplo', 'exito');
+                mostrarMensaje('📝 Cargados eventos de ejemplo', 'exito');
             }
         }
         
         async function guardarEventoEnSheet(eventoData) {
             try {
-                const response = await fetch(SCRIPT_URL, {
+                await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
@@ -656,8 +668,6 @@
                         }]
                     })
                 });
-                
-                localStorage.setItem('eventos_backup', JSON.stringify(eventos));
                 return true;
             } catch(error) {
                 console.error('Error al guardar:', error);
@@ -687,22 +697,51 @@
                 fechaInicio, fechaFin, titulo, descripcion
             };
             
-            mostrarMensaje('⏳ Guardando en Google Sheets...', 'cargando');
+            mostrarMensaje('⏳ Guardando...', 'cargando');
             
             const guardado = await guardarEventoEnSheet(eventoData);
             
             if (guardado) {
-                mostrarMensaje('✅ ¡Evento guardado! Haz clic en "Sincronizar" para verlo', 'exito');
-                document.getElementById('eventoTitulo').value = '';
-                document.getElementById('eventoDescripcion').value = '';
+                eventos.push(eventoData);
+                renderizarListaEventos();
+                renderCalendar();
                 cerrarModal();
-                // Recargar después de 3 segundos
-                setTimeout(() => {
-                    cargarEventosDesdeCSV();
-                }, 3000);
+                mostrarMensaje('✅ ¡Evento guardado!', 'exito');
+                localStorage.setItem('eventos_backup', JSON.stringify(eventos));
+                setTimeout(() => cargarEventosDesdeCSV(), 2000);
             } else {
-                mostrarMensaje('⚠️ Error al guardar. Revisa la consola', 'error');
+                mostrarMensaje('⚠️ Error al guardar', 'error');
             }
+        }
+        
+        // Función para mover un evento a nuevas fechas (drag & drop)
+        async function moverEvento(eventoId, nuevaFechaInicio, nuevaFechaFin) {
+            const eventoIndex = eventos.findIndex(e => e.id === eventoId);
+            if (eventoIndex !== -1) {
+                const eventoOriginal = eventos[eventoIndex];
+                const duracion = calcularDuracion(eventoOriginal.fechaInicio, eventoOriginal.fechaFin);
+                
+                eventos[eventoIndex] = {
+                    ...eventoOriginal,
+                    fechaInicio: nuevaFechaInicio,
+                    fechaFin: nuevaFechaFin
+                };
+                
+                renderizarListaEventos();
+                renderCalendar();
+                mostrarMensaje(`📅 Evento movido a ${nuevaFechaInicio} → ${nuevaFechaFin}`, 'exito');
+                localStorage.setItem('eventos_backup', JSON.stringify(eventos));
+                
+                // Guardar en Google Sheets
+                await guardarEventoEnSheet(eventos[eventoIndex]);
+            }
+        }
+        
+        function calcularDuracion(fechaInicio, fechaFin) {
+            const inicio = new Date(fechaInicio);
+            const fin = new Date(fechaFin);
+            const diffDays = Math.ceil((fin - inicio) / (1000 * 60 * 60 * 24));
+            return diffDays + 1;
         }
         
         function renderizarListaEventos() {
@@ -748,7 +787,6 @@
             mensaje += "\n🔗 *CRM Aventura Total*";
             
             window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
-            mostrarMensaje('📱 Compartiendo evento...', 'exito');
         }
         
         function compartirTodosWhatsApp() {
@@ -769,7 +807,6 @@
             
             mensaje += `\n${"─".repeat(30)}\n🔗 *CRM Aventura Total*`;
             window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
-            mostrarMensaje('📱 Compartiendo todos los eventos...', 'exito');
         }
         
         function abrirConfirmEliminar(id, titulo) {
@@ -788,7 +825,7 @@
                 eventos = eventos.filter(e => e.id !== eventoAEliminarId);
                 renderizarListaEventos();
                 renderCalendar();
-                mostrarMensaje('✅ Evento eliminado localmente', 'exito');
+                mostrarMensaje('✅ Evento eliminado', 'exito');
                 cerrarConfirmModal();
                 eventoAEliminarId = null;
                 localStorage.setItem('eventos_backup', JSON.stringify(eventos));
@@ -799,7 +836,7 @@
             const hoy = new Date();
             const fechaHoy = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
             
-            document.getElementById('modalTitulo').textContent = '📝 Nuevo Evento por Rango';
+            document.getElementById('modalTitulo').textContent = '📝 Nuevo Evento';
             document.getElementById('eventoFechaInicio').value = fechaHoy;
             document.getElementById('eventoFechaFin').value = fechaHoy;
             document.getElementById('eventoTitulo').value = '';
@@ -829,8 +866,9 @@
                     renderizarListaEventos();
                     renderCalendar();
                     cerrarModal();
-                    mostrarMensaje('✅ Evento actualizado localmente', 'exito');
+                    mostrarMensaje('✅ Evento actualizado', 'exito');
                     localStorage.setItem('eventos_backup', JSON.stringify(eventos));
+                    await guardarEventoEnSheet(eventos[index]);
                 }
             };
         }
@@ -842,6 +880,56 @@
             mesActual = hoy.getMonth();
             añoActual = hoy.getFullYear();
             renderCalendar();
+        }
+        
+        // Funciones para Drag & Drop
+        function iniciarDrag(evento, e) {
+            eventoDrag = evento;
+            e.target.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', evento.id);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        
+        function terminarDrag(e) {
+            if (e.target.classList) {
+                e.target.classList.remove('dragging');
+            }
+            eventoDrag = null;
+        }
+        
+        function permitirDrop(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        
+        function dragOver(e, fechaStr) {
+            e.preventDefault();
+            const dayElement = e.currentTarget;
+            dayElement.classList.add('dragging-over');
+        }
+        
+        function dragLeave(e) {
+            const dayElement = e.currentTarget;
+            dayElement.classList.remove('dragging-over');
+        }
+        
+        async function soltarEnDia(e, fechaStr) {
+            e.preventDefault();
+            const dayElement = e.currentTarget;
+            dayElement.classList.remove('dragging-over');
+            
+            if (!eventoDrag) return;
+            
+            const eventoId = eventoDrag.id;
+            const duracion = calcularDuracion(eventoDrag.fechaInicio, eventoDrag.fechaFin);
+            
+            // Calcular nueva fecha fin
+            const nuevaFechaInicio = fechaStr;
+            const nuevaFechaFinDate = new Date(fechaStr);
+            nuevaFechaFinDate.setDate(nuevaFechaFinDate.getDate() + duracion - 1);
+            const nuevaFechaFin = nuevaFechaFinDate.toISOString().split('T')[0];
+            
+            await moverEvento(eventoId, nuevaFechaInicio, nuevaFechaFin);
         }
         
         function renderCalendar() {
@@ -877,7 +965,11 @@
                     if (fechaStr > e.fechaInicio && fechaStr < e.fechaFin) claseExtra += ' rango-medio';
                 });
                 
-                html += `<div class="calendar-day ${esHoy ? 'today' : ''}${claseExtra}" onclick="abrirModalCrear()">
+                html += `<div class="calendar-day ${esHoy ? 'today' : ''}${claseExtra}" 
+                    onclick="abrirModalCrear()"
+                    ondrop="soltarEnDia(event, '${fechaStr}')"
+                    ondragover="permitirDrop(event); dragOver(event, '${fechaStr}')"
+                    ondragleave="dragLeave(event)">
                     <div class="day-number">${dia}</div>`;
                 
                 const eventosUnicos = [];
@@ -886,7 +978,13 @@
                 });
                 
                 eventosUnicos.slice(0, 2).forEach(evento => {
-                    html += `<div class="event-item" onclick="event.stopPropagation(); abrirModalEditar(${JSON.stringify(evento).replace(/'/g, "&#39;")})">📌 ${evento.titulo}</div>`;
+                    html += `<div class="event-item" 
+                        draggable="true"
+                        ondragstart="iniciarDrag(${JSON.stringify(evento).replace(/"/g, '&quot;')}, event)"
+                        ondragend="terminarDrag(event)"
+                        onclick="event.stopPropagation(); abrirModalEditar(${JSON.stringify(evento).replace(/"/g, '&quot;')})">
+                        📌 ${evento.titulo}
+                    </div>`;
                 });
                 
                 if (eventosUnicos.length > 2) {
@@ -914,7 +1012,7 @@
             renderCalendar();
         }
         
-        // Inicializar cargando desde CSV
+        // Inicializar
         cargarEventosDesdeCSV();
     </script>
 </body>
