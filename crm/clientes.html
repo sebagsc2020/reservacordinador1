@@ -203,7 +203,7 @@
             outline: none;
             border-color: #667eea;
         }
-        .btn-filtrar, .btn-recargar {
+        .btn-filtrar, .btn-recargar, .btn-pdf {
             padding: 10px 18px;
             border: none;
             border-radius: 10px;
@@ -213,11 +213,12 @@
             white-space: nowrap;
             transition: all 0.2s;
         }
-        .btn-filtrar:active, .btn-recargar:active {
+        .btn-filtrar:active, .btn-recargar:active, .btn-pdf:active {
             transform: scale(0.96);
         }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
+        .btn-pdf { background: #dc2626; color: white; }
         
         /* ===== TABLA ===== */
         .table-container {
@@ -399,7 +400,7 @@
                 width: 100%;
             }
             
-            .btn-filtrar, .btn-recargar {
+            .btn-filtrar, .btn-recargar, .btn-pdf {
                 width: 100%;
                 text-align: center;
             }
@@ -475,6 +476,7 @@
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono..." id="busquedaCliente">
             <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
+            <button class="btn-pdf" onclick="descargarPDF()">📄 Descargar PDF</button>
         </div>
 
         <div class="table-container">
@@ -494,6 +496,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Incluir librería html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
         // ==================================================
@@ -644,6 +649,7 @@
                 
                 const clientesMap = new Map();
                 const reservasCount = new Map();
+                let clienteId = 1;
                 
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
@@ -661,6 +667,7 @@
                     
                     if (!clientesMap.has(email)) {
                         clientesMap.set(email, {
+                            id: clienteId++,
                             email: email,
                             nombre: nombreCompleto,
                             telefono: telefono
@@ -709,13 +716,13 @@
             
             tbody.innerHTML = clientesFiltrados.map((cliente, index) => `
                 <tr>
-                    <td>${index + 1}</td>
-                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
-                    <td style="font-size:11px">${escapeHtml(cliente.email)}</td>
-                    <td>${escapeHtml(cliente.telefono)}</td>
-                    <td><span class="badge" style="background:#eef2ff; color:#667eea;">${cliente.totalReservas} reserva(s)</span></td>
-                    <td><span class="badge badge-activo">Activo</span></td>
-                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td>
+                    <td>${cliente.id}</td
+                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td
+                    <td style="font-size:11px">${escapeHtml(cliente.email)}</td
+                    <td>${escapeHtml(cliente.telefono)}</td
+                    <td><span class="badge" style="background:#eef2ff; color:#667eea;">${cliente.totalReservas} reserva(s)</span></td
+                    <td><span class="badge badge-activo">Activo</span></td
+                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td
                 </tr>
             `).join('');
         }
@@ -738,6 +745,169 @@
                 );
             }
             renderizarTabla();
+        }
+        
+        // ==================================================
+        // DESCARGAR PDF CON LOS DATOS FILTRADOS
+        // ==================================================
+        function descargarPDF() {
+            if (clientesFiltrados.length === 0) {
+                alert('⚠️ No hay clientes para exportar.');
+                return;
+            }
+            
+            // Crear contenido HTML para el PDF
+            const fechaActual = new Date();
+            const fechaFormateada = `${fechaActual.getDate().toString().padStart(2,'0')}/${(fechaActual.getMonth()+1).toString().padStart(2,'0')}/${fechaActual.getFullYear()} ${fechaActual.getHours().toString().padStart(2,'0')}:${fechaActual.getMinutes().toString().padStart(2,'0')}`;
+            
+            let tablaHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Lista de Clientes - Aventura Total</title>
+                    <style>
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            padding: 30px;
+                            background: white;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                            border-bottom: 2px solid #667eea;
+                            padding-bottom: 20px;
+                        }
+                        .logo {
+                            font-size: 40px;
+                            margin-bottom: 10px;
+                        }
+                        h1 {
+                            color: #1a1a2e;
+                            font-size: 24px;
+                            margin-bottom: 5px;
+                        }
+                        .subtitulo {
+                            color: #666;
+                            font-size: 12px;
+                        }
+                        .fecha {
+                            text-align: right;
+                            font-size: 10px;
+                            color: #999;
+                            margin-bottom: 20px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 20px;
+                        }
+                        th {
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            padding: 12px;
+                            text-align: left;
+                            font-size: 12px;
+                            font-weight: 600;
+                        }
+                        td {
+                            padding: 10px 12px;
+                            border-bottom: 1px solid #e0e0e0;
+                            font-size: 11px;
+                            color: #333;
+                        }
+                        tr:hover td {
+                            background: #f8f9ff;
+                        }
+                        .footer {
+                            margin-top: 30px;
+                            text-align: center;
+                            font-size: 10px;
+                            color: #999;
+                            border-top: 1px solid #e0e0e0;
+                            padding-top: 20px;
+                        }
+                        .total {
+                            margin-top: 20px;
+                            font-size: 12px;
+                            font-weight: bold;
+                            text-align: right;
+                            color: #667eea;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="logo">🏔️</div>
+                        <h1>Aventura Total - Lista de Clientes</h1>
+                        <div class="subtitulo">Reporte generado desde el sistema CRM</div>
+                    </div>
+                    <div class="fecha">📅 Generado: ${fechaFormateada}</div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Agregar filas de clientes filtrados
+            for (const cliente of clientesFiltrados) {
+                tablaHtml += `
+                    <tr>
+                        <td>${cliente.id}</td>
+                        <td>${escapeHtml(cliente.nombre)}</td>
+                        <td>${escapeHtml(cliente.email)}</td>
+                        <td>${escapeHtml(cliente.telefono || 'No registrado')}</td>
+                    </tr>
+                `;
+            }
+            
+            tablaHtml += `
+                        </tbody>
+                    </table>
+                    
+                    <div class="total">
+                        Total de clientes: ${clientesFiltrados.length}
+                    </div>
+                    
+                    <div class="footer">
+                        Aventura Total - CRM | Generado automáticamente
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            // Configurar opciones para html2pdf
+            const element = document.createElement('div');
+            element.innerHTML = tablaHtml;
+            document.body.appendChild(element);
+            
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: `clientes_aventura_total_${fechaActual.getFullYear()}-${(fechaActual.getMonth()+1).toString().padStart(2,'0')}-${fechaActual.getDate().toString().padStart(2,'0')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.body.removeChild(element);
+            }).catch(err => {
+                console.error('Error al generar PDF:', err);
+                alert('❌ Error al generar el PDF. Intente nuevamente.');
+                document.body.removeChild(element);
+            });
         }
         
         // ==================================================
@@ -844,6 +1014,13 @@
             if (modal) modal.remove();
         }
         
+        function escapeHtml(text) { 
+            if (!text) return ''; 
+            const div = document.createElement('div'); 
+            div.textContent = text; 
+            return div.innerHTML; 
+        }
+        
         // ==================================================
         // INICIALIZAR
         // ==================================================
@@ -852,6 +1029,7 @@
         window.verReservasCliente = verReservasCliente;
         window.cerrarModalReservas = cerrarModalReservas;
         window.logout = logout;
+        window.descargarPDF = descargarPDF;
         
         const busquedaInput = document.getElementById('busquedaCliente');
         if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarClientes(); });
