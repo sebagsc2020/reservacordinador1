@@ -498,9 +498,8 @@
     <button class="btn-flotante" onclick="abrirModalCrear()">+</button>
     
     <script>
-        // CONFIGURACIÓN - Usando tu URL de Google Sheets
-        const SHEET_PUBLIC_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRE_HJe0tXPVESz1HrJP7haymZT2Yitp-4Gow4Ugogg-eGS2GvN1pv451L3m7NjU0qY02YYJkzIXKxB/pubhtml?gid=1858664682&single=true";
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMJ2pnekFjza6cEp6DglLMEVz5C49hwusa6u1V6Sw3N_40YKg1GOfPWYdSoqhpaA4baw/exec";
+        // CONFIGURACIÓN
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjYF6md3Z_sDjrqJuRHuq31Z-1QprEjXYQMqkxTXMmEGVXBaHEa42UaIlkFafvY-k3ag/exec";
         
         let eventos = [];
         let mesActual = new Date().getMonth();
@@ -535,105 +534,52 @@
             setTimeout(() => div.remove(), 3000);
         }
         
-        // Cargar eventos desde Google Sheets usando sheet.best API (gratuito y sin CORS)
+        // Cargar eventos desde Google Sheets usando GET
         async function cargarEventosDesdeSheet() {
             mostrarMensaje('🔄 Sincronizando con Google Sheets...', 'cargando');
             
-            // Usar la API de sheet.best para convertir la hoja pública en JSON
-            // Extraer el ID de la hoja de la URL pública
-            const sheetId = "2PACX-1vRE_HJe0tXPVESz1HrJP7haymZT2Yitp-4Gow4Ugogg-eGS2GvN1pv451L3m7NjU0qY02YYJkzIXKxB";
-            const gid = "1858664682";
-            
-            // Usar la API de Google Sheets v4 con formato JSONP
-            const jsonUrl = `https://docs.google.com/spreadsheets/d/e/${sheetId}/pub?gid=${gid}&single=true&output=csv`;
-            
             try {
-                // Fetch como CSV y convertir
-                const response = await fetch(jsonUrl);
-                const csvText = await response.text();
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' }
+                });
                 
-                // Parsear CSV manualmente
-                const lineas = csvText.split('\n');
-                if (lineas.length < 2) {
-                    throw new Error('No hay datos en la hoja');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
-                // Saltar encabezados (primera línea)
-                const eventosTemp = [];
-                for (let i = 1; i < lineas.length; i++) {
-                    const linea = lineas[i].trim();
-                    if (!linea) continue;
-                    
-                    // Parsear CSV simple (respetando comillas)
-                    const valores = [];
-                    let enComillas = false;
-                    let valorActual = '';
-                    
-                    for (let c = 0; c < linea.length; c++) {
-                        const char = linea[c];
-                        if (char === '"') {
-                            enComillas = !enComillas;
-                        } else if (char === ',' && !enComillas) {
-                            valores.push(valorActual);
-                            valorActual = '';
-                        } else {
-                            valorActual += char;
-                        }
-                    }
-                    valores.push(valorActual);
-                    
-                    // Limpiar comillas
-                    const limpiar = (v) => v.replace(/^"|"$/g, '').trim();
-                    
-                    const id = limpiar(valores[0] || '');
-                    const titulo = limpiar(valores[1] || '');
-                    const fechaInicio = limpiar(valores[2] || '');
-                    const fechaFin = limpiar(valores[3] || '');
-                    const descripcion = limpiar(valores[4] || '');
-                    
-                    if (id && titulo && fechaInicio && fechaFin) {
-                        eventosTemp.push({
-                            id: id,
-                            titulo: titulo,
-                            fechaInicio: fechaInicio,
-                            fechaFin: fechaFin,
-                            descripcion: descripcion
-                        });
-                    }
-                }
+                const data = await response.json();
                 
-                if (eventosTemp.length > 0) {
-                    eventos = eventosTemp;
+                if (data.status === 'success' && data.eventos) {
+                    eventos = data.eventos;
                     renderizarListaEventos();
                     renderCalendar();
                     mostrarMensaje(`✅ Cargados ${eventos.length} eventos desde Google Sheets`, 'exito');
                     localStorage.setItem('eventos_backup', JSON.stringify(eventos));
                 } else {
-                    cargarBackupLocal();
+                    throw new Error(data.message || 'Error al cargar');
                 }
             } catch(error) {
-                console.error('Error cargando CSV:', error);
-                cargarBackupLocal();
-            }
-        }
-        
-        function cargarBackupLocal() {
-            const backup = localStorage.getItem('eventos_backup');
-            if (backup && JSON.parse(backup).length > 0) {
-                eventos = JSON.parse(backup);
-                renderizarListaEventos();
-                renderCalendar();
-                mostrarMensaje(`📱 Cargados ${eventos.length} eventos desde caché local`, 'exito');
-            } else {
-                // Eventos de ejemplo
-                eventos = [
-                    { id: '1', fechaInicio: '2026-06-01', fechaFin: '2026-06-03', titulo: 'City Tour', descripcion: 'Tour 3 días' },
-                    { id: '2', fechaInicio: '2026-06-05', fechaFin: '2026-06-07', titulo: 'Barco Pirata', descripcion: '' },
-                    { id: '3', fechaInicio: '2026-06-10', fechaFin: '2026-06-15', titulo: 'Valle Nevado', descripcion: '5 días de aventura' }
-                ];
-                renderizarListaEventos();
-                renderCalendar();
-                mostrarMensaje('📝 Cargados eventos de ejemplo', 'exito');
+                console.error('Error:', error);
+                mostrarMensaje('⚠️ Error de conexión. Cargando datos locales...', 'error');
+                
+                const backup = localStorage.getItem('eventos_backup');
+                if (backup && JSON.parse(backup).length > 0) {
+                    eventos = JSON.parse(backup);
+                    renderizarListaEventos();
+                    renderCalendar();
+                    mostrarMensaje(`📱 Cargados ${eventos.length} eventos desde caché`, 'exito');
+                } else {
+                    eventos = [
+                        { id: '1', fechaInicio: '2026-06-01', fechaFin: '2026-06-03', titulo: 'City Tour', descripcion: 'Tour 3 días' },
+                        { id: '2', fechaInicio: '2026-06-05', fechaFin: '2026-06-07', titulo: 'Barco Pirata', descripcion: '' },
+                        { id: '3', fechaInicio: '2026-06-10', fechaFin: '2026-06-15', titulo: 'Valle Nevado', descripcion: '5 días' }
+                    ];
+                    renderizarListaEventos();
+                    renderCalendar();
+                    mostrarMensaje('📝 Cargados eventos de ejemplo', 'exito');
+                }
             }
         }
         
@@ -688,15 +634,18 @@
             
             const guardado = await guardarEventoEnSheet(eventoData);
             
-            eventos.push(eventoData);
-            renderizarListaEventos();
-            renderCalendar();
-            cerrarModal();
-            
             if (guardado) {
-                mostrarMensaje('✅ ¡Evento guardado! Actualiza la lista con "Sincronizar"', 'exito');
+                mostrarMensaje('✅ ¡Evento guardado! Haz clic en "Sincronizar" para verlo', 'exito');
+                // Limpiar formulario
+                document.getElementById('eventoTitulo').value = '';
+                document.getElementById('eventoDescripcion').value = '';
+                cerrarModal();
+                // Recargar eventos después de 2 segundos
+                setTimeout(() => {
+                    cargarEventosDesdeSheet();
+                }, 2000);
             } else {
-                mostrarMensaje('⚠️ Guardado localmente. Sincroniza luego', 'error');
+                mostrarMensaje('⚠️ Error al guardar. Revisa la consola', 'error');
             }
         }
         
@@ -783,7 +732,7 @@
                 eventos = eventos.filter(e => e.id !== eventoAEliminarId);
                 renderizarListaEventos();
                 renderCalendar();
-                mostrarMensaje('✅ Evento eliminado', 'exito');
+                mostrarMensaje('✅ Evento eliminado localmente', 'exito');
                 cerrarConfirmModal();
                 eventoAEliminarId = null;
                 localStorage.setItem('eventos_backup', JSON.stringify(eventos));
@@ -824,7 +773,7 @@
                     renderizarListaEventos();
                     renderCalendar();
                     cerrarModal();
-                    mostrarMensaje('✅ Evento actualizado', 'exito');
+                    mostrarMensaje('✅ Evento actualizado localmente', 'exito');
                     localStorage.setItem('eventos_backup', JSON.stringify(eventos));
                 }
             };
