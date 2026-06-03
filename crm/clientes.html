@@ -7,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
-
+        
         /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
         .menu-btn {
             position: fixed;
@@ -26,17 +26,17 @@
             transition: all 0.3s ease;
             border: none;
         }
-
+        
         .menu-btn:hover {
             background: #5a6fd6;
             transform: scale(1.05);
         }
-
+        
         .menu-btn span {
             font-size: 24px;
             color: white;
         }
-
+        
         /* ===== SIDEBAR ===== */
         .sidebar { 
             width: 250px; 
@@ -51,11 +51,11 @@
             transform: translateX(-100%);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
-
+        
         .sidebar.open {
             transform: translateX(0);
         }
-
+        
         .menu-overlay {
             position: fixed;
             top: 0;
@@ -68,17 +68,17 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-
+        
         .menu-overlay.active {
             display: block;
             opacity: 1;
         }
-
+        
         .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .sidebar-logo .logo-icon { font-size: 40px; }
         .sidebar-logo h2 { font-size: 18px; margin-top: 8px; }
         .sidebar-logo h2 span { color: #667eea; }
-
+        
         .nav-menu { list-style: none; padding: 0 15px; }
         .nav-menu li { margin-bottom: 5px; }
         .nav-menu a {
@@ -95,7 +95,7 @@
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
         .nav-menu a.active { background: #667eea; }
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-
+        
         .sidebar-footer {
             position: absolute;
             bottom: 20px;
@@ -117,7 +117,7 @@
         .btn-logout-sidebar:hover {
             background: rgba(231,76,60,0.4);
         }
-
+        
         /* ===== CONTENIDO PRINCIPAL ===== */
         .main-content {
             margin-left: 0;
@@ -125,7 +125,7 @@
             padding: 20px;
             transition: margin-left 0.3s ease;
         }
-
+        
         .header {
             display: flex;
             justify-content: space-between;
@@ -135,7 +135,7 @@
             gap: 15px;
         }
         .header h1 { font-size: 26px; color: #1a1a2e; }
-
+        
         .user-info {
             display: flex;
             align-items: center;
@@ -157,7 +157,7 @@
             color: white;
             font-weight: 700;
         }
-
+        
         /* ===== TARJETAS ===== */
         .stats-card {
             background: white;
@@ -177,7 +177,7 @@
             color: #666;
             margin-top: 5px;
         }
-
+        
         /* ===== FILTROS ===== */
         .filters-bar {
             background: white;
@@ -219,7 +219,7 @@
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
         .btn-pdf { background: #dc2626; color: white; }
-
+        
         /* ===== TABLA ===== */
         .table-container {
             background: white;
@@ -242,7 +242,6 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
             min-width: 700px;
         }
         th {
@@ -250,7 +249,6 @@
             padding: 12px;
             background: #f8f9fa;
             color: #666;
-            font-size: 11px;
             font-size: 12px;
             text-transform: uppercase;
             font-weight: 600;
@@ -259,16 +257,16 @@
         td {
             padding: 12px;
             border-bottom: 1px solid #f0f0f0;
-            font-size: 12px;
             font-size: 13px;
             color: #333;
         }
         tr:hover td {
-@@ -266,24 +267,29 @@
+            background: #f8f9ff;
+        }
+        
         .badge {
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 10px;
             font-size: 11px;
             font-weight: 700;
             display: inline-block;
@@ -281,24 +279,144 @@
             background: #eef2ff;
             color: #667eea;
         }
-
+        
         .btn-ver {
-            padding: 5px 12px;
             padding: 6px 14px;
             background: #667eea;
             color: white;
             border: none;
-            border-radius: 5px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 11px;
             font-size: 12px;
             transition: background 0.2s;
             font-weight: 500;
         }
         .btn-ver:active {
             transform: scale(0.96);
-@@ -414,6 +420,11 @@
+        }
+        .btn-ver:hover {
+            background: #5a67d8;
+        }
+        
+        /* Estilos para el modal de reservas */
+        .reserva-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .reserva-id {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .reserva-fecha {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+        .reserva-excursiones {
+            margin-top: 8px;
+        }
+        .reserva-excursiones-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .reserva-excursiones-lista {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .reserva-excursiones-lista li {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        /* ===== SCROLL SIDEBAR ===== */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+        
+        /* ===== DESKTOP ===== */
+        @media (min-width: 769px) {
+            .menu-btn {
+                display: none !important;
+            }
+            
+            .sidebar {
+                transform: translateX(0) !important;
+                width: 250px;
+            }
+            
+            .menu-overlay {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 250px;
+                padding: 30px;
+            }
+        }
+        
+        /* ===== MÓVIL ===== */
+        @media (max-width: 768px) {
+            .menu-btn {
+                display: flex;
+            }
+            
+            .main-content {
+                padding: 60px 12px 20px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .user-info {
+                padding: 5px 12px;
+                font-size: 12px;
+            }
+            
+            .user-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            
+            .stats-number {
+                font-size: 32px;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+            }
+            
+            .filter-input {
+                width: 100%;
+            }
+            
+            .btn-filtrar, .btn-recargar, .btn-pdf {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            th, td {
                 padding: 8px 6px;
                 font-size: 11px;
             }
@@ -308,13 +426,78 @@
                 font-size: 10px;
             }
         }
-
+        
         @media (max-width: 480px) {
-@@ -487,10 +498,18 @@
+            .stats-number {
+                font-size: 28px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Botón menú hamburguesa (solo móvil) -->
+    <button class="menu-btn" id="menuBtn">
+        <span>☰</span>
+    </button>
+    
+    <!-- Overlay para cerrar menú -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">🏔️</div>
+            <h2>Aventura <span>Total</span></h2>
+            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a href="clientes.html" class="active"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
+            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
+            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="header">
+            <div><h1>👥 Clientes</h1></div>
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <span>Admin</span>
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <div class="stats-number" id="totalClientes">0</div>
+            <div class="stats-label">Clientes Registrados</div>
+        </div>
+
+        <div class="filters-bar">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono..." id="busquedaCliente">
+            <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Filtrar</button>
+            <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
+            <button class="btn-pdf" onclick="descargarPDF()">📄 Descargar PDF</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3>📋 Lista de Clientes</h3>
+                <span id="totalClientesSpan" style="font-size:12px;color:#666;">0 clientes</span>
+            </div>
             <div class="table-wrapper">
                 <table id="clientesTable">
                     <thead>
-                        <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Reservas</th><th>Estado</th><th>Acciones</th></tr>
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
@@ -326,52 +509,209 @@
                         </tr>
                     </thead>
                     <tbody id="tablaClientes">
-                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td
                         <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>
                     </tbody>
                 </table>
             </div>
-@@ -640,7 +659,7 @@
+        </div>
+    </div>
 
+    <!-- Incluir librería html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        // ==================================================
+        // MENÚ FLOTANTE
+        // ==================================================
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const menuOverlay = document.getElementById('menuOverlay');
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('open');
+            menuOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+        
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (menuBtn) {
+            menuBtn.addEventListener('click', toggleMenu);
+        }
+        
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', closeMenu);
+        }
+        
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeMenu();
+                }
+            });
+        });
+        
+        // ==================================================
+        // CONFIGURACIÓN
+        // ==================================================
+        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
+        const SHEET_NAME = 'Hoja 1';
+        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        
+        if (sessionStorage.getItem('crm_logged') !== 'true') { 
+            window.location.href = 'index.html'; 
+        }
+        
+        function logout() { 
+            sessionStorage.clear(); 
+            window.location.href = 'index.html'; 
+        }
+        
+        let clientesData = [];
+        let clientesFiltrados = [];
+        
+        function parseCSV(csvText) {
+            const filas = [];
+            let filaActual = [];
+            let celdaActual = '';
+            let dentroComillas = false;
+            
+            for (let i = 0; i < csvText.length; i++) {
+                const char = csvText[i];
+                const nextChar = csvText[i + 1];
+                
+                if (dentroComillas) {
+                    if (char === '"') {
+                        if (nextChar === '"') {
+                            celdaActual += '"';
+                            i++;
+                        } else {
+                            dentroComillas = false;
+                        }
+                    } else {
+                        celdaActual += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        dentroComillas = true;
+                    } else if (char === ',') {
+                        filaActual.push(celdaActual.trim());
+                        celdaActual = '';
+                    } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
+                        filaActual.push(celdaActual.trim());
+                        filas.push(filaActual);
+                        filaActual = [];
+                        celdaActual = '';
+                        if (char === '\r') i++;
+                    } else {
+                        celdaActual += char;
+                    }
+                }
+            }
+            if (celdaActual.trim() || filaActual.length > 0) {
+                filaActual.push(celdaActual.trim());
+                filas.push(filaActual);
+            }
+            return filas.filter(fila => fila.some(celda => celda !== ''));
+        }
+        
+        function obtenerListaExcursiones(excursionesRaw) {
+            if (!excursionesRaw) return [];
+            let partes = [];
+            if (excursionesRaw.includes('\n')) {
+                partes = excursionesRaw.split('\n');
+            } else if (excursionesRaw.includes(' | ')) {
+                partes = excursionesRaw.split(' | ');
+            } else if (excursionesRaw.includes(', ')) {
+                partes = excursionesRaw.split(', ');
+            } else {
+                partes = [excursionesRaw];
+            }
+            return partes.map(p => p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(p => p);
+        }
+        
+        async function cargarClientes() {
+            const tbody = document.getElementById('tablaClientes');
+            const totalSpan = document.getElementById('totalClientesSpan');
+            const totalNum = document.getElementById('totalClientes');
+            
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr';
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
-@@ -691,7 +710,7 @@
-
+                const filas = parseCSV(csvText);
+                if (filas.length < 2) throw new Error('No hay datos');
+                
+                const clientesMap = new Map();
+                const reservasCount = new Map();
+                let clienteId = 1;
+                
+                for (let i = 1; i < filas.length; i++) {
+                    const fila = filas[i];
+                    if (fila.length < 3 || !fila[0]) continue;
+                    
+                    const email = fila[4] || '';
+                    if (!email) continue;
+                    
+                    const nombre = fila[2] || '';
+                    const apellido = fila[3] || '';
+                    const telefono = fila[5] || '';
+                    const nombreCompleto = `${nombre} ${apellido}`.trim() || 'Sin nombre';
+                    
+                    reservasCount.set(email, (reservasCount.get(email) || 0) + 1);
+                    
+                    if (!clientesMap.has(email)) {
+                        clientesMap.set(email, {
+                            id: clienteId++,
+                            email: email,
+                            nombre: nombreCompleto,
+                            telefono: telefono
+                        });
+                    }
+                }
+                
+                clientesData = Array.from(clientesMap.values()).map(cliente => ({
+                    ...cliente,
+                    totalReservas: reservasCount.get(cliente.email) || 0
+                }));
+                
+                clientesData.sort((a, b) => a.nombre.localeCompare(b.nombre));
+                clientesFiltrados = [...clientesData];
+                renderizarTabla();
+                
+                if (totalNum) totalNum.textContent = clientesData.length;
+                if (totalSpan) totalSpan.textContent = `${clientesData.length} clientes`;
+                
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</tr`;
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
-
-@@ -703,7 +722,7 @@
+        
+        function renderizarTabla() {
+            const tbody = document.getElementById('tablaClientes');
             if (!tbody) return;
-
+            
             if (clientesFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td</tr';
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td></tr>';
                 return;
             }
-
-@@ -714,15 +733,15 @@
+            
+            function escapeHtml(text) { 
+                if (!text) return ''; 
+                const div = document.createElement('div'); 
+                div.textContent = text; 
                 return div.innerHTML; 
             }
-
-            tbody.innerHTML = clientesFiltrados.map((cliente, index) => `
+            
             tbody.innerHTML = clientesFiltrados.map((cliente) => `
                 <tr>
-                    <td>${cliente.id}</td
-                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td
-                    <td style="font-size:11px">${escapeHtml(cliente.email)}</td
-                    <td>${escapeHtml(cliente.telefono)}</td
-                    <td><span class="badge" style="background:#eef2ff; color:#667eea;">${cliente.totalReservas} reserva(s)</span></td
-                    <td><span class="badge badge-activo">Activo</span></td
-                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td
                     <td>${cliente.id}</td>
                     <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
                     <td style="font-size:12px">${escapeHtml(cliente.email)}</td>
@@ -382,10 +722,33 @@
                 </tr>
             `).join('');
         }
-@@ -861,6 +880,13 @@
-                        <tbody>
-            `;
-
+        
+        function filtrarClientes() {
+            const busqueda = document.getElementById('busquedaCliente');
+            if (!busqueda) return;
+            const texto = busqueda.value.toLowerCase().trim();
+            
+            if (!texto) {
+                clientesFiltrados = [...clientesData];
+            } else {
+                clientesFiltrados = clientesData.filter(c => 
+                    c.nombre.toLowerCase().includes(texto) || 
+                    c.email.toLowerCase().includes(texto) ||
+                    (c.telefono && c.telefono.includes(texto))
+                );
+            }
+            renderizarTabla();
+        }
+        
+        function descargarPDF() {
+            if (clientesFiltrados.length === 0) {
+                alert('⚠️ No hay clientes para exportar.');
+                return;
+            }
+            
+            const fechaActual = new Date();
+            const fechaFormateada = `${fechaActual.getDate().toString().padStart(2,'0')}/${(fechaActual.getMonth()+1).toString().padStart(2,'0')}/${fechaActual.getFullYear()} ${fechaActual.getHours().toString().padStart(2,'0')}:${fechaActual.getMinutes().toString().padStart(2,'0')}`;
+            
             function escapeHtml(text) { 
                 if (!text) return ''; 
                 const div = document.createElement('div'); 
@@ -393,33 +756,242 @@
                 return div.innerHTML; 
             }
             
-            // Agregar filas de clientes filtrados
+            let filasTabla = '';
             for (const cliente of clientesFiltrados) {
-                tablaHtml += `
-@@ -1014,28 +1040,21 @@
-            if (modal) modal.remove();
-        }
-
-        function escapeHtml(text) { 
-            if (!text) return ''; 
-            const div = document.createElement('div'); 
-            div.textContent = text; 
-            return div.innerHTML; 
+                filasTabla += `
+                    <tr>
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.nombre)}</td>
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.email)}</td>
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.telefono || 'No registrado')}</td>
+                    </tr>
+                `;
+            }
+            
+            const contenidoPDF = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Lista de Clientes - Aventura Total</title>
+                    <style>
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            padding: 20px;
+                            margin: 0;
+                            background: white;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 25px;
+                            border-bottom: 2px solid #667eea;
+                            padding-bottom: 15px;
+                        }
+                        .logo {
+                            font-size: 40px;
+                            margin-bottom: 8px;
+                        }
+                        h1 {
+                            color: #1a1a2e;
+                            font-size: 20px;
+                            margin-bottom: 5px;
+                        }
+                        .subtitulo {
+                            color: #666;
+                            font-size: 11px;
+                        }
+                        .fecha {
+                            text-align: right;
+                            font-size: 9px;
+                            color: #999;
+                            margin-bottom: 15px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 15px;
+                        }
+                        th {
+                            background: #667eea;
+                            color: white;
+                            padding: 10px 8px;
+                            text-align: left;
+                            font-size: 11px;
+                            font-weight: 600;
+                        }
+                        td {
+                            padding: 8px;
+                            border-bottom: 1px solid #e0e0e0;
+                            font-size: 10px;
+                            color: #333;
+                        }
+                        .total-container {
+                            margin-top: 20px;
+                            text-align: right;
+                            font-size: 11px;
+                            font-weight: bold;
+                            color: #667eea;
+                            border-top: 1px solid #e0e0e0;
+                            padding-top: 12px;
+                        }
+                        .footer {
+                            margin-top: 25px;
+                            text-align: center;
+                            font-size: 9px;
+                            color: #999;
+                            border-top: 1px solid #e0e0e0;
+                            padding-top: 15px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="logo">🏔️</div>
+                        <h1>Aventura Total - Lista de Clientes</h1>
+                        <div class="subtitulo">Reporte generado desde el sistema CRM</div>
+                    </div>
+                    <div class="fecha">📅 Generado: ${fechaFormateada}</div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NOMBRE</th>
+                                <th>EMAIL</th>
+                                <th>TELÉFONO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filasTabla}
+                        </tbody>
+                    </table>
+                    
+                    <div class="total-container">
+                        Total de clientes: ${clientesFiltrados.length}
+                    </div>
+                    
+                    <div class="footer">
+                        Aventura Total - CRM | Generado automáticamente
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: `clientes_aventura_total_${fechaActual.getFullYear()}-${(fechaActual.getMonth()+1).toString().padStart(2,'0')}-${fechaActual.getDate().toString().padStart(2,'0')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+            
+            html2pdf().set(opt).from(contenidoPDF).save();
         }
         
-        // ==================================================
-        // INICIALIZAR
-        // ==================================================
+        async function verReservasCliente(email) {
+            try {
+                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                const csvText = await response.text();
+                const filas = parseCSV(csvText);
+                
+                const reservas = [];
+                for (let i = 1; i < filas.length; i++) {
+                    const fila = filas[i];
+                    if (fila.length < 3 || !fila[0]) continue;
+                    
+                    const emailFila = fila[4] || '';
+                    if (emailFila.toLowerCase() !== email.toLowerCase()) continue;
+                    
+                    const id = fila[1] || `R-${i}`;
+                    const timestamp = fila[0] || '';
+                    let fecha = '';
+                    if (timestamp) {
+                        const fechaObj = new Date(timestamp);
+                        if (!isNaN(fechaObj.getTime())) {
+                            fecha = `${fechaObj.getDate().toString().padStart(2,'0')}/${(fechaObj.getMonth()+1).toString().padStart(2,'0')}/${fechaObj.getFullYear()}`;
+                        }
+                    }
+                    
+                    const excursionesRaw = fila[8] || '';
+                    const excursionesLista = obtenerListaExcursiones(excursionesRaw);
+                    
+                    reservas.push({ id: id, fecha: fecha || 'Sin fecha', excursiones: excursionesLista });
+                }
+                
+                function escapeHtml(text) { 
+                    if (!text) return ''; 
+                    const div = document.createElement('div'); 
+                    div.textContent = text; 
+                    return div.innerHTML; 
+                }
+                
+                let reservasHtml = '';
+                if (reservas.length === 0) {
+                    reservasHtml = '<p style="text-align:center;padding:20px;">📭 No hay reservas para este cliente</p>';
+                } else {
+                    reservas.forEach(r => {
+                        let excursionesListHtml = '';
+                        if (r.excursiones && r.excursiones.length > 0) {
+                            excursionesListHtml = '<ul class="reserva-excursiones-lista" style="margin:0; padding-left:20px;">';
+                            r.excursiones.forEach(exc => {
+                                excursionesListHtml += `<li style="margin-bottom:4px;">${escapeHtml(exc)}</li>`;
+                            });
+                            excursionesListHtml += '</ul>';
+                        } else {
+                            excursionesListHtml = '<p style="color:#999; font-size:12px;">Sin excursiones específicas</p>';
+                        }
+                        
+                        reservasHtml += `
+                            <div class="reserva-item" style="background:#f8f9fa; border-radius:12px; padding:15px; margin-bottom:15px; border-left:4px solid #667eea;">
+                                <div class="reserva-id" style="font-weight:700; color:#667eea; font-size:14px; margin-bottom:8px;">🆔 Reserva: ${escapeHtml(r.id)}</div>
+                                <div class="reserva-fecha" style="font-size:11px; color:#999; margin-bottom:10px;">📅 ${escapeHtml(r.fecha)}</div>
+                                <div class="reserva-excursiones">
+                                    <div class="reserva-excursiones-title" style="font-size:11px; font-weight:600; color:#666; margin-bottom:5px;">✨ Excursiones seleccionadas:</div>
+                                    ${excursionesListHtml}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                const modalHtml = `
+                    <div id="modalReservas" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:2000;">
+                        <div style="background:white; border-radius:20px; max-width:550px; width:90%; max-height:85vh; overflow-y:auto; padding:25px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #eef2ff; padding-bottom:12px;">
+                                <h3 style="color:#667eea;">📋 Reservas del cliente</h3>
+                                <button onclick="cerrarModalReservas()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">✕</button>
+                            </div>
+                            <p><strong>📧 Email:</strong> ${escapeHtml(email)}</p>
+                            <p><strong>📊 Total reservas:</strong> ${reservas.length}</p>
+                            <hr style="margin:15px 0;">
+                            <div style="max-height: 50vh; overflow-y: auto;">
+                                ${reservasHtml}
+                            </div>
+                            <button onclick="cerrarModalReservas()" style="width:100%; padding:12px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border:none; border-radius:12px; margin-top:20px; cursor:pointer; font-weight:600;">Cerrar</button>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+            } catch (error) {
+                console.error(error);
+                alert('Error al cargar reservas: ' + error.message);
+            }
+        }
+        
+        function cerrarModalReservas() {
+            const modal = document.getElementById('modalReservas');
+            if (modal) modal.remove();
+        }
+        
         window.filtrarClientes = filtrarClientes;
         window.cargarClientes = cargarClientes;
         window.verReservasCliente = verReservasCliente;
         window.cerrarModalReservas = cerrarModalReservas;
         window.logout = logout;
         window.descargarPDF = descargarPDF;
-
+        
         const busquedaInput = document.getElementById('busquedaCliente');
         if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarClientes(); });
-
+        
         cargarClientes();
         setInterval(cargarClientes, 60000);
     </script>
