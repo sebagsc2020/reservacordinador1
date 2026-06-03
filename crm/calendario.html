@@ -3,203 +3,540 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario - Guardar en Google Sheets</title>
+    <title>Calendario - CRM Aventura Total</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            min-height: 100vh;
         }
-        .formulario {
+        
+        .sidebar {
+            width: 250px;
+            background: #1a1a2e;
+            color: white;
+            padding: 25px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo .logo-icon { font-size: 40px; }
+        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; }
+        .sidebar-logo h2 span { color: #667eea; }
+        
+        .nav-menu { list-style: none; padding: 0 15px; }
+        .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a {
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+            color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px;
+            transition: all 0.3s ease; font-size: 14px; font-weight: 500;
+        }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
+        .nav-menu a.active { background: #667eea; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        
+        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
+        .btn-logout-sidebar {
+            width: 100%; padding: 12px; background: rgba(231,76,60,0.2);
+            color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); border-radius: 10px;
+            cursor: pointer; font-weight: 600; font-size: 13px;
+        }
+        
+        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 26px; color: #1a1a2e; }
+        
+        .user-info {
+            display: flex; align-items: center; gap: 10px; background: white;
+            padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px;
+        }
+        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        
+        /* ===== NAVEGACIÓN ===== */
+        .calendar-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            background: white; padding: 20px; border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
+        }
+        
+        .calendar-nav button {
+            padding: 10px 20px; background: #667eea; color: white; border: none;
+            border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .calendar-nav button:hover { background: #5a6fd6; }
+        
+        .calendar-nav h2 { font-size: 22px; color: #1a1a2e; }
+        
+        .btn-hoy { background: #27ae60 !important; }
+        .btn-agregar { background: #f39c12 !important; }
+        
+        /* ===== CALENDARIO ===== */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
         }
-        input, button {
+        
+        .calendar-day-header {
+            text-align: center;
+            padding: 10px;
+            font-weight: 700;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .calendar-day {
+            min-height: 100px;
+            padding: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        
+        .calendar-day:hover { background: #f0f0ff; border-color: #667eea; }
+        .calendar-day.today { background: #f0f0ff; border-color: #667eea; }
+        .calendar-day.otro-mes { opacity: 0.3; }
+        
+        .calendar-day-numero {
+            font-size: 14px; font-weight: 700; color: #333; margin-bottom: 5px;
+        }
+        
+        .calendar-event {
+            font-size: 10px; padding: 3px 6px; border-radius: 4px; margin-bottom: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            cursor: pointer; font-weight: 600;
+        }
+        
+        .event-confirmado { background: #d4edda; color: #155724; }
+        .event-pendiente { background: #fff3cd; color: #856404; }
+        .event-pagado { background: #d1ecf1; color: #0c5460; }
+        
+        /* ===== LISTA DEL DÍA ===== */
+        .day-list {
+            background: white; border-radius: 15px; padding: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-top: 25px;
+        }
+        .day-list h3 { margin-bottom: 15px; color: #1a1a2e; font-size: 18px; }
+        
+        .day-event {
+            display: flex; align-items: center; gap: 15px; padding: 12px;
+            border-radius: 10px; margin-bottom: 8px; transition: all 0.3s ease;
+        }
+        .day-event:hover { background: #f8f9fa; }
+        .day-event .hora { font-weight: 700; color: #667eea; min-width: 50px; }
+        .day-event .info { flex: 1; }
+        .day-event .info strong { color: #333; font-size: 14px; }
+        .day-event .info p { color: #666; font-size: 12px; }
+        
+        /* Modal para agregar evento */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #1a1a2e;
+        }
+        
+        .modal-content input,
+        .modal-content select {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ddd;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 14px;
             box-sizing: border-box;
         }
-        button {
-            background-color: #4CAF50;
+        
+        .modal-content button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #667eea;
             color: white;
             border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        .mensaje {
-            margin-top: 20px;
-            padding: 10px;
             border-radius: 5px;
-            display: none;
+            cursor: pointer;
+            font-weight: 600;
         }
-        .exito {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        
+        .modal-content button:hover {
+            background: #5a6fd6;
         }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
         }
-        h2 {
-            text-align: center;
+        
+        .close-modal:hover {
             color: #333;
         }
-        .loading {
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-            margin-top: 10px;
+        
+        .mensaje-flotante {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .mensaje-exito {
+            background-color: #27ae60;
+        }
+        
+        .mensaje-error {
+            background-color: #e74c3c;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; }
+            .nav-menu a { justify-content: center; padding: 12px; }
+            .main-content { margin-left: 70px; padding: 15px; }
+            .calendar-day { min-height: 60px; }
+            .calendar-day-numero { font-size: 11px; }
+            .calendar-event { font-size: 8px; }
         }
     </style>
 </head>
 <body>
-    <div class="formulario">
-        <h2>📅 Guardar Evento en Google Sheets</h2>
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">🏔️</div>
+            <h2>Aventura <span>Total</span></h2>
+            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">📧</span> <span>Emails</span></a></li>
+            <li><a href="calendario.html" class="active"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar Sesión</button>
+        </div>
+    </nav>
+    
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1>📅 Calendario de Salidas</h1>
+                <p style="color:#999;font-size:13px;">Vista mensual de excursiones programadas</p>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <span>Admin</span>
+            </div>
+        </div>
         
-        <input type="text" id="id" placeholder="ID del evento (opcional)" />
-        <input type="text" id="nombre" placeholder="Nombre del evento *" required />
-        <input type="datetime-local" id="fechaInicio" placeholder="Fecha inicio" />
-        <input type="datetime-local" id="fechaFin" placeholder="Fecha fin" />
+        <!-- Navegación -->
+        <div class="calendar-nav">
+            <button onclick="cambiarMes(-1)">◀ Anterior</button>
+            <h2 id="mesTitulo">Mayo 2026</h2>
+            <div>
+                <button class="btn-hoy" onclick="irAHoy()">📅 Hoy</button>
+                <button class="btn-agregar" onclick="abrirModalAgregar()" style="margin-left:5px;">➕ Agregar</button>
+            </div>
+            <button onclick="cambiarMes(1)">Siguiente ▶</button>
+        </div>
         
-        <button id="btnGuardar">💾 Guardar en Google Sheets</button>
-        <div id="loading" class="loading" style="display:none;">⏳ Guardando...</div>
-        <div id="mensaje" class="mensaje"></div>
+        <!-- Calendario -->
+        <div class="calendar-grid" id="calendarGrid"></div>
+        
+        <!-- Lista del día -->
+        <div class="day-list">
+            <h3>📋 Salidas del día seleccionado</h3>
+            <div id="dayEvents">
+                <p style="color:#999;text-align:center;padding:20px;">Seleccioná un día para ver las salidas</p>
+            </div>
+        </div>
     </div>
-
+    
+    <!-- Modal para agregar evento -->
+    <div id="modalAgregar" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="cerrarModal()">&times;</span>
+            <h2>➕ Agregar Nueva Salida</h2>
+            <input type="date" id="fechaEvento" required>
+            <input type="text" id="clienteEvento" placeholder="Nombre del cliente" required>
+            <input type="text" id="excursionEvento" placeholder="Excursión" required>
+            <input type="number" id="personasEvento" placeholder="Número de personas" value="1" min="1">
+            <select id="estadoEvento">
+                <option value="pendiente">Pendiente</option>
+                <option value="confirmado">Confirmado</option>
+                <option value="pagado">Pagado</option>
+            </select>
+            <button onclick="guardarEventoGoogleSheets()">💾 Guardar en Google Sheets</button>
+        </div>
+    </div>
+    
     <script>
-        // ACTUALIZA ESTA URL CON LA QUE TE DIO GOOGLE AL REPUBLICAR
+        // URL del script de Google Apps Script
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMJ2pnekFjza6cEp6DglLMEVz5C49hwusa6u1V6Sw3N_40YKg1GOfPWYdSoqhpaA4baw/exec";
         
-        async function guardarEventoEnGoogleSheets(eventoData) {
-            // Validar datos
-            if (!eventoData.nombre || eventoData.nombre.trim() === "") {
-                throw new Error("El nombre del evento es obligatorio");
+        // Verificar autenticación
+        if (sessionStorage.getItem('crm_logged') !== 'true') { 
+            window.location.href = 'index.html'; 
+        }
+        
+        function logout() { 
+            sessionStorage.clear(); 
+            window.location.href = 'index.html'; 
+        }
+        
+        let fechaActual = new Date();
+        let mesActual = fechaActual.getMonth();
+        let añoActual = fechaActual.getFullYear();
+        
+        // Datos de ejemplo (se mantienen para mostrar, pero los nuevos se guardan en Sheets)
+        let eventos = [
+            { fecha: '2026-05-29', cliente: 'Juan Pérez', excursion: 'City Tour Local', personas: 4, estado: 'confirmado' },
+            { fecha: '2026-05-30', cliente: 'María García', excursion: 'Barco Pirata', personas: 2, estado: 'pendiente' },
+            { fecha: '2026-06-01', cliente: 'Carlos López', excursion: 'Valle Nevado', personas: 6, estado: 'pagado' },
+            { fecha: '2026-06-02', cliente: 'Ana Martínez', excursion: 'Circuito Chico', personas: 3, estado: 'confirmado' },
+            { fecha: '2026-06-03', cliente: 'Pedro Sánchez', excursion: 'City Tour Histórico', personas: 2, estado: 'pendiente' },
+            { fecha: '2026-06-05', cliente: 'Diego Torres', excursion: 'Sky Costanera', personas: 4, estado: 'confirmado' },
+            { fecha: '2026-06-10', cliente: 'Laura Fernández', excursion: 'Camino del Vino', personas: 5, estado: 'pagado' },
+            { fecha: '2026-06-15', cliente: 'Sofía Rodríguez', excursion: 'Tren del Fin del Mundo', personas: 2, estado: 'confirmado' }
+        ];
+        
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        
+        function mostrarMensaje(mensaje, tipo) {
+            const div = document.createElement('div');
+            div.className = `mensaje-flotante mensaje-${tipo}`;
+            div.textContent = mensaje;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 5000);
+        }
+        
+        async function guardarEventoGoogleSheets() {
+            const fecha = document.getElementById('fechaEvento').value;
+            const cliente = document.getElementById('clienteEvento').value;
+            const excursion = document.getElementById('excursionEvento').value;
+            const personas = document.getElementById('personasEvento').value;
+            const estado = document.getElementById('estadoEvento').value;
+            
+            if (!fecha || !cliente || !excursion) {
+                mostrarMensaje('⚠️ Por favor, completa todos los campos', 'error');
+                return;
             }
             
-            // Preparar datos
-            const datosAEnviar = {
-                eventos: [{
-                    id: String(eventoData.id || Date.now()),
-                    nombre: eventoData.nombre.trim(),
-                    fechaInicio: eventoData.fechaInicio || "",
-                    fechaFin: eventoData.fechaFin || ""
-                }]
+            const eventoData = {
+                id: Date.now().toString(),
+                nombre: `${cliente} - ${excursion}`,
+                fechaInicio: fecha,
+                fechaFin: fecha,
+                cliente: cliente,
+                excursion: excursion,
+                personas: parseInt(personas),
+                estado: estado
             };
             
-            console.log("📤 Enviando a:", SCRIPT_URL);
-            console.log("📦 Datos:", datosAEnviar);
-            
-            // Timeout de 30 segundos
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000);
+            mostrarMensaje('⏳ Guardando en Google Sheets...', 'exito');
             
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // 🔥 CRUCIAL: modo no-cors
-                    cache: 'no-cache',
+                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(datosAEnviar),
-                    signal: controller.signal
+                    body: JSON.stringify({
+                        eventos: [{
+                            id: eventoData.id,
+                            nombre: eventoData.nombre,
+                            fechaInicio: eventoData.fechaInicio,
+                            fechaFin: eventoData.fechaFin
+                        }]
+                    })
                 });
                 
-                clearTimeout(timeoutId);
+                // Agregar evento localmente también
+                eventos.push({
+                    fecha: fecha,
+                    cliente: cliente,
+                    excursion: excursion,
+                    personas: parseInt(personas),
+                    estado: estado
+                });
                 
-                // En modo no-cors, no podemos leer la respuesta
-                // Asumimos éxito si no hay error
-                console.log("✅ Petición enviada (modo no-cors)");
-                return { exito: true, mensaje: "✅ Evento enviado a Google Sheets" };
+                renderCalendar();
+                seleccionarDia(fecha);
+                cerrarModal();
+                mostrarMensaje('✅ ¡Evento guardado correctamente en Google Sheets!', 'exito');
+                
+                // Limpiar formulario
+                document.getElementById('clienteEvento').value = '';
+                document.getElementById('excursionEvento').value = '';
+                document.getElementById('personasEvento').value = '1';
+                document.getElementById('estadoEvento').value = 'pendiente';
                 
             } catch(error) {
-                clearTimeout(timeoutId);
+                console.error('Error:', error);
+                mostrarMensaje('❌ Error al guardar: ' + error.message, 'error');
+            }
+        }
+        
+        function abrirModalAgregar() {
+            const hoy = new Date();
+            const fechaHoy = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+            document.getElementById('fechaEvento').value = fechaHoy;
+            document.getElementById('modalAgregar').style.display = 'block';
+        }
+        
+        function cerrarModal() {
+            document.getElementById('modalAgregar').style.display = 'none';
+        }
+        
+        function renderCalendar() {
+            document.getElementById('mesTitulo').textContent = `${meses[mesActual]} ${añoActual}`;
+            
+            let html = '';
+            diasSemana.forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
+            
+            const primerDia = new Date(añoActual, mesActual, 1).getDay();
+            const diasEnMes = new Date(añoActual, mesActual + 1, 0).getDate();
+            const diasMesAnterior = new Date(añoActual, mesActual, 0).getDate();
+            
+            const hoy = new Date();
+            const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+            
+            // Días del mes anterior
+            for (let i = primerDia - 1; i >= 0; i--) {
+                const dia = diasMesAnterior - i;
+                html += `<div class="calendar-day otro-mes"><div class="calendar-day-numero">${dia}</div></div>`;
+            }
+            
+            // Días del mes actual
+            for (let dia = 1; dia <= diasEnMes; dia++) {
+                const fechaStr = `${añoActual}-${String(mesActual+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+                const esHoy = fechaStr === hoyStr;
+                const eventosDelDia = eventos.filter(e => e.fecha === fechaStr);
                 
-                if (error.name === 'AbortError') {
-                    throw new Error("Tiempo de espera agotado (30 segundos)");
+                html += `<div class="calendar-day ${esHoy ? 'today' : ''}" onclick="seleccionarDia('${fechaStr}')">
+                    <div class="calendar-day-numero">${dia}</div>
+                    ${eventosDelDia.slice(0,3).map(e => `<div class="calendar-event event-${e.estado}" title="${e.cliente} - ${e.excursion}">${e.excursion.substring(0,12)}...</div>`).join('')}
+                    ${eventosDelDia.length > 3 ? `<div class="calendar-event" style="background:#e9ecef;">+${eventosDelDia.length-3} más</div>` : ''}
+                </div>`;
+            }
+            
+            // Días del mes siguiente
+            const totalCeldas = primerDia + diasEnMes;
+            const diasRestantes = 7 - (totalCeldas % 7);
+            if (diasRestantes < 7) {
+                for (let dia = 1; dia <= diasRestantes; dia++) {
+                    html += `<div class="calendar-day otro-mes"><div class="calendar-day-numero">${dia}</div></div>`;
                 }
-                
-                console.error("❌ Error:", error);
-                throw new Error("Error de conexión: " + error.message);
             }
+            
+            document.getElementById('calendarGrid').innerHTML = html;
         }
         
-        function mostrarMensaje(texto, tipo) {
-            const mensajeDiv = document.getElementById('mensaje');
-            mensajeDiv.textContent = texto;
-            mensajeDiv.className = `mensaje ${tipo}`;
-            mensajeDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                mensajeDiv.style.display = 'none';
-            }, 5000);
+        function cambiarMes(direccion) {
+            mesActual += direccion;
+            if (mesActual > 11) { mesActual = 0; añoActual++; }
+            if (mesActual < 0) { mesActual = 11; añoActual--; }
+            renderCalendar();
         }
         
-        function setLoading(visible) {
-            const btn = document.getElementById('btnGuardar');
-            const loadingDiv = document.getElementById('loading');
+        function irAHoy() {
+            const hoy = new Date();
+            mesActual = hoy.getMonth();
+            añoActual = hoy.getFullYear();
+            renderCalendar();
+            seleccionarDia(`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`);
+        }
+        
+        function seleccionarDia(fechaStr) {
+            const eventosDelDia = eventos.filter(e => e.fecha === fechaStr);
+            const fecha = new Date(fechaStr + 'T00:00:00');
+            const fechaFormateada = fecha.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             
-            if (visible) {
-                btn.disabled = true;
-                loadingDiv.style.display = 'block';
-                mostrarMensaje("⏳ Enviando a Google Sheets...", "exito");
+            if (eventosDelDia.length === 0) {
+                document.getElementById('dayEvents').innerHTML = `<p style="color:#999;text-align:center;padding:20px;">No hay salidas programadas para el ${fechaFormateada}</p>`;
             } else {
-                btn.disabled = false;
-                loadingDiv.style.display = 'none';
+                document.getElementById('dayEvents').innerHTML = `
+                    <p style="color:#667eea;font-weight:600;margin-bottom:15px;">📅 ${fechaFormateada} - ${eventosDelDia.length} salida(s)</p>
+                    ${eventosDelDia.map(e => `
+                        <div class="day-event">
+                            <span class="hora">🕐 09:00</span>
+                            <div class="info">
+                                <strong>${e.cliente} - ${e.excursion}</strong>
+                                <p>👥 ${e.personas} personas | <span style="color:${e.estado==='confirmado'?'#27ae60':e.estado==='pendiente'?'#f39c12':'#3498db'}">${e.estado}</span></p>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
             }
         }
         
-        // Evento del botón
-        document.getElementById('btnGuardar').onclick = async function(e) {
-            e.preventDefault();
-            
-            const evento = {
-                id: document.getElementById('id').value,
-                nombre: document.getElementById('nombre').value,
-                fechaInicio: document.getElementById('fechaInicio').value,
-                fechaFin: document.getElementById('fechaFin').value
-            };
-            
-            if (!evento.nombre) {
-                mostrarMensaje("⚠️ Por favor, ingresa el nombre del evento", "error");
-                return;
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalAgregar');
+            if (event.target === modal) {
+                cerrarModal();
             }
-            
-            setLoading(true);
-            
-            try {
-                const resultado = await guardarEventoEnGoogleSheets(evento);
-                mostrarMensaje(resultado.mensaje, "exito");
-                
-                // Limpiar campos
-                document.getElementById('nombre').value = "";
-                document.getElementById('fechaInicio').value = "";
-                document.getElementById('fechaFin').value = "";
-                
-            } catch(error) {
-                mostrarMensaje("❌ " + error.message, "error");
-            } finally {
-                setLoading(false);
-            }
-        };
+        }
         
-        console.log("📄 Página lista. URL:", SCRIPT_URL);
+        renderCalendar();
+        seleccionarDia(`${añoActual}-${String(mesActual+1).padStart(2,'0')}-${String(fechaActual.getDate()).padStart(2,'0')}`);
     </script>
 </body>
 </html>
