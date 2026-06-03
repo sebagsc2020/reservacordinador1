@@ -509,7 +509,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaClientes">
-                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>
+                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>
                     </tbody>
                 </table>
             </div>
@@ -641,7 +641,7 @@
             
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -690,7 +690,7 @@
                 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</tr`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
@@ -699,7 +699,7 @@
             if (!tbody) return;
             
             if (clientesFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td</tr';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td></tr>';
                 return;
             }
             
@@ -712,13 +712,13 @@
             
             tbody.innerHTML = clientesFiltrados.map((cliente) => `
                 <tr>
-                    <td>${cliente.id}</td
-                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td
-                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td
-                    <td>${escapeHtml(cliente.telefono || 'No registrado')}</td
-                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td
-                    <td><span class="badge badge-activo">Activo</span></td
-                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td
+                    <td>${cliente.id}</td>
+                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
+                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td>
+                    <td>${escapeHtml(cliente.telefono || 'No registrado')}</td>
+                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td>
+                    <td><span class="badge badge-activo">Activo</span></td>
+                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td>
                 </tr>
             `).join('');
         }
@@ -760,9 +760,9 @@
             for (const cliente of clientesFiltrados) {
                 filasTabla += `
                     <tr>
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.nombre)}</td
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.email)}</td
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.telefono || 'No registrado')}</td
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.nombre)}</td>
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.email)}</td>
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.telefono || 'No registrado')}</td>
                     </tr>
                 `;
             }
@@ -930,7 +930,7 @@
                     reservas.forEach(r => {
                         let excursionesListHtml = '';
                         if (r.excursiones && r.excursiones.length > 0) {
-                            excursionesListHtml = '<ul class="reserva-excursiones-lista" style="margin:0; padding-left:20px;">';
+                            excursionesListHtml = '<ul style="margin:0; padding-left:20px;">';
                             r.excursiones.forEach(exc => {
                                 excursionesListHtml += `<li style="margin-bottom:4px;">${escapeHtml(exc)}</li>`;
                             });
@@ -940,11 +940,11 @@
                         }
                         
                         reservasHtml += `
-                            <div class="reserva-item" style="background:#f8f9fa; border-radius:12px; padding:15px; margin-bottom:15px; border-left:4px solid #667eea;">
-                                <div class="reserva-id" style="font-weight:700; color:#667eea; font-size:14px; margin-bottom:8px;">🆔 Reserva: ${escapeHtml(r.id)}</div>
-                                <div class="reserva-fecha" style="font-size:11px; color:#999; margin-bottom:10px;">📅 ${escapeHtml(r.fecha)}</div>
-                                <div class="reserva-excursiones">
-                                    <div class="reserva-excursiones-title" style="font-size:11px; font-weight:600; color:#666; margin-bottom:5px;">✨ Excursiones seleccionadas:</div>
+                            <div style="background:#f8f9fa; border-radius:12px; padding:15px; margin-bottom:15px; border-left:4px solid #667eea;">
+                                <div style="font-weight:700; color:#667eea; font-size:14px; margin-bottom:8px;">🆔 Reserva: ${escapeHtml(r.id)}</div>
+                                <div style="font-size:11px; color:#999; margin-bottom:10px;">📅 ${escapeHtml(r.fecha)}</div>
+                                <div>
+                                    <div style="font-size:11px; font-weight:600; color:#666; margin-bottom:5px;">✨ Excursiones seleccionadas:</div>
                                     ${excursionesListHtml}
                                 </div>
                             </div>
