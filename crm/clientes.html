@@ -242,6 +242,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 800px;
             min-width: 700px;
         }
         th {
@@ -249,6 +250,7 @@
             padding: 12px;
             background: #f8f9fa;
             color: #666;
+            font-size: 11px;
             font-size: 12px;
             text-transform: uppercase;
             font-weight: 600;
@@ -257,16 +259,16 @@
         td {
             padding: 12px;
             border-bottom: 1px solid #f0f0f0;
+            font-size: 12px;
             font-size: 13px;
             color: #333;
         }
         tr:hover td {
-            background: #f8f9ff;
-        }
-
+@@ -266,24 +267,29 @@
         .badge {
             padding: 4px 10px;
             border-radius: 20px;
+            font-size: 10px;
             font-size: 11px;
             font-weight: 700;
             display: inline-block;
@@ -281,146 +283,26 @@
         }
 
         .btn-ver {
+            padding: 5px 12px;
             padding: 6px 14px;
             background: #667eea;
             color: white;
             border: none;
+            border-radius: 5px;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 11px;
             font-size: 12px;
             transition: background 0.2s;
             font-weight: 500;
         }
         .btn-ver:active {
             transform: scale(0.96);
-        }
-        .btn-ver:hover {
-            background: #5a67d8;
-        }
-
-        /* Estilos para el modal de reservas */
-        .reserva-item {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid #667eea;
-        }
-        .reserva-id {
-            font-weight: 700;
-            color: #667eea;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-        .reserva-fecha {
-            font-size: 11px;
-            color: #999;
-            margin-bottom: 10px;
-        }
-        .reserva-excursiones {
-            margin-top: 8px;
-        }
-        .reserva-excursiones-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        .reserva-excursiones-lista {
-            margin: 0;
-            padding-left: 20px;
-        }
-        .reserva-excursiones-lista li {
-            font-size: 12px;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        /* ===== SCROLL SIDEBAR ===== */
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar::-webkit-scrollbar-track {
-            background: #1a1a2e;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
-        }
-
-        /* ===== DESKTOP ===== */
-        @media (min-width: 769px) {
-            .menu-btn {
-                display: none !important;
-            }
-
-            .sidebar {
-                transform: translateX(0) !important;
-                width: 250px;
-            }
-
-            .menu-overlay {
-                display: none !important;
-            }
-
-            .main-content {
-                margin-left: 250px;
-                padding: 30px;
-            }
-        }
-
-        /* ===== MÓVIL ===== */
-        @media (max-width: 768px) {
-            .menu-btn {
-                display: flex;
-            }
-
-            .main-content {
-                padding: 60px 12px 20px;
-            }
-
-            .header h1 {
-                font-size: 20px;
-            }
-
-            .user-info {
-                padding: 5px 12px;
-                font-size: 12px;
-            }
-
-            .user-avatar {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
-
-            .stats-number {
-                font-size: 32px;
-            }
-
-            .filters-bar {
-                flex-direction: column;
-            }
-
-            .filter-input {
-                width: 100%;
-            }
-
-            .btn-filtrar, .btn-recargar, .btn-pdf {
-                width: 100%;
-                text-align: center;
-            }
-
-            .table-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            th, td {
+@@ -414,6 +420,11 @@
                 padding: 8px 6px;
                 font-size: 11px;
             }
-
+            
             .btn-ver {
                 padding: 4px 10px;
                 font-size: 10px;
@@ -428,76 +310,11 @@
         }
 
         @media (max-width: 480px) {
-            .stats-number {
-                font-size: 28px;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Botón menú hamburguesa (solo móvil) -->
-    <button class="menu-btn" id="menuBtn">
-        <span>☰</span>
-    </button>
-
-    <!-- Overlay para cerrar menú -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🏔️</div>
-            <h2>Aventura <span>Total</span></h2>
-            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="clientes.html" class="active"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
-            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
-            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
-            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
-            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
-        </div>
-    </nav>
-
-    <div class="main-content">
-        <div class="header">
-            <div><h1>👥 Clientes</h1></div>
-            <div class="user-info">
-                <div class="user-avatar">A</div>
-                <span>Admin</span>
-            </div>
-        </div>
-
-        <div class="stats-card">
-            <div class="stats-number" id="totalClientes">0</div>
-            <div class="stats-label">Clientes Registrados</div>
-        </div>
-
-        <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono..." id="busquedaCliente">
-            <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Filtrar</button>
-            <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
-            <button class="btn-pdf" onclick="descargarPDF()">📄 Descargar PDF</button>
-        </div>
-
-        <div class="table-container">
-            <div class="table-header">
-                <h3>📋 Lista de Clientes</h3>
-                <span id="totalClientesSpan" style="font-size:12px;color:#666;">0 clientes</span>
-            </div>
+@@ -487,10 +498,18 @@
             <div class="table-wrapper">
                 <table id="clientesTable">
                     <thead>
+                        <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Reservas</th><th>Estado</th><th>Acciones</th></tr>
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
@@ -509,97 +326,30 @@
                         </tr>
                     </thead>
                     <tbody id="tablaClientes">
+                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td
                         <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+@@ -640,7 +659,7 @@
 
-    <!-- Incluir librería html2pdf -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+            if (!tbody) return;
+            try {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
+                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const csvText = await response.text();
+@@ -691,7 +710,7 @@
 
-    <script>
-        // ==================================================
-@@ -547,7 +547,6 @@
-            menuOverlay.addEventListener('click', closeMenu);
-        }
-
-        // Cerrar menú al hacer clic en un enlace
-        document.querySelectorAll('.nav-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-@@ -563,9 +562,6 @@
-        const SHEET_NAME = 'Hoja 1';
-        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
-
-        // ==================================================
-        // VERIFICAR AUTENTICACIÓN
-        // ==================================================
-        if (sessionStorage.getItem('crm_logged') !== 'true') { 
-            window.location.href = 'index.html'; 
-        }
-@@ -575,15 +571,9 @@
-            window.location.href = 'index.html'; 
-        }
-
-        // ==================================================
-        // VARIABLES GLOBALES
-        // ==================================================
-        let clientesData = [];
-        let clientesFiltrados = [];
-
-        // ==================================================
-        // PARSEAR CSV
-        // ==================================================
-        function parseCSV(csvText) {
-            const filas = [];
-            let filaActual = [];
-@@ -629,12 +619,8 @@
-            return filas.filter(fila => fila.some(celda => celda !== ''));
-        }
-
-        // ==================================================
-        // FUNCIÓN PARA OBTENER TODAS LAS EXCURSIONES
-        // ==================================================
-        function obtenerListaExcursiones(excursionesRaw) {
-            if (!excursionesRaw) return [];
-            
-            let partes = [];
-            if (excursionesRaw.includes('\n')) {
-                partes = excursionesRaw.split('\n');
-@@ -645,13 +631,9 @@
-            } else {
-                partes = [excursionesRaw];
-            }
-            
-            return partes.map(p => p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(p => p);
-        }
-
-        // ==================================================
-        // CARGAR CLIENTES
-        // ==================================================
-        async function cargarClientes() {
-            const tbody = document.getElementById('tablaClientes');
-            const totalSpan = document.getElementById('totalClientesSpan');
-@@ -706,23 +688,18 @@
-                if (totalNum) totalNum.textContent = clientesData.length;
-                if (totalSpan) totalSpan.textContent = `${clientesData.length} clientes`;
-
-                console.log(`📊 Clientes cargados: ${clientesData.length}`);
-                
             } catch (error) {
                 console.error(error);
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</tr`;
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
 
-        // ==================================================
-        // RENDERIZAR TABLA
-        // ==================================================
-        function renderizarTabla() {
-            const tbody = document.getElementById('tablaClientes');
+@@ -703,7 +722,7 @@
             if (!tbody) return;
 
             if (clientesFiltrados.length === 0) {
@@ -608,15 +358,18 @@
                 return;
             }
 
-@@ -735,20 +712,17 @@
+@@ -714,15 +733,15 @@
+                return div.innerHTML; 
+            }
 
+            tbody.innerHTML = clientesFiltrados.map((cliente, index) => `
             tbody.innerHTML = clientesFiltrados.map((cliente) => `
                 <tr>
                     <td>${cliente.id}</td
                     <td><strong>${escapeHtml(cliente.nombre)}</strong></td
-                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td
-                    <td>${escapeHtml(cliente.telefono || 'No registrado')}</td
-                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td
+                    <td style="font-size:11px">${escapeHtml(cliente.email)}</td
+                    <td>${escapeHtml(cliente.telefono)}</td
+                    <td><span class="badge" style="background:#eef2ff; color:#667eea;">${cliente.totalReservas} reserva(s)</span></td
                     <td><span class="badge badge-activo">Activo</span></td
                     <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td
                     <td>${cliente.id}</td>
@@ -629,280 +382,31 @@
                 </tr>
             `).join('');
         }
+@@ -861,6 +880,13 @@
+                        <tbody>
+            `;
 
-        // ==================================================
-        // FILTRAR CLIENTES
-        // ==================================================
-        function filtrarClientes() {
-            const busqueda = document.getElementById('busquedaCliente');
-            if (!busqueda) return;
-@@ -766,16 +740,12 @@
-            renderizarTabla();
-        }
-
-        // ==================================================
-        // DESCARGAR PDF CON LOS DATOS FILTRADOS (SIN ID, CON TOTAL A LA DERECHA)
-        // ==================================================
-        function descargarPDF() {
-            if (clientesFiltrados.length === 0) {
-                alert('⚠️ No hay clientes para exportar.');
-                return;
-            }
-
-            // Crear contenido HTML para el PDF
-            const fechaActual = new Date();
-            const fechaFormateada = `${fechaActual.getDate().toString().padStart(2,'0')}/${(fechaActual.getMonth()+1).toString().padStart(2,'0')}/${fechaActual.getFullYear()} ${fechaActual.getHours().toString().padStart(2,'0')}:${fechaActual.getMinutes().toString().padStart(2,'0')}`;
-
-@@ -786,21 +756,28 @@
+            function escapeHtml(text) { 
+                if (!text) return ''; 
+                const div = document.createElement('div'); 
+                div.textContent = text; 
                 return div.innerHTML; 
             }
-
-            let tablaHtml = `
-            let filasTabla = '';
-            for (const cliente of clientesFiltrados) {
-                filasTabla += `
-                    <tr>
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.nombre)}</td>
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.email)}</td>
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.telefono || 'No registrado')}</td>
-                    </tr>
-                `;
-            }
             
-            const contenidoPDF = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Lista de Clientes - Aventura Total</title>
-                    <style>
-                        * {
-                            margin: 0;
-                            padding: 0;
-                            box-sizing: border-box;
-                        }
-                        body {
-                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                            padding: 20px;
-                            margin: 0;
-                            background: white;
-                        }
-                        .header {
-@@ -815,7 +792,7 @@
-                        }
-                        h1 {
-                            color: #1a1a2e;
-                            font-size: 22px;
-                            font-size: 20px;
-                            margin-bottom: 5px;
-                        }
-                        .subtitulo {
-@@ -828,18 +805,13 @@
-                            color: #999;
-                            margin-bottom: 15px;
-                        }
-                        .contenido-pdf {
-                            width: 100%;
-                            overflow-x: visible;
-                        }
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-top: 15px;
-                            table-layout: fixed;
-                        }
-                        th {
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            background: #667eea;
-                            color: white;
-                            padding: 10px 8px;
-                            text-align: left;
-@@ -851,15 +823,6 @@
-                            border-bottom: 1px solid #e0e0e0;
-                            font-size: 10px;
-                            color: #333;
-                            word-wrap: break-word;
-                        }
-                        .footer {
-                            margin-top: 25px;
-                            text-align: center;
-                            font-size: 9px;
-                            color: #999;
-                            border-top: 1px solid #e0e0e0;
-                            padding-top: 15px;
-                        }
-                        .total-container {
-                            margin-top: 20px;
-@@ -870,10 +833,14 @@
-                            border-top: 1px solid #e0e0e0;
-                            padding-top: 12px;
-                        }
-                        /* Ajustar anchos de columnas */
-                        .col-nombre { width: 30%; }
-                        .col-email { width: 40%; }
-                        .col-telefono { width: 30%; }
-                        .footer {
-                            margin-top: 25px;
-                            text-align: center;
-                            font-size: 9px;
-                            color: #999;
-                            border-top: 1px solid #e0e0e0;
-                            padding-top: 15px;
-                        }
-                    </style>
-                </head>
-                <body>
-@@ -884,33 +851,18 @@
-                    </div>
-                    <div class="fecha">📅 Generado: ${fechaFormateada}</div>
-                    
-                    <div class="contenido-pdf">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th class="col-nombre">NOMBRE</th>
-                                    <th class="col-email">EMAIL</th>
-                                    <th class="col-telefono">TELÉFONO</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-            `;
-            
-            // Agregar filas de clientes filtrados (sin ID)
+            // Agregar filas de clientes filtrados
             for (const cliente of clientesFiltrados) {
                 tablaHtml += `
-                    <tr>
-                        <td>${escapeHtml(cliente.nombre)}</td
-                        <td>${escapeHtml(cliente.email)}</td
-                        <td>${escapeHtml(cliente.telefono || 'No registrado')}</td
-                    </tr>
-                `;
-            }
-            
-            tablaHtml += `
-                            </tbody>
-                        </table>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>NOMBRE</th>
-                                <th>EMAIL</th>
-                                <th>TELÉFONO</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${filasTabla}
-                        </tbody>
-                    </table>
-                    
-                    <div class="total-container">
-                        Total de clientes: ${clientesFiltrados.length}
-@@ -923,44 +875,17 @@
-                </html>
-            `;
-
-            // Crear un elemento temporal con el contenido
-            const element = document.createElement('div');
-            element.innerHTML = tablaHtml;
-            element.style.position = 'absolute';
-            element.style.left = '-9999px';
-            element.style.top = '-9999px';
-            document.body.appendChild(element);
-            
-            // Configurar opciones optimizadas para que no corte los datos
-            const opt = {
-                margin: [0.5, 0.5, 0.5, 0.5],
-                filename: `clientes_aventura_total_${fechaActual.getFullYear()}-${(fechaActual.getMonth()+1).toString().padStart(2,'0')}-${fechaActual.getDate().toString().padStart(2,'0')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    letterRendering: true,
-                    useCORS: true,
-                    logging: false
-                },
-                jsPDF: { 
-                    unit: 'in', 
-                    format: 'a4', 
-                    orientation: 'landscape'  // Cambiado a landscape para mejor visualización
-                }
-                html2canvas: { scale: 2, letterRendering: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-            };
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                document.body.removeChild(element);
-            }).catch(err => {
-                console.error('Error al generar PDF:', err);
-                alert('❌ Error al generar el PDF. Intente nuevamente.');
-                document.body.removeChild(element);
-            });
-            html2pdf().set(opt).from(contenidoPDF).save();
-        }
-
-        // ==================================================
-        // VER RESERVAS DEL CLIENTE (CON TODAS LAS EXCURSIONES)
-        // ==================================================
-        async function verReservasCliente(email) {
-            try {
-                const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
-@@ -981,18 +906,14 @@
-                    if (timestamp) {
-                        const fechaObj = new Date(timestamp);
-                        if (!isNaN(fechaObj.getTime())) {
-                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
-                            fecha = `${fechaObj.getDate().toString().padStart(2,'0')}/${(fechaObj.getMonth()+1).toString().padStart(2,'0')}/${fechaObj.getFullYear()}`;
-                        }
-                    }
-
-                    const excursionesRaw = fila[8] || '';
-                    const excursionesLista = obtenerListaExcursiones(excursionesRaw);
-
-                    reservas.push({ 
-                        id: id, 
-                        fecha: fecha || 'Sin fecha', 
-                        excursiones: excursionesLista 
-                    });
-                    reservas.push({ id: id, fecha: fecha || 'Sin fecha', excursiones: excursionesLista });
-                }
-
-                function escapeHtml(text) { 
-@@ -1006,25 +927,24 @@
-                if (reservas.length === 0) {
-                    reservasHtml = '<p style="text-align:center;padding:20px;">📭 No hay reservas para este cliente</p>';
-                } else {
-                    reservasHtml = '';
-                    reservas.forEach(r => {
-                        let excursionesListHtml = '';
-                        if (r.excursiones && r.excursiones.length > 0) {
-                            excursionesListHtml = '<ul class="reserva-excursiones-lista">';
-                            excursionesListHtml = '<ul class="reserva-excursiones-lista" style="margin:0; padding-left:20px;">';
-                            r.excursiones.forEach(exc => {
-                                excursionesListHtml += `<li>${escapeHtml(exc)}</li>`;
-                                excursionesListHtml += `<li style="margin-bottom:4px;">${escapeHtml(exc)}</li>`;
-                            });
-                            excursionesListHtml += '</ul>';
-                        } else {
-                            excursionesListHtml = '<p style="color:#999; font-size:12px;">Sin excursiones específicas</p>';
-                        }
-
-                        reservasHtml += `
-                            <div class="reserva-item">
-                                <div class="reserva-id">🆔 Reserva: ${escapeHtml(r.id)}</div>
-                                <div class="reserva-fecha">📅 ${escapeHtml(r.fecha)}</div>
-                            <div class="reserva-item" style="background:#f8f9fa; border-radius:12px; padding:15px; margin-bottom:15px; border-left:4px solid #667eea;">
-                                <div class="reserva-id" style="font-weight:700; color:#667eea; font-size:14px; margin-bottom:8px;">🆔 Reserva: ${escapeHtml(r.id)}</div>
-                                <div class="reserva-fecha" style="font-size:11px; color:#999; margin-bottom:10px;">📅 ${escapeHtml(r.fecha)}</div>
-                                <div class="reserva-excursiones">
-                                    <div class="reserva-excursiones-title">✨ Excursiones seleccionadas:</div>
-                                    <div class="reserva-excursiones-title" style="font-size:11px; font-weight:600; color:#666; margin-bottom:5px;">✨ Excursiones seleccionadas:</div>
-                                    ${excursionesListHtml}
-                                </div>
-                            </div>
-@@ -1062,21 +982,18 @@
+@@ -1014,28 +1040,21 @@
             if (modal) modal.remove();
         }
 
+        function escapeHtml(text) { 
+            if (!text) return ''; 
+            const div = document.createElement('div'); 
+            div.textContent = text; 
+            return div.innerHTML; 
+        }
+        
         // ==================================================
         // INICIALIZAR
         // ==================================================
