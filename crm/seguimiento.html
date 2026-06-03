@@ -282,6 +282,43 @@
         .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
         @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
         
+        /* Estilos para el botón de cobrar */
+        .btn-cobrar {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #009ee3 0%, #0077b3 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-cobrar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,158,227,0.3);
+        }
+        .btn-cobrar:active {
+            transform: scale(0.98);
+        }
+        
+        .aviso-pago {
+            background: #fff3cd;
+            border: 1px solid #ffecb5;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #856404;
+            text-align: center;
+        }
+        
         /* Scroll sidebar */
         .sidebar::-webkit-scrollbar {
             width: 4px;
@@ -527,6 +564,9 @@
         // Misma URL del Google Apps Script que en reservas.html
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
+        // Link de Mercado Pago
+        const MERCADO_PAGO_LINK = 'https://link.mercadopago.com.ar/scphotobr';
+        
         let reservasData = [];
         let estadosGlobales = {};
 
@@ -590,6 +630,27 @@
                 return texto.split('\n').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
             return [texto.trim().replace(/^\d+\.\s*/, '')].filter(p => p);
+        }
+
+        // Función para abrir Mercado Pago con mensaje de advertencia
+        function abrirMercadoPago() {
+            // Mostrar mensaje de advertencia antes de redirigir
+            const confirmar = confirm('⚠️ ATENCIÓN ⚠️\n\nCaso no recuerde el monto total de su reserva, solicítelo vía WhatsApp.\n\n¿Desea continuar al link de pago?');
+            
+            if (confirmar) {
+                // Intentar abrir la app de Mercado Pago (deep link)
+                const mercadoPagoAppLink = 'mercadopago://' + MERCADO_PAGO_LINK.replace('https://', '');
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = mercadoPagoAppLink;
+                document.body.appendChild(iframe);
+                
+                // Si después de 2 segundos no se abrió la app, redirigir a la web
+                setTimeout(function() {
+                    document.body.removeChild(iframe);
+                    window.open(MERCADO_PAGO_LINK, '_blank');
+                }, 2000);
+            }
         }
 
         async function cargarDatos() {
@@ -656,7 +717,7 @@
                     const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
                     const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
 
-                    // 🔥 Obtener estado desde la nube (misma fuente que reservas.html)
+                    // Obtener estado desde la nube (misma fuente que reservas.html)
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
@@ -770,7 +831,18 @@
                         <p><strong>Excursiones:</strong> ${excursionesHtml}</p>
                         <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
                         <p><strong>Estado:</strong> <span style="background:#eef2ff; padding:3px 10px; border-radius:20px; font-weight:700;">${estadoText}</span></p>
-                        <button onclick="cerrarModal()" style="width:100%; padding:12px; background:#667eea; color:white; border:none; border-radius:12px; margin-top:15px; cursor:pointer;">Cerrar</button>
+                        
+                        <!-- Mensaje de aviso -->
+                        <div class="aviso-pago">
+                            ⚠️ <strong>Importante:</strong> Caso no recuerde el monto total de su reserva, solicítelo vía WhatsApp. Muchas Gracias.
+                        </div>
+                        
+                        <!-- Botón Cobrar Mercado Pago -->
+                        <button class="btn-cobrar" onclick="abrirMercadoPago()">
+                            💰 Cobrar con Mercado Pago
+                        </button>
+                        
+                        <button onclick="cerrarModal()" style="width:100%; padding:12px; background:#667eea; color:white; border:none; border-radius:12px; margin-top:10px; cursor:pointer;">Cerrar</button>
                     </div>
                 </div>
             `;
@@ -789,10 +861,12 @@
             return div.innerHTML; 
         }
 
+        // Exponer funciones globalmente
         window.verDetalle = verDetalle;
         window.cerrarModal = cerrarModal;
         window.cargarDatos = cargarDatos;
         window.logout = logout;
+        window.abrirMercadoPago = abrirMercadoPago;
 
         cargarDatos();
         setInterval(cargarDatos, 30000);
