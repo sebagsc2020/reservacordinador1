@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario - CRM Aventura Total</title>
+    <title>Calendario Interactivo - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -59,92 +59,123 @@
         }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
-        /* ===== NAVEGACIÓN ===== */
-        .calendar-nav {
-            display: flex; justify-content: space-between; align-items: center;
-            background: white; padding: 20px; border-radius: 15px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
-        }
-        
-        .calendar-nav button {
-            padding: 10px 20px; background: #667eea; color: white; border: none;
-            border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14px;
-            transition: all 0.3s ease;
-        }
-        .calendar-nav button:hover { background: #5a6fd6; }
-        
-        .calendar-nav h2 { font-size: 22px; color: #1a1a2e; }
-        
-        .btn-hoy { background: #27ae60 !important; }
-        .btn-agregar { background: #f39c12 !important; }
-        
         /* ===== CALENDARIO ===== */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+        .calendar-container {
             background: white;
-            padding: 20px;
             border-radius: 15px;
+            padding: 20px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.05);
         }
         
-        .calendar-day-header {
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        
+        .calendar-header button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .calendar-header button:hover {
+            background: #5a6fd6;
+            transform: scale(1.02);
+        }
+        
+        .calendar-header h2 {
+            font-size: 24px;
+            color: #1a1a2e;
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .weekday {
             text-align: center;
-            padding: 10px;
+            padding: 12px;
             font-weight: 700;
-            color: #666;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #667eea;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
         }
         
         .calendar-day {
-            min-height: 100px;
-            padding: 8px;
+            min-height: 120px;
+            padding: 10px;
+            background: #f8f9fa;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
             border: 2px solid transparent;
+            position: relative;
         }
         
-        .calendar-day:hover { background: #f0f0ff; border-color: #667eea; }
-        .calendar-day.today { background: #f0f0ff; border-color: #667eea; }
-        .calendar-day.otro-mes { opacity: 0.3; }
-        
-        .calendar-day-numero {
-            font-size: 14px; font-weight: 700; color: #333; margin-bottom: 5px;
+        .calendar-day:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
         }
         
-        .calendar-event {
-            font-size: 10px; padding: 3px 6px; border-radius: 4px; margin-bottom: 2px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            cursor: pointer; font-weight: 600;
+        .calendar-day.today {
+            background: #fff3cd;
+            border-color: #ffc107;
         }
         
-        .event-confirmado { background: #d4edda; color: #155724; }
-        .event-pendiente { background: #fff3cd; color: #856404; }
-        .event-pagado { background: #d1ecf1; color: #0c5460; }
-        
-        /* ===== LISTA DEL DÍA ===== */
-        .day-list {
-            background: white; border-radius: 15px; padding: 25px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-top: 25px;
+        .calendar-day.other-month {
+            opacity: 0.4;
+            background: #f1f3f5;
         }
-        .day-list h3 { margin-bottom: 15px; color: #1a1a2e; font-size: 18px; }
         
-        .day-event {
-            display: flex; align-items: center; gap: 15px; padding: 12px;
-            border-radius: 10px; margin-bottom: 8px; transition: all 0.3s ease;
+        .day-number {
+            font-size: 14px;
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 8px;
         }
-        .day-event:hover { background: #f8f9fa; }
-        .day-event .hora { font-weight: 700; color: #667eea; min-width: 50px; }
-        .day-event .info { flex: 1; }
-        .day-event .info strong { color: #333; font-size: 14px; }
-        .day-event .info p { color: #666; font-size: 12px; }
         
-        /* Modal para agregar evento */
+        .event-item {
+            font-size: 11px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .event-item:hover {
+            transform: scale(1.02);
+            filter: brightness(0.95);
+        }
+        
+        .event-confirmado { background: #d4edda; color: #155724; border-left: 3px solid #28a745; }
+        .event-pendiente { background: #fff3cd; color: #856404; border-left: 3px solid #ffc107; }
+        .event-pagado { background: #d1ecf1; color: #0c5460; border-left: 3px solid #17a2b8; }
+        
+        /* Modal para crear/editar evento */
         .modal {
             display: none;
             position: fixed;
@@ -154,32 +185,60 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .modal-content {
             background-color: white;
-            margin: 10% auto;
+            margin: 5% auto;
             padding: 30px;
-            border-radius: 15px;
+            border-radius: 20px;
             width: 90%;
             max-width: 500px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
         
         .modal-content h2 {
             margin-bottom: 20px;
             color: #1a1a2e;
+            font-size: 24px;
         }
         
         .modal-content input,
-        .modal-content select {
+        .modal-content select,
+        .modal-content textarea {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
             font-size: 14px;
             box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        
+        .modal-content input:focus,
+        .modal-content select:focus,
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: #667eea;
         }
         
         .modal-content button {
@@ -189,13 +248,20 @@
             background: #667eea;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
         
         .modal-content button:hover {
             background: #5a6fd6;
+            transform: translateY(-2px);
+        }
+        
+        .modal-content button:active {
+            transform: translateY(0);
         }
         
         .close-modal {
@@ -204,12 +270,14 @@
             font-weight: bold;
             cursor: pointer;
             color: #999;
+            transition: color 0.3s ease;
         }
         
         .close-modal:hover {
             color: #333;
         }
         
+        /* Mensajes flotantes */
         .mensaje-flotante {
             position: fixed;
             bottom: 20px;
@@ -241,14 +309,25 @@
             }
         }
         
+        .event-detail {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .event-detail.show {
+            display: block;
+        }
+        
         @media (max-width: 768px) {
             .sidebar { width: 70px; }
             .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; }
             .nav-menu a { justify-content: center; padding: 12px; }
             .main-content { margin-left: 70px; padding: 15px; }
-            .calendar-day { min-height: 60px; }
-            .calendar-day-numero { font-size: 11px; }
-            .calendar-event { font-size: 8px; }
+            .calendar-day { min-height: 80px; font-size: 12px; }
+            .event-item { font-size: 9px; }
         }
     </style>
 </head>
@@ -275,8 +354,8 @@
     <div class="main-content">
         <div class="header">
             <div>
-                <h1>📅 Calendario de Salidas</h1>
-                <p style="color:#999;font-size:13px;">Vista mensual de excursiones programadas</p>
+                <h1>📅 Calendario de Eventos</h1>
+                <p style="color:#999;font-size:13px;">Haz clic en cualquier día para crear un evento</p>
             </div>
             <div class="user-info">
                 <div class="user-avatar">A</div>
@@ -284,44 +363,44 @@
             </div>
         </div>
         
-        <!-- Navegación -->
-        <div class="calendar-nav">
-            <button onclick="cambiarMes(-1)">◀ Anterior</button>
-            <h2 id="mesTitulo">Mayo 2026</h2>
-            <div>
-                <button class="btn-hoy" onclick="irAHoy()">📅 Hoy</button>
-                <button class="btn-agregar" onclick="abrirModalAgregar()" style="margin-left:5px;">➕ Agregar</button>
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button onclick="cambiarMes(-1)">◀ Anterior</button>
+                <h2 id="mesTitulo"></h2>
+                <button onclick="cambiarMes(1)">Siguiente ▶</button>
             </div>
-            <button onclick="cambiarMes(1)">Siguiente ▶</button>
-        </div>
-        
-        <!-- Calendario -->
-        <div class="calendar-grid" id="calendarGrid"></div>
-        
-        <!-- Lista del día -->
-        <div class="day-list">
-            <h3>📋 Salidas del día seleccionado</h3>
-            <div id="dayEvents">
-                <p style="color:#999;text-align:center;padding:20px;">Seleccioná un día para ver las salidas</p>
+            
+            <div class="weekdays">
+                <div class="weekday">Domingo</div>
+                <div class="weekday">Lunes</div>
+                <div class="weekday">Martes</div>
+                <div class="weekday">Miércoles</div>
+                <div class="weekday">Jueves</div>
+                <div class="weekday">Viernes</div>
+                <div class="weekday">Sábado</div>
             </div>
+            
+            <div class="calendar-days" id="calendarDays"></div>
         </div>
     </div>
     
-    <!-- Modal para agregar evento -->
-    <div id="modalAgregar" class="modal">
+    <!-- Modal para crear/editar evento -->
+    <div id="eventModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="cerrarModal()">&times;</span>
-            <h2>➕ Agregar Nueva Salida</h2>
-            <input type="date" id="fechaEvento" required>
-            <input type="text" id="clienteEvento" placeholder="Nombre del cliente" required>
-            <input type="text" id="excursionEvento" placeholder="Excursión" required>
-            <input type="number" id="personasEvento" placeholder="Número de personas" value="1" min="1">
-            <select id="estadoEvento">
-                <option value="pendiente">Pendiente</option>
-                <option value="confirmado">Confirmado</option>
-                <option value="pagado">Pagado</option>
+            <h2 id="modalTitulo">📝 Crear Nuevo Evento</h2>
+            <input type="date" id="eventoFecha" readonly style="background:#f8f9fa;">
+            <input type="text" id="eventoTitulo" placeholder="Título del evento *" required>
+            <input type="time" id="eventoHora" placeholder="Hora">
+            <input type="text" id="eventoCliente" placeholder="Nombre del cliente">
+            <input type="number" id="eventoPersonas" placeholder="Número de personas" min="1" value="1">
+            <select id="eventoEstado">
+                <option value="pendiente">🟡 Pendiente</option>
+                <option value="confirmado">🟢 Confirmado</option>
+                <option value="pagado">🔵 Pagado</option>
             </select>
-            <button onclick="guardarEventoGoogleSheets()">💾 Guardar en Google Sheets</button>
+            <textarea id="eventoDescripcion" rows="3" placeholder="Descripción adicional..."></textarea>
+            <button onclick="guardarEvento()">💾 Guardar Evento en Google Sheets</button>
         </div>
     </div>
     
@@ -343,20 +422,28 @@
         let mesActual = fechaActual.getMonth();
         let añoActual = fechaActual.getFullYear();
         
-        // Datos de ejemplo (se mantienen para mostrar, pero los nuevos se guardan en Sheets)
-        let eventos = [
-            { fecha: '2026-05-29', cliente: 'Juan Pérez', excursion: 'City Tour Local', personas: 4, estado: 'confirmado' },
-            { fecha: '2026-05-30', cliente: 'María García', excursion: 'Barco Pirata', personas: 2, estado: 'pendiente' },
-            { fecha: '2026-06-01', cliente: 'Carlos López', excursion: 'Valle Nevado', personas: 6, estado: 'pagado' },
-            { fecha: '2026-06-02', cliente: 'Ana Martínez', excursion: 'Circuito Chico', personas: 3, estado: 'confirmado' },
-            { fecha: '2026-06-03', cliente: 'Pedro Sánchez', excursion: 'City Tour Histórico', personas: 2, estado: 'pendiente' },
-            { fecha: '2026-06-05', cliente: 'Diego Torres', excursion: 'Sky Costanera', personas: 4, estado: 'confirmado' },
-            { fecha: '2026-06-10', cliente: 'Laura Fernández', excursion: 'Camino del Vino', personas: 5, estado: 'pagado' },
-            { fecha: '2026-06-15', cliente: 'Sofía Rodríguez', excursion: 'Tren del Fin del Mundo', personas: 2, estado: 'confirmado' }
-        ];
+        // Array de eventos (se cargarán desde localStorage)
+        let eventos = [];
         
-        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        // Cargar eventos guardados
+        function cargarEventos() {
+            const guardados = localStorage.getItem('eventos_calendario');
+            if (guardados) {
+                eventos = JSON.parse(guardados);
+            } else {
+                // Eventos de ejemplo
+                eventos = [
+                    { id: '1', fecha: '2026-06-01', titulo: 'City Tour Local', cliente: 'Juan Pérez', hora: '09:00', personas: 4, estado: 'confirmado', descripcion: 'Tour por el centro histórico' },
+                    { id: '2', fecha: '2026-06-02', titulo: 'Barco Pirata', cliente: 'María García', hora: '14:00', personas: 2, estado: 'pendiente', descripcion: 'Paseo en barco' },
+                    { id: '3', fecha: '2026-06-03', titulo: 'Valle Nevado', cliente: 'Carlos López', hora: '08:00', personas: 6, estado: 'pagado', descripcion: 'Excursión a la montaña' }
+                ];
+            }
+        }
+        
+        // Guardar eventos en localStorage
+        function guardarEventosLocal() {
+            localStorage.setItem('eventos_calendario', JSON.stringify(eventos));
+        }
         
         function mostrarMensaje(mensaje, tipo) {
             const div = document.createElement('div');
@@ -366,90 +453,136 @@
             setTimeout(() => div.remove(), 5000);
         }
         
-        async function guardarEventoGoogleSheets() {
-            const fecha = document.getElementById('fechaEvento').value;
-            const cliente = document.getElementById('clienteEvento').value;
-            const excursion = document.getElementById('excursionEvento').value;
-            const personas = document.getElementById('personasEvento').value;
-            const estado = document.getElementById('estadoEvento').value;
+        async function guardarEvento() {
+            const fecha = document.getElementById('eventoFecha').value;
+            const titulo = document.getElementById('eventoTitulo').value;
+            const hora = document.getElementById('eventoHora').value;
+            const cliente = document.getElementById('eventoCliente').value;
+            const personas = document.getElementById('eventoPersonas').value;
+            const estado = document.getElementById('eventoEstado').value;
+            const descripcion = document.getElementById('eventoDescripcion').value;
             
-            if (!fecha || !cliente || !excursion) {
-                mostrarMensaje('⚠️ Por favor, completa todos los campos', 'error');
+            if (!fecha || !titulo) {
+                mostrarMensaje('⚠️ Por favor, completa el título y la fecha', 'error');
                 return;
             }
             
+            const eventoId = Date.now().toString();
             const eventoData = {
-                id: Date.now().toString(),
-                nombre: `${cliente} - ${excursion}`,
-                fechaInicio: fecha,
-                fechaFin: fecha,
-                cliente: cliente,
-                excursion: excursion,
+                id: eventoId,
+                fecha: fecha,
+                titulo: titulo,
+                hora: hora,
+                cliente: cliente || 'Cliente no especificado',
                 personas: parseInt(personas),
-                estado: estado
+                estado: estado,
+                descripcion: descripcion
             };
             
             mostrarMensaje('⏳ Guardando en Google Sheets...', 'exito');
             
             try {
-                const response = await fetch(SCRIPT_URL, {
+                // Guardar en Google Sheets
+                await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         eventos: [{
-                            id: eventoData.id,
-                            nombre: eventoData.nombre,
-                            fechaInicio: eventoData.fechaInicio,
-                            fechaFin: eventoData.fechaFin
+                            id: eventoId,
+                            nombre: `${cliente || 'Evento'} - ${titulo}`,
+                            fechaInicio: fecha,
+                            fechaFin: fecha
                         }]
                     })
                 });
                 
-                // Agregar evento localmente también
-                eventos.push({
-                    fecha: fecha,
-                    cliente: cliente,
-                    excursion: excursion,
-                    personas: parseInt(personas),
-                    estado: estado
-                });
-                
+                // Guardar localmente
+                eventos.push(eventoData);
+                guardarEventosLocal();
                 renderCalendar();
-                seleccionarDia(fecha);
                 cerrarModal();
-                mostrarMensaje('✅ ¡Evento guardado correctamente en Google Sheets!', 'exito');
+                mostrarMensaje('✅ ¡Evento guardado correctamente!', 'exito');
                 
                 // Limpiar formulario
-                document.getElementById('clienteEvento').value = '';
-                document.getElementById('excursionEvento').value = '';
-                document.getElementById('personasEvento').value = '1';
-                document.getElementById('estadoEvento').value = 'pendiente';
+                document.getElementById('eventoTitulo').value = '';
+                document.getElementById('eventoHora').value = '';
+                document.getElementById('eventoCliente').value = '';
+                document.getElementById('eventoPersonas').value = '1';
+                document.getElementById('eventoEstado').value = 'pendiente';
+                document.getElementById('eventoDescripcion').value = '';
                 
             } catch(error) {
                 console.error('Error:', error);
-                mostrarMensaje('❌ Error al guardar: ' + error.message, 'error');
+                mostrarMensaje('❌ Error al guardar, pero se guardó localmente', 'error');
+                // Aún así guardar localmente
+                eventos.push(eventoData);
+                guardarEventosLocal();
+                renderCalendar();
+                cerrarModal();
             }
         }
         
-        function abrirModalAgregar() {
-            const hoy = new Date();
-            const fechaHoy = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
-            document.getElementById('fechaEvento').value = fechaHoy;
-            document.getElementById('modalAgregar').style.display = 'block';
+        function abrirModalCrear(fecha) {
+            document.getElementById('modalTitulo').textContent = '📝 Crear Nuevo Evento';
+            document.getElementById('eventoFecha').value = fecha;
+            document.getElementById('eventoTitulo').value = '';
+            document.getElementById('eventoHora').value = '';
+            document.getElementById('eventoCliente').value = '';
+            document.getElementById('eventoPersonas').value = '1';
+            document.getElementById('eventoEstado').value = 'pendiente';
+            document.getElementById('eventoDescripcion').value = '';
+            document.getElementById('eventModal').style.display = 'block';
+        }
+        
+        function abrirModalEditar(evento) {
+            document.getElementById('modalTitulo').textContent = '✏️ Editar Evento';
+            document.getElementById('eventoFecha').value = evento.fecha;
+            document.getElementById('eventoTitulo').value = evento.titulo;
+            document.getElementById('eventoHora').value = evento.hora || '';
+            document.getElementById('eventoCliente').value = evento.cliente || '';
+            document.getElementById('eventoPersonas').value = evento.personas || 1;
+            document.getElementById('eventoEstado').value = evento.estado;
+            document.getElementById('eventoDescripcion').value = evento.descripcion || '';
+            document.getElementById('eventModal').style.display = 'block';
+            
+            // Cambiar el botón para editar
+            const btn = document.querySelector('#eventModal button');
+            const oldClick = btn.onclick;
+            btn.onclick = async function() {
+                await actualizarEvento(evento.id);
+            };
+        }
+        
+        async function actualizarEvento(id) {
+            const eventoIndex = eventos.findIndex(e => e.id === id);
+            if (eventoIndex !== -1) {
+                eventos[eventoIndex] = {
+                    ...eventos[eventoIndex],
+                    titulo: document.getElementById('eventoTitulo').value,
+                    hora: document.getElementById('eventoHora').value,
+                    cliente: document.getElementById('eventoCliente').value,
+                    personas: parseInt(document.getElementById('eventoPersonas').value),
+                    estado: document.getElementById('eventoEstado').value,
+                    descripcion: document.getElementById('eventoDescripcion').value
+                };
+                guardarEventosLocal();
+                renderCalendar();
+                cerrarModal();
+                mostrarMensaje('✅ Evento actualizado', 'exito');
+            }
         }
         
         function cerrarModal() {
-            document.getElementById('modalAgregar').style.display = 'none';
+            document.getElementById('eventModal').style.display = 'none';
+            // Restaurar el botón a su función original
+            const btn = document.querySelector('#eventModal button');
+            btn.onclick = guardarEvento;
         }
         
         function renderCalendar() {
+            const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             document.getElementById('mesTitulo').textContent = `${meses[mesActual]} ${añoActual}`;
-            
-            let html = '';
-            diasSemana.forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
             
             const primerDia = new Date(añoActual, mesActual, 1).getDay();
             const diasEnMes = new Date(añoActual, mesActual + 1, 0).getDate();
@@ -458,10 +591,15 @@
             const hoy = new Date();
             const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
             
+            let html = '';
+            
             // Días del mes anterior
             for (let i = primerDia - 1; i >= 0; i--) {
                 const dia = diasMesAnterior - i;
-                html += `<div class="calendar-day otro-mes"><div class="calendar-day-numero">${dia}</div></div>`;
+                const fechaStr = `${añoActual}-${String(mesActual).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+                html += `<div class="calendar-day other-month" onclick="abrirModalCrear('${fechaStr}')">
+                    <div class="day-number">${dia}</div>
+                </div>`;
             }
             
             // Días del mes actual
@@ -470,11 +608,16 @@
                 const esHoy = fechaStr === hoyStr;
                 const eventosDelDia = eventos.filter(e => e.fecha === fechaStr);
                 
-                html += `<div class="calendar-day ${esHoy ? 'today' : ''}" onclick="seleccionarDia('${fechaStr}')">
-                    <div class="calendar-day-numero">${dia}</div>
-                    ${eventosDelDia.slice(0,3).map(e => `<div class="calendar-event event-${e.estado}" title="${e.cliente} - ${e.excursion}">${e.excursion.substring(0,12)}...</div>`).join('')}
-                    ${eventosDelDia.length > 3 ? `<div class="calendar-event" style="background:#e9ecef;">+${eventosDelDia.length-3} más</div>` : ''}
-                </div>`;
+                html += `<div class="calendar-day ${esHoy ? 'today' : ''}" onclick="abrirModalCrear('${fechaStr}')">
+                    <div class="day-number">${dia}</div>`;
+                
+                eventosDelDia.forEach(evento => {
+                    html += `<div class="event-item event-${evento.estado}" onclick="event.stopPropagation(); abrirModalEditar(${JSON.stringify(evento).replace(/"/g, '&quot;')})">
+                        ${evento.hora ? evento.hora + ' - ' : ''}${evento.titulo}
+                    </div>`;
+                });
+                
+                html += `</div>`;
             }
             
             // Días del mes siguiente
@@ -482,61 +625,40 @@
             const diasRestantes = 7 - (totalCeldas % 7);
             if (diasRestantes < 7) {
                 for (let dia = 1; dia <= diasRestantes; dia++) {
-                    html += `<div class="calendar-day otro-mes"><div class="calendar-day-numero">${dia}</div></div>`;
+                    const fechaStr = `${añoActual}-${String(mesActual+2).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+                    html += `<div class="calendar-day other-month" onclick="abrirModalCrear('${fechaStr}')">
+                        <div class="day-number">${dia}</div>
+                    </div>`;
                 }
             }
             
-            document.getElementById('calendarGrid').innerHTML = html;
+            document.getElementById('calendarDays').innerHTML = html;
         }
         
         function cambiarMes(direccion) {
             mesActual += direccion;
-            if (mesActual > 11) { mesActual = 0; añoActual++; }
-            if (mesActual < 0) { mesActual = 11; añoActual--; }
-            renderCalendar();
-        }
-        
-        function irAHoy() {
-            const hoy = new Date();
-            mesActual = hoy.getMonth();
-            añoActual = hoy.getFullYear();
-            renderCalendar();
-            seleccionarDia(`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`);
-        }
-        
-        function seleccionarDia(fechaStr) {
-            const eventosDelDia = eventos.filter(e => e.fecha === fechaStr);
-            const fecha = new Date(fechaStr + 'T00:00:00');
-            const fechaFormateada = fecha.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            
-            if (eventosDelDia.length === 0) {
-                document.getElementById('dayEvents').innerHTML = `<p style="color:#999;text-align:center;padding:20px;">No hay salidas programadas para el ${fechaFormateada}</p>`;
-            } else {
-                document.getElementById('dayEvents').innerHTML = `
-                    <p style="color:#667eea;font-weight:600;margin-bottom:15px;">📅 ${fechaFormateada} - ${eventosDelDia.length} salida(s)</p>
-                    ${eventosDelDia.map(e => `
-                        <div class="day-event">
-                            <span class="hora">🕐 09:00</span>
-                            <div class="info">
-                                <strong>${e.cliente} - ${e.excursion}</strong>
-                                <p>👥 ${e.personas} personas | <span style="color:${e.estado==='confirmado'?'#27ae60':e.estado==='pendiente'?'#f39c12':'#3498db'}">${e.estado}</span></p>
-                            </div>
-                        </div>
-                    `).join('')}
-                `;
+            if (mesActual > 11) {
+                mesActual = 0;
+                añoActual++;
             }
+            if (mesActual < 0) {
+                mesActual = 11;
+                añoActual--;
+            }
+            renderCalendar();
         }
+        
+        // Inicializar
+        cargarEventos();
+        renderCalendar();
         
         // Cerrar modal al hacer clic fuera
         window.onclick = function(event) {
-            const modal = document.getElementById('modalAgregar');
+            const modal = document.getElementById('eventModal');
             if (event.target === modal) {
                 cerrarModal();
             }
         }
-        
-        renderCalendar();
-        seleccionarDia(`${añoActual}-${String(mesActual+1).padStart(2,'0')}-${String(fechaActual.getDate()).padStart(2,'0')}`);
     </script>
 </body>
 </html>
