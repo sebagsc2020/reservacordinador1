@@ -675,12 +675,12 @@
 
         async function guardarEstadoEnNube(id, nuevoEstado) {
             try {
-                await fetch(ESTADOS_SCRIPT_URL, {
+                const response = await fetch(ESTADOS_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'action=guardar&id=' + encodeURIComponent(id) + '&estado=' + encodeURIComponent(nuevoEstado)
                 });
+                console.log(`✅ Estado guardado: ${id} -> ${nuevoEstado}`);
                 return true;
             } catch (error) {
                 console.error('Error al guardar en nube:', error);
@@ -690,11 +690,12 @@
 
         async function cargarEstadosDesdeNube() {
             try {
-                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener');
+                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
                 const data = await response.json();
                 if (data.success && data.estados) {
                     estadosGlobales = data.estados;
                     localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
+                    console.log('📥 Estados cargados desde nube:', Object.keys(estadosGlobales).length);
                     return estadosGlobales;
                 } else {
                     throw new Error('No se pudieron obtener estados');
@@ -715,9 +716,10 @@
             try {
                 mostrarPreloader();
 
+                // Primero cargar los estados guardados
                 await cargarEstadosDesdeNube();
 
-                const response = await fetch(JSON_URL);
+                const response = await fetch(JSON_URL + '&t=' + Date.now());
                 const texto = await response.text();
 
                 let jsonStr = texto;
@@ -775,9 +777,12 @@
                     const lugar = (c[12] && c[12].v) ? String(c[12].v) : 'No especificado';
                     const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
 
+                    // Usar el estado guardado en la nube, si existe
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
+                        // Guardar el estado inicial en la nube
+                        await guardarEstadoEnNube(id, estado);
                     }
 
                     reservasData.push({
@@ -816,11 +821,25 @@
         async function cambiarEstado(id, nuevoEstado) {
             const reserva = reservasData.find(function(r) { return r.id === id; });
             if (reserva) {
+                // Actualizar estado localmente
                 reserva.estado = nuevoEstado;
                 estadosGlobales[id] = nuevoEstado;
+                
+                // Actualizar en reservasFiltradas también
                 const indexFiltrada = reservasFiltradas.findIndex(function(r) { return r.id === id; });
                 if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
+                
+                // Guardar en la nube
                 await guardarEstadoEnNube(id, nuevoEstado);
+                
+                // Guardar en localStorage como backup
+                localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
+                
+                // Mostrar mensaje de confirmación
+                const estadoText = nuevoEstado === 'confirmado' ? 'Confirmada' : (nuevoEstado === 'pendiente' ? 'Pendiente' : 'Pagada');
+                alert(`✅ Estado cambiado a: ${estadoText}`);
+                
+                // Recargar las cards para reflejar el cambio
                 renderizarCards();
             }
         }
@@ -874,11 +893,12 @@
             for (let idx = 0; idx < reservasFiltradas.length; idx++) {
                 const r = reservasFiltradas[idx];
                 let estadoText = '';
+                let estadoClass = '';
                 switch(r.estado) {
-                    case 'pendiente': estadoText = 'Pendiente'; break;
-                    case 'confirmado': estadoText = 'Confirmado'; break;
-                    case 'pagado': estadoText = 'Pagado'; break;
-                    default: estadoText = 'Confirmado';
+                    case 'pendiente': estadoText = 'Pendiente'; estadoClass = 'pendiente'; break;
+                    case 'confirmado': estadoText = 'Confirmado'; estadoClass = 'confirmado'; break;
+                    case 'pagado': estadoText = 'Pagado'; estadoClass = 'pagado'; break;
+                    default: estadoText = 'Confirmado'; estadoClass = 'confirmado';
                 }
 
                 let excursionesHtml = '<ul class="excursiones-lista-card">';
@@ -895,7 +915,7 @@
                             '<div class="card-header">' +
                                 '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">' +
                                     '<span class="card-id">ID: ' + escapeHtml(r.id) + '</span>' +
-                                    '<span class="card-estado-header" style="font-weight: 700;">' + estadoText + '</span>' +
+                                    '<span class="card-estado-header" style="font-weight: 700; background: ' + (r.estado === 'pendiente' ? '#ffc107' : (r.estado === 'pagado' ? '#3498db' : '#27ae60')) + ';">' + estadoText + '</span>' +
                                 '</div>' +
                                 '<span class="card-fecha">' + escapeHtml(r.fecha) + '</span>' +
                             '</div>' +
@@ -1012,7 +1032,9 @@
             });
         }
 
+        // Inicializar
         cargarReservas();
+        // Recargar cada 30 segundos
         setInterval(() => cargarReservas(), 30000);
     </script>
 </body>
