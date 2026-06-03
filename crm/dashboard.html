@@ -2,25 +2,80 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Dashboard - CRM Aventura Total</title>
     <!-- Chart.js CDN para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
         
-        /* ========== SIDEBAR MÁS ANGOSTA ========== */
+        /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
+        .menu-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 50px;
+            height: 50px;
+            background: #667eea;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .menu-btn:hover {
+            background: #5a6fd6;
+            transform: scale(1.05);
+        }
+        
+        .menu-btn span {
+            font-size: 24px;
+            color: white;
+        }
+        
+        /* ========== SIDEBAR ========== */
         .sidebar { 
-            width: 180px; 
+            width: 200px; 
             background: #1a1a2e; 
             color: white; 
             padding: 20px 0; 
             position: fixed; 
             height: 100vh; 
             overflow-y: auto; 
-            z-index: 100;
+            z-index: 1001;
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
         .sidebar-logo { 
             text-align: center; 
             padding: 0 12px 20px; 
@@ -37,15 +92,16 @@
             display: flex; 
             align-items: center; 
             gap: 8px; 
-            padding: 8px 10px; 
+            padding: 10px 12px; 
             color: rgba(255,255,255,0.7); 
             text-decoration: none; 
             border-radius: 8px; 
-            font-size: 12px; 
+            font-size: 13px; 
+            transition: all 0.2s;
         }
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
         .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 16px; width: 22px; text-align: center; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
         
         .sidebar-footer { 
             position: absolute; 
@@ -55,22 +111,27 @@
         }
         .btn-logout-sidebar { 
             width: 100%; 
-            padding: 8px; 
+            padding: 10px; 
             background: rgba(231,76,60,0.2); 
             color: #e74c3c; 
             border-radius: 8px; 
             cursor: pointer; 
             font-weight: 600; 
-            font-size: 11px; 
+            font-size: 12px; 
             border: none; 
+            transition: all 0.2s;
+        }
+        .btn-logout-sidebar:hover {
+            background: rgba(231,76,60,0.4);
         }
         
         /* ========== CONTENIDO PRINCIPAL ========== */
         .main-content { 
-            margin-left: 180px; 
+            margin-left: 0;
             flex: 1; 
             padding: 20px; 
             min-width: 0;
+            transition: margin-left 0.3s ease;
         }
         .header { 
             display: flex; 
@@ -107,7 +168,7 @@
         /* ========== TARJETAS DE MÉTRICAS ========== */
         .stats-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
             gap: 15px; 
             margin-bottom: 25px; 
         }
@@ -121,7 +182,7 @@
             gap: 12px; 
             transition: transform 0.2s;
         }
-        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card:active { transform: scale(0.98); }
         .stat-icon { font-size: 32px; }
         .stat-info h3 { font-size: 11px; color: #666; margin-bottom: 5px; text-transform: uppercase; }
         .stat-info .number { font-size: 28px; font-weight: 700; color: #1a1a2e; }
@@ -129,7 +190,7 @@
         /* ========== GRÁFICOS ========== */
         .charts-row { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
             gap: 20px; 
             margin-bottom: 25px; 
         }
@@ -139,8 +200,8 @@
             padding: 20px; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
         }
-        .chart-container h3 { margin-bottom: 15px; color: #333; font-size: 15px; }
-        canvas { max-height: 280px; width: 100% !important; }
+        .chart-container h3 { margin-bottom: 15px; color: #333; font-size: 14px; }
+        canvas { max-height: 250px; width: 100% !important; }
         
         /* ========== TABLA ÚLTIMAS RESERVAS ========== */
         .recent-section { 
@@ -159,19 +220,130 @@
         .badge-confirmado { background: #d4edda; color: #155724; }
         .badge-pagado { background: #d1ecf1; color: #0c5460; }
         
+        /* Desktop */
+        @media (min-width: 769px) {
+            .menu-btn {
+                display: none !important;
+            }
+            
+            .sidebar {
+                transform: translateX(0) !important;
+                width: 200px;
+            }
+            
+            .menu-overlay {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 200px;
+                padding: 20px;
+            }
+        }
+        
+        /* Móvil */
         @media (max-width: 768px) { 
-            .sidebar { width: 60px; } 
-            .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
-            .nav-menu a { justify-content: center; padding: 10px; }
-            .nav-icon { font-size: 18px; width: auto; }
-            .main-content { margin-left: 60px; padding: 12px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .charts-row { grid-template-columns: 1fr; }
+            .menu-btn {
+                display: flex;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 60px 12px 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .charts-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .stat-icon {
+                font-size: 28px;
+            }
+            
+            .stat-info .number {
+                font-size: 22px;
+            }
+            
+            .stat-info h3 {
+                font-size: 10px;
+            }
+            
+            .chart-container {
+                padding: 15px;
+            }
+            
+            .recent-section {
+                padding: 15px;
+                overflow-x: auto;
+            }
+            
+            table {
+                font-size: 11px;
+                min-width: 500px;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .user-info {
+                padding: 4px 12px;
+                font-size: 11px;
+            }
+            
+            .user-avatar {
+                width: 26px;
+                height: 26px;
+                font-size: 11px;
+            }
+        }
+        
+        /* Scroll suave */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <nav class="sidebar">
+    <!-- Botón menú hamburguesa (solo móvil) -->
+    <button class="menu-btn" id="menuBtn">
+        <span>☰</span>
+    </button>
+    
+    <!-- Overlay para cerrar menú -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
         <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2></div>
         <ul class="nav-menu">
             <li><a href="dashboard.html" class="active"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
@@ -226,6 +398,42 @@
 
     <script>
         // ==================================================
+        // MENÚ FLOTANTE
+        // ==================================================
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const menuOverlay = document.getElementById('menuOverlay');
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('open');
+            menuOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+        
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (menuBtn) {
+            menuBtn.addEventListener('click', toggleMenu);
+        }
+        
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', closeMenu);
+        }
+        
+        // Cerrar menú al hacer clic en un enlace
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeMenu();
+                }
+            });
+        });
+        
+        // ==================================================
         // CONFIGURACIÓN - PLANILLA CORRECTA
         // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
@@ -253,7 +461,7 @@
         let estadosChart = null;
         
         // ==================================================
-        // PARSEAR CSV (mismo que en reservas.html)
+        // PARSEAR CSV
         // ==================================================
         function parseCSV(csvText) {
             const filas = [];
@@ -307,8 +515,6 @@
         // ==================================================
         function formatearFecha(fechaStr) {
             if (!fechaStr) return '';
-            
-            // Si es timestamp de Google Sheets
             if (fechaStr.includes('GMT') || fechaStr.includes(' ')) {
                 try {
                     const fecha = new Date(fechaStr);
@@ -317,16 +523,11 @@
                     }
                 } catch(e) {}
             }
-            
-            // Si ya tiene formato DD/MM/YYYY
             if (fechaStr.includes('/')) return fechaStr;
-            
-            // Si tiene formato YYYY-MM-DD
             const partes = fechaStr.split('-');
             if (partes.length === 3 && partes[0].length === 4) {
                 return `${partes[2]}/${partes[1]}/${partes[0]}`;
             }
-            
             return fechaStr;
         }
         
@@ -381,25 +582,22 @@
                 clientesSet.clear();
                 const estadosGuardados = cargarEstadosGuardados();
                 
-                // Procesar filas (saltar encabezado)
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
                     if (fila.length < 3 || !fila[0]) continue;
                     
-                    // Mapeo por posición (igual que en reservas.html)
-                    const id = fila[1] || `R-${i}`;           // columna B
-                    const timestamp = fila[0] || '';          // columna A
-                    const nombre = fila[2] || '';             // columna C
-                    const apellido = fila[3] || '';           // columna D
-                    const email = fila[4] || '';              // columna E
-                    const excursionesRaw = fila[8] || '';     // columna I
-                    const fecha = fila[9] || '';              // columna J
+                    const id = fila[1] || `R-${i}`;
+                    const timestamp = fila[0] || '';
+                    const nombre = fila[2] || '';
+                    const apellido = fila[3] || '';
+                    const email = fila[4] || '';
+                    const excursionesRaw = fila[8] || '';
+                    const fecha = fila[9] || '';
                     
                     const nombreCompleto = `${nombre} ${apellido}`.trim() || 'No especificado';
                     const excursionTexto = obtenerPrimeraExcursion(excursionesRaw);
                     const fechaFormateada = formatearFecha(timestamp) || formatearFecha(fecha);
                     
-                    // Obtener estado del localStorage o usar 'confirmado' por defecto
                     let estado = estadosGuardados[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
@@ -421,7 +619,6 @@
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
                 console.log(`👥 Clientes únicos: ${clientesSet.size}`);
                 
-                // Ordenar por fecha descendente
                 reservasData.sort((a, b) => {
                     const fechaA = a.fecha.split('/').reverse().join('');
                     const fechaB = b.fecha.split('/').reverse().join('');
@@ -440,7 +637,6 @@
         // ACTUALIZAR DASHBOARD
         // ==================================================
         function actualizarDashboard() {
-            // Métricas
             const total = reservasData.length;
             const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
             const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
@@ -453,7 +649,6 @@
             document.getElementById('totalPagadas').innerText = pagadas;
             document.getElementById('totalClientes').innerText = clientes;
             
-            // Gráfico de reservas por mes
             const meses = obtenerUltimos6Meses();
             const reservasPorMesData = contarReservasPorMes(meses);
             
@@ -483,7 +678,6 @@
                 }
             });
             
-            // Gráfico de dona (estados)
             if (estadosChart) estadosChart.destroy();
             const ctxDona = document.getElementById('estadosChart').getContext('2d');
             estadosChart = new Chart(ctxDona, {
@@ -503,7 +697,6 @@
                 }
             });
             
-            // Últimas 5 reservas
             const ultimas = reservasData.slice(0, 5);
             const tbody = document.getElementById('tablaUltimasReservas');
             if (ultimas.length === 0) {
@@ -521,9 +714,6 @@
             }
         }
         
-        // ==================================================
-        // OBTENER ÚLTIMOS 6 MESES
-        // ==================================================
         function obtenerUltimos6Meses() {
             const hoy = new Date();
             const meses = [];
@@ -536,9 +726,6 @@
             return meses;
         }
         
-        // ==================================================
-        // CONTAR RESERVAS POR MES
-        // ==================================================
         function contarReservasPorMes(meses) {
             return meses.map(m => {
                 let count = 0;
@@ -557,9 +744,6 @@
             });
         }
         
-        // ==================================================
-        // ESCAPAR HTML
-        // ==================================================
         function escapeHtml(text) { 
             if (!text) return ''; 
             const div = document.createElement('div'); 
@@ -567,9 +751,6 @@
             return div.innerHTML; 
         }
         
-        // ==================================================
-        // INICIALIZAR
-        // ==================================================
         cargarDatos();
         setInterval(cargarDatos, 60000);
     </script>
