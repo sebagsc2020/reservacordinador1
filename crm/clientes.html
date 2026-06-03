@@ -291,6 +291,44 @@
             background: #5a67d8;
         }
         
+        /* Estilos para el modal de reservas */
+        .reserva-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .reserva-id {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .reserva-fecha {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+        .reserva-excursiones {
+            margin-top: 8px;
+        }
+        .reserva-excursiones-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .reserva-excursiones-lista {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .reserva-excursiones-lista li {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
         /* ===== SCROLL SIDEBAR ===== */
         .sidebar::-webkit-scrollbar {
             width: 4px;
@@ -568,6 +606,26 @@
         }
         
         // ==================================================
+        // FUNCIÓN PARA OBTENER TODAS LAS EXCURSIONES
+        // ==================================================
+        function obtenerListaExcursiones(excursionesRaw) {
+            if (!excursionesRaw) return [];
+            
+            let partes = [];
+            if (excursionesRaw.includes('\n')) {
+                partes = excursionesRaw.split('\n');
+            } else if (excursionesRaw.includes(' | ')) {
+                partes = excursionesRaw.split(' | ');
+            } else if (excursionesRaw.includes(', ')) {
+                partes = excursionesRaw.split(', ');
+            } else {
+                partes = [excursionesRaw];
+            }
+            
+            return partes.map(p => p.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(p => p);
+        }
+        
+        // ==================================================
         // CARGAR CLIENTES
         // ==================================================
         async function cargarClientes() {
@@ -577,7 +635,7 @@
             
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</td';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -626,7 +684,7 @@
                 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<td><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</tr`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td</tr`;
             }
         }
         
@@ -683,7 +741,7 @@
         }
         
         // ==================================================
-        // VER RESERVAS DEL CLIENTE
+        // VER RESERVAS DEL CLIENTE (CON TODAS LAS EXCURSIONES)
         // ==================================================
         async function verReservasCliente(email) {
             try {
@@ -700,11 +758,23 @@
                     if (emailFila.toLowerCase() !== email.toLowerCase()) continue;
                     
                     const id = fila[1] || `R-${i}`;
-                    const fecha = fila[9] || '';
-                    const excursionesRaw = fila[8] || '';
-                    const excursion = excursionesRaw.split('\n')[0] || excursionesRaw.split(' | ')[0] || 'Sin excursión';
+                    const timestamp = fila[0] || '';
+                    let fecha = '';
+                    if (timestamp) {
+                        const fechaObj = new Date(timestamp);
+                        if (!isNaN(fechaObj.getTime())) {
+                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
+                        }
+                    }
                     
-                    reservas.push({ id, fecha: fecha || 'Sin fecha', excursion: excursion.substring(0, 60) });
+                    const excursionesRaw = fila[8] || '';
+                    const excursionesLista = obtenerListaExcursiones(excursionesRaw);
+                    
+                    reservas.push({ 
+                        id: id, 
+                        fecha: fecha || 'Sin fecha', 
+                        excursiones: excursionesLista 
+                    });
                 }
                 
                 function escapeHtml(text) { 
@@ -716,33 +786,55 @@
                 
                 let reservasHtml = '';
                 if (reservas.length === 0) {
-                    reservasHtml = '<p>No hay reservas para este cliente</p>';
+                    reservasHtml = '<p style="text-align:center;padding:20px;">📭 No hay reservas para este cliente</p>';
                 } else {
-                    reservasHtml = '<ul style="margin:0; padding-left:20px;">';
+                    reservasHtml = '';
                     reservas.forEach(r => {
-                        reservasHtml += `<li><strong>${escapeHtml(r.id)}</strong> - ${escapeHtml(r.fecha)} - ${escapeHtml(r.excursion)}</li>`;
+                        let excursionesListHtml = '';
+                        if (r.excursiones && r.excursiones.length > 0) {
+                            excursionesListHtml = '<ul class="reserva-excursiones-lista">';
+                            r.excursiones.forEach(exc => {
+                                excursionesListHtml += `<li>${escapeHtml(exc)}</li>`;
+                            });
+                            excursionesListHtml += '</ul>';
+                        } else {
+                            excursionesListHtml = '<p style="color:#999; font-size:12px;">Sin excursiones específicas</p>';
+                        }
+                        
+                        reservasHtml += `
+                            <div class="reserva-item">
+                                <div class="reserva-id">🆔 Reserva: ${escapeHtml(r.id)}</div>
+                                <div class="reserva-fecha">📅 ${escapeHtml(r.fecha)}</div>
+                                <div class="reserva-excursiones">
+                                    <div class="reserva-excursiones-title">✨ Excursiones seleccionadas:</div>
+                                    ${excursionesListHtml}
+                                </div>
+                            </div>
+                        `;
                     });
-                    reservasHtml += '</ul>';
                 }
                 
                 const modalHtml = `
                     <div id="modalReservas" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:2000;">
-                        <div style="background:white; border-radius:16px; max-width:500px; width:90%; max-height:70vh; overflow-y:auto; padding:20px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <div style="background:white; border-radius:20px; max-width:550px; width:90%; max-height:85vh; overflow-y:auto; padding:25px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #eef2ff; padding-bottom:12px;">
                                 <h3 style="color:#667eea;">📋 Reservas del cliente</h3>
-                                <button onclick="cerrarModalReservas()" style="background:none; border:none; font-size:22px; cursor:pointer;">✕</button>
+                                <button onclick="cerrarModalReservas()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">✕</button>
                             </div>
-                            <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-                            <p><strong>Total reservas:</strong> ${reservas.length}</p>
-                            <hr style="margin:10px 0;">
-                            ${reservasHtml}
-                            <button onclick="cerrarModalReservas()" style="width:100%; padding:10px; background:#667eea; color:white; border:none; border-radius:8px; margin-top:15px; cursor:pointer;">Cerrar</button>
+                            <p><strong>📧 Email:</strong> ${escapeHtml(email)}</p>
+                            <p><strong>📊 Total reservas:</strong> ${reservas.length}</p>
+                            <hr style="margin:15px 0;">
+                            <div style="max-height: 50vh; overflow-y: auto;">
+                                ${reservasHtml}
+                            </div>
+                            <button onclick="cerrarModalReservas()" style="width:100%; padding:12px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border:none; border-radius:12px; margin-top:20px; cursor:pointer; font-weight:600;">Cerrar</button>
                         </div>
                     </div>
                 `;
                 document.body.insertAdjacentHTML('beforeend', modalHtml);
                 
             } catch (error) {
+                console.error(error);
                 alert('Error al cargar reservas: ' + error.message);
             }
         }
