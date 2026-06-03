@@ -699,7 +699,7 @@
             if (!tbody) return;
             
             if (clientesFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td</tr';
                 return;
             }
             
@@ -712,13 +712,13 @@
             
             tbody.innerHTML = clientesFiltrados.map((cliente) => `
                 <tr>
-                    <td>${cliente.id}</td>
-                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
-                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td>
-                    <td>${escapeHtml(cliente.telefono || 'No registrado')}</td>
-                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td>
-                    <td><span class="badge badge-activo">Activo</span></td>
-                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td>
+                    <td>${cliente.id}</td
+                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td
+                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td
+                    <td>${escapeHtml(cliente.telefono || 'No registrado')}</td
+                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td
+                    <td><span class="badge badge-activo">Activo</span></td
+                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td
                 </tr>
             `).join('');
         }
@@ -756,13 +756,14 @@
                 return div.innerHTML; 
             }
             
+            // Construir filas de la tabla correctamente
             let filasTabla = '';
             for (const cliente of clientesFiltrados) {
                 filasTabla += `
                     <tr>
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.nombre)}</td>
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.email)}</td>
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.telefono || 'No registrado')}</td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #e0e0e0; font-size: 11px;">${escapeHtml(cliente.nombre)}</td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #e0e0e0; font-size: 11px;">${escapeHtml(cliente.email)}</td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #e0e0e0; font-size: 11px;">${escapeHtml(cliente.telefono || 'No registrado')}</td>
                     </tr>
                 `;
             }
@@ -774,25 +775,29 @@
                     <meta charset="UTF-8">
                     <title>Lista de Clientes - Aventura Total</title>
                     <style>
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
                         body {
                             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                             padding: 20px;
-                            margin: 0;
                             background: white;
                         }
                         .header {
                             text-align: center;
-                            margin-bottom: 25px;
+                            margin-bottom: 20px;
                             border-bottom: 2px solid #667eea;
                             padding-bottom: 15px;
                         }
                         .logo {
                             font-size: 40px;
-                            margin-bottom: 8px;
+                            margin-bottom: 5px;
                         }
                         h1 {
                             color: #1a1a2e;
-                            font-size: 20px;
+                            font-size: 22px;
                             margin-bottom: 5px;
                         }
                         .subtitulo {
@@ -811,35 +816,35 @@
                             margin-top: 15px;
                         }
                         th {
-                            background: #667eea;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                             color: white;
                             padding: 10px 8px;
                             text-align: left;
-                            font-size: 11px;
+                            font-size: 12px;
                             font-weight: 600;
                         }
                         td {
-                            padding: 8px;
+                            padding: 10px 8px;
                             border-bottom: 1px solid #e0e0e0;
-                            font-size: 10px;
+                            font-size: 11px;
                             color: #333;
                         }
                         .total-container {
                             margin-top: 20px;
                             text-align: right;
-                            font-size: 11px;
+                            font-size: 12px;
                             font-weight: bold;
                             color: #667eea;
                             border-top: 1px solid #e0e0e0;
                             padding-top: 12px;
                         }
                         .footer {
-                            margin-top: 25px;
+                            margin-top: 20px;
                             text-align: center;
                             font-size: 9px;
                             color: #999;
                             border-top: 1px solid #e0e0e0;
-                            padding-top: 15px;
+                            padding-top: 12px;
                         }
                     </style>
                 </head>
@@ -880,7 +885,7 @@
                 filename: `clientes_aventura_total_${fechaActual.getFullYear()}-${(fechaActual.getMonth()+1).toString().padStart(2,'0')}-${fechaActual.getDate().toString().padStart(2,'0')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, letterRendering: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
             
             html2pdf().set(opt).from(contenidoPDF).save();
