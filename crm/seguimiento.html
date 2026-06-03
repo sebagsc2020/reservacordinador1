@@ -7,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
-        
+
         /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
         .menu-btn {
             position: fixed;
@@ -26,17 +26,17 @@
             transition: all 0.3s ease;
             border: none;
         }
-        
+
         .menu-btn:hover {
             background: #5a6fd6;
             transform: scale(1.05);
         }
-        
+
         .menu-btn span {
             font-size: 24px;
             color: white;
         }
-        
+
         /* ===== SIDEBAR ===== */
         .sidebar { 
             width: 250px; 
@@ -51,11 +51,11 @@
             transform: translateX(-100%);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
-        
+
         .sidebar.open {
             transform: translateX(0);
         }
-        
+
         .menu-overlay {
             position: fixed;
             top: 0;
@@ -68,17 +68,17 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        
+
         .menu-overlay.active {
             display: block;
             opacity: 1;
         }
-        
+
         .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .sidebar-logo .logo-icon { font-size: 40px; } 
         .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } 
         .sidebar-logo h2 span { color: #667eea; }
-        
+
         .nav-menu { list-style: none; padding: 0 15px; } 
         .nav-menu li { margin-bottom: 5px; }
         .nav-menu a { 
@@ -95,7 +95,7 @@
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
         .nav-menu a.active { background: #667eea; }
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        
+
         .sidebar-footer { 
             position: absolute; 
             bottom: 20px; 
@@ -117,7 +117,7 @@
         .btn-logout-sidebar:hover {
             background: rgba(231,76,60,0.4);
         }
-        
+
         /* ===== CONTENIDO PRINCIPAL ===== */
         .main-content { 
             margin-left: 0;
@@ -155,7 +155,7 @@
             color: white; 
             font-weight: 700; 
         }
-        
+
         .metricas-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
@@ -174,7 +174,7 @@
         .metrica-card:hover { transform: translateY(-3px); }
         .metrica-valor { font-size: 32px; font-weight: 800; color: #667eea; } 
         .metrica-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
-        
+
         .btn-recargar { 
             padding: 10px 20px; 
             background: #27ae60; 
@@ -187,7 +187,7 @@
         }
         .btn-recargar:active { transform: scale(0.96); }
         .btn-recargar:hover { background: #219a52; transform: translateY(-2px); }
-        
+
         .kanban-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .kanban-column { background: #f8f9fa; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; }
         .kanban-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e0e0e0; }
@@ -199,7 +199,7 @@
         .kanban-column.confirmado .kanban-count { background: #27ae60; color: white; }
         .kanban-column.pagado .kanban-header { border-bottom-color: #3498db; } 
         .kanban-column.pagado .kanban-count { background: #3498db; color: white; }
-        
+
         .kanban-cards { 
             flex: 1; 
             display: flex; 
@@ -212,7 +212,7 @@
         .kanban-cards::-webkit-scrollbar { width: 5px; }
         .kanban-cards::-webkit-scrollbar-track { background: #e0e0e0; border-radius: 10px; }
         .kanban-cards::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
-        
+
         .kanban-card { 
             background: white; 
             border-radius: 12px; 
@@ -235,9 +235,9 @@
         .kanban-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
         .kanban-card-personas { background: #f0f0ff; color: #667eea; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
         .kanban-card-formapago { color: #888; }
-        
+
         .loading-text { text-align: center; padding: 30px; color: #999; }
-        
+
         /* ===== PRELOADER POPUP ===== */
         .preloader-popup {
             position: fixed;
@@ -281,511 +281,99 @@
         .preloader-popup-subtitulo { font-size: 14px; color: #666; }
         .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
         @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
-        
-        /* Estilos para botones de cambio de estado en modal */
-        .modal-buttons-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-        .btn-modal-estado {
-            flex: 1;
-            padding: 10px 12px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-        .btn-modal-estado:active { transform: scale(0.96); }
-        .btn-modal-estado:hover { transform: translateY(-1px); filter: brightness(1.05); }
-        .btn-modal-confirmar { background: #27ae60; color: white; }
-        .btn-modal-pendiente { background: #ffc107; color: #856404; }
-        .btn-modal-pagado { background: #3498db; color: white; }
-        
+
+        /* Estilos para el botón de cobrar */
+        .btn-cobrar {
         /* Estilos para botón de pago WhatsApp */
         .btn-pagar-whatsapp {
             width: 100%;
             padding: 14px;
+            background: linear-gradient(135deg, #009ee3 0%, #0077b3 100%);
             background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
             color: white;
             border: none;
             border-radius: 12px;
-            margin-top: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
+@@ -300,11 +300,11 @@
             justify-content: center;
             gap: 10px;
         }
+        .btn-cobrar:hover {
         .btn-pagar-whatsapp:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,158,227,0.3);
             box-shadow: 0 5px 15px rgba(37,211,102,0.3);
         }
+        .btn-cobrar:active {
         .btn-pagar-whatsapp:active {
             transform: scale(0.98);
         }
-        
-        .aviso-pago {
-            background: #fff3cd;
-            border: 1px solid #ffecb5;
-            border-radius: 10px;
-            padding: 12px;
-            margin-top: 15px;
-            font-size: 12px;
-            color: #856404;
-            text-align: center;
-        }
-        
-        /* Scroll sidebar */
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar::-webkit-scrollbar-track {
-            background: #1a1a2e;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
-        }
-        
-        /* Desktop */
-        @media (min-width: 769px) {
-            .menu-btn {
-                display: none !important;
-            }
-            
-            .sidebar {
-                transform: translateX(0) !important;
-                width: 250px;
-            }
-            
-            .menu-overlay {
-                display: none !important;
-            }
-            
-            .main-content {
-                margin-left: 250px;
-                padding: 30px;
-            }
-        }
-        
-        /* Tablet */
-        @media (max-width: 1100px) and (min-width: 769px) { 
-            .kanban-board { grid-template-columns: repeat(2, 1fr); } 
-        }
-        
-        /* Móvil */
-        @media (max-width: 768px) { 
-            .menu-btn {
-                display: flex;
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 60px 12px 20px;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            .user-info {
-                padding: 5px 12px;
-                font-size: 12px;
-            }
-            
-            .user-avatar {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
-            
-            .metricas-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-            
-            .metrica-valor {
-                font-size: 28px;
-            }
-            
-            .kanban-board {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .kanban-column {
-                padding: 15px;
-            }
-            
-            .preloader-popup-contenido {
-                padding: 25px 35px;
-            }
-            
-            .preloader-popup-icono {
-                width: 55px;
-                height: 55px;
-            }
-            
-            .preloader-popup-titulo {
-                font-size: 18px;
-            }
-            
-            .modal-buttons-row {
-                flex-direction: column;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .header div:first-child {
-                width: 100%;
-            }
-            
-            .metricas-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Botón menú hamburguesa (solo móvil) -->
-    <button class="menu-btn" id="menuBtn">
-        <span>☰</span>
-    </button>
-    
-    <!-- Overlay para cerrar menú -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-    
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🏔️</div>
-            <h2>Aventura <span>Total</span></h2>
-            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
-            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
-            <li><a href="seguimiento.html" class="active"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
-            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
-            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
-        </div>
-    </nav>
-    
-    <div class="main-content">
-        <div class="header">
-            <div>
-                <h1>📈 Seguimiento</h1>
-                <p style="color:#999;font-size:13px;">Pipeline de reservas - Estado actual</p>
-            </div>
-            <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
-                <button class="btn-recargar" onclick="cargarDatos()">🔄 Recargar</button>
-                <div class="user-info">
-                    <div class="user-avatar">A</div>
-                    <span>Admin</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="metricas-grid">
-            <div class="metrica-card"><div class="metrica-valor" id="metricaTotal">--</div><div class="metrica-label">Total Reservas</div></div>
-            <div class="metrica-card"><div class="metrica-valor" id="metricaConfirmadas">--</div><div class="metrica-label">Confirmadas</div></div>
-            <div class="metrica-card"><div class="metrica-valor" id="metricaPendientes">--</div><div class="metrica-label">Pendientes</div></div>
-            <div class="metrica-card"><div class="metrica-valor" id="metricaPagadas">--</div><div class="metrica-label">Pagadas</div></div>
-        </div>
-        
-        <div class="kanban-board" id="kanbanBoard">
-            <div class="kanban-column pendiente">
-                <div class="kanban-header"><span class="kanban-title">⏳ Pendientes</span><span class="kanban-count" id="countPendiente">0</span></div>
-                <div class="kanban-cards" id="kanbanPendiente"><div class="loading-text">Cargando...</div></div>
-            </div>
-            <div class="kanban-column confirmado">
-                <div class="kanban-header"><span class="kanban-title">✅ Confirmadas</span><span class="kanban-count" id="countConfirmado">0</span></div>
-                <div class="kanban-cards" id="kanbanConfirmado"><div class="loading-text">Cargando...</div></div>
-            </div>
-            <div class="kanban-column pagado">
-                <div class="kanban-header"><span class="kanban-title">💰 Pagadas</span><span class="kanban-count" id="countPagado">0</span></div>
-                <div class="kanban-cards" id="kanbanPagado"><div class="loading-text">Cargando...</div></div>
-            </div>
-        </div>
-    </div>
 
-    <!-- PRELOADER POPUP -->
-    <div id="preloaderPopup" class="preloader-popup oculto">
-        <div class="preloader-popup-contenido">
-            <div class="preloader-popup-icono"></div>
-            <div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div>
-            <div class="preloader-popup-subtitulo">Cargando datos desde Google Sheets...</div>
-        </div>
-    </div>
+@@ -595,64 +595,6 @@
+            }
+        }
 
-    <script>
-        // ==================================================
-        // MENÚ FLOTANTE
-        // ==================================================
-        const menuBtn = document.getElementById('menuBtn');
-        const sidebar = document.getElementById('sidebar');
-        const menuOverlay = document.getElementById('menuOverlay');
-        
-        function toggleMenu() {
-            sidebar.classList.toggle('open');
-            menuOverlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-        }
-        
-        function closeMenu() {
-            sidebar.classList.remove('open');
-            menuOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        if (menuBtn) {
-            menuBtn.addEventListener('click', toggleMenu);
-        }
-        
-        if (menuOverlay) {
-            menuOverlay.addEventListener('click', closeMenu);
-        }
-        
-        // Cerrar menú al hacer clic en un enlace
-        document.querySelectorAll('.nav-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    closeMenu();
+        function parseCSV(csvText) {
+            const lineas = csvText.split('\n');
+            const resultados = [];
+            for (let i = 0; i < lineas.length; i++) {
+                const linea = lineas[i].trim();
+                if (!linea) continue;
+                const fila = [];
+                let campo = '';
+                let enComillas = false;
+                for (let j = 0; j < linea.length; j++) {
+                    const char = linea[j];
+                    if (char === '"') { enComillas = !enComillas; } 
+                    else if (char === ',' && !enComillas) { fila.push(campo); campo = ''; } 
+                    else { campo += char; }
                 }
-            });
-        });
-        
-        // ==================================================
-        // CONFIGURACIÓN
-        // ==================================================
-        if (sessionStorage.getItem('crm_logged') !== 'true') { 
-            window.location.href = 'index.html'; 
-        }
-        
-        function logout() { 
-            sessionStorage.clear(); 
-            window.location.href = 'index.html'; 
-        }
-
-        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const SHEET_NAME = 'Hoja 1';
-        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
-        
-        // Misma URL del Google Apps Script que en reservas.html
-        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
-        
-        // Link de Mercado Pago
-        const MERCADO_PAGO_LINK = 'https://link.mercadopago.com.ar/scphotobr';
-        
-        let reservasData = [];
-        let estadosGlobales = {};
-
-        // Preloader Popup
-        const preloaderPopup = document.getElementById('preloaderPopup');
-        
-        function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
-        function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
-
-        async function guardarEstadoEnNube(id, nuevoEstado) {
-            try {
-                await fetch(ESTADOS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'action=guardar&id=' + encodeURIComponent(id) + '&estado=' + encodeURIComponent(nuevoEstado)
-                });
-                return true;
-            } catch (error) {
-                console.error('Error al guardar en nube:', error);
-                return false;
+                fila.push(campo);
+                resultados.push(fila.map(c => c.replace(/^"|"$/g, '').trim()));
             }
+            return resultados;
         }
 
-        async function cambiarEstado(id, nuevoEstado) {
-            const reserva = reservasData.find(r => r.id === id);
-            if (reserva) {
-                reserva.estado = nuevoEstado;
-                estadosGlobales[id] = nuevoEstado;
-                await guardarEstadoEnNube(id, nuevoEstado);
-                await cargarDatos(); // Recargar datos para actualizar Kanban
-                cerrarModal(); // Cerrar el modal después de cambiar estado
+        function formatearFecha(fechaStr) {
+            if (!fechaStr) return '';
+            if (fechaStr.includes('/')) return fechaStr;
+            const partes = fechaStr.split('-');
+            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            return fechaStr;
+        }
+
+        function dividirExcursiones(texto) {
+            if (!texto) return [];
+            if (texto.includes('\n')) {
+                return texto.split('\n').map(p => p.trim().replace(/^\d+\.\s*/, '')).filter(p => p);
             }
+            return [texto.trim().replace(/^\d+\.\s*/, '')].filter(p => p);
         }
 
-        async function cargarEstadosDesdeNube() {
-            try {
-                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener');
-                const data = await response.json();
-                if (data.success && data.estados) {
-                    estadosGlobales = data.estados;
-                    localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
-                    return estadosGlobales;
-                } else {
-                    throw new Error('No se pudieron obtener estados');
-                }
-            } catch (error) {
-                console.error('Error al cargar desde nube:', error);
-                const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
-                estadosGlobales = estadosLocal;
-                return estadosLocal;
+        // Función para abrir Mercado Pago con mensaje de advertencia
+        function abrirMercadoPago() {
+            // Mostrar mensaje de advertencia antes de redirigir
+            const confirmar = confirm('⚠️ ATENCIÓN ⚠️\n\nCaso no recuerde el monto total de su reserva, solicítelo vía WhatsApp.\n\n¿Desea continuar al link de pago?');
+            
+            if (confirmar) {
+                // Intentar abrir la app de Mercado Pago (deep link)
+                const mercadoPagoAppLink = 'mercadopago://' + MERCADO_PAGO_LINK.replace('https://', '');
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = mercadoPagoAppLink;
+                document.body.appendChild(iframe);
+                
+                // Si después de 2 segundos no se abrió la app, redirigir a la web
+                setTimeout(function() {
+                    document.body.removeChild(iframe);
+                    window.open(MERCADO_PAGO_LINK, '_blank');
+                }, 2000);
             }
         }
 
         async function cargarDatos() {
             try {
                 mostrarPreloader();
-
-                // Cargar estados desde la nube
-                await cargarEstadosDesdeNube();
-
-                const response = await fetch(JSON_URL);
-                const texto = await response.text();
-
-                let jsonStr = texto;
-                jsonStr = jsonStr.replace("/*O_o*/", "");
-                jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
-                jsonStr = jsonStr.slice(0, -2);
-
-                const data = JSON.parse(jsonStr);
-                const rows = data.table.rows;
-
-                if (!rows || rows.length === 0) throw new Error('No hay datos');
-
-                reservasData = [];
-                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
-
-                for (let i = 0; i < rows.length; i++) {
-                    const c = rows[i].c;
-                    if (!c || c.length < 5) continue;
-
-                    const id = (c[1] && c[1].v) ? String(c[1].v) : '';
-                    if (!id || excluidos.includes(id)) continue;
-
-                    const nombre = (c[2] && c[2].v) ? String(c[2].v) : '';
-                    const apellido = (c[3] && c[3].v) ? String(c[3].v) : '';
-                    const email = (c[4] && c[4].v) ? String(c[4].v) : '';
-                    const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
-                    const ciudad = (c[7] && c[7].v) ? String(c[7].v) : '';
-
-                    let excursionesLista = [];
-                    const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
-                    if (excursionesRaw) {
-                        if (excursionesRaw.includes('\n')) {
-                            excursionesLista = excursionesRaw.split('\n');
-                        } else if (excursionesRaw.includes(' | ')) {
-                            excursionesLista = excursionesRaw.split(' | ');
-                        } else {
-                            excursionesLista = [excursionesRaw];
-                        }
-                        excursionesLista = excursionesLista.map(function(e) { 
-                            return e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
-                        }).filter(function(e) { return e; });
-                    }
-
-                    let fecha = '';
-                    const timestamp = (c[0] && c[0].v) ? c[0].v : null;
-                    if (timestamp) {
-                        const fechaObj = new Date(timestamp);
-                        if (!isNaN(fechaObj.getTime())) {
-                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
-                        }
-                    }
-
-                    const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
-                    const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
-                    const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
-
-                    // Obtener estado desde la nube (misma fuente que reservas.html)
-                    let estado = estadosGlobales[id];
-                    if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
-                        estado = 'confirmado';
-                    }
-
-                    reservasData.push({
-                        id: id,
-                        fecha: fecha,
-                        nombre: nombreCompleto,
-                        email: email,
-                        telefono: telefono,
-                        ciudad: ciudad,
-                        excursionesLista: excursionesLista,
-                        personas: parseInt(personas) || 1,
-                        formaPago: formaPago,
-                        estado: estado
-                    });
-                }
-
-                console.log(`📊 Cargadas ${reservasData.length} reservas`);
-
-                // Actualizar métricas
-                const total = reservasData.length;
-                const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
-                const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
-                const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
-                
-                document.getElementById('metricaTotal').textContent = total;
-                document.getElementById('metricaConfirmadas').textContent = confirmadas;
-                document.getElementById('metricaPendientes').textContent = pendientes;
-                document.getElementById('metricaPagadas').textContent = pagadas;
-                
-                document.getElementById('countPendiente').textContent = pendientes;
-                document.getElementById('countConfirmado').textContent = confirmadas;
-                document.getElementById('countPagado').textContent = pagadas;
-                
-                // Actualizar columnas Kanban
-                document.getElementById('kanbanPendiente').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pendiente'));
-                document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'confirmado'));
-                document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pagado'));
-                
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('kanbanPendiente').innerHTML = '<div class="loading-text">Error al cargar datos</div>';
-            } finally {
-                ocultarPreloader();
-            }
-        }
-
-        function renderizarTarjetas(reservas) {
-            if (reservas.length === 0) {
-                return '<div class="loading-text">📭 Sin reservas</div>';
-            }
-            return reservas.map(r => {
-                const excursionPrimera = r.excursionesLista && r.excursionesLista.length > 0 ? r.excursionesLista[0] : 'Sin excursiones';
-                const excursionesTexto = excursionPrimera + (r.excursionesLista && r.excursionesLista.length > 1 ? ` (+${r.excursionesLista.length-1} más)` : '');
-                
-                return `
-                    <div class="kanban-card ${r.estado}" onclick="verDetalle('${escapeHtml(r.id)}')">
-                        <div class="kanban-card-header">
-                            <span class="kanban-card-id">${escapeHtml(r.id)}</span>
-                            <span class="kanban-card-fecha">${escapeHtml(r.fecha)}</span>
-                        </div>
-                        <div class="kanban-card-cliente">${escapeHtml(r.nombre)}</div>
-                        <div class="kanban-card-excursion">${escapeHtml(excursionesTexto)}</div>
-                        <div class="kanban-card-footer">
-                            <span class="kanban-card-personas">👥 ${escapeHtml(r.personas)}</span>
-                            <span class="kanban-card-formapago">${escapeHtml(r.formaPago)}</span>
-                        </div>
-                    </div>
-                `;
+@@ -792,6 +734,37 @@
             }).join('');
         }
 
@@ -823,92 +411,25 @@ ${MERCADO_PAGO_LINK}
         function verDetalle(id) {
             const reserva = reservasData.find(r => r.id === id);
             if (!reserva) return;
-            
-            let estadoText = '';
-            switch(reserva.estado) {
-                case 'pendiente': estadoText = 'Pendiente'; break;
-                case 'confirmado': estadoText = 'Confirmado'; break;
-                case 'pagado': estadoText = 'Pagado'; break;
-                default: estadoText = 'Confirmado';
-            }
-            
-            let excursionesHtml = '<ul style="margin:5px 0 0 20px; padding:0;">';
-            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
-                reserva.excursionesLista.forEach(exc => {
-                    excursionesHtml += `<li style="margin-bottom:3px;">${escapeHtml(exc)}</li>`;
-                });
-            } else {
-                excursionesHtml += '<li>Sin excursiones</li>';
-            }
-            excursionesHtml += '</ul>';
-            
-            const modalHtml = `
-                <div id="modalDetalle" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:2000;">
-                    <div style="background:white; border-radius:20px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto; padding:25px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                            <h2 style="color:#667eea;">📋 Detalle de Reserva</h2>
-                            <button onclick="cerrarModal()" style="background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
-                        </div>
-                        <p><strong>ID:</strong> ${escapeHtml(reserva.id)}</p>
-                        <p><strong>Fecha:</strong> ${escapeHtml(reserva.fecha)}</p>
-                        <p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p>
-                        <p><strong>Email:</strong> ${escapeHtml(reserva.email)}</p>
-                        <p><strong>Teléfono:</strong> ${escapeHtml(reserva.telefono)}</p>
-                        <p><strong>Ciudad:</strong> ${escapeHtml(reserva.ciudad)}</p>
-                        <p><strong>Personas:</strong> ${escapeHtml(reserva.personas)}</p>
-                        <p><strong>Excursiones:</strong> ${excursionesHtml}</p>
-                        <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
-                        <p><strong>Estado:</strong> <span style="background:#eef2ff; padding:3px 10px; border-radius:20px; font-weight:700;">${estadoText}</span></p>
-                        
-                        <!-- Botones de cambio de estado -->
-                        <div class="modal-buttons-row">
-                            <button class="btn-modal-estado btn-modal-confirmar" onclick="cambiarEstado('${reserva.id}', 'confirmado')">
-                                ✅ Confirmada
-                            </button>
-                            <button class="btn-modal-estado btn-modal-pendiente" onclick="cambiarEstado('${reserva.id}', 'pendiente')">
-                                ⏳ Pendiente
-                            </button>
-                            <button class="btn-modal-estado btn-modal-pagado" onclick="cambiarEstado('${reserva.id}', 'pagado')">
-                                💰 Pagada
-                            </button>
-                        </div>
-                        
-                        <!-- Mensaje de aviso -->
-                        <div class="aviso-pago">
+@@ -837,9 +810,9 @@
                             ⚠️ <strong>Importante:</strong> Caso no recuerde el monto total de su reserva, solicítelo vía WhatsApp. Muchas Gracias.
                         </div>
                         
+                        <!-- Botón Cobrar Mercado Pago -->
+                        <button class="btn-cobrar" onclick="abrirMercadoPago()">
+                            💰 Cobrar con Mercado Pago
                         <!-- Botón Enviar link de pago por WhatsApp -->
                         <button class="btn-pagar-whatsapp" onclick="enviarLinkPagoWhatsApp(reservasData.find(r => r.id === '${reserva.id}'))">
                             💬 Enviar link de pago por WhatsApp
                         </button>
                         
                         <button onclick="cerrarModal()" style="width:100%; padding:12px; background:#667eea; color:white; border:none; border-radius:12px; margin-top:10px; cursor:pointer;">Cerrar</button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-        }
-
-        function cerrarModal() {
-            const modal = document.getElementById('modalDetalle');
-            if (modal) modal.remove();
-        }
-
-        function escapeHtml(text) { 
-            if (!text) return ''; 
-            const div = document.createElement('div'); 
-            div.textContent = text; 
-            return div.innerHTML; 
-        }
-
-        // Exponer funciones globalmente
-        window.verDetalle = verDetalle;
+@@ -866,10 +839,10 @@
         window.cerrarModal = cerrarModal;
         window.cargarDatos = cargarDatos;
         window.logout = logout;
+        window.abrirMercadoPago = abrirMercadoPago;
         window.enviarLinkPagoWhatsApp = enviarLinkPagoWhatsApp;
-        window.cambiarEstado = cambiarEstado;
 
         cargarDatos();
         setInterval(cargarDatos, 30000);
