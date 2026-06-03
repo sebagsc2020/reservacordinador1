@@ -32,7 +32,6 @@
             transition: transform 0.3s ease;
         }
         
-        /* Botón menú móvil */
         .menu-toggle {
             display: none;
             position: fixed;
@@ -106,7 +105,174 @@
         }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
-        /* ===== CALENDARIO ADAPTATIVO ===== */
+        /* ===== LISTA DE EVENTOS SUPERIOR ===== */
+        .eventos-lista-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+        
+        .eventos-lista-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .eventos-lista-header h3 {
+            color: #1a1a2e;
+            font-size: clamp(16px, 4vw, 18px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-crear-rapido {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-crear-rapido:active {
+            transform: scale(0.96);
+        }
+        
+        .buscar-eventos {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 13px;
+            width: 200px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .buscar-eventos:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .eventos-lista-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        
+        .evento-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            border-left: 4px solid #667eea;
+        }
+        
+        .evento-card:hover {
+            background: #e9ecef;
+            transform: translateX(3px);
+        }
+        
+        .evento-card-info {
+            flex: 1;
+            cursor: pointer;
+        }
+        
+        .evento-card-titulo {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        
+        .evento-card-fechas {
+            font-size: 11px;
+            color: #666;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .evento-card-cliente {
+            font-size: 11px;
+            color: #667eea;
+            margin-top: 4px;
+        }
+        
+        .evento-card-estado {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        
+        .estado-confirmado { background: #d4edda; color: #155724; }
+        .estado-pendiente { background: #fff3cd; color: #856404; }
+        .estado-pagado { background: #d1ecf1; color: #0c5460; }
+        
+        .evento-card-acciones {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-eliminar-evento {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-eliminar-evento:active {
+            transform: scale(0.94);
+        }
+        
+        .btn-editar-evento {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-editar-evento:active {
+            transform: scale(0.94);
+        }
+        
+        .sin-eventos {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            grid-column: 1 / -1;
+        }
+        
+        /* ===== CALENDARIO ===== */
         .calendar-container {
             background: white;
             border-radius: 15px;
@@ -189,7 +355,6 @@
             overflow-y: auto;
         }
         
-        /* Scroll personalizado para días con muchos eventos */
         .calendar-day::-webkit-scrollbar {
             width: 3px;
         }
@@ -255,16 +420,11 @@
             transform: scale(0.98);
         }
         
-        .evento-rango {
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            color: white;
-        }
-        
         .event-confirmado { background: #d4edda; color: #155724; border-left: 3px solid #28a745; }
         .event-pendiente { background: #fff3cd; color: #856404; border-left: 3px solid #ffc107; }
         .event-pagado { background: #d1ecf1; color: #0c5460; border-left: 3px solid #17a2b8; }
         
-        /* Modal adaptativo */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -323,9 +483,6 @@
             border-radius: 10px;
             font-size: 14px;
             box-sizing: border-box;
-            transition: border-color 0.3s ease;
-            -webkit-appearance: none;
-            appearance: none;
         }
         
         .modal-content input:focus,
@@ -378,14 +535,12 @@
             cursor: pointer;
             color: #999;
             transition: color 0.3s ease;
-            line-height: 1;
         }
         
         .close-modal:active {
             color: #333;
         }
         
-        /* Mensajes flotantes */
         .mensaje-flotante {
             position: fixed;
             bottom: 20px;
@@ -426,7 +581,6 @@
             text-align: center;
         }
         
-        /* Botón flotante adaptativo */
         .btn-flotante {
             position: fixed;
             bottom: 20px;
@@ -451,152 +605,36 @@
             transform: scale(0.92);
         }
         
-        /* ===== MEDIA QUERIES RESPONSIVAS ===== */
+        .modal-eliminar {
+            text-align: center;
+        }
+        
+        .modal-eliminar button {
+            margin: 10px 5px;
+            width: auto;
+            padding: 10px 20px;
+        }
+        
+        .btn-confirmar-eliminar {
+            background: #e74c3c !important;
+        }
+        
+        .btn-cancelar-eliminar {
+            background: #95a5a6 !important;
+        }
+        
         @media (max-width: 768px) {
-            .menu-toggle {
-                display: flex;
-            }
-            
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-            
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 60px 15px 20px;
-            }
-            
-            .calendar-header button {
-                padding: 6px 12px;
-                min-width: 60px;
-            }
-            
-            .weekday {
-                padding: 6px 3px;
-                font-size: 10px;
-            }
-            
-            .calendar-day {
-                min-height: 70px;
-                padding: 4px;
-            }
-            
-            .event-item {
-                padding: 2px 4px;
-                margin-bottom: 2px;
-                font-size: 8px;
-            }
-            
-            .day-number {
-                font-size: 11px;
-                margin-bottom: 3px;
-            }
-            
-            .btn-flotante {
-                width: 50px;
-                height: 50px;
-                font-size: 24px;
-                bottom: 15px;
-                right: 15px;
-            }
-            
-            .modal-content {
-                margin: 10% auto;
-                padding: 20px;
-                width: 95%;
-            }
-            
-            .fecha-rango {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .fecha-rango div {
-                width: 100%;
-            }
+            .menu-toggle { display: flex; }
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 60px 15px 20px; }
+            .eventos-lista-grid { grid-template-columns: 1fr; max-height: 250px; }
+            .buscar-eventos { width: 100%; }
         }
         
         @media (max-width: 480px) {
-            .header h1 {
-                font-size: 18px;
-            }
-            
-            .user-info {
-                padding: 5px 12px;
-                font-size: 12px;
-            }
-            
-            .user-avatar {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
-            
-            .weekday {
-                font-size: 9px;
-                padding: 5px 2px;
-            }
-            
-            .calendar-day {
-                min-height: 60px;
-            }
-            
-            .calendar-header {
-                flex-direction: column;
-            }
-            
-            .calendar-nav-buttons {
-                order: 1;
-            }
-            
-            .calendar-header h2 {
-                order: 0;
-            }
-            
-            .mensaje-flotante {
-                left: 10px;
-                right: 10px;
-                bottom: 10px;
-                font-size: 12px;
-                text-align: center;
-            }
-        }
-        
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .calendar-day {
-                min-height: 90px;
-            }
-            
-            .event-item {
-                font-size: 10px;
-            }
-        }
-        
-        /* Para tablets en landscape */
-        @media (min-width: 1025px) {
-            .calendar-day {
-                min-height: 110px;
-            }
-        }
-        
-        /* Ajustes para touch */
-        @media (hover: none) and (pointer: coarse) {
-            .calendar-day:hover {
-                transform: none;
-            }
-            
-            button:hover {
-                transform: none;
-            }
-            
-            .event-item:hover {
-                transform: none;
-            }
+            .evento-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .evento-card-acciones { width: 100%; justify-content: flex-end; }
         }
     </style>
 </head>
@@ -626,11 +664,25 @@
         <div class="header">
             <div>
                 <h1>📅 Calendario de Eventos</h1>
-                <p>Eventos por rango de fechas | Adaptado para móvil</p>
+                <p>Gestión visual con rango de fechas</p>
             </div>
             <div class="user-info">
                 <div class="user-avatar">A</div>
                 <span>Admin</span>
+            </div>
+        </div>
+        
+        <!-- LISTA DE EVENTOS SUPERIOR -->
+        <div class="eventos-lista-container">
+            <div class="eventos-lista-header">
+                <h3>📋 Lista de Eventos <span id="eventosCount">(0)</span></h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="buscarEventos" class="buscar-eventos" placeholder="🔍 Buscar evento...">
+                    <button class="btn-crear-rapido" onclick="abrirModalCrear()">➕ Nuevo Evento</button>
+                </div>
+            </div>
+            <div id="eventosListaGrid" class="eventos-lista-grid">
+                <!-- Eventos cargados dinámicamente -->
             </div>
         </div>
         
@@ -658,7 +710,7 @@
         </div>
     </div>
     
-    <!-- Modal para crear evento con RANGO -->
+    <!-- Modal para crear/editar evento -->
     <div id="eventModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="cerrarModal()">&times;</span>
@@ -688,11 +740,25 @@
                 <option value="pagado">🔵 Pagado</option>
             </select>
             <textarea id="eventoDescripcion" rows="3" placeholder="Descripción..."></textarea>
-            <button onclick="guardarEventoRango()">💾 Guardar en Google Sheets</button>
+            <button id="btnGuardarModal" onclick="guardarEventoRango()">💾 Guardar en Google Sheets</button>
         </div>
     </div>
     
-    <button class="btn-flotante" id="btnFlotante" onclick="abrirModalCrear()">+</button>
+    <!-- Modal de confirmación para eliminar -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content modal-eliminar">
+            <span class="close-modal" onclick="cerrarConfirmModal()">&times;</span>
+            <h2>🗑️ Confirmar Eliminación</h2>
+            <p style="margin: 20px 0;">¿Estás seguro de eliminar este evento?</p>
+            <p id="eventoAEliminarInfo" style="color: #667eea; font-weight: 600;"></p>
+            <div>
+                <button class="btn-cancelar-eliminar" onclick="cerrarConfirmModal()">Cancelar</button>
+                <button class="btn-confirmar-eliminar" onclick="confirmarEliminar()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+    
+    <button class="btn-flotante" onclick="abrirModalCrear()">+</button>
     
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMJ2pnekFjza6cEp6DglLMEVz5C49hwusa6u1V6Sw3N_40YKg1GOfPWYdSoqhpaA4baw/exec";
@@ -706,7 +772,6 @@
                 sidebar.classList.toggle('open');
             });
             
-            // Cerrar menú al hacer clic en un enlace
             document.querySelectorAll('.nav-menu a').forEach(link => {
                 link.addEventListener('click', () => {
                     sidebar.classList.remove('open');
@@ -714,7 +779,6 @@
             });
         }
         
-        // Cerrar menú al hacer clic fuera en móvil
         document.addEventListener('click', function(event) {
             const isMobile = window.innerWidth <= 768;
             if (isMobile && sidebar.classList.contains('open')) {
@@ -736,8 +800,9 @@
         let fechaActual = new Date();
         let mesActual = fechaActual.getMonth();
         let añoActual = fechaActual.getFullYear();
-        
         let eventos = [];
+        let eventoAEliminarId = null;
+        let filtroBusqueda = '';
         
         function cargarEventos() {
             const guardados = localStorage.getItem('eventos_rango_calendario');
@@ -754,6 +819,82 @@
         
         function guardarEventosLocal() {
             localStorage.setItem('eventos_rango_calendario', JSON.stringify(eventos));
+            renderizarListaEventos();
+            renderCalendar();
+        }
+        
+        function renderizarListaEventos() {
+            const container = document.getElementById('eventosListaGrid');
+            const eventosCount = document.getElementById('eventosCount');
+            let eventosFiltrados = eventos;
+            
+            if (filtroBusqueda) {
+                eventosFiltrados = eventos.filter(e => 
+                    e.titulo.toLowerCase().includes(filtroBusqueda.toLowerCase()) ||
+                    (e.cliente && e.cliente.toLowerCase().includes(filtroBusqueda.toLowerCase()))
+                );
+            }
+            
+            eventosCount.textContent = `(${eventosFiltrados.length})`;
+            
+            if (eventosFiltrados.length === 0) {
+                container.innerHTML = '<div class="sin-eventos">📭 No hay eventos registrados</div>';
+                return;
+            }
+            
+            const getEstadoClass = (estado) => {
+                switch(estado) {
+                    case 'confirmado': return 'estado-confirmado';
+                    case 'pagado': return 'estado-pagado';
+                    default: return 'estado-pendiente';
+                }
+            };
+            
+            const getEstadoTexto = (estado) => {
+                switch(estado) {
+                    case 'confirmado': return '✅ Confirmado';
+                    case 'pagado': return '💰 Pagado';
+                    default: return '⏳ Pendiente';
+                }
+            };
+            
+            container.innerHTML = eventosFiltrados.map(evento => `
+                <div class="evento-card">
+                    <div class="evento-card-info" onclick="abrirModalEditar(${JSON.stringify(evento).replace(/"/g, '&quot;')})">
+                        <div class="evento-card-titulo">📌 ${evento.titulo}</div>
+                        <div class="evento-card-fechas">
+                            📅 ${evento.fechaInicio} → ${evento.fechaFin}
+                        </div>
+                        <div class="evento-card-cliente">👤 ${evento.cliente || 'Sin cliente'}</div>
+                        <div class="evento-card-estado ${getEstadoClass(evento.estado)}">${getEstadoTexto(evento.estado)}</div>
+                    </div>
+                    <div class="evento-card-acciones">
+                        <button class="btn-editar-evento" onclick="event.stopPropagation(); abrirModalEditar(${JSON.stringify(evento).replace(/"/g, '&quot;')})">✏️</button>
+                        <button class="btn-eliminar-evento" onclick="event.stopPropagation(); abrirConfirmEliminar('${evento.id}', '${evento.titulo}')">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function abrirConfirmEliminar(id, titulo) {
+            eventoAEliminarId = id;
+            document.getElementById('eventoAEliminarInfo').textContent = `"${titulo}"`;
+            document.getElementById('confirmModal').style.display = 'block';
+        }
+        
+        function cerrarConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+            eventoAEliminarId = null;
+        }
+        
+        function confirmarEliminar() {
+            if (eventoAEliminarId) {
+                eventos = eventos.filter(e => e.id !== eventoAEliminarId);
+                guardarEventosLocal();
+                mostrarMensaje('✅ Evento eliminado correctamente', 'exito');
+                cerrarConfirmModal();
+                eventoAEliminarId = null;
+            }
         }
         
         function mostrarMensaje(mensaje, tipo) {
@@ -761,7 +902,7 @@
             div.className = `mensaje-flotante mensaje-${tipo}`;
             div.textContent = mensaje;
             document.body.appendChild(div);
-            setTimeout(() => div.remove(), 4000);
+            setTimeout(() => div.remove(), 3000);
         }
         
         async function guardarEventoRango() {
@@ -810,18 +951,12 @@
                 
                 eventos.push(eventoData);
                 guardarEventosLocal();
-                renderCalendar();
                 cerrarModal();
                 mostrarMensaje('✅ ¡Evento guardado!', 'exito');
-                
-                document.getElementById('eventoTitulo').value = '';
-                document.getElementById('eventoCliente').value = '';
-                document.getElementById('eventoDescripcion').value = '';
                 
             } catch(error) {
                 eventos.push(eventoData);
                 guardarEventosLocal();
-                renderCalendar();
                 cerrarModal();
                 mostrarMensaje('✅ Guardado localmente', 'exito');
             }
@@ -841,7 +976,7 @@
             document.getElementById('eventoDescripcion').value = '';
             document.getElementById('eventModal').style.display = 'block';
             
-            const btn = document.querySelector('#eventModal button');
+            const btn = document.getElementById('btnGuardarModal');
             btn.onclick = guardarEventoRango;
         }
         
@@ -856,7 +991,7 @@
             document.getElementById('eventoDescripcion').value = evento.descripcion || '';
             document.getElementById('eventModal').style.display = 'block';
             
-            const btn = document.querySelector('#eventModal button');
+            const btn = document.getElementById('btnGuardarModal');
             btn.onclick = async function() {
                 const index = eventos.findIndex(e => e.id === evento.id);
                 if (index !== -1) {
@@ -871,11 +1006,9 @@
                         descripcion: document.getElementById('eventoDescripcion').value
                     };
                     guardarEventosLocal();
-                    renderCalendar();
                     cerrarModal();
                     mostrarMensaje('✅ Evento actualizado', 'exito');
                 }
-                btn.onclick = guardarEventoRango;
             };
         }
         
@@ -907,7 +1040,6 @@
                 return eventos.filter(e => fechaStr >= e.fechaInicio && fechaStr <= e.fechaFin);
             }
             
-            // Días del mes anterior
             for (let i = primerDia - 1; i >= 0; i--) {
                 const dia = diasMesAnterior - i;
                 html += `<div class="calendar-day other-month" onclick="abrirModalCrear()">
@@ -915,7 +1047,6 @@
                 </div>`;
             }
             
-            // Días del mes actual
             for (let dia = 1; dia <= diasEnMes; dia++) {
                 const fechaStr = `${añoActual}-${String(mesActual+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
                 const esHoy = fechaStr === hoyStr;
@@ -951,7 +1082,6 @@
                 html += `</div>`;
             }
             
-            // Días del mes siguiente
             const totalCeldas = primerDia + diasEnMes;
             const diasRestantes = 7 - (totalCeldas % 7);
             if (diasRestantes < 7) {
@@ -972,12 +1102,21 @@
             renderCalendar();
         }
         
+        // Buscador de eventos
+        document.getElementById('buscarEventos').addEventListener('input', function(e) {
+            filtroBusqueda = e.target.value;
+            renderizarListaEventos();
+        });
+        
         cargarEventos();
         renderCalendar();
+        renderizarListaEventos();
         
         window.onclick = function(event) {
             const modal = document.getElementById('eventModal');
+            const confirmModal = document.getElementById('confirmModal');
             if (event.target === modal) cerrarModal();
+            if (event.target === confirmModal) cerrarConfirmModal();
         }
     </script>
 </body>
