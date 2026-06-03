@@ -2,18 +2,24 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario - CRM Aventura Total</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Calendario Adaptativo - CRM Aventura Total</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+        }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             background: #f0f2f5;
             display: flex;
             min-height: 100vh;
         }
         
+        /* Sidebar adaptativa */
         .sidebar {
             width: 250px;
             background: #1a1a2e;
@@ -23,6 +29,27 @@
             height: 100vh;
             overflow-y: auto;
             z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Botón menú móvil */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 101;
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            align-items: center;
+            justify-content: center;
         }
         
         .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
@@ -48,23 +75,44 @@
             cursor: pointer; font-weight: 600; font-size: 13px;
         }
         
-        .main-content { margin-left: 250px; flex: 1; padding: 30px; }
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 20px 30px;
+            transition: margin-left 0.3s ease;
+            width: 100%;
+        }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header h1 { font-size: clamp(20px, 5vw, 26px); color: #1a1a2e; }
+        .header p { font-size: clamp(11px, 3vw, 13px); color: #999; margin-top: 5px; }
         
         .user-info {
-            display: flex; align-items: center; gap: 10px; background: white;
-            padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            font-size: 14px;
         }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
-        /* ===== CALENDARIO ===== */
+        /* ===== CALENDARIO ADAPTATIVO ===== */
         .calendar-container {
             background: white;
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            overflow-x: auto;
         }
         
         .calendar-header {
@@ -72,69 +120,92 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            padding-bottom: 20px;
+            padding-bottom: 15px;
             border-bottom: 2px solid #f0f2f5;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .calendar-header button {
-            padding: 10px 20px;
+            padding: 8px 16px;
             background: #667eea;
             color: white;
             border: none;
             border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 14px;
+            font-size: clamp(12px, 3.5vw, 14px);
             transition: all 0.3s ease;
+            min-width: 80px;
         }
         
-        .calendar-header button:hover {
-            background: #5a6fd6;
-            transform: scale(1.02);
+        .calendar-header button:active {
+            transform: scale(0.96);
         }
         
         .calendar-header h2 {
-            font-size: 24px;
+            font-size: clamp(18px, 5vw, 24px);
             color: #1a1a2e;
+            text-align: center;
+        }
+        
+        .calendar-nav-buttons {
+            display: flex;
+            gap: 10px;
         }
         
         .weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
         
         .weekday {
             text-align: center;
-            padding: 12px;
+            padding: 10px 5px;
             font-weight: 700;
             color: #667eea;
             background: #f8f9fa;
             border-radius: 10px;
-            font-size: 14px;
+            font-size: clamp(11px, 3vw, 14px);
         }
         
         .calendar-days {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
+            gap: 6px;
         }
         
         .calendar-day {
-            min-height: 120px;
-            padding: 10px;
+            min-height: clamp(70px, 12vw, 110px);
+            padding: 6px;
             background: #f8f9fa;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border: 2px solid transparent;
             position: relative;
+            overflow-y: auto;
         }
         
-        .calendar-day:hover {
+        /* Scroll personalizado para días con muchos eventos */
+        .calendar-day::-webkit-scrollbar {
+            width: 3px;
+        }
+        
+        .calendar-day::-webkit-scrollbar-track {
             background: #e9ecef;
-            transform: translateY(-2px);
+            border-radius: 3px;
+        }
+        
+        .calendar-day::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+        
+        .calendar-day:active {
+            transform: scale(0.98);
         }
         
         .calendar-day.today {
@@ -162,40 +233,38 @@
         }
         
         .day-number {
-            font-size: 14px;
+            font-size: clamp(12px, 3.5vw, 14px);
             font-weight: 700;
             color: #495057;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .event-item {
-            font-size: 11px;
+            font-size: clamp(9px, 2.5vw, 11px);
             padding: 4px 6px;
             border-radius: 6px;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            margin-bottom: 3px;
+            white-space: normal;
+            word-break: break-word;
             cursor: pointer;
             transition: all 0.2s ease;
+            line-height: 1.3;
         }
         
-        .event-item:hover {
-            transform: scale(1.02);
-            filter: brightness(0.95);
+        .event-item:active {
+            transform: scale(0.98);
         }
         
         .evento-rango {
             background: linear-gradient(90deg, #667eea, #764ba2);
             color: white;
-            border-left: 3px solid #fff;
         }
         
         .event-confirmado { background: #d4edda; color: #155724; border-left: 3px solid #28a745; }
         .event-pendiente { background: #fff3cd; color: #856404; border-left: 3px solid #ffc107; }
         .event-pagado { background: #d1ecf1; color: #0c5460; border-left: 3px solid #17a2b8; }
         
-        /* Modal */
+        /* Modal adaptativo */
         .modal {
             display: none;
             position: fixed;
@@ -216,12 +285,14 @@
         .modal-content {
             background-color: white;
             margin: 5% auto;
-            padding: 30px;
+            padding: 20px;
             border-radius: 20px;
             width: 90%;
-            max-width: 550px;
+            max-width: 500px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             animation: slideDown 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         @keyframes slideDown {
@@ -238,7 +309,8 @@
         .modal-content h2 {
             margin-bottom: 20px;
             color: #1a1a2e;
-            font-size: 24px;
+            font-size: clamp(18px, 5vw, 24px);
+            padding-right: 30px;
         }
         
         .modal-content input,
@@ -246,12 +318,14 @@
         .modal-content textarea {
             width: 100%;
             padding: 12px;
-            margin: 10px 0;
+            margin: 8px 0;
             border: 2px solid #e9ecef;
             border-radius: 10px;
             font-size: 14px;
             box-sizing: border-box;
             transition: border-color 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
         }
         
         .modal-content input:focus,
@@ -264,15 +338,24 @@
         .fecha-rango {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         .fecha-rango div {
             flex: 1;
+            min-width: 120px;
+        }
+        
+        .fecha-rango label {
+            font-size: 12px;
+            color: #666;
+            display: block;
+            margin-top: 5px;
         }
         
         .modal-content button {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin-top: 15px;
             background: #667eea;
             color: white;
@@ -284,9 +367,8 @@
             transition: all 0.3s ease;
         }
         
-        .modal-content button:hover {
-            background: #5a6fd6;
-            transform: translateY(-2px);
+        .modal-content button:active {
+            transform: scale(0.97);
         }
         
         .close-modal {
@@ -296,31 +378,32 @@
             cursor: pointer;
             color: #999;
             transition: color 0.3s ease;
+            line-height: 1;
         }
         
-        .close-modal:hover {
+        .close-modal:active {
             color: #333;
         }
         
+        /* Mensajes flotantes */
         .mensaje-flotante {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 15px 20px;
+            left: auto;
+            padding: 12px 18px;
             border-radius: 10px;
             color: white;
             font-weight: 600;
             z-index: 1000;
             animation: slideIn 0.3s ease;
+            font-size: 14px;
+            max-width: 90%;
+            text-align: center;
         }
         
-        .mensaje-exito {
-            background-color: #27ae60;
-        }
-        
-        .mensaje-error {
-            background-color: #e74c3c;
-        }
+        .mensaje-exito { background-color: #27ae60; }
+        .mensaje-error { background-color: #e74c3c; }
         
         @keyframes slideIn {
             from {
@@ -343,19 +426,184 @@
             text-align: center;
         }
         
+        /* Botón flotante adaptativo */
+        .btn-flotante {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 99;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-flotante:active {
+            transform: scale(0.92);
+        }
+        
+        /* ===== MEDIA QUERIES RESPONSIVAS ===== */
         @media (max-width: 768px) {
-            .sidebar { width: 70px; }
-            .sidebar-logo h2, .sidebar-logo p, .nav-menu a span:not(.nav-icon) { display: none; }
-            .nav-menu a { justify-content: center; padding: 12px; }
-            .main-content { margin-left: 70px; padding: 15px; }
-            .calendar-day { min-height: 80px; }
-            .event-item { font-size: 9px; }
-            .fecha-rango { flex-direction: column; }
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 60px 15px 20px;
+            }
+            
+            .calendar-header button {
+                padding: 6px 12px;
+                min-width: 60px;
+            }
+            
+            .weekday {
+                padding: 6px 3px;
+                font-size: 10px;
+            }
+            
+            .calendar-day {
+                min-height: 70px;
+                padding: 4px;
+            }
+            
+            .event-item {
+                padding: 2px 4px;
+                margin-bottom: 2px;
+                font-size: 8px;
+            }
+            
+            .day-number {
+                font-size: 11px;
+                margin-bottom: 3px;
+            }
+            
+            .btn-flotante {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .modal-content {
+                margin: 10% auto;
+                padding: 20px;
+                width: 95%;
+            }
+            
+            .fecha-rango {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .fecha-rango div {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .user-info {
+                padding: 5px 12px;
+                font-size: 12px;
+            }
+            
+            .user-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            
+            .weekday {
+                font-size: 9px;
+                padding: 5px 2px;
+            }
+            
+            .calendar-day {
+                min-height: 60px;
+            }
+            
+            .calendar-header {
+                flex-direction: column;
+            }
+            
+            .calendar-nav-buttons {
+                order: 1;
+            }
+            
+            .calendar-header h2 {
+                order: 0;
+            }
+            
+            .mensaje-flotante {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                font-size: 12px;
+                text-align: center;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .calendar-day {
+                min-height: 90px;
+            }
+            
+            .event-item {
+                font-size: 10px;
+            }
+        }
+        
+        /* Para tablets en landscape */
+        @media (min-width: 1025px) {
+            .calendar-day {
+                min-height: 110px;
+            }
+        }
+        
+        /* Ajustes para touch */
+        @media (hover: none) and (pointer: coarse) {
+            .calendar-day:hover {
+                transform: none;
+            }
+            
+            button:hover {
+                transform: none;
+            }
+            
+            .event-item:hover {
+                transform: none;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="sidebar">
+    <button class="menu-toggle" id="menuToggle">☰</button>
+    
+    <nav class="sidebar" id="sidebar">
         <div class="sidebar-logo">
             <div class="logo-icon">🏔️</div>
             <h2>Aventura <span>Total</span></h2>
@@ -377,8 +625,8 @@
     <div class="main-content">
         <div class="header">
             <div>
-                <h1>📅 Calendario de Eventos por Rango</h1>
-                <p style="color:#999;font-size:13px;">Selecciona un rango de fechas para cada evento</p>
+                <h1>📅 Calendario de Eventos</h1>
+                <p>Eventos por rango de fechas | Adaptado para móvil</p>
             </div>
             <div class="user-info">
                 <div class="user-avatar">A</div>
@@ -388,12 +636,15 @@
         
         <div class="calendar-container">
             <div class="calendar-header">
-                <button onclick="cambiarMes(-1)">◀ Anterior</button>
+                <div class="calendar-nav-buttons">
+                    <button onclick="cambiarMes(-1)">◀</button>
+                    <button onclick="cambiarMes(1)">▶</button>
+                </div>
                 <h2 id="mesTitulo"></h2>
-                <button onclick="cambiarMes(1)">Siguiente ▶</button>
+                <button class="btn-hoy" onclick="irAHoy()">📅 Hoy</button>
             </div>
             
-            <div class="weekdays">
+            <div class="weekdays" id="weekdays">
                 <div class="weekday">Dom</div>
                 <div class="weekday">Lun</div>
                 <div class="weekday">Mar</div>
@@ -407,45 +658,72 @@
         </div>
     </div>
     
-    <!-- Modal para crear evento con RANGO de fechas -->
+    <!-- Modal para crear evento con RANGO -->
     <div id="eventModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="cerrarModal()">&times;</span>
-            <h2 id="modalTitulo">📝 Crear Evento por Rango</h2>
+            <h2 id="modalTitulo">📝 Evento por Rango</h2>
             
             <div class="info-rango">
-                📅 Define el período del evento (fecha inicio y fecha fin)
+                📅 Define inicio y fin del evento
             </div>
             
             <div class="fecha-rango">
                 <div>
-                    <label>📅 Fecha Inicio *</label>
+                    <label>📅 Desde</label>
                     <input type="date" id="eventoFechaInicio" required>
                 </div>
                 <div>
-                    <label>📅 Fecha Fin *</label>
+                    <label>📅 Hasta</label>
                     <input type="date" id="eventoFechaFin" required>
                 </div>
             </div>
             
             <input type="text" id="eventoTitulo" placeholder="Nombre del evento *" required>
-            <input type="text" id="eventoCliente" placeholder="Nombre del cliente">
-            <input type="number" id="eventoPersonas" placeholder="Número de personas" min="1" value="1">
+            <input type="text" id="eventoCliente" placeholder="Cliente">
+            <input type="number" id="eventoPersonas" placeholder="Personas" min="1" value="1">
             <select id="eventoEstado">
                 <option value="pendiente">🟡 Pendiente</option>
                 <option value="confirmado">🟢 Confirmado</option>
                 <option value="pagado">🔵 Pagado</option>
             </select>
-            <textarea id="eventoDescripcion" rows="3" placeholder="Descripción adicional..."></textarea>
-            <button onclick="guardarEventoRango()">💾 Guardar Evento en Google Sheets</button>
+            <textarea id="eventoDescripcion" rows="3" placeholder="Descripción..."></textarea>
+            <button onclick="guardarEventoRango()">💾 Guardar en Google Sheets</button>
         </div>
     </div>
     
+    <button class="btn-flotante" id="btnFlotante" onclick="abrirModalCrear()">+</button>
+    
     <script>
-        // URL del script de Google Apps Script
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMJ2pnekFjza6cEp6DglLMEVz5C49hwusa6u1V6Sw3N_40YKg1GOfPWYdSoqhpaA4baw/exec";
         
-        // Verificar autenticación
+        // Menú móvil
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+            });
+            
+            // Cerrar menú al hacer clic en un enlace
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                });
+            });
+        }
+        
+        // Cerrar menú al hacer clic fuera en móvil
+        document.addEventListener('click', function(event) {
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
         }
@@ -459,52 +737,21 @@
         let mesActual = fechaActual.getMonth();
         let añoActual = fechaActual.getFullYear();
         
-        // Array de eventos con RANGO de fechas
         let eventos = [];
         
-        // Cargar eventos guardados
         function cargarEventos() {
             const guardados = localStorage.getItem('eventos_rango_calendario');
             if (guardados) {
                 eventos = JSON.parse(guardados);
             } else {
-                // Eventos de ejemplo con rango
                 eventos = [
-                    { 
-                        id: '1', 
-                        fechaInicio: '2026-06-01', 
-                        fechaFin: '2026-06-03',
-                        titulo: 'City Tour Local', 
-                        cliente: 'Juan Pérez', 
-                        personas: 4, 
-                        estado: 'confirmado', 
-                        descripcion: 'Tour por el centro histórico de 3 días' 
-                    },
-                    { 
-                        id: '2', 
-                        fechaInicio: '2026-06-05', 
-                        fechaFin: '2026-06-07',
-                        titulo: 'Barco Pirata', 
-                        cliente: 'María García', 
-                        personas: 2, 
-                        estado: 'pendiente', 
-                        descripcion: 'Paseo en barco - 2 días' 
-                    },
-                    { 
-                        id: '3', 
-                        fechaInicio: '2026-06-10', 
-                        fechaFin: '2026-06-15',
-                        titulo: 'Valle Nevado', 
-                        cliente: 'Carlos López', 
-                        personas: 6, 
-                        estado: 'pagado', 
-                        descripcion: 'Excursión a la montaña - 5 días' 
-                    }
+                    { id: '1', fechaInicio: '2026-06-01', fechaFin: '2026-06-03', titulo: 'City Tour', cliente: 'Juan Pérez', personas: 4, estado: 'confirmado', descripcion: 'Tour 3 días' },
+                    { id: '2', fechaInicio: '2026-06-05', fechaFin: '2026-06-07', titulo: 'Barco Pirata', cliente: 'María García', personas: 2, estado: 'pendiente', descripcion: '' },
+                    { id: '3', fechaInicio: '2026-06-10', fechaFin: '2026-06-15', titulo: 'Valle Nevado', cliente: 'Carlos López', personas: 6, estado: 'pagado', descripcion: '5 días' }
                 ];
             }
         }
         
-        // Guardar eventos en localStorage
         function guardarEventosLocal() {
             localStorage.setItem('eventos_rango_calendario', JSON.stringify(eventos));
         }
@@ -514,12 +761,7 @@
             div.className = `mensaje-flotante mensaje-${tipo}`;
             div.textContent = mensaje;
             document.body.appendChild(div);
-            setTimeout(() => div.remove(), 5000);
-        }
-        
-        // Verificar si una fecha está dentro del rango de un evento
-        function fechaEnRango(fecha, fechaInicio, fechaFin) {
-            return fecha >= fechaInicio && fecha <= fechaFin;
+            setTimeout(() => div.remove(), 4000);
         }
         
         async function guardarEventoRango() {
@@ -532,31 +774,27 @@
             const descripcion = document.getElementById('eventoDescripcion').value;
             
             if (!fechaInicio || !fechaFin || !titulo) {
-                mostrarMensaje('⚠️ Completa: Fecha Inicio, Fecha Fin y Título', 'error');
+                mostrarMensaje('⚠️ Completa fechas y título', 'error');
                 return;
             }
             
             if (fechaFin < fechaInicio) {
-                mostrarMensaje('⚠️ La fecha fin no puede ser anterior a la fecha inicio', 'error');
+                mostrarMensaje('⚠️ La fecha fin no puede ser anterior', 'error');
                 return;
             }
             
             const eventoId = Date.now().toString();
             const eventoData = {
                 id: eventoId,
-                fechaInicio: fechaInicio,
-                fechaFin: fechaFin,
-                titulo: titulo,
+                fechaInicio, fechaFin, titulo,
                 cliente: cliente || 'Cliente no especificado',
                 personas: parseInt(personas),
-                estado: estado,
-                descripcion: descripcion
+                estado, descripcion
             };
             
-            mostrarMensaje('⏳ Guardando en Google Sheets...', 'exito');
+            mostrarMensaje('⏳ Guardando...', 'exito');
             
             try {
-                // Guardar en Google Sheets (solo una vez por evento, con el rango)
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -565,33 +803,27 @@
                         eventos: [{
                             id: eventoId,
                             nombre: `${cliente || 'Evento'} - ${titulo}`,
-                            fechaInicio: fechaInicio,
-                            fechaFin: fechaFin
+                            fechaInicio, fechaFin
                         }]
                     })
                 });
                 
-                // Guardar localmente
                 eventos.push(eventoData);
                 guardarEventosLocal();
                 renderCalendar();
                 cerrarModal();
-                mostrarMensaje('✅ ¡Evento guardado correctamente!', 'exito');
+                mostrarMensaje('✅ ¡Evento guardado!', 'exito');
                 
-                // Limpiar formulario
                 document.getElementById('eventoTitulo').value = '';
                 document.getElementById('eventoCliente').value = '';
-                document.getElementById('eventoPersonas').value = '1';
-                document.getElementById('eventoEstado').value = 'pendiente';
                 document.getElementById('eventoDescripcion').value = '';
                 
             } catch(error) {
-                console.error('Error:', error);
-                mostrarMensaje('⚠️ Error en la nube, pero se guardó localmente', 'error');
                 eventos.push(eventoData);
                 guardarEventosLocal();
                 renderCalendar();
                 cerrarModal();
+                mostrarMensaje('✅ Guardado localmente', 'exito');
             }
         }
         
@@ -599,7 +831,7 @@
             const hoy = new Date();
             const fechaHoy = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
             
-            document.getElementById('modalTitulo').textContent = '📝 Crear Evento por Rango';
+            document.getElementById('modalTitulo').textContent = '📝 Nuevo Evento por Rango';
             document.getElementById('eventoFechaInicio').value = fechaHoy;
             document.getElementById('eventoFechaFin').value = fechaHoy;
             document.getElementById('eventoTitulo').value = '';
@@ -608,10 +840,13 @@
             document.getElementById('eventoEstado').value = 'pendiente';
             document.getElementById('eventoDescripcion').value = '';
             document.getElementById('eventModal').style.display = 'block';
+            
+            const btn = document.querySelector('#eventModal button');
+            btn.onclick = guardarEventoRango;
         }
         
         function abrirModalEditar(evento) {
-            document.getElementById('modalTitulo').textContent = '✏️ Editar Evento por Rango';
+            document.getElementById('modalTitulo').textContent = '✏️ Editar Evento';
             document.getElementById('eventoFechaInicio').value = evento.fechaInicio;
             document.getElementById('eventoFechaFin').value = evento.fechaFin;
             document.getElementById('eventoTitulo').value = evento.titulo;
@@ -621,41 +856,38 @@
             document.getElementById('eventoDescripcion').value = evento.descripcion || '';
             document.getElementById('eventModal').style.display = 'block';
             
-            // Cambiar el botón para editar
             const btn = document.querySelector('#eventModal button');
             btn.onclick = async function() {
-                await actualizarEventoRango(evento.id);
-            };
-        }
-        
-        async function actualizarEventoRango(id) {
-            const eventoIndex = eventos.findIndex(e => e.id === id);
-            if (eventoIndex !== -1) {
-                eventos[eventoIndex] = {
-                    ...eventos[eventoIndex],
-                    fechaInicio: document.getElementById('eventoFechaInicio').value,
-                    fechaFin: document.getElementById('eventoFechaFin').value,
-                    titulo: document.getElementById('eventoTitulo').value,
-                    cliente: document.getElementById('eventoCliente').value,
-                    personas: parseInt(document.getElementById('eventoPersonas').value),
-                    estado: document.getElementById('eventoEstado').value,
-                    descripcion: document.getElementById('eventoDescripcion').value
-                };
-                guardarEventosLocal();
-                renderCalendar();
-                cerrarModal();
-                mostrarMensaje('✅ Evento actualizado', 'exito');
-                
-                // Restaurar botón
-                const btn = document.querySelector('#eventModal button');
+                const index = eventos.findIndex(e => e.id === evento.id);
+                if (index !== -1) {
+                    eventos[index] = {
+                        ...eventos[index],
+                        fechaInicio: document.getElementById('eventoFechaInicio').value,
+                        fechaFin: document.getElementById('eventoFechaFin').value,
+                        titulo: document.getElementById('eventoTitulo').value,
+                        cliente: document.getElementById('eventoCliente').value,
+                        personas: parseInt(document.getElementById('eventoPersonas').value),
+                        estado: document.getElementById('eventoEstado').value,
+                        descripcion: document.getElementById('eventoDescripcion').value
+                    };
+                    guardarEventosLocal();
+                    renderCalendar();
+                    cerrarModal();
+                    mostrarMensaje('✅ Evento actualizado', 'exito');
+                }
                 btn.onclick = guardarEventoRango;
-            }
+            };
         }
         
         function cerrarModal() {
             document.getElementById('eventModal').style.display = 'none';
-            const btn = document.querySelector('#eventModal button');
-            btn.onclick = guardarEventoRango;
+        }
+        
+        function irAHoy() {
+            const hoy = new Date();
+            mesActual = hoy.getMonth();
+            añoActual = hoy.getFullYear();
+            renderCalendar();
         }
         
         function renderCalendar() {
@@ -671,17 +903,13 @@
             
             let html = '';
             
-            // Función para obtener eventos que cubren una fecha específica
             function getEventosPorFecha(fechaStr) {
-                return eventos.filter(e => {
-                    return fechaStr >= e.fechaInicio && fechaStr <= e.fechaFin;
-                });
+                return eventos.filter(e => fechaStr >= e.fechaInicio && fechaStr <= e.fechaFin);
             }
             
             // Días del mes anterior
             for (let i = primerDia - 1; i >= 0; i--) {
                 const dia = diasMesAnterior - i;
-                const fechaStr = `${añoActual}-${String(mesActual).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
                 html += `<div class="calendar-day other-month" onclick="abrirModalCrear()">
                     <div class="day-number">${dia}</div>
                 </div>`;
@@ -693,7 +921,6 @@
                 const esHoy = fechaStr === hoyStr;
                 const eventosDelDia = getEventosPorFecha(fechaStr);
                 
-                // Determinar si es inicio o fin de algún evento (para estilo visual)
                 let claseExtra = '';
                 eventos.forEach(e => {
                     if (fechaStr === e.fechaInicio) claseExtra += ' rango-inicio';
@@ -704,7 +931,6 @@
                 html += `<div class="calendar-day ${esHoy ? 'today' : ''}${claseExtra}" onclick="abrirModalCrear()">
                     <div class="day-number">${dia}</div>`;
                 
-                // Mostrar eventos (solo mostrar uno por evento en cada día)
                 const eventosUnicos = [];
                 eventosDelDia.forEach(evento => {
                     if (!eventosUnicos.find(e => e.id === evento.id)) {
@@ -713,14 +939,13 @@
                 });
                 
                 eventosUnicos.slice(0, 2).forEach(evento => {
-                    const duracion = evento.fechaInicio === evento.fechaFin ? '' : ` (${evento.fechaInicio} a ${evento.fechaFin})`;
                     html += `<div class="event-item event-${evento.estado}" onclick="event.stopPropagation(); abrirModalEditar(${JSON.stringify(evento).replace(/"/g, '&quot;')})">
-                        📌 ${evento.titulo}${duracion}
+                        📌 ${evento.titulo}
                     </div>`;
                 });
                 
                 if (eventosUnicos.length > 2) {
-                    html += `<div class="event-item" style="background:#e9ecef; text-align:center;">+${eventosUnicos.length-2} más</div>`;
+                    html += `<div class="event-item" style="background:#e9ecef;text-align:center;">+${eventosUnicos.length-2}</div>`;
                 }
                 
                 html += `</div>`;
@@ -731,7 +956,6 @@
             const diasRestantes = 7 - (totalCeldas % 7);
             if (diasRestantes < 7) {
                 for (let dia = 1; dia <= diasRestantes; dia++) {
-                    const fechaStr = `${añoActual}-${String(mesActual+2).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
                     html += `<div class="calendar-day other-month" onclick="abrirModalCrear()">
                         <div class="day-number">${dia}</div>
                     </div>`;
@@ -743,51 +967,17 @@
         
         function cambiarMes(direccion) {
             mesActual += direccion;
-            if (mesActual > 11) {
-                mesActual = 0;
-                añoActual++;
-            }
-            if (mesActual < 0) {
-                mesActual = 11;
-                añoActual--;
-            }
+            if (mesActual > 11) { mesActual = 0; añoActual++; }
+            if (mesActual < 0) { mesActual = 11; añoActual--; }
             renderCalendar();
         }
         
-        // Agregar botón flotante para crear evento
-        const btnFlotante = document.createElement('button');
-        btnFlotante.innerHTML = '+';
-        btnFlotante.style.cssText = `
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #667eea;
-            color: white;
-            border: none;
-            font-size: 30px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 99;
-            transition: all 0.3s ease;
-        `;
-        btnFlotante.onmouseover = () => btnFlotante.style.transform = 'scale(1.1)';
-        btnFlotante.onmouseout = () => btnFlotante.style.transform = 'scale(1)';
-        btnFlotante.onclick = () => abrirModalCrear();
-        document.body.appendChild(btnFlotante);
-        
-        // Inicializar
         cargarEventos();
         renderCalendar();
         
-        // Cerrar modal al hacer clic fuera
         window.onclick = function(event) {
             const modal = document.getElementById('eventModal');
-            if (event.target === modal) {
-                cerrarModal();
-            }
+            if (event.target === modal) cerrarModal();
         }
     </script>
 </body>
