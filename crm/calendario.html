@@ -150,6 +150,25 @@
             transform: scale(0.96);
         }
         
+        .btn-whatsapp-compartir {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-whatsapp-compartir:active {
+            transform: scale(0.96);
+        }
+        
         .buscar-eventos {
             padding: 8px 12px;
             border: 2px solid #e9ecef;
@@ -207,12 +226,6 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-        }
-        
-        .evento-card-cliente {
-            font-size: 11px;
-            color: #667eea;
-            margin-top: 4px;
         }
         
         .evento-card-estado {
@@ -678,6 +691,7 @@
                 <h3>📋 Lista de Eventos <span id="eventosCount">(0)</span></h3>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <input type="text" id="buscarEventos" class="buscar-eventos" placeholder="🔍 Buscar evento...">
+                    <button class="btn-whatsapp-compartir" onclick="compartirPorWhatsApp()">📱 Compartir por WhatsApp</button>
                     <button class="btn-crear-rapido" onclick="abrirModalCrear()">➕ Nuevo Evento</button>
                 </div>
             </div>
@@ -732,14 +746,12 @@
             </div>
             
             <input type="text" id="eventoTitulo" placeholder="Nombre del evento *" required>
-            <input type="text" id="eventoCliente" placeholder="Cliente">
-            <input type="number" id="eventoPersonas" placeholder="Personas" min="1" value="1">
             <select id="eventoEstado">
                 <option value="pendiente">🟡 Pendiente</option>
                 <option value="confirmado">🟢 Confirmado</option>
                 <option value="pagado">🔵 Pagado</option>
             </select>
-            <textarea id="eventoDescripcion" rows="3" placeholder="Descripción..."></textarea>
+            <textarea id="eventoDescripcion" rows="3" placeholder="Descripción adicional..."></textarea>
             <button id="btnGuardarModal" onclick="guardarEventoRango()">💾 Guardar en Google Sheets</button>
         </div>
     </div>
@@ -810,9 +822,9 @@
                 eventos = JSON.parse(guardados);
             } else {
                 eventos = [
-                    { id: '1', fechaInicio: '2026-06-01', fechaFin: '2026-06-03', titulo: 'City Tour', cliente: 'Juan Pérez', personas: 4, estado: 'confirmado', descripcion: 'Tour 3 días' },
-                    { id: '2', fechaInicio: '2026-06-05', fechaFin: '2026-06-07', titulo: 'Barco Pirata', cliente: 'María García', personas: 2, estado: 'pendiente', descripcion: '' },
-                    { id: '3', fechaInicio: '2026-06-10', fechaFin: '2026-06-15', titulo: 'Valle Nevado', cliente: 'Carlos López', personas: 6, estado: 'pagado', descripcion: '5 días' }
+                    { id: '1', fechaInicio: '2026-06-01', fechaFin: '2026-06-03', titulo: 'City Tour', estado: 'confirmado', descripcion: 'Tour 3 días' },
+                    { id: '2', fechaInicio: '2026-06-05', fechaFin: '2026-06-07', titulo: 'Barco Pirata', estado: 'pendiente', descripcion: '' },
+                    { id: '3', fechaInicio: '2026-06-10', fechaFin: '2026-06-15', titulo: 'Valle Nevado', estado: 'pagado', descripcion: '5 días' }
                 ];
             }
         }
@@ -830,8 +842,7 @@
             
             if (filtroBusqueda) {
                 eventosFiltrados = eventos.filter(e => 
-                    e.titulo.toLowerCase().includes(filtroBusqueda.toLowerCase()) ||
-                    (e.cliente && e.cliente.toLowerCase().includes(filtroBusqueda.toLowerCase()))
+                    e.titulo.toLowerCase().includes(filtroBusqueda.toLowerCase())
                 );
             }
             
@@ -865,7 +876,6 @@
                         <div class="evento-card-fechas">
                             📅 ${evento.fechaInicio} → ${evento.fechaFin}
                         </div>
-                        <div class="evento-card-cliente">👤 ${evento.cliente || 'Sin cliente'}</div>
                         <div class="evento-card-estado ${getEstadoClass(evento.estado)}">${getEstadoTexto(evento.estado)}</div>
                     </div>
                     <div class="evento-card-acciones">
@@ -874,6 +884,50 @@
                     </div>
                 </div>
             `).join('');
+        }
+        
+        function compartirPorWhatsApp() {
+            if (eventos.length === 0) {
+                mostrarMensaje('No hay eventos para compartir', 'error');
+                return;
+            }
+            
+            // Formatear mensaje
+            let mensaje = "🏔️ *CALENDARIO DE EVENTOS - AVENTURA TOTAL* 🏔️\n\n";
+            mensaje += `📅 *Fecha:* ${new Date().toLocaleDateString('es-ES')}\n`;
+            mensaje += `📊 *Total de eventos:* ${eventos.length}\n\n`;
+            mensaje += "*LISTA DE EVENTOS:*\n";
+            mensaje += "─" + "─".repeat(30) + "\n\n";
+            
+            eventos.forEach((evento, index) => {
+                const getEmoji = (estado) => {
+                    switch(estado) {
+                        case 'confirmado': return '✅';
+                        case 'pagado': return '💰';
+                        default: return '⏳';
+                    }
+                };
+                
+                mensaje += `${index + 1}. *${evento.titulo}*\n`;
+                mensaje += `   📅 ${evento.fechaInicio} → ${evento.fechaFin}\n`;
+                mensaje += `   ${getEmoji(evento.estado)} Estado: ${evento.estado.toUpperCase()}\n`;
+                if (evento.descripcion) {
+                    mensaje += `   📝 ${evento.descripcion}\n`;
+                }
+                mensaje += "\n";
+            });
+            
+            mensaje += "\n─" + "─".repeat(30) + "\n";
+            mensaje += "🔗 *CRM Aventura Total*\n";
+            mensaje += "📱 Enviado desde el panel de gestión";
+            
+            // Codificar mensaje para URL
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            const urlWhatsApp = `https://wa.me/?text=${mensajeCodificado}`;
+            
+            // Abrir WhatsApp
+            window.open(urlWhatsApp, '_blank');
+            mostrarMensaje('📱 Abriendo WhatsApp para compartir...', 'exito');
         }
         
         function abrirConfirmEliminar(id, titulo) {
@@ -909,8 +963,6 @@
             const fechaInicio = document.getElementById('eventoFechaInicio').value;
             const fechaFin = document.getElementById('eventoFechaFin').value;
             const titulo = document.getElementById('eventoTitulo').value;
-            const cliente = document.getElementById('eventoCliente').value;
-            const personas = document.getElementById('eventoPersonas').value;
             const estado = document.getElementById('eventoEstado').value;
             const descripcion = document.getElementById('eventoDescripcion').value;
             
@@ -928,8 +980,6 @@
             const eventoData = {
                 id: eventoId,
                 fechaInicio, fechaFin, titulo,
-                cliente: cliente || 'Cliente no especificado',
-                personas: parseInt(personas),
                 estado, descripcion
             };
             
@@ -943,7 +993,7 @@
                     body: JSON.stringify({
                         eventos: [{
                             id: eventoId,
-                            nombre: `${cliente || 'Evento'} - ${titulo}`,
+                            nombre: titulo,
                             fechaInicio, fechaFin
                         }]
                     })
@@ -970,8 +1020,6 @@
             document.getElementById('eventoFechaInicio').value = fechaHoy;
             document.getElementById('eventoFechaFin').value = fechaHoy;
             document.getElementById('eventoTitulo').value = '';
-            document.getElementById('eventoCliente').value = '';
-            document.getElementById('eventoPersonas').value = '1';
             document.getElementById('eventoEstado').value = 'pendiente';
             document.getElementById('eventoDescripcion').value = '';
             document.getElementById('eventModal').style.display = 'block';
@@ -985,8 +1033,6 @@
             document.getElementById('eventoFechaInicio').value = evento.fechaInicio;
             document.getElementById('eventoFechaFin').value = evento.fechaFin;
             document.getElementById('eventoTitulo').value = evento.titulo;
-            document.getElementById('eventoCliente').value = evento.cliente || '';
-            document.getElementById('eventoPersonas').value = evento.personas || 1;
             document.getElementById('eventoEstado').value = evento.estado;
             document.getElementById('eventoDescripcion').value = evento.descripcion || '';
             document.getElementById('eventModal').style.display = 'block';
@@ -1000,8 +1046,6 @@
                         fechaInicio: document.getElementById('eventoFechaInicio').value,
                         fechaFin: document.getElementById('eventoFechaFin').value,
                         titulo: document.getElementById('eventoTitulo').value,
-                        cliente: document.getElementById('eventoCliente').value,
-                        personas: parseInt(document.getElementById('eventoPersonas').value),
                         estado: document.getElementById('eventoEstado').value,
                         descripcion: document.getElementById('eventoDescripcion').value
                     };
