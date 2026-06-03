@@ -282,6 +282,31 @@
         .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
         @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
         
+        /* Estilos para botones de cambio de estado en modal */
+        .modal-buttons-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-modal-estado {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .btn-modal-estado:active { transform: scale(0.96); }
+        .btn-modal-estado:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        .btn-modal-confirmar { background: #27ae60; color: white; }
+        .btn-modal-pendiente { background: #ffc107; color: #856404; }
+        .btn-modal-pagado { background: #3498db; color: white; }
+        
         /* Estilos para botón de pago WhatsApp */
         .btn-pagar-whatsapp {
             width: 100%;
@@ -290,7 +315,7 @@
             color: white;
             border: none;
             border-radius: 12px;
-            margin-top: 15px;
+            margin-top: 10px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 700;
@@ -412,6 +437,10 @@
             
             .preloader-popup-titulo {
                 font-size: 18px;
+            }
+            
+            .modal-buttons-row {
+                flex-direction: column;
             }
         }
         
@@ -575,6 +604,32 @@
         
         function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
         function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
+
+        async function guardarEstadoEnNube(id, nuevoEstado) {
+            try {
+                await fetch(ESTADOS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=guardar&id=' + encodeURIComponent(id) + '&estado=' + encodeURIComponent(nuevoEstado)
+                });
+                return true;
+            } catch (error) {
+                console.error('Error al guardar en nube:', error);
+                return false;
+            }
+        }
+
+        async function cambiarEstado(id, nuevoEstado) {
+            const reserva = reservasData.find(r => r.id === id);
+            if (reserva) {
+                reserva.estado = nuevoEstado;
+                estadosGlobales[id] = nuevoEstado;
+                await guardarEstadoEnNube(id, nuevoEstado);
+                await cargarDatos(); // Recargar datos para actualizar Kanban
+                cerrarModal(); // Cerrar el modal después de cambiar estado
+            }
+        }
 
         async function cargarEstadosDesdeNube() {
             try {
@@ -805,6 +860,19 @@ ${MERCADO_PAGO_LINK}
                         <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
                         <p><strong>Estado:</strong> <span style="background:#eef2ff; padding:3px 10px; border-radius:20px; font-weight:700;">${estadoText}</span></p>
                         
+                        <!-- Botones de cambio de estado -->
+                        <div class="modal-buttons-row">
+                            <button class="btn-modal-estado btn-modal-confirmar" onclick="cambiarEstado('${reserva.id}', 'confirmado')">
+                                ✅ Confirmada
+                            </button>
+                            <button class="btn-modal-estado btn-modal-pendiente" onclick="cambiarEstado('${reserva.id}', 'pendiente')">
+                                ⏳ Pendiente
+                            </button>
+                            <button class="btn-modal-estado btn-modal-pagado" onclick="cambiarEstado('${reserva.id}', 'pagado')">
+                                💰 Pagada
+                            </button>
+                        </div>
+                        
                         <!-- Mensaje de aviso -->
                         <div class="aviso-pago">
                             ⚠️ <strong>Importante:</strong> Caso no recuerde el monto total de su reserva, solicítelo vía WhatsApp. Muchas Gracias.
@@ -840,6 +908,7 @@ ${MERCADO_PAGO_LINK}
         window.cargarDatos = cargarDatos;
         window.logout = logout;
         window.enviarLinkPagoWhatsApp = enviarLinkPagoWhatsApp;
+        window.cambiarEstado = cambiarEstado;
 
         cargarDatos();
         setInterval(cargarDatos, 30000);
