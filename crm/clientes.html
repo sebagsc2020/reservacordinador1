@@ -722,7 +722,7 @@
             if (!tbody) return;
             
             if (clientesFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td</tr';
                 return;
             }
             
@@ -735,13 +735,13 @@
             
             tbody.innerHTML = clientesFiltrados.map((cliente) => `
                 <tr>
-                    <td>${cliente.id}</td>
-                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
-                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td>
-                    <td>${escapeHtml(cliente.telefono || 'No registrado')}</td>
-                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td>
-                    <td><span class="badge badge-activo">Activo</span></td>
-                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td>
+                    <td>${cliente.id}</td
+                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td
+                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td
+                    <td>${escapeHtml(cliente.telefono || 'No registrado')}</td
+                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td
+                    <td><span class="badge badge-activo">Activo</span></td
+                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td
                 </tr>
             `).join('');
         }
@@ -767,7 +767,7 @@
         }
         
         // ==================================================
-        // DESCARGAR PDF CON LOS DATOS FILTRADOS
+        // DESCARGAR PDF CON LOS DATOS FILTRADOS (SIN ID, CON TOTAL A LA DERECHA)
         // ==================================================
         function descargarPDF() {
             if (clientesFiltrados.length === 0) {
@@ -778,6 +778,13 @@
             // Crear contenido HTML para el PDF
             const fechaActual = new Date();
             const fechaFormateada = `${fechaActual.getDate().toString().padStart(2,'0')}/${(fechaActual.getMonth()+1).toString().padStart(2,'0')}/${fechaActual.getFullYear()} ${fechaActual.getHours().toString().padStart(2,'0')}:${fechaActual.getMinutes().toString().padStart(2,'0')}`;
+            
+            function escapeHtml(text) { 
+                if (!text) return ''; 
+                const div = document.createElement('div'); 
+                div.textContent = text; 
+                return div.innerHTML; 
+            }
             
             let tablaHtml = `
                 <!DOCTYPE html>
@@ -793,71 +800,80 @@
                         }
                         body {
                             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                            padding: 30px;
+                            padding: 20px;
                             background: white;
                         }
                         .header {
                             text-align: center;
-                            margin-bottom: 30px;
+                            margin-bottom: 25px;
                             border-bottom: 2px solid #667eea;
-                            padding-bottom: 20px;
+                            padding-bottom: 15px;
                         }
                         .logo {
                             font-size: 40px;
-                            margin-bottom: 10px;
+                            margin-bottom: 8px;
                         }
                         h1 {
                             color: #1a1a2e;
-                            font-size: 24px;
+                            font-size: 22px;
                             margin-bottom: 5px;
                         }
                         .subtitulo {
                             color: #666;
-                            font-size: 12px;
+                            font-size: 11px;
                         }
                         .fecha {
                             text-align: right;
-                            font-size: 10px;
+                            font-size: 9px;
                             color: #999;
-                            margin-bottom: 20px;
+                            margin-bottom: 15px;
+                        }
+                        .contenido-pdf {
+                            width: 100%;
+                            overflow-x: visible;
                         }
                         table {
                             width: 100%;
                             border-collapse: collapse;
-                            margin-top: 20px;
+                            margin-top: 15px;
+                            table-layout: fixed;
                         }
                         th {
                             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                             color: white;
-                            padding: 12px;
+                            padding: 10px 8px;
                             text-align: left;
-                            font-size: 12px;
+                            font-size: 11px;
                             font-weight: 600;
                         }
                         td {
-                            padding: 10px 12px;
+                            padding: 8px;
                             border-bottom: 1px solid #e0e0e0;
-                            font-size: 11px;
+                            font-size: 10px;
                             color: #333;
-                        }
-                        tr:hover td {
-                            background: #f8f9ff;
+                            word-wrap: break-word;
                         }
                         .footer {
-                            margin-top: 30px;
+                            margin-top: 25px;
                             text-align: center;
-                            font-size: 10px;
+                            font-size: 9px;
                             color: #999;
                             border-top: 1px solid #e0e0e0;
-                            padding-top: 20px;
+                            padding-top: 15px;
                         }
-                        .total {
+                        .total-container {
                             margin-top: 20px;
-                            font-size: 12px;
-                            font-weight: bold;
                             text-align: right;
+                            font-size: 11px;
+                            font-weight: bold;
                             color: #667eea;
+                            border-top: 1px solid #e0e0e0;
+                            padding-top: 12px;
                         }
+                        /* Ajustar anchos de columnas */
+                        .col-nombre { width: 30%; }
+                        .col-email { width: 40%; }
+                        .col-telefono { width: 30%; }
                     </style>
                 </head>
                 <body>
@@ -868,42 +884,35 @@
                     </div>
                     <div class="fecha">📅 Generado: ${fechaFormateada}</div>
                     
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Teléfono</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <div class="contenido-pdf">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="col-nombre">NOMBRE</th>
+                                    <th class="col-email">EMAIL</th>
+                                    <th class="col-telefono">TELÉFONO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
             `;
             
-            function escapeHtml(text) { 
-                if (!text) return ''; 
-                const div = document.createElement('div'); 
-                div.textContent = text; 
-                return div.innerHTML; 
-            }
-            
-            // Agregar filas de clientes filtrados
+            // Agregar filas de clientes filtrados (sin ID)
             for (const cliente of clientesFiltrados) {
                 tablaHtml += `
                     <tr>
-                        <td>${cliente.id}</td>
-                        <td>${escapeHtml(cliente.nombre)}</td>
-                        <td>${escapeHtml(cliente.email)}</td>
-                        <td>${escapeHtml(cliente.telefono || 'No registrado')}</td>
+                        <td>${escapeHtml(cliente.nombre)}</td
+                        <td>${escapeHtml(cliente.email)}</td
+                        <td>${escapeHtml(cliente.telefono || 'No registrado')}</td
                     </tr>
                 `;
             }
             
             tablaHtml += `
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                     
-                    <div class="total">
+                    <div class="total-container">
                         Total de clientes: ${clientesFiltrados.length}
                     </div>
                     
@@ -914,17 +923,30 @@
                 </html>
             `;
             
-            // Configurar opciones para html2pdf
+            // Crear un elemento temporal con el contenido
             const element = document.createElement('div');
             element.innerHTML = tablaHtml;
+            element.style.position = 'absolute';
+            element.style.left = '-9999px';
+            element.style.top = '-9999px';
             document.body.appendChild(element);
             
+            // Configurar opciones optimizadas para que no corte los datos
             const opt = {
                 margin: [0.5, 0.5, 0.5, 0.5],
                 filename: `clientes_aventura_total_${fechaActual.getFullYear()}-${(fechaActual.getMonth()+1).toString().padStart(2,'0')}-${fechaActual.getDate().toString().padStart(2,'0')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, letterRendering: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                html2canvas: { 
+                    scale: 2, 
+                    letterRendering: true,
+                    useCORS: true,
+                    logging: false
+                },
+                jsPDF: { 
+                    unit: 'in', 
+                    format: 'a4', 
+                    orientation: 'landscape'  // Cambiado a landscape para mejor visualización
+                }
             };
             
             html2pdf().set(opt).from(element).save().then(() => {
