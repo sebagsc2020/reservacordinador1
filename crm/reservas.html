@@ -2,31 +2,197 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Reservas - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
 
-        .sidebar { width: 250px; background: #1a1a2e; color: white; padding: 25px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
+        .menu-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 50px;
+            height: 50px;
+            background: #667eea;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .menu-btn:hover {
+            background: #5a6fd6;
+            transform: scale(1.05);
+        }
+        
+        .menu-btn span {
+            font-size: 24px;
+            color: white;
+        }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar { 
+            width: 250px; 
+            background: #1a1a2e; 
+            color: white; 
+            padding: 25px 0; 
+            position: fixed; 
+            height: 100vh; 
+            overflow-y: auto; 
+            z-index: 1001;
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
         .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; } .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } .sidebar-logo h2 span { color: #667eea; }
-        .nav-menu { list-style: none; padding: 0 15px; } .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px; font-size: 14px; }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } .nav-menu a.active { background: #667eea; }
+        .sidebar-logo .logo-icon { font-size: 40px; } 
+        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } 
+        .sidebar-logo h2 span { color: #667eea; }
+        
+        .nav-menu { list-style: none; padding: 0 15px; } 
+        .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 12px 15px; 
+            color: rgba(255,255,255,0.7); 
+            text-decoration: none; 
+            border-radius: 10px; 
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
+        .nav-menu a.active { background: #667eea; }
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
-        .btn-logout-sidebar { width: 100%; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; border: none; }
+        
+        .sidebar-footer { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 15px; 
+            right: 15px; 
+        }
+        .btn-logout-sidebar { 
+            width: 100%; 
+            padding: 12px; 
+            background: rgba(231,76,60,0.2); 
+            color: #e74c3c; 
+            border: 1px solid rgba(231,76,60,0.3);
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 13px; 
+            transition: all 0.2s ease;
+        }
+        .btn-logout-sidebar:hover {
+            background: rgba(231,76,60,0.4);
+        }
 
-        .main-content { margin-left: 250px; flex: 1; padding: 30px; min-width: 0; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; }
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        .main-content { 
+            margin-left: 0;
+            flex: 1; 
+            padding: 20px; 
+            min-width: 0;
+            transition: margin-left 0.3s ease;
+        }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+        }
         .header h1 { font-size: 26px; color: #1a1a2e; }
-        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
-        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        .user-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            background: white; 
+            padding: 8px 20px; 
+            border-radius: 50px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            font-size: 14px; 
+        }
+        .user-avatar { 
+            width: 35px; 
+            height: 35px; 
+            background: #667eea; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-weight: 700; 
+        }
 
-        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-input { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
-        .btn-filtrar, .btn-recargar, .btn-pdf { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .filters-bar { 
+            background: white; 
+            padding: 15px 20px; 
+            border-radius: 15px; 
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); 
+            margin-bottom: 20px; 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+        }
+        .filter-input { 
+            padding: 12px 15px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            font-size: 13px; 
+            flex: 2; 
+            min-width: 200px; 
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-filtrar, .btn-recargar, .btn-pdf { 
+            padding: 10px 18px; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 12px; 
+            white-space: nowrap; 
+            transition: all 0.2s;
+        }
+        .btn-filtrar:active, .btn-recargar:active, .btn-pdf:active {
+            transform: scale(0.96);
+        }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
         .btn-pdf { background: #2c7da0; color: white; }
@@ -39,6 +205,9 @@
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .reserva-card:active {
+            transform: scale(0.99);
         }
         .reserva-card:hover {
             transform: translateY(-4px);
@@ -103,7 +272,10 @@
             transition: all 0.2s;
             text-align: center;
         }
-        .btn-card:hover { transform: scale(0.98); opacity: 0.9; }
+        .btn-card:active {
+            transform: scale(0.96);
+        }
+        .btn-card:hover { opacity: 0.9; }
         .btn-confirmar-card { background: #27ae60; color: white; }
         .btn-pendiente-card { background: #ffc107; color: #856404; }
         .btn-pagar-card { background: #3498db; color: white; }
@@ -179,23 +351,143 @@
             100% { content: ''; }
         }
 
-        @media (max-width: 1200px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { 
-            .sidebar { width: 60px; } 
-            .sidebar-logo h2, .nav-menu a span:not(.nav-icon) { display: none; } 
-            .nav-menu a { justify-content: center; } 
-            .main-content { margin-left: 60px; padding: 15px; }
-            .cards-grid { grid-template-columns: 1fr; }
-            .card-header { flex-direction: column; align-items: flex-start; }
-            .preloader-popup-contenido { padding: 25px 35px; }
-            .preloader-popup-icono { width: 55px; height: 55px; }
-            .preloader-popup-titulo { font-size: 18px; }
+        /* Scroll sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        /* Desktop */
+        @media (min-width: 1201px) {
+            .cards-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* Tablet */
+        @media (min-width: 769px) and (max-width: 1200px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Desktop menú */
+        @media (min-width: 769px) {
+            .menu-btn {
+                display: none !important;
+            }
+            
+            .sidebar {
+                transform: translateX(0) !important;
+                width: 250px;
+            }
+            
+            .menu-overlay {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 250px;
+                padding: 30px;
+            }
+        }
+
+        /* Móvil */
+        @media (max-width: 768px) {
+            .menu-btn {
+                display: flex;
+            }
+            
+            .main-content {
+                padding: 60px 12px 20px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .user-info {
+                padding: 5px 12px;
+                font-size: 12px;
+            }
+            
+            .user-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+            }
+            
+            .filter-input {
+                width: 100%;
+            }
+            
+            .btn-filtrar, .btn-recargar, .btn-pdf {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-actions {
+                flex-direction: column;
+            }
+            
+            .btn-card {
+                width: 100%;
+            }
+            
+            .preloader-popup-contenido {
+                padding: 25px 35px;
+            }
+            
+            .preloader-popup-icono {
+                width: 55px;
+                height: 55px;
+            }
+            
+            .preloader-popup-titulo {
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="sidebar">
-        <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2></div>
+    <!-- Botón menú hamburguesa (solo móvil) -->
+    <button class="menu-btn" id="menuBtn">
+        <span>☰</span>
+    </button>
+    
+    <!-- Overlay para cerrar menú -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">🏔️</div>
+            <h2>Aventura <span>Total</span></h2>
+            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
+        </div>
         <ul class="nav-menu">
             <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
             <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
@@ -205,7 +497,9 @@
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
             <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
         </ul>
-        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button></div>
+        <div class="sidebar-footer">
+            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
+        </div>
     </nav>
 
     <div class="main-content">
@@ -241,6 +535,45 @@
     </div>
 
     <script>
+        // ==================================================
+        // MENÚ FLOTANTE
+        // ==================================================
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const menuOverlay = document.getElementById('menuOverlay');
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('open');
+            menuOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+        
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (menuBtn) {
+            menuBtn.addEventListener('click', toggleMenu);
+        }
+        
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', closeMenu);
+        }
+        
+        // Cerrar menú al hacer clic en un enlace
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeMenu();
+                }
+            });
+        });
+        
+        // ==================================================
+        // CONFIGURACIÓN
+        // ==================================================
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
         }
@@ -468,6 +801,13 @@
                 return;
             }
 
+            function escapeHtml(text) { 
+                if (!text) return ''; 
+                const div = document.createElement('div'); 
+                div.textContent = text; 
+                return div.innerHTML; 
+            }
+
             let html = '';
             for (let idx = 0; idx < reservasFiltradas.length; idx++) {
                 const r = reservasFiltradas[idx];
@@ -591,13 +931,6 @@
             if (!pdfWindow) {
                 alert('⚠️ Por favor, permita ventanas emergentes para generar el PDF.');
             }
-        }
-
-        function escapeHtml(text) { 
-            if (!text) return ''; 
-            const div = document.createElement('div'); 
-            div.textContent = text; 
-            return div.innerHTML; 
         }
 
         window.logout = logout;
