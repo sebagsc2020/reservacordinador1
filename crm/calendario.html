@@ -439,7 +439,7 @@
                 </div>
             </div>
             <div id="eventosListaGrid" class="eventos-lista-grid">
-                <div class="sin-eventos">🔄 Cargando eventos desde Google Sheets...</div>
+                <div class="sin-eventos">🔄 Cargando eventos...</div>
             </div>
         </div>
         
@@ -498,7 +498,8 @@
     <button class="btn-flotante" onclick="abrirModalCrear()">+</button>
     
     <script>
-        // ⚠️ ACTUALIZA ESTA URL CON LA QUE OBTENGAS AL PUBLICAR EL SCRIPT ⚠️
+        // CONFIGURACIÓN - Usando tu URL de Google Sheets
+        const SHEET_PUBLIC_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRE_HJe0tXPVESz1HrJP7haymZT2Yitp-4Gow4Ugogg-eGS2GvN1pv451L3m7NjU0qY02YYJkzIXKxB/pubhtml?gid=1858664682&single=true";
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMJ2pnekFjza6cEp6DglLMEVz5C49hwusa6u1V6Sw3N_40YKg1GOfPWYdSoqhpaA4baw/exec";
         
         let eventos = [];
@@ -534,58 +535,105 @@
             setTimeout(() => div.remove(), 3000);
         }
         
-        // Cargar eventos desde Google Sheets usando JSONP para evitar CORS
+        // Cargar eventos desde Google Sheets usando sheet.best API (gratuito y sin CORS)
         async function cargarEventosDesdeSheet() {
             mostrarMensaje('🔄 Sincronizando con Google Sheets...', 'cargando');
             
+            // Usar la API de sheet.best para convertir la hoja pública en JSON
+            // Extraer el ID de la hoja de la URL pública
+            const sheetId = "2PACX-1vRE_HJe0tXPVESz1HrJP7haymZT2Yitp-4Gow4Ugogg-eGS2GvN1pv451L3m7NjU0qY02YYJkzIXKxB";
+            const gid = "1858664682";
+            
+            // Usar la API de Google Sheets v4 con formato JSONP
+            const jsonUrl = `https://docs.google.com/spreadsheets/d/e/${sheetId}/pub?gid=${gid}&single=true&output=csv`;
+            
             try {
-                // Usar fetch con modo cors y cache no-cache
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'GET',
-                    mode: 'cors',
-                    cache: 'no-cache',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
+                // Fetch como CSV y convertir
+                const response = await fetch(jsonUrl);
+                const csvText = await response.text();
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                // Parsear CSV manualmente
+                const lineas = csvText.split('\n');
+                if (lineas.length < 2) {
+                    throw new Error('No hay datos en la hoja');
                 }
                 
-                const data = await response.json();
+                // Saltar encabezados (primera línea)
+                const eventosTemp = [];
+                for (let i = 1; i < lineas.length; i++) {
+                    const linea = lineas[i].trim();
+                    if (!linea) continue;
+                    
+                    // Parsear CSV simple (respetando comillas)
+                    const valores = [];
+                    let enComillas = false;
+                    let valorActual = '';
+                    
+                    for (let c = 0; c < linea.length; c++) {
+                        const char = linea[c];
+                        if (char === '"') {
+                            enComillas = !enComillas;
+                        } else if (char === ',' && !enComillas) {
+                            valores.push(valorActual);
+                            valorActual = '';
+                        } else {
+                            valorActual += char;
+                        }
+                    }
+                    valores.push(valorActual);
+                    
+                    // Limpiar comillas
+                    const limpiar = (v) => v.replace(/^"|"$/g, '').trim();
+                    
+                    const id = limpiar(valores[0] || '');
+                    const titulo = limpiar(valores[1] || '');
+                    const fechaInicio = limpiar(valores[2] || '');
+                    const fechaFin = limpiar(valores[3] || '');
+                    const descripcion = limpiar(valores[4] || '');
+                    
+                    if (id && titulo && fechaInicio && fechaFin) {
+                        eventosTemp.push({
+                            id: id,
+                            titulo: titulo,
+                            fechaInicio: fechaInicio,
+                            fechaFin: fechaFin,
+                            descripcion: descripcion
+                        });
+                    }
+                }
                 
-                if (data.status === 'success' && data.eventos) {
-                    eventos = data.eventos;
+                if (eventosTemp.length > 0) {
+                    eventos = eventosTemp;
                     renderizarListaEventos();
                     renderCalendar();
                     mostrarMensaje(`✅ Cargados ${eventos.length} eventos desde Google Sheets`, 'exito');
-                    // Guardar backup
                     localStorage.setItem('eventos_backup', JSON.stringify(eventos));
                 } else {
-                    throw new Error(data.message || 'Error al cargar');
+                    cargarBackupLocal();
                 }
             } catch(error) {
-                console.error('Error en sincronización:', error);
-                mostrarMensaje('⚠️ Error de conexión. Cargando datos locales...', 'error');
-                
-                // Cargar desde localStorage como fallback
-                const guardados = localStorage.getItem('eventos_backup');
-                if (guardados && JSON.parse(guardados).length > 0) {
-                    eventos = JSON.parse(guardados);
-                    renderizarListaEventos();
-                    renderCalendar();
-                    mostrarMensaje(`📱 Cargados ${eventos.length} eventos desde caché local`, 'exito');
-                } else {
-                    // Datos de ejemplo
-                    eventos = [
-                        { id: '1', fechaInicio: '2026-06-01', fechaFin: '2026-06-03', titulo: 'City Tour', descripcion: 'Tour 3 días' },
-                        { id: '2', fechaInicio: '2026-06-05', fechaFin: '2026-06-07', titulo: 'Barco Pirata', descripcion: '' }
-                    ];
-                    renderizarListaEventos();
-                    renderCalendar();
-                    mostrarMensaje('📝 Cargados eventos de ejemplo', 'exito');
-                }
+                console.error('Error cargando CSV:', error);
+                cargarBackupLocal();
+            }
+        }
+        
+        function cargarBackupLocal() {
+            const backup = localStorage.getItem('eventos_backup');
+            if (backup && JSON.parse(backup).length > 0) {
+                eventos = JSON.parse(backup);
+                renderizarListaEventos();
+                renderCalendar();
+                mostrarMensaje(`📱 Cargados ${eventos.length} eventos desde caché local`, 'exito');
+            } else {
+                // Eventos de ejemplo
+                eventos = [
+                    { id: '1', fechaInicio: '2026-06-01', fechaFin: '2026-06-03', titulo: 'City Tour', descripcion: 'Tour 3 días' },
+                    { id: '2', fechaInicio: '2026-06-05', fechaFin: '2026-06-07', titulo: 'Barco Pirata', descripcion: '' },
+                    { id: '3', fechaInicio: '2026-06-10', fechaFin: '2026-06-15', titulo: 'Valle Nevado', descripcion: '5 días de aventura' }
+                ];
+                renderizarListaEventos();
+                renderCalendar();
+                mostrarMensaje('📝 Cargados eventos de ejemplo', 'exito');
             }
         }
         
@@ -606,7 +654,6 @@
                     })
                 });
                 
-                // Backup local
                 localStorage.setItem('eventos_backup', JSON.stringify(eventos));
                 return true;
             } catch(error) {
@@ -647,7 +694,7 @@
             cerrarModal();
             
             if (guardado) {
-                mostrarMensaje('✅ ¡Evento guardado en la nube!', 'exito');
+                mostrarMensaje('✅ ¡Evento guardado! Actualiza la lista con "Sincronizar"', 'exito');
             } else {
                 mostrarMensaje('⚠️ Guardado localmente. Sincroniza luego', 'error');
             }
@@ -664,17 +711,24 @@
                 return;
             }
             
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
             container.innerHTML = eventos.map(evento => `
                 <div class="evento-card">
-                    <div class="evento-card-info" onclick="abrirModalEditar(${JSON.stringify(evento).replace(/"/g, '&quot;')})">
-                        <div class="evento-card-titulo">📌 ${evento.titulo}</div>
+                    <div class="evento-card-info" onclick='abrirModalEditar(${JSON.stringify(evento).replace(/'/g, "&#39;")})'>
+                        <div class="evento-card-titulo">📌 ${escapeHtml(evento.titulo)}</div>
                         <div class="evento-card-fechas">📅 ${evento.fechaInicio} → ${evento.fechaFin}</div>
-                        ${evento.descripcion ? `<div class="evento-card-descripcion">📝 ${evento.descripcion}</div>` : ''}
+                        ${evento.descripcion ? `<div class="evento-card-descripcion">📝 ${escapeHtml(evento.descripcion)}</div>` : ''}
                     </div>
                     <div class="evento-card-acciones">
-                        <button class="btn-compartir-evento" onclick="event.stopPropagation(); compartirEventoWhatsApp(${JSON.stringify(evento).replace(/"/g, '&quot;')})">📱</button>
-                        <button class="btn-editar-evento" onclick="event.stopPropagation(); abrirModalEditar(${JSON.stringify(evento).replace(/"/g, '&quot;')})">✏️</button>
-                        <button class="btn-eliminar-evento" onclick="event.stopPropagation(); abrirConfirmEliminar('${evento.id}', '${evento.titulo}')">🗑️</button>
+                        <button class="btn-compartir-evento" onclick='event.stopPropagation(); compartirEventoWhatsApp(${JSON.stringify(evento).replace(/'/g, "&#39;")})'>📱</button>
+                        <button class="btn-editar-evento" onclick='event.stopPropagation(); abrirModalEditar(${JSON.stringify(evento).replace(/'/g, "&#39;")})'>✏️</button>
+                        <button class="btn-eliminar-evento" onclick="event.stopPropagation(); abrirConfirmEliminar('${evento.id}', '${escapeHtml(evento.titulo)}')">🗑️</button>
                     </div>
                 </div>
             `).join('');
@@ -689,6 +743,7 @@
             mensaje += "\n🔗 *CRM Aventura Total*";
             
             window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+            mostrarMensaje('📱 Compartiendo evento...', 'exito');
         }
         
         function compartirTodosWhatsApp() {
@@ -709,6 +764,7 @@
             
             mensaje += `\n${"─".repeat(30)}\n🔗 *CRM Aventura Total*`;
             window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+            mostrarMensaje('📱 Compartiendo todos los eventos...', 'exito');
         }
         
         function abrirConfirmEliminar(id, titulo) {
@@ -825,7 +881,7 @@
                 });
                 
                 eventosUnicos.slice(0, 2).forEach(evento => {
-                    html += `<div class="event-item" onclick="event.stopPropagation(); abrirModalEditar(${JSON.stringify(evento).replace(/"/g, '&quot;')})">📌 ${evento.titulo}</div>`;
+                    html += `<div class="event-item" onclick="event.stopPropagation(); abrirModalEditar(${JSON.stringify(evento).replace(/'/g, "&#39;")})">📌 ${evento.titulo}</div>`;
                 });
                 
                 if (eventosUnicos.length > 2) {
