@@ -512,38 +512,36 @@
         // ==================================================
         // MENÚ FLOTANTE
         // ==================================================
-        const menuBtn = document.getElementById('menuBtn');
-        const sidebar = document.getElementById('sidebar');
-        const menuOverlay = document.getElementById('menuOverlay');
-        
-        function toggleMenu() {
-            sidebar.classList.toggle('open');
-            menuOverlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-        }
-        
-        function closeMenu() {
-            sidebar.classList.remove('open');
-            menuOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        if (menuBtn) {
+        function initMenu() {
+            const menuBtn = document.getElementById('menuBtn');
+            const sidebar = document.getElementById('sidebar');
+            const menuOverlay = document.getElementById('menuOverlay');
+            
+            if (!menuBtn || !sidebar || !menuOverlay) return;
+            
+            function toggleMenu() {
+                sidebar.classList.toggle('open');
+                menuOverlay.classList.toggle('active');
+                document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+            }
+            
+            function closeMenu() {
+                sidebar.classList.remove('open');
+                menuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
             menuBtn.addEventListener('click', toggleMenu);
-        }
-        
-        if (menuOverlay) {
             menuOverlay.addEventListener('click', closeMenu);
-        }
-        
-        // Cerrar menú al hacer clic en un enlace
-        document.querySelectorAll('.nav-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    closeMenu();
-                }
+            
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        closeMenu();
+                    }
+                });
             });
-        });
+        }
         
         // ==================================================
         // CONFIGURACIÓN
@@ -561,8 +559,8 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         
-        // Misma URL del Google Apps Script que en reservas.html
-        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
+        // URL del Google Apps Script - ACTUALIZAR CON TU URL
+        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0HFsdajR5wgLlqnpc1p-pzW7YOTGynhFCwsCgp_jPRQ_RUDBAX8I4aw1YHCcKGN2utQ/exec';
         
         // Link de Mercado Pago
         const MERCADO_PAGO_LINK = 'https://link.mercadopago.com.ar/scphotobr';
@@ -576,33 +574,65 @@
         function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
         function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
 
+        // ==================================================
+        // CARGAR ESTADOS DESDE LA NUBE
+        // ==================================================
         async function cargarEstadosDesdeNube() {
             try {
-                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener');
+                // Primero intentar cargar desde localStorage
+                const localEstados = localStorage.getItem('estadosReservasCloud');
+                if (localEstados) {
+                    const parsed = JSON.parse(localEstados);
+                    if (Object.keys(parsed).length > 0) {
+                        estadosGlobales = parsed;
+                        console.log('📥 Estados cargados desde localStorage:', Object.keys(estadosGlobales).length);
+                    }
+                }
+                
+                // Luego sincronizar con la nube
+                const url = ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now();
+                console.log('🔍 Consultando estados desde:', url);
+                
+                const response = await fetch(url);
                 const data = await response.json();
+                
+                console.log('📦 Respuesta del servidor:', data);
+                
                 if (data.success && data.estados) {
                     estadosGlobales = data.estados;
                     localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
-                    return estadosGlobales;
+                    console.log('📥 Estados sincronizados desde nube:', Object.keys(estadosGlobales).length);
                 } else {
-                    throw new Error('No se pudieron obtener estados');
+                    console.warn('⚠️ No se pudieron obtener estados desde nube, usando localStorage');
                 }
+                return estadosGlobales;
             } catch (error) {
-                console.error('Error al cargar desde nube:', error);
+                console.error('❌ Error al cargar desde nube:', error);
                 const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
                 estadosGlobales = estadosLocal;
                 return estadosLocal;
             }
         }
 
+        // ==================================================
+        // CARGAR DATOS PRINCIPAL
+        // ==================================================
         async function cargarDatos() {
+            const kanbanPendiente = document.getElementById('kanbanPendiente');
+            const kanbanConfirmado = document.getElementById('kanbanConfirmado');
+            const kanbanPagado = document.getElementById('kanbanPagado');
+            
+            if (!kanbanPendiente) return;
+
             try {
                 mostrarPreloader();
+                console.log('🚀 Iniciando carga de datos...');
 
                 // Cargar estados desde la nube
                 await cargarEstadosDesdeNube();
+                console.log('✅ Estados cargados:', Object.keys(estadosGlobales).length);
 
-                const response = await fetch(JSON_URL);
+                const response = await fetch(JSON_URL + '&t=' + Date.now());
                 const texto = await response.text();
 
                 let jsonStr = texto;
@@ -659,7 +689,7 @@
                     const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
                     const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
 
-                    // Obtener estado desde la nube (misma fuente que reservas.html)
+                    // Obtener estado desde estadosGlobales
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
@@ -680,6 +710,7 @@
                 }
 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
+                console.log('📋 Estados por reserva:', reservasData.map(r => ({ id: r.id, estado: r.estado })));
 
                 // Actualizar métricas
                 const total = reservasData.length;
@@ -701,9 +732,13 @@
                 document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'confirmado'));
                 document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pagado'));
                 
+                console.log('✅ Dashboard actualizado correctamente');
+                
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('kanbanPendiente').innerHTML = '<div class="loading-text">Error al cargar datos</div>';
+                console.error('❌ Error:', error);
+                if (kanbanPendiente) kanbanPendiente.innerHTML = '<div class="loading-text">Error al cargar datos</div>';
+                if (kanbanConfirmado) kanbanConfirmado.innerHTML = '<div class="loading-text">Error al cargar datos</div>';
+                if (kanbanPagado) kanbanPagado.innerHTML = '<div class="loading-text">Error al cargar datos</div>';
             } finally {
                 ocultarPreloader();
             }
@@ -736,13 +771,11 @@
 
         // Función para enviar link de pago por WhatsApp
         function enviarLinkPagoWhatsApp(reserva) {
-            // Formatear teléfono
             let telefono = reserva.telefono.replace(/\D/g, '');
             if (telefono.length === 10) {
                 telefono = '54' + telefono;
             }
             
-            // Construir mensaje con el link de Mercado Pago
             const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
 
 💰 *SOLICITUD DE PAGO*
@@ -760,8 +793,6 @@ ${MERCADO_PAGO_LINK}
             
             const mensajeCodificado = encodeURIComponent(mensaje);
             const urlWhatsApp = `https://wa.me/${telefono}?text=${mensajeCodificado}`;
-            
-            // Abrir WhatsApp
             window.open(urlWhatsApp, '_blank');
         }
 
@@ -805,12 +836,10 @@ ${MERCADO_PAGO_LINK}
                         <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
                         <p><strong>Estado:</strong> <span style="background:#eef2ff; padding:3px 10px; border-radius:20px; font-weight:700;">${estadoText}</span></p>
                         
-                        <!-- Mensaje de aviso -->
                         <div class="aviso-pago">
                             ⚠️ <strong>Importante:</strong> Caso no recuerde el monto total de su reserva, solicítelo vía WhatsApp. Muchas Gracias.
                         </div>
                         
-                        <!-- Botón Enviar link de pago por WhatsApp -->
                         <button class="btn-pagar-whatsapp" onclick="enviarLinkPagoWhatsApp(reservasData.find(r => r.id === '${reserva.id}'))">
                             💬 Enviar link de pago por WhatsApp
                         </button>
@@ -834,15 +863,28 @@ ${MERCADO_PAGO_LINK}
             return div.innerHTML; 
         }
 
+        // ==================================================
+        // INICIALIZAR
+        // ==================================================
+        function init() {
+            initMenu();
+            cargarDatos();
+            setInterval(cargarDatos, 30000);
+        }
+        
         // Exponer funciones globalmente
         window.verDetalle = verDetalle;
         window.cerrarModal = cerrarModal;
         window.cargarDatos = cargarDatos;
         window.logout = logout;
         window.enviarLinkPagoWhatsApp = enviarLinkPagoWhatsApp;
-
-        cargarDatos();
-        setInterval(cargarDatos, 30000);
+        
+        // Iniciar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 </body>
 </html>
