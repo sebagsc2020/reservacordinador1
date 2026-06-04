@@ -262,6 +262,23 @@
             padding: 4px 10px;
             border-radius: 20px;
         }
+        .btn-editar-nombre {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 20px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-editar-nombre:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+        .btn-editar-nombre:active {
+            transform: scale(0.95);
+        }
         .card-estado-header {
             font-weight: 700;
             font-size: 12px;
@@ -647,8 +664,8 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         
-        // URL del Google Apps Script
-        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0HFsdajR5wgLlqnpc1p-pzW7YOTGynhFCwsCgp_jPRQ_RUDBAX8I4aw1YHCcKGN2utQ/exec';
+        // URL del Google Apps Script - ACTUALIZAR CON TU URL
+        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
         
         let reservasData = [];
         let reservasFiltradas = [];
@@ -669,6 +686,74 @@
                     preloaderPopup.classList.add('oculto');
                 }, 300);
             }
+        }
+
+        // ==================================================
+        // GUARDAR NOMBRE EDITADO EN LA NUBE
+        // ==================================================
+        async function guardarNombreEnNube(id, nuevoNombre) {
+            try {
+                const formData = new URLSearchParams();
+                formData.append('action', 'actualizarNombre');
+                formData.append('id', id);
+                formData.append('nombre', nuevoNombre);
+                
+                const response = await fetch(ESTADOS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString()
+                });
+                
+                const text = await response.text();
+                console.log(`✅ Nombre guardado en nube: ${id} -> ${nuevoNombre}`, text);
+                return true;
+            } catch (error) {
+                console.error('Error al guardar nombre en nube:', error);
+                return false;
+            }
+        }
+
+        // ==================================================
+        // EDITAR NOMBRE DE LA RESERVA
+        // ==================================================
+        async function editarNombreReserva(id, nombreActual) {
+            const nuevoNombre = prompt('✏️ Editar nombre del cliente:', nombreActual);
+            if (!nuevoNombre || nuevoNombre.trim() === '') return;
+            if (nuevoNombre === nombreActual) return;
+            
+            try {
+                mostrarPreloader();
+                
+                const reserva = reservasData.find(r => r.id === id);
+                if (reserva) {
+                    reserva.nombre = nuevoNombre.trim();
+                    
+                    const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
+                    if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].nombre = nuevoNombre.trim();
+                    
+                    // Guardar en localStorage como backup
+                    const nombresEditados = JSON.parse(localStorage.getItem('nombresEditados') || '{}');
+                    nombresEditados[id] = nuevoNombre.trim();
+                    localStorage.setItem('nombresEditados', JSON.stringify(nombresEditados));
+                    
+                    // Guardar en la nube
+                    await guardarNombreEnNube(id, nuevoNombre.trim());
+                    
+                    renderizarCards();
+                    alert('✅ Nombre actualizado correctamente en la nube');
+                }
+            } catch (error) {
+                console.error('Error al editar nombre:', error);
+                alert('❌ Error al actualizar el nombre');
+            } finally {
+                ocultarPreloader();
+            }
+        }
+
+        function cargarNombresEditados() {
+            return JSON.parse(localStorage.getItem('nombresEditados') || '{}');
         }
 
         // ==================================================
@@ -703,7 +788,6 @@
         // ==================================================
         async function cargarEstadosDesdeNube() {
             try {
-                // Intentar cargar desde localStorage primero
                 const localEstados = localStorage.getItem('estadosReservasCloud');
                 if (localEstados) {
                     const parsed = JSON.parse(localEstados);
@@ -713,7 +797,6 @@
                     }
                 }
                 
-                // Luego intentar sincronizar con la nube
                 const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
                 const data = await response.json();
                 if (data.success && data.estados) {
@@ -758,6 +841,7 @@
 
                 reservasData = [];
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
+                const nombresEditados = cargarNombresEditados();
 
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
@@ -799,7 +883,12 @@
                     const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
                     const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
                     const lugar = (c[12] && c[12].v) ? String(c[12].v) : 'No especificado';
-                    const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
+                    let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
+                    
+                    // Aplicar nombre editado si existe
+                    if (nombresEditados[id]) {
+                        nombreCompleto = nombresEditados[id];
+                    }
 
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
@@ -901,6 +990,14 @@
                 return div.innerHTML; 
             }
 
+            // Actualizar nombres desde localStorage
+            const nombresEditados = cargarNombresEditados();
+            reservasFiltradas.forEach(reserva => {
+                if (nombresEditados[reserva.id]) {
+                    reserva.nombre = nombresEditados[reserva.id];
+                }
+            });
+
             let html = '';
             for (let idx = 0; idx < reservasFiltradas.length; idx++) {
                 const r = reservasFiltradas[idx];
@@ -938,6 +1035,7 @@
                             '<div class="card-header">' +
                                 '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">' +
                                     '<span class="card-id">ID: ' + escapeHtml(r.id) + '</span>' +
+                                    '<button class="btn-editar-nombre" onclick="editarNombreReserva(\'' + r.id + '\', \'' + escapeHtml(r.nombre).replace(/'/g, "\\'") + '\')" title="Editar nombre">✏️</button>' +
                                     '<span class="card-estado-header" style="font-weight: 700; background: ' + estadoColor + ';">' + estadoText + '</span>' +
                                 '</div>' +
                                 '<span class="card-fecha">' + escapeHtml(r.fecha) + '</span>' +
@@ -1039,7 +1137,7 @@
         }
 
         // ==================================================
-        // INICIALIZAR - ACTUALIZACIÓN CADA 2 MINUTOS (SOLO SI PESTAÑA VISIBLE)
+        // INICIALIZAR
         // ==================================================
         function init() {
             initMenu();
@@ -1058,10 +1156,8 @@
                 });
             }
             
-            // Carga inicial
             cargarReservas();
             
-            // Actualización automática CADA 2 MINUTOS (solo si la pestaña está visible)
             setInterval(() => {
                 if (document.visibilityState === 'visible') {
                     console.log('🔄 Actualización automática - pestaña visible');
@@ -1075,8 +1171,8 @@
         window.cargarReservas = cargarReservas;
         window.generarPDFExterno = generarPDFExterno;
         window.abrirReservaManual = abrirReservaManual;
+        window.editarNombreReserva = editarNombreReserva;
         
-        // Iniciar cuando el DOM esté listo
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
