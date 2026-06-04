@@ -474,44 +474,10 @@
         function ocultarPreloader() { if (preloaderPopup) preloaderPopup.classList.add('oculto'); }
         
         // ==================================================
-        // FUNCIÓN CRÍTICA: Convierte cualquier fecha a DD/MM/YYYY
+        // FUNCIÓN: Convierte OBJETO DATE a string DD/MM/YYYY
         // ==================================================
-        function fechaToDDMMYYYY(fechaInput) {
-            if (!fechaInput) return '';
-            
-            let fecha;
-            
-            // Si es un objeto Date
-            if (fechaInput instanceof Date) {
-                fecha = fechaInput;
-            }
-            // Si es un string
-            else if (typeof fechaInput === 'string') {
-                // Si ya está en formato DD/MM/YYYY
-                if (fechaInput.includes('/')) {
-                    return fechaInput;
-                }
-                // Si está en formato YYYY-MM-DD
-                if (fechaInput.includes('-')) {
-                    const partes = fechaInput.split('-');
-                    if (partes.length === 3) {
-                        fecha = new Date(partes[0], partes[1] - 1, partes[2]);
-                    }
-                }
-                // Si es un string de fecha tipo "Fri Jun 05 2026..."
-                else {
-                    fecha = new Date(fechaInput);
-                }
-            }
-            // Si es un timestamp
-            else if (typeof fechaInput === 'number') {
-                fecha = new Date(fechaInput);
-            }
-            
-            if (!fecha || isNaN(fecha.getTime())) {
-                return String(fechaInput);
-            }
-            
+        function dateToDDMMYYYY(fecha) {
+            if (!fecha) return '';
             const dia = fecha.getDate().toString().padStart(2, '0');
             const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
             const anio = fecha.getFullYear();
@@ -519,33 +485,78 @@
         }
         
         // ==================================================
-        // GENERAR FECHAS ENTRE DOS FECHAS
+        // FUNCIÓN: Convierte CUALQUIER cosa a DD/MM/YYYY
         // ==================================================
-        function generarFechasEntre(fechaInicioStr, fechaFinStr) {
-            const fechas = [];
+        function cualquierFechaToDDMMYYYY(fechaInput) {
+            if (!fechaInput) return '';
             
-            // Extraer día, mes, año de strings DD/MM/YYYY
-            const inicioParts = fechaInicioStr.split('/');
-            const finParts = fechaFinStr.split('/');
-            
-            if (inicioParts.length !== 3 || finParts.length !== 3) {
-                console.error('Formato de fecha inválido:', fechaInicioStr, fechaFinStr);
-                return fechas;
+            // Si es un objeto Date
+            if (fechaInput instanceof Date) {
+                return dateToDDMMYYYY(fechaInput);
             }
             
-            const inicio = new Date(inicioParts[2], inicioParts[1] - 1, inicioParts[0]);
-            const fin = new Date(finParts[2], finParts[1] - 1, finParts[0]);
+            // Si es un string
+            if (typeof fechaInput === 'string') {
+                // Si ya está en DD/MM/YYYY
+                if (fechaInput.includes('/')) {
+                    return fechaInput;
+                }
+                // Si está en YYYY-MM-DD
+                if (fechaInput.includes('-')) {
+                    const partes = fechaInput.split('-');
+                    if (partes.length === 3) {
+                        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+                    }
+                }
+            }
+            
+            // Intentar crear un objeto Date
+            const fecha = new Date(fechaInput);
+            if (!isNaN(fecha.getTime())) {
+                return dateToDDMMYYYY(fecha);
+            }
+            
+            return String(fechaInput);
+        }
+        
+        // ==================================================
+        // FUNCIÓN: Genera array de fechas entre dos fechas (en DD/MM/YYYY)
+        // ==================================================
+        function generarFechasEntre(fechaInicio, fechaFin) {
+            const fechas = [];
+            
+            // Asegurar que son objetos Date
+            let inicio, fin;
+            
+            if (fechaInicio instanceof Date) {
+                inicio = new Date(fechaInicio);
+            } else {
+                const partes = String(fechaInicio).split('/');
+                if (partes.length === 3) {
+                    inicio = new Date(partes[2], partes[1] - 1, partes[0]);
+                } else {
+                    inicio = new Date(fechaInicio);
+                }
+            }
+            
+            if (fechaFin instanceof Date) {
+                fin = new Date(fechaFin);
+            } else {
+                const partes = String(fechaFin).split('/');
+                if (partes.length === 3) {
+                    fin = new Date(partes[2], partes[1] - 1, partes[0]);
+                } else {
+                    fin = new Date(fechaFin);
+                }
+            }
             
             if (isNaN(inicio.getTime()) || isNaN(fin.getTime())) {
-                console.error('Fechas inválidas:', inicio, fin);
+                console.error('No se pudieron parsear las fechas:', fechaInicio, fechaFin);
                 return fechas;
             }
             
             for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
-                const dia = d.getDate().toString().padStart(2, '0');
-                const mes = (d.getMonth() + 1).toString().padStart(2, '0');
-                const anio = d.getFullYear();
-                fechas.push(`${dia}/${mes}/${anio}`);
+                fechas.push(dateToDDMMYYYY(d));
             }
             
             return fechas;
@@ -630,7 +641,7 @@
                 <div class="evento-card">
                     <div class="evento-header">
                         <div class="evento-titulo">${escapeHtml(evento.nombre)}</div>
-                        <div class="evento-fechas">📅 ${fechaToDDMMYYYY(evento.fechaInicio)} - ${fechaToDDMMYYYY(evento.fechaFin)}</div>
+                        <div class="evento-fechas">📅 ${cualquierFechaToDDMMYYYY(evento.fechaInicio)} - ${cualquierFechaToDDMMYYYY(evento.fechaFin)}</div>
                         <div class="evento-pax">👥 ${evento.pax} pasajeros</div>
                     </div>
                     <div class="evento-acciones">
@@ -687,8 +698,8 @@
                 return;
             }
             
-            const fechaInicio = fechaToDDMMYYYY(fechaInicioInput);
-            const fechaFin = fechaToDDMMYYYY(fechaFinInput);
+            const fechaInicio = cualquierFechaToDDMMYYYY(fechaInicioInput);
+            const fechaFin = cualquierFechaToDDMMYYYY(fechaFinInput);
             
             mostrarPreloader();
             
@@ -746,20 +757,51 @@
                 const evento = data.evento;
                 const notasEvento = data.notas || [];
                 
-                // CONVERTIR FECHAS DEL EVENTO A DD/MM/YYYY
-                const fechaInicioStr = fechaToDDMMYYYY(evento.fechaInicio);
-                const fechaFinStr = fechaToDDMMYYYY(evento.fechaFin);
+                // CREAR OBJETOS DATE a partir de las fechas del evento
+                let fechaInicioDate, fechaFinDate;
                 
-                console.log('Fechas convertidas:', fechaInicioStr, fechaFinStr);
+                // Si la fecha es un string en DD/MM/YYYY
+                if (typeof evento.fechaInicio === 'string' && evento.fechaInicio.includes('/')) {
+                    const partes = evento.fechaInicio.split('/');
+                    fechaInicioDate = new Date(partes[2], partes[1] - 1, partes[0]);
+                } 
+                // Si es un objeto Date
+                else if (evento.fechaInicio instanceof Date) {
+                    fechaInicioDate = evento.fechaInicio;
+                }
+                // Si es otro formato
+                else {
+                    fechaInicioDate = new Date(evento.fechaInicio);
+                }
                 
-                // GENERAR FECHAS ENTRE INICIO Y FIN
-                const fechas = generarFechasEntre(fechaInicioStr, fechaFinStr);
+                if (typeof evento.fechaFin === 'string' && evento.fechaFin.includes('/')) {
+                    const partes = evento.fechaFin.split('/');
+                    fechaFinDate = new Date(partes[2], partes[1] - 1, partes[0]);
+                } 
+                else if (evento.fechaFin instanceof Date) {
+                    fechaFinDate = evento.fechaFin;
+                }
+                else {
+                    fechaFinDate = new Date(evento.fechaFin);
+                }
+                
+                console.log('Fechas como Date:', fechaInicioDate, fechaFinDate);
+                
+                // Generar array de fechas entre inicio y fin
+                const fechas = [];
+                for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
+                    const dia = d.getDate().toString().padStart(2, '0');
+                    const mes = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const anio = d.getFullYear();
+                    fechas.push(`${dia}/${mes}/${anio}`);
+                }
+                
                 console.log('Fechas generadas:', fechas);
                 
-                // CREAR MAPA DE NOTAS POR FECHA
+                // Crear mapa de notas por fecha
                 const notasPorFecha = {};
                 notasEvento.forEach(nota => {
-                    let fechaNota = fechaToDDMMYYYY(nota.fecha);
+                    let fechaNota = cualquierFechaToDDMMYYYY(nota.fecha);
                     if (!notasPorFecha[fechaNota]) {
                         notasPorFecha[fechaNota] = [];
                     }
@@ -768,7 +810,7 @@
                 
                 console.log('Notas por fecha:', notasPorFecha);
                 
-                // GENERAR HTML DE DÍAS
+                // Generar HTML de días
                 let diasHtml = '';
                 for (const fecha of fechas) {
                     const notasDelDia = notasPorFecha[fecha] || [];
@@ -800,6 +842,9 @@
                     `;
                 }
                 
+                const fechaInicioMostrar = dateToDDMMYYYY(fechaInicioDate);
+                const fechaFinMostrar = dateToDDMMYYYY(fechaFinDate);
+                
                 const modalHtml = `
                     <div id="modalEvento" class="modal">
                         <div class="modal-contenido">
@@ -807,7 +852,7 @@
                                 <h3>📅 ${escapeHtml(evento.nombre)}</h3>
                                 <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
                             </div>
-                            <p><strong>📅 Período:</strong> ${fechaInicioStr} - ${fechaFinStr}</p>
+                            <p><strong>📅 Período:</strong> ${fechaInicioMostrar} - ${fechaFinMostrar}</p>
                             <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
                             <div class="dias-container">
                                 ${diasHtml}
@@ -1051,7 +1096,7 @@
             const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
 
 📅 *EVENTO: ${evento.nombre}*
-📍 Período: ${fechaToDDMMYYYY(evento.fechaInicio)} - ${fechaToDDMMYYYY(evento.fechaFin)}
+📍 Período: ${cualquierFechaToDDMMYYYY(evento.fechaInicio)} - ${cualquierFechaToDDMMYYYY(evento.fechaFin)}
 👥 Pasajeros: ${evento.pax}
 
 🔗 Para más información, contáctenos.`;
