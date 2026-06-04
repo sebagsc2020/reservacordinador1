@@ -647,7 +647,7 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         
-        // URL del Google Apps Script - ACTUALIZAR CON TU URL
+        // URL del Google Apps Script
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0HFsdajR5wgLlqnpc1p-pzW7YOTGynhFCwsCgp_jPRQ_RUDBAX8I4aw1YHCcKGN2utQ/exec';
         
         let reservasData = [];
@@ -672,7 +672,7 @@
         }
 
         // ==================================================
-        // GUARDAR ESTADO EN LA NUBE (VERSIÓN CORREGIDA)
+        // GUARDAR ESTADO EN LA NUBE
         // ==================================================
         async function guardarEstadoEnNube(id, nuevoEstado) {
             try {
@@ -1027,7 +1027,7 @@
         }
 
         // ==================================================
-        // INICIALIZAR
+        // INICIALIZAR - ACTUALIZACIÓN CADA 2 MINUTOS (SOLO SI PESTAÑA VISIBLE)
         // ==================================================
         function init() {
             initMenu();
@@ -1046,8 +1046,16 @@
                 });
             }
             
+            // Carga inicial
             cargarReservas();
-            setInterval(() => cargarReservas(), 30000);
+            
+            // Actualización automática CADA 2 MINUTOS (solo si la pestaña está visible)
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    console.log('🔄 Actualización automática - pestaña visible');
+                    cargarReservas();
+                }
+            }, 120000);
         }
         
         window.logout = logout;
