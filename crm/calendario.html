@@ -519,64 +519,53 @@
         }
         
         // ==================================================
-        // FUNCIONES PARA FORMATEAR FECHAS (MANEJA STRING Y OBJECT DATE)
+        // FUNCIONES PARA FECHAS EN DD/MM/YYYY
         // ==================================================
-        function formatearFechaParaMostrar(fechaInput) {
-            if (!fechaInput) return '';
+        
+        // Convierte DD/MM/YYYY a objeto Date
+        function fechaDDMMYYYYaDate(fechaStr) {
+            if (!fechaStr) return null;
+            const partes = fechaStr.split('/');
+            if (partes.length === 3) {
+                return new Date(partes[2], partes[1] - 1, partes[0]);
+            }
+            return null;
+        }
+        
+        // Formatea una fecha a DD/MM/YYYY
+        function formatearFecha(fecha) {
+            if (!fecha) return '';
+            if (typeof fecha === 'string' && fecha.includes('/')) return fecha;
             
-            let fecha = new Date(fechaInput);
-            if (isNaN(fecha.getTime())) {
-                // Si no es una fecha válida, intentar como string
-                if (typeof fechaInput === 'string') {
-                    if (fechaInput.includes('/')) {
-                        const partes = fechaInput.split('/');
-                        if (partes.length === 3) {
-                            fecha = new Date(partes[2], partes[1] - 1, partes[0]);
-                        }
-                    } else if (fechaInput.includes('-')) {
-                        const partes = fechaInput.split('-');
-                        if (partes.length === 3) {
-                            fecha = new Date(partes[0], partes[1] - 1, partes[2]);
-                        }
-                    }
+            let fechaObj;
+            if (typeof fecha === 'string') {
+                if (fecha.includes('-')) {
+                    const partes = fecha.split('-');
+                    fechaObj = new Date(partes[0], partes[1] - 1, partes[2]);
+                } else {
+                    fechaObj = new Date(fecha);
                 }
+            } else {
+                fechaObj = fecha;
             }
             
-            if (isNaN(fecha.getTime())) return String(fechaInput);
+            if (isNaN(fechaObj.getTime())) return String(fecha);
             
-            const dia = fecha.getDate().toString().padStart(2, '0');
-            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-            const año = fecha.getFullYear();
+            const dia = fechaObj.getDate().toString().padStart(2, '0');
+            const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
+            const año = fechaObj.getFullYear();
             return `${dia}/${mes}/${año}`;
         }
         
-        function obtenerFechaEnFormatoYYYYMMDD(fechaInput) {
-            if (!fechaInput) return '';
-            
-            let fecha = new Date(fechaInput);
-            if (isNaN(fecha.getTime())) {
-                // Si no es una fecha válida, intentar como string
-                if (typeof fechaInput === 'string') {
-                    if (fechaInput.includes('/')) {
-                        const partes = fechaInput.split('/');
-                        if (partes.length === 3) {
-                            fecha = new Date(partes[2], partes[1] - 1, partes[0]);
-                        }
-                    } else if (fechaInput.includes('-')) {
-                        const partes = fechaInput.split('-');
-                        if (partes.length === 3 && partes[0].length === 4) {
-                            return fechaInput; // Ya está en formato YYYY-MM-DD
-                        }
-                    }
-                }
+        // Convierte DD/MM/YYYY a YYYY-MM-DD para comparaciones
+        function fechaDDMMYYYYtoYYYYMMDD(fechaStr) {
+            if (!fechaStr) return '';
+            if (fechaStr.includes('-')) return fechaStr;
+            const partes = fechaStr.split('/');
+            if (partes.length === 3) {
+                return `${partes[2]}-${partes[1]}-${partes[0]}`;
             }
-            
-            if (isNaN(fecha.getTime())) return String(fechaInput);
-            
-            const año = fecha.getFullYear();
-            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-            const dia = fecha.getDate().toString().padStart(2, '0');
-            return `${año}-${mes}-${dia}`;
+            return fechaStr;
         }
         
         // ==================================================
@@ -631,7 +620,7 @@
                 <div class="evento-card">
                     <div class="evento-header">
                         <div class="evento-titulo">${escapeHtml(evento.nombre)}</div>
-                        <div class="evento-fechas">📅 ${formatearFechaParaMostrar(evento.fechaInicio)} - ${formatearFechaParaMostrar(evento.fechaFin)}</div>
+                        <div class="evento-fechas">📅 ${evento.fechaInicio || ''} - ${evento.fechaFin || ''}</div>
                         <div class="evento-pax">👥 ${evento.pax} pasajeros</div>
                     </div>
                     <div class="evento-acciones">
@@ -679,13 +668,23 @@
         
         async function crearEvento() {
             const nombre = document.getElementById('eventoNombre')?.value;
-            const fechaInicio = document.getElementById('eventoFechaInicio')?.value;
-            const fechaFin = document.getElementById('eventoFechaFin')?.value;
+            let fechaInicio = document.getElementById('eventoFechaInicio')?.value;
+            let fechaFin = document.getElementById('eventoFechaFin')?.value;
             const pax = document.getElementById('eventoPax')?.value || '0';
             
             if (!nombre || !fechaInicio || !fechaFin) {
                 alert('⚠️ Por favor, complete todos los campos');
                 return;
+            }
+            
+            // Convertir fechas de YYYY-MM-DD a DD/MM/YYYY
+            if (fechaInicio && fechaInicio.includes('-')) {
+                const partes = fechaInicio.split('-');
+                fechaInicio = `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            if (fechaFin && fechaFin.includes('-')) {
+                const partes = fechaFin.split('-');
+                fechaFin = `${partes[2]}/${partes[1]}/${partes[0]}`;
             }
             
             mostrarPreloader();
@@ -700,6 +699,8 @@
                 formData.append('fechaFin', fechaFin);
                 formData.append('pax', pax);
                 formData.append('estado', 'activo');
+                
+                console.log('📝 Creando evento:', { nombre, fechaInicio, fechaFin, pax });
                 
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
@@ -746,65 +747,47 @@
                 }
                 
                 const evento = data.evento;
-                let notasEvento = data.notas || [];
+                const notasEvento = data.notas || [];
                 
                 console.log('📝 NOTAS RECIBIDAS:', notasEvento);
+                console.log('📅 Evento fechas:', evento.fechaInicio, evento.fechaFin);
                 
-                // Obtener fechas en formato YYYY-MM-DD para comparar
-                const fechaInicioStr = obtenerFechaEnFormatoYYYYMMDD(evento.fechaInicio);
-                const fechaFinStr = obtenerFechaEnFormatoYYYYMMDD(evento.fechaFin);
-                
-                console.log('📅 Fechas normalizadas:', { fechaInicioStr, fechaFinStr });
-                
-                // Generar array de fechas entre inicio y fin
-                function obtenerFechasEntre(fechaInicio, fechaFin) {
+                // Generar array de fechas entre inicio y fin (en formato DD/MM/YYYY)
+                function obtenerFechasEntre(fechaInicioStr, fechaFinStr) {
                     const fechas = [];
-                    const inicio = new Date(fechaInicio);
-                    const fin = new Date(fechaFin);
+                    const inicio = fechaDDMMYYYYaDate(fechaInicioStr);
+                    const fin = fechaDDMMYYYYaDate(fechaFinStr);
                     
-                    if (isNaN(inicio.getTime()) || isNaN(fin.getTime())) {
-                        console.error('Fechas inválidas:', fechaInicio, fechaFin);
+                    if (!inicio || !fin || isNaN(inicio.getTime()) || isNaN(fin.getTime())) {
+                        console.error('Fechas inválidas:', fechaInicioStr, fechaFinStr);
                         return fechas;
                     }
                     
                     for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
+                        const dia = d.getDate().toString().padStart(2, '0');
+                        const mes = (d.getMonth() + 1).toString().padStart(2, '0');
                         const año = d.getFullYear();
-                        const mes = String(d.getMonth() + 1).padStart(2, '0');
-                        const dia = String(d.getDate()).padStart(2, '0');
-                        fechas.push(`${año}-${mes}-${dia}`);
+                        fechas.push(`${dia}/${mes}/${año}`);
                     }
                     return fechas;
                 }
                 
-                const fechas = obtenerFechasEntre(fechaInicioStr, fechaFinStr);
+                const fechas = obtenerFechasEntre(evento.fechaInicio, evento.fechaFin);
                 console.log('📋 LISTA DE FECHAS DEL EVENTO:', fechas);
-                
-                // Limpiar las fechas de las notas
-                const notasLimpia = notasEvento.map(nota => {
-                    let fechaLimpia = nota.fecha;
-                    if (fechaLimpia && typeof fechaLimpia === 'string') {
-                        if (fechaLimpia.includes(' ')) {
-                            fechaLimpia = fechaLimpia.split(' ')[0];
-                        }
-                        if (fechaLimpia.includes('/')) {
-                            const partes = fechaLimpia.split('/');
-                            if (partes.length === 3) {
-                                fechaLimpia = `${partes[2]}-${partes[1]}-${partes[0]}`;
-                            }
-                        }
-                    }
-                    return { ...nota, fecha: fechaLimpia };
-                });
-                
-                console.log('📝 NOTAS CON FECHAS LIMPIAS:', notasLimpia);
                 
                 // Crear un mapa de notas por fecha
                 const notasPorFecha = {};
-                notasLimpia.forEach(nota => {
-                    if (!notasPorFecha[nota.fecha]) {
-                        notasPorFecha[nota.fecha] = [];
+                notasEvento.forEach(nota => {
+                    let fechaNota = nota.fecha;
+                    // Limpiar fecha si tiene formato YYYY-MM-DD
+                    if (fechaNota && fechaNota.includes('-')) {
+                        const partes = fechaNota.split('-');
+                        fechaNota = `${partes[2]}/${partes[1]}/${partes[0]}`;
                     }
-                    notasPorFecha[nota.fecha].push(nota);
+                    if (!notasPorFecha[fechaNota]) {
+                        notasPorFecha[fechaNota] = [];
+                    }
+                    notasPorFecha[fechaNota].push(nota);
                 });
                 
                 console.log('📊 NOTAS POR FECHA:', notasPorFecha);
@@ -828,11 +811,9 @@
                         });
                     }
                     
-                    const fechaMostrar = formatearFechaParaMostrar(fecha);
-                    
                     diasHtml += `
                         <div class="dia-card">
-                            <div class="dia-titulo">${fechaMostrar}</div>
+                            <div class="dia-titulo">${fecha}</div>
                             ${notasHtml}
                             <button class="btn-agregar-nota" onclick="mostrarModalAgregarNota('${evento.id}', '${fecha}')">+ Agregar nota</button>
                         </div>
@@ -846,7 +827,7 @@
                                 <h3>📅 ${escapeHtml(evento.nombre)}</h3>
                                 <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
                             </div>
-                            <p><strong>📅 Período:</strong> ${formatearFechaParaMostrar(evento.fechaInicio)} - ${formatearFechaParaMostrar(evento.fechaFin)}</p>
+                            <p><strong>📅 Período:</strong> ${evento.fechaInicio || ''} - ${evento.fechaFin || ''}</p>
                             <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
                             <div class="dias-container">
                                 ${diasHtml}
@@ -868,12 +849,11 @@
         // AGREGAR NOTA
         // ==================================================
         function mostrarModalAgregarNota(eventoId, fecha) {
-            const fechaFormateada = formatearFechaParaMostrar(fecha);
             const modalHtml = `
                 <div id="modalAgregarNota" class="modal">
                     <div class="modal-contenido">
                         <div class="modal-header">
-                            <h3>📝 Agregar nota para ${fechaFormateada}</h3>
+                            <h3>📝 Agregar nota para ${fecha}</h3>
                             <button class="cerrar-modal" onclick="cerrarModal('modalAgregarNota')">✕</button>
                         </div>
                         <div class="form-group">
@@ -903,20 +883,6 @@
                 return;
             }
             
-            // Asegurar fecha en formato YYYY-MM-DD
-            let fechaLimpia = fecha;
-            if (fechaLimpia && typeof fechaLimpia === 'string') {
-                if (fechaLimpia.includes(' ')) {
-                    fechaLimpia = fechaLimpia.split(' ')[0];
-                }
-                if (fechaLimpia.includes('/')) {
-                    const partes = fechaLimpia.split('/');
-                    if (partes.length === 3) {
-                        fechaLimpia = `${partes[2]}-${partes[1]}-${partes[0]}`;
-                    }
-                }
-            }
-            
             mostrarPreloader();
             
             try {
@@ -925,11 +891,11 @@
                 formData.append('action', 'guardarNota');
                 formData.append('id', notaId);
                 formData.append('eventoId', eventoId);
-                formData.append('fecha', fechaLimpia);
+                formData.append('fecha', fecha); // Ya está en DD/MM/YYYY
                 formData.append('nota', texto);
                 formData.append('tipo', tipo);
                 
-                console.log('📝 Guardando nota:', { eventoId, fecha: fechaLimpia, texto, tipo });
+                console.log('📝 Guardando nota:', { eventoId, fecha, texto, tipo });
                 
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
@@ -1000,7 +966,7 @@
             const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
 
 📅 *EVENTO: ${evento.nombre}*
-📍 Período: ${formatearFechaParaMostrar(evento.fechaInicio)} - ${formatearFechaParaMostrar(evento.fechaFin)}
+📍 Período: ${evento.fechaInicio || ''} - ${evento.fechaFin || ''}
 👥 Pasajeros: ${evento.pax}
 
 🔗 Para más información, contáctenos.`;
