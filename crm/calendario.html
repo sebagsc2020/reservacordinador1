@@ -477,7 +477,7 @@
         }
 
         // IMPORTANTE: Reemplaza con la URL de tu Google Apps Script
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwD3AMlNoJuOBWBbdt_S1-MXzUs5oABh0cy4pNqq4c-ES5wuPS0-G_hmxK3U__ajvK/exec';
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtXw37Vem0BZoXLh-2ZKF1UCT2sD8JveuBYQ7_wjwK5LRlCo2uX8kw17o4GYVfpywO_Q/exec';
         
         let eventos = [];
         let notas = {};
@@ -520,18 +520,41 @@
         }
         
         // ==================================================
+        // FUNCIONES PARA FORMATEAR FECHAS
+        // ==================================================
+        function formatFechaParaMostrar(fechaStr) {
+            if (!fechaStr) return '';
+            if (fechaStr.includes('/')) return fechaStr;
+            const partes = fechaStr.split('-');
+            if (partes.length === 3) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            return fechaStr;
+        }
+        
+        function formatFechaParaComparar(fechaStr) {
+            if (!fechaStr) return '';
+            if (fechaStr.includes('-') && fechaStr.length === 10) return fechaStr;
+            const partes = fechaStr.split('/');
+            if (partes.length === 3) {
+                return `${partes[2]}-${partes[1]}-${partes[0]}`;
+            }
+            return fechaStr;
+        }
+        
+        // ==================================================
         // CARGAR EVENTOS DESDE LA NUBE
         // ==================================================
         async function cargarEventos() {
             mostrarPreloader();
             try {
                 const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
-                console.log('🔍 Cargando eventos desde:', url);
+                console.log('🔍 Cargando eventos...');
                 
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                console.log('📦 Respuesta eventos:', data);
+                console.log('📦 Eventos recibidos:', data);
                 
                 if (data.success && data.eventos) {
                     eventos = data.eventos;
@@ -545,61 +568,6 @@
                 document.getElementById('eventosContainer').innerHTML = '<div style="text-align:center; padding:50px;">❌ Error al conectar con el servidor</div>';
             } finally {
                 ocultarPreloader();
-            }
-        }
-        
-        // ==================================================
-        // FUNCIÓN PARA FORMATEAR FECHAS (YYYY-MM-DD a DD/MM/YYYY)
-        // ==================================================
-        function formatFechaParaMostrar(fechaStr) {
-            if (!fechaStr) return '';
-            // Si ya viene en formato DD/MM/YYYY
-            if (fechaStr.includes('/')) return fechaStr;
-            // Si viene en formato YYYY-MM-DD
-            const partes = fechaStr.split('-');
-            if (partes.length === 3) {
-                return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
-            return fechaStr;
-        }
-        
-        // ==================================================
-        // FUNCIÓN PARA FORMATEAR FECHA PARA COMPARAR (DD/MM/YYYY a YYYY-MM-DD)
-        // ==================================================
-        function formatFechaParaComparar(fechaStr) {
-            if (!fechaStr) return '';
-            // Si ya viene en formato YYYY-MM-DD
-            if (fechaStr.includes('-') && fechaStr.length === 10) return fechaStr;
-            // Si viene en formato DD/MM/YYYY
-            const partes = fechaStr.split('/');
-            if (partes.length === 3) {
-                return `${partes[2]}-${partes[1]}-${partes[0]}`;
-            }
-            return fechaStr;
-        }
-        
-        // ==================================================
-        // CARGAR NOTAS DE UN EVENTO
-        // ==================================================
-        async function cargarNotas(eventoId) {
-            try {
-                const url = `${APP_SCRIPT_URL}?action=obtenerNotas&eventoId=${eventoId}&t=${Date.now()}`;
-                console.log('🔍 Cargando notas para evento:', eventoId);
-                
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                console.log('📦 Respuesta notas:', data);
-                
-                if (data.success && data.notas) {
-                    notas[eventoId] = data.notas;
-                    console.log(`📝 Notas cargadas para ${eventoId}:`, data.notas.length);
-                    return data.notas;
-                }
-                return [];
-            } catch (error) {
-                console.error('Error al cargar notas:', error);
-                return [];
             }
         }
         
@@ -705,7 +673,7 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    alert('✅ Evento creado correctamente en la nube');
+                    alert('✅ Evento creado correctamente');
                     cerrarModal('modalCrearEvento');
                     await cargarEventos();
                 } else {
@@ -720,25 +688,28 @@
         }
         
         // ==================================================
-        // VER DETALLE DEL EVENTO CON NOTAS
+        // VER DETALLE DEL EVENTO (CON NOTAS)
         // ==================================================
         async function verEvento(eventoId) {
             mostrarPreloader();
             
             try {
-                // Primero obtener el evento
-                const urlEvento = `${APP_SCRIPT_URL}?action=obtenerEventoCompleto&eventoId=${eventoId}&t=${Date.now()}`;
-                const responseEvento = await fetch(urlEvento);
-                const dataEvento = await responseEvento.json();
+                const url = `${APP_SCRIPT_URL}?action=obtenerEventoCompleto&eventoId=${eventoId}&t=${Date.now()}`;
+                console.log('🔍 Cargando evento completo:', eventoId);
                 
-                if (!dataEvento.success || !dataEvento.evento) {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                console.log('📦 Evento completo recibido:', data);
+                
+                if (!data.success || !data.evento) {
                     alert('Error al cargar el evento');
                     ocultarPreloader();
                     return;
                 }
                 
-                const evento = dataEvento.evento;
-                const notasEvento = dataEvento.notas || [];
+                const evento = data.evento;
+                const notasEvento = data.notas || [];
                 
                 console.log('📝 Notas recibidas:', notasEvento);
                 
@@ -762,14 +733,13 @@
                 
                 let diasHtml = '';
                 fechas.forEach(fecha => {
-                    // Buscar notas que coincidan con esta fecha (comparar en formato YYYY-MM-DD)
+                    // Buscar notas que coincidan con esta fecha
                     const notasDelDia = notasEvento.filter(n => {
                         const notaFecha = formatFechaParaComparar(n.fecha);
-                        console.log(`Comparando: notaFecha=${notaFecha} vs fecha=${fecha}`);
                         return notaFecha === fecha;
                     });
                     
-                    console.log(`Notas para ${fecha}:`, notasDelDia.length);
+                    console.log(`Notas para ${fecha}: ${notasDelDia.length}`);
                     
                     let notasHtml = '';
                     if (notasDelDia.length === 0) {
@@ -785,7 +755,6 @@
                         });
                     }
                     
-                    // Formatear fecha para mostrar (YYYY-MM-DD a DD/MM/YYYY)
                     const fechaMostrar = formatFechaParaMostrar(fecha);
                     
                     diasHtml += `
@@ -869,7 +838,7 @@
                 formData.append('action', 'guardarNota');
                 formData.append('id', notaId);
                 formData.append('eventoId', eventoId);
-                formData.append('fecha', fecha); // Guardar en formato YYYY-MM-DD
+                formData.append('fecha', fecha);
                 formData.append('nota', texto);
                 formData.append('tipo', tipo);
                 
@@ -887,7 +856,6 @@
                     alert('✅ Nota guardada correctamente');
                     cerrarModal('modalAgregarNota');
                     cerrarModal('modalEvento');
-                    // Recargar el evento para mostrar la nueva nota
                     await verEvento(eventoId);
                 } else {
                     alert('❌ Error al guardar nota: ' + data.message);
