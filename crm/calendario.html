@@ -519,53 +519,50 @@
         }
         
         // ==================================================
-        // FUNCIONES PARA FECHAS EN DD/MM/YYYY
+        // FUNCIONES PARA MANEJAR FECHAS (CUALQUIER FORMATO)
         // ==================================================
         
-        // Convierte DD/MM/YYYY a objeto Date
-        function fechaDDMMYYYYaDate(fechaStr) {
-            if (!fechaStr) return null;
-            const partes = fechaStr.split('/');
-            if (partes.length === 3) {
-                return new Date(partes[2], partes[1] - 1, partes[0]);
+        // Convierte cualquier fecha a objeto Date
+        function convertirAFecha(fechaInput) {
+            if (!fechaInput) return null;
+            
+            // Si ya es un objeto Date
+            if (fechaInput instanceof Date) {
+                return new Date(fechaInput);
             }
-            return null;
+            
+            // Si es string
+            if (typeof fechaInput === 'string') {
+                // Formato DD/MM/YYYY
+                if (fechaInput.includes('/')) {
+                    const partes = fechaInput.split('/');
+                    if (partes.length === 3) {
+                        return new Date(partes[2], partes[1] - 1, partes[0]);
+                    }
+                }
+                // Formato YYYY-MM-DD
+                if (fechaInput.includes('-')) {
+                    const partes = fechaInput.split('-');
+                    if (partes.length === 3) {
+                        return new Date(partes[0], partes[1] - 1, partes[2]);
+                    }
+                }
+            }
+            
+            // Intentar crear fecha directamente
+            const fecha = new Date(fechaInput);
+            return isNaN(fecha.getTime()) ? null : fecha;
         }
         
         // Formatea una fecha a DD/MM/YYYY
-        function formatearFecha(fecha) {
-            if (!fecha) return '';
-            if (typeof fecha === 'string' && fecha.includes('/')) return fecha;
-            
-            let fechaObj;
-            if (typeof fecha === 'string') {
-                if (fecha.includes('-')) {
-                    const partes = fecha.split('-');
-                    fechaObj = new Date(partes[0], partes[1] - 1, partes[2]);
-                } else {
-                    fechaObj = new Date(fecha);
-                }
-            } else {
-                fechaObj = fecha;
-            }
-            
-            if (isNaN(fechaObj.getTime())) return String(fecha);
+        function formatearFechaDDMMYYYY(fecha) {
+            const fechaObj = convertirAFecha(fecha);
+            if (!fechaObj) return String(fecha);
             
             const dia = fechaObj.getDate().toString().padStart(2, '0');
             const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
             const año = fechaObj.getFullYear();
             return `${dia}/${mes}/${año}`;
-        }
-        
-        // Convierte DD/MM/YYYY a YYYY-MM-DD para comparaciones
-        function fechaDDMMYYYYtoYYYYMMDD(fechaStr) {
-            if (!fechaStr) return '';
-            if (fechaStr.includes('-')) return fechaStr;
-            const partes = fechaStr.split('/');
-            if (partes.length === 3) {
-                return `${partes[2]}-${partes[1]}-${partes[0]}`;
-            }
-            return fechaStr;
         }
         
         // ==================================================
@@ -620,7 +617,7 @@
                 <div class="evento-card">
                     <div class="evento-header">
                         <div class="evento-titulo">${escapeHtml(evento.nombre)}</div>
-                        <div class="evento-fechas">📅 ${evento.fechaInicio || ''} - ${evento.fechaFin || ''}</div>
+                        <div class="evento-fechas">📅 ${formatearFechaDDMMYYYY(evento.fechaInicio)} - ${formatearFechaDDMMYYYY(evento.fechaFin)}</div>
                         <div class="evento-pax">👥 ${evento.pax} pasajeros</div>
                     </div>
                     <div class="evento-acciones">
@@ -668,24 +665,18 @@
         
         async function crearEvento() {
             const nombre = document.getElementById('eventoNombre')?.value;
-            let fechaInicio = document.getElementById('eventoFechaInicio')?.value;
-            let fechaFin = document.getElementById('eventoFechaFin')?.value;
+            const fechaInicioInput = document.getElementById('eventoFechaInicio')?.value;
+            const fechaFinInput = document.getElementById('eventoFechaFin')?.value;
             const pax = document.getElementById('eventoPax')?.value || '0';
             
-            if (!nombre || !fechaInicio || !fechaFin) {
+            if (!nombre || !fechaInicioInput || !fechaFinInput) {
                 alert('⚠️ Por favor, complete todos los campos');
                 return;
             }
             
             // Convertir fechas de YYYY-MM-DD a DD/MM/YYYY
-            if (fechaInicio && fechaInicio.includes('-')) {
-                const partes = fechaInicio.split('-');
-                fechaInicio = `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
-            if (fechaFin && fechaFin.includes('-')) {
-                const partes = fechaFin.split('-');
-                fechaFin = `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
+            const fechaInicio = formatearFechaDDMMYYYY(fechaInicioInput);
+            const fechaFin = formatearFechaDDMMYYYY(fechaFinInput);
             
             mostrarPreloader();
             
@@ -750,40 +741,39 @@
                 const notasEvento = data.notas || [];
                 
                 console.log('📝 NOTAS RECIBIDAS:', notasEvento);
-                console.log('📅 Evento fechas:', evento.fechaInicio, evento.fechaFin);
                 
-                // Generar array de fechas entre inicio y fin (en formato DD/MM/YYYY)
-                function obtenerFechasEntre(fechaInicioStr, fechaFinStr) {
-                    const fechas = [];
-                    const inicio = fechaDDMMYYYYaDate(fechaInicioStr);
-                    const fin = fechaDDMMYYYYaDate(fechaFinStr);
-                    
-                    if (!inicio || !fin || isNaN(inicio.getTime()) || isNaN(fin.getTime())) {
-                        console.error('Fechas inválidas:', fechaInicioStr, fechaFinStr);
-                        return fechas;
-                    }
-                    
-                    for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
-                        const dia = d.getDate().toString().padStart(2, '0');
-                        const mes = (d.getMonth() + 1).toString().padStart(2, '0');
-                        const año = d.getFullYear();
-                        fechas.push(`${dia}/${mes}/${año}`);
-                    }
-                    return fechas;
+                // Normalizar fechas del evento a objetos Date
+                const fechaInicioDate = convertirAFecha(evento.fechaInicio);
+                const fechaFinDate = convertirAFecha(evento.fechaFin);
+                
+                if (!fechaInicioDate || !fechaFinDate) {
+                    console.error('No se pudieron convertir las fechas del evento');
+                    alert('Error: Fechas del evento inválidas');
+                    ocultarPreloader();
+                    return;
                 }
                 
-                const fechas = obtenerFechasEntre(evento.fechaInicio, evento.fechaFin);
+                console.log('📅 Fechas convertidas:', { 
+                    inicio: fechaInicioDate, 
+                    fin: fechaFinDate 
+                });
+                
+                // Generar array de fechas entre inicio y fin (en formato DD/MM/YYYY)
+                const fechas = [];
+                for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
+                    const dia = d.getDate().toString().padStart(2, '0');
+                    const mes = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const año = d.getFullYear();
+                    fechas.push(`${dia}/${mes}/${año}`);
+                }
+                
                 console.log('📋 LISTA DE FECHAS DEL EVENTO:', fechas);
                 
-                // Crear un mapa de notas por fecha
+                // Crear un mapa de notas por fecha (normalizando formato de las notas)
                 const notasPorFecha = {};
                 notasEvento.forEach(nota => {
-                    let fechaNota = nota.fecha;
-                    // Limpiar fecha si tiene formato YYYY-MM-DD
-                    if (fechaNota && fechaNota.includes('-')) {
-                        const partes = fechaNota.split('-');
-                        fechaNota = `${partes[2]}/${partes[1]}/${partes[0]}`;
-                    }
+                    // Normalizar la fecha de la nota a DD/MM/YYYY
+                    let fechaNota = formatearFechaDDMMYYYY(nota.fecha);
                     if (!notasPorFecha[fechaNota]) {
                         notasPorFecha[fechaNota] = [];
                     }
@@ -806,6 +796,10 @@
                                 <div class="nota-item">
                                     <div class="nota-texto">${escapeHtml(nota.nota)}</div>
                                     <div class="nota-fecha">${nota.tipo === 'mañana' ? '🌅 Mañana' : '🌙 Tarde'}</div>
+                                    <div style="display:flex; gap:5px; margin-top:5px;">
+                                        <button class="btn-editar-nota" onclick="editarNota('${nota.id}', '${nota.eventoId}', '${fecha}', '${escapeHtml(nota.nota)}', '${nota.tipo}')" style="background:#667eea; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:10px; cursor:pointer;">✏️ Editar</button>
+                                        <button class="btn-eliminar-nota" onclick="eliminarNota('${nota.id}', '${nota.eventoId}')" style="background:#e74c3c; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:10px; cursor:pointer;">🗑️ Eliminar</button>
+                                    </div>
                                 </div>
                             `;
                         });
@@ -827,7 +821,7 @@
                                 <h3>📅 ${escapeHtml(evento.nombre)}</h3>
                                 <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
                             </div>
-                            <p><strong>📅 Período:</strong> ${evento.fechaInicio || ''} - ${evento.fechaFin || ''}</p>
+                            <p><strong>📅 Período:</strong> ${formatearFechaDDMMYYYY(evento.fechaInicio)} - ${formatearFechaDDMMYYYY(evento.fechaFin)}</p>
                             <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
                             <div class="dias-container">
                                 ${diasHtml}
@@ -840,6 +834,117 @@
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error al cargar el evento');
+            } finally {
+                ocultarPreloader();
+            }
+        }
+        
+        // ==================================================
+        // EDITAR NOTA
+        // ==================================================
+        function editarNota(notaId, eventoId, fecha, textoActual, tipoActual) {
+            const modalHtml = `
+                <div id="modalEditarNota" class="modal">
+                    <div class="modal-contenido">
+                        <div class="modal-header">
+                            <h3>✏️ Editar nota para ${fecha}</h3>
+                            <button class="cerrar-modal" onclick="cerrarModal('modalEditarNota')">✕</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Nota</label>
+                            <textarea id="notaTextoEditar" rows="3" placeholder="Escriba su nota aquí...">${escapeHtml(textoActual)}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Momento del día</label>
+                            <select id="notaTipoEditar">
+                                <option value="mañana" ${tipoActual === 'mañana' ? 'selected' : ''}>🌅 Mañana</option>
+                                <option value="tarde" ${tipoActual === 'tarde' ? 'selected' : ''}>🌙 Tarde</option>
+                            </select>
+                        </div>
+                        <button class="btn-crear" style="width:100%; margin-top:10px;" onclick="actualizarNota('${notaId}', '${eventoId}', '${fecha}')">💾 Actualizar nota</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        async function actualizarNota(notaId, eventoId, fecha) {
+            const texto = document.getElementById('notaTextoEditar')?.value;
+            const tipo = document.getElementById('notaTipoEditar')?.value;
+            
+            if (!texto) {
+                alert('⚠️ Por favor, escriba una nota');
+                return;
+            }
+            
+            mostrarPreloader();
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('action', 'actualizarNota');
+                formData.append('id', notaId);
+                formData.append('nota', texto);
+                formData.append('tipo', tipo);
+                
+                console.log('✏️ Actualizando nota:', { notaId, texto, tipo });
+                
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Nota actualizada correctamente');
+                    cerrarModal('modalEditarNota');
+                    cerrarModal('modalEvento');
+                    await verEvento(eventoId);
+                } else {
+                    alert('❌ Error al actualizar nota: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al conectar con el servidor');
+            } finally {
+                ocultarPreloader();
+            }
+        }
+        
+        // ==================================================
+        // ELIMINAR NOTA
+        // ==================================================
+        async function eliminarNota(notaId, eventoId) {
+            if (!confirm('⚠️ ¿Estás seguro de eliminar esta nota?')) return;
+            
+            mostrarPreloader();
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('action', 'eliminarNota');
+                formData.append('id', notaId);
+                
+                console.log('🗑️ Eliminando nota:', notaId);
+                
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Nota eliminada correctamente');
+                    cerrarModal('modalEvento');
+                    await verEvento(eventoId);
+                } else {
+                    alert('❌ Error al eliminar nota: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al conectar con el servidor');
             } finally {
                 ocultarPreloader();
             }
@@ -891,7 +996,7 @@
                 formData.append('action', 'guardarNota');
                 formData.append('id', notaId);
                 formData.append('eventoId', eventoId);
-                formData.append('fecha', fecha); // Ya está en DD/MM/YYYY
+                formData.append('fecha', fecha);
                 formData.append('nota', texto);
                 formData.append('tipo', tipo);
                 
@@ -966,7 +1071,7 @@
             const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
 
 📅 *EVENTO: ${evento.nombre}*
-📍 Período: ${evento.fechaInicio || ''} - ${evento.fechaFin || ''}
+📍 Período: ${formatearFechaDDMMYYYY(evento.fechaInicio)} - ${formatearFechaDDMMYYYY(evento.fechaFin)}
 👥 Pasajeros: ${evento.pax}
 
 🔗 Para más información, contáctenos.`;
@@ -998,12 +1103,16 @@
             cargarEventos();
         }
         
+        // Exponer funciones globalmente
         window.verEvento = verEvento;
         window.cerrarModal = cerrarModal;
         window.mostrarModalCrearEvento = mostrarModalCrearEvento;
         window.crearEvento = crearEvento;
         window.mostrarModalAgregarNota = mostrarModalAgregarNota;
         window.guardarNota = guardarNota;
+        window.editarNota = editarNota;
+        window.actualizarNota = actualizarNota;
+        window.eliminarNota = eliminarNota;
         window.compartirEvento = compartirEvento;
         window.eliminarEvento = eliminarEvento;
         window.logout = logout;
