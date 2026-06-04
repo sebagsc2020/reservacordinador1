@@ -434,14 +434,7 @@
         });
         
         // ==================================================
-        // CONFIGURACIÓN - PLANILLA CORRECTA
-        // ==================================================
-        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const SHEET_NAME = 'Hoja 1';
-        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
-        
-        // ==================================================
-        // VERIFICAR AUTENTICACIÓN
+        // CONFIGURACIÓN
         // ==================================================
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
@@ -451,6 +444,13 @@
             sessionStorage.clear(); 
             window.location.href = 'index.html'; 
         }
+
+        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
+        const SHEET_NAME = 'Hoja 1';
+        const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        
+        // URL del Google Apps Script para obtener estados (mismo que reservas.html)
+        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
         // ==================================================
         // VARIABLES GLOBALES
@@ -459,6 +459,39 @@
         let clientesSet = new Set();
         let reservasPorMesChart = null;
         let estadosChart = null;
+        let estadosGlobales = {};
+        
+        // ==================================================
+        // CARGAR ESTADOS DESDE LA NUBE (mismo que reservas.html)
+        // ==================================================
+        async function cargarEstadosDesdeNube() {
+            try {
+                // Primero intentar desde localStorage
+                const localEstados = localStorage.getItem('estadosReservasCloud');
+                if (localEstados) {
+                    const parsed = JSON.parse(localEstados);
+                    if (Object.keys(parsed).length > 0) {
+                        estadosGlobales = parsed;
+                        console.log('📥 Estados cargados desde localStorage:', Object.keys(estadosGlobales).length);
+                    }
+                }
+                
+                // Luego sincronizar con la nube
+                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
+                const data = await response.json();
+                if (data.success && data.estados) {
+                    estadosGlobales = data.estados;
+                    localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
+                    console.log('📥 Estados sincronizados desde nube:', Object.keys(estadosGlobales).length);
+                }
+                return estadosGlobales;
+            } catch (error) {
+                console.error('Error al cargar desde nube:', error);
+                const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
+                estadosGlobales = estadosLocal;
+                return estadosLocal;
+            }
+        }
         
         // ==================================================
         // PARSEAR CSV
@@ -552,22 +585,15 @@
         }
         
         // ==================================================
-        // CARGAR ESTADOS DESDE LOCALSTORAGE
-        // ==================================================
-        function cargarEstadosGuardados() {
-            try { 
-                return JSON.parse(localStorage.getItem('estadosReservas') || '{}'); 
-            } catch(e) { 
-                return {}; 
-            }
-        }
-        
-        // ==================================================
         // CARGAR DATOS DESDE GOOGLE SHEETS
         // ==================================================
         async function cargarDatos() {
             try {
                 console.log('📡 Cargando datos desde:', SHEET_CSV_URL);
+                
+                // Primero cargar los estados desde la nube
+                await cargarEstadosDesdeNube();
+                
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
@@ -580,7 +606,6 @@
                 
                 reservasData = [];
                 clientesSet.clear();
-                const estadosGuardados = cargarEstadosGuardados();
                 
                 for (let i = 1; i < filas.length; i++) {
                     const fila = filas[i];
@@ -598,7 +623,8 @@
                     const excursionTexto = obtenerPrimeraExcursion(excursionesRaw);
                     const fechaFormateada = formatearFecha(timestamp) || formatearFecha(fecha);
                     
-                    let estado = estadosGuardados[id];
+                    // Usar el estado desde la nube (mismo que reservas.html)
+                    let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
                     }
@@ -618,6 +644,7 @@
                 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
                 console.log(`👥 Clientes únicos: ${clientesSet.size}`);
+                console.log(`📊 Estados: Pendientes=${reservasData.filter(r => r.estado === 'pendiente').length}, Confirmadas=${reservasData.filter(r => r.estado === 'confirmado').length}, Pagadas=${reservasData.filter(r => r.estado === 'pagado').length}`);
                 
                 reservasData.sort((a, b) => {
                     const fechaA = a.fecha.split('/').reverse().join('');
@@ -700,15 +727,15 @@
             const ultimas = reservasData.slice(0, 5);
             const tbody = document.getElementById('tablaUltimasReservas');
             if (ultimas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5">No hay reservas</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5">No hay reservas</td</tr';
             } else {
                 tbody.innerHTML = ultimas.map(r => `
                     <tr>
-                        <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td>${escapeHtml(r.nombre)}</td>
-                        <td>${escapeHtml(r.excursion)}</td>
-                        <td>${escapeHtml(r.fecha)}</td>
-                        <td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td>
+                        <td><strong>${escapeHtml(r.id)}</strong></td
+                        <td>${escapeHtml(r.nombre)}</td
+                        <td>${escapeHtml(r.excursion)}</td
+                        <td>${escapeHtml(r.fecha)}</td
+                        <td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td
                     </tr>
                 `).join('');
             }
@@ -751,7 +778,9 @@
             return div.innerHTML; 
         }
         
+        // Iniciar carga de datos
         cargarDatos();
+        // Recargar cada 60 segundos
         setInterval(cargarDatos, 60000);
     </script>
 </body>
