@@ -465,7 +465,6 @@
             window.location.href = 'index.html'; 
         }
 
-        // IMPORTANTE: Reemplaza con la URL de tu Google Apps Script
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
         
         let eventos = [];
@@ -475,55 +474,21 @@
         function ocultarPreloader() { if (preloaderPopup) preloaderPopup.classList.add('oculto'); }
         
         // ==================================================
-        // FUNCIONES DE FECHAS OPTIMIZADAS
+        // FUNCIONES DE FECHAS (MANEJA FORMATO ISO)
         // ==================================================
-        function dateToDDMMYYYY(fecha) {
-            if (!fecha) return '';
-            if (fecha instanceof Date && !isNaN(fecha.getTime())) {
-                const dia = fecha.getDate().toString().padStart(2, '0');
-                const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-                const anio = fecha.getFullYear();
-                return `${dia}/${mes}/${anio}`;
-            }
-            return '';
-        }
-
-        function formatearFechaParaMostrar(fechaInput) {
-            if (!fechaInput) return '';
-            
-            if (typeof fechaInput === 'string' && fechaInput.includes('/') && fechaInput.length === 10) {
-                return fechaInput;
-            }
-            
-            let fecha = null;
-            
-            if (fechaInput instanceof Date) {
-                fecha = fechaInput;
-            }
-            else if (typeof fechaInput === 'string') {
-                let fechaLimpia = fechaInput;
-                if (fechaLimpia.includes('T')) {
-                    const match = fechaLimpia.match(/(\d{1,2})T.*?(\d{1,2})\/(\d{4})/);
-                    if (match) {
-                        return `${match[1].padStart(2,'0')}/${match[2].padStart(2,'0')}/${match[3]}`;
-                    }
-                }
-                fecha = new Date(fechaLimpia);
-            }
-            
-            if (fecha && !isNaN(fecha.getTime())) {
-                const dia = fecha.getDate().toString().padStart(2, '0');
-                const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-                const anio = fecha.getFullYear();
-                return `${dia}/${mes}/${anio}`;
-            }
-            
-            return String(fechaInput);
+        function convertirFechaISOtoDDMMYYYY(fechaIso) {
+            if (!fechaIso) return '';
+            const fecha = new Date(fechaIso);
+            if (isNaN(fecha.getTime())) return fechaIso;
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const anio = fecha.getFullYear();
+            return `${dia}/${mes}/${anio}`;
         }
 
         function formatearRangoFechas(fechaInicio, fechaFin) {
-            const inicio = formatearFechaParaMostrar(fechaInicio);
-            const fin = formatearFechaParaMostrar(fechaFin);
+            const inicio = convertirFechaISOtoDDMMYYYY(fechaInicio);
+            const fin = convertirFechaISOtoDDMMYYYY(fechaFin);
             return `Del ${inicio} al ${fin}`;
         }
         
@@ -560,8 +525,12 @@
             mostrarPreloader();
             try {
                 const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
+                console.log('📡 Cargando eventos...');
+                
                 const response = await fetch(url);
                 const data = await response.json();
+                
+                console.log('📦 Eventos recibidos:', data);
                 
                 if (data.success && data.eventos) {
                     eventos = data.eventos;
@@ -657,8 +626,6 @@
                 return;
             }
             
-            const fechaInicio = formatearFechaParaMostrar(fechaInicioInput);
-            const fechaFin = formatearFechaParaMostrar(fechaFinInput);
             mostrarPreloader();
             
             try {
@@ -667,8 +634,8 @@
                 formData.append('action', 'guardarEvento');
                 formData.append('id', eventoId);
                 formData.append('nombre', nombre);
-                formData.append('fechaInicio', fechaInicio);
-                formData.append('fechaFin', fechaFin);
+                formData.append('fechaInicio', fechaInicioInput);
+                formData.append('fechaFin', fechaFinInput);
                 formData.append('pax', pax);
                 formData.append('estado', 'activo');
                 
@@ -714,34 +681,27 @@
                 const evento = data.evento;
                 const notasEvento = data.notas || [];
                 
-                let fechaInicioDate, fechaFinDate;
+                // Convertir fechas ISO a objetos Date
+                const fechaInicioDate = new Date(evento.fechaInicio);
+                const fechaFinDate = new Date(evento.fechaFin);
                 
-                if (typeof evento.fechaInicio === 'string' && evento.fechaInicio.includes('/')) {
-                    const partes = evento.fechaInicio.split('/');
-                    fechaInicioDate = new Date(partes[2], partes[1] - 1, partes[0]);
-                } else if (evento.fechaInicio instanceof Date) {
-                    fechaInicioDate = evento.fechaInicio;
-                } else {
-                    fechaInicioDate = new Date(evento.fechaInicio);
-                }
-                
-                if (typeof evento.fechaFin === 'string' && evento.fechaFin.includes('/')) {
-                    const partes = evento.fechaFin.split('/');
-                    fechaFinDate = new Date(partes[2], partes[1] - 1, partes[0]);
-                } else if (evento.fechaFin instanceof Date) {
-                    fechaFinDate = evento.fechaFin;
-                } else {
-                    fechaFinDate = new Date(evento.fechaFin);
-                }
-                
+                // Generar array de fechas
                 const fechas = [];
                 for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
-                    fechas.push(dateToDDMMYYYY(d));
+                    const dia = d.getDate().toString().padStart(2, '0');
+                    const mes = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const anio = d.getFullYear();
+                    fechas.push(`${dia}/${mes}/${anio}`);
                 }
                 
+                // Organizar notas por fecha
                 const notasPorFecha = {};
                 notasEvento.forEach(nota => {
-                    let fechaNota = formatearFechaParaMostrar(nota.fecha);
+                    let fechaNota = nota.fecha;
+                    // Si la nota tiene fecha en formato ISO, convertirla
+                    if (fechaNota && fechaNota.includes('T')) {
+                        fechaNota = convertirFechaISOtoDDMMYYYY(fechaNota);
+                    }
                     if (!notasPorFecha[fechaNota]) notasPorFecha[fechaNota] = [];
                     notasPorFecha[fechaNota].push(nota);
                 });
@@ -1017,31 +977,21 @@
                 const evento = data.evento;
                 const notasEvento = data.notas || [];
                 
-                let fechaInicioDate, fechaFinDate;
-                
-                if (typeof evento.fechaInicio === 'string' && evento.fechaInicio.includes('/')) {
-                    const partes = evento.fechaInicio.split('/');
-                    fechaInicioDate = new Date(partes[2], partes[1] - 1, partes[0]);
-                } else if (evento.fechaInicio instanceof Date) {
-                    fechaInicioDate = evento.fechaInicio;
-                } else {
-                    fechaInicioDate = new Date(evento.fechaInicio);
-                }
-                
-                if (typeof evento.fechaFin === 'string' && evento.fechaFin.includes('/')) {
-                    const partes = evento.fechaFin.split('/');
-                    fechaFinDate = new Date(partes[2], partes[1] - 1, partes[0]);
-                } else if (evento.fechaFin instanceof Date) {
-                    fechaFinDate = evento.fechaFin;
-                } else {
-                    fechaFinDate = new Date(evento.fechaFin);
-                }
+                const fechaInicioDate = new Date(evento.fechaInicio);
+                const fechaFinDate = new Date(evento.fechaFin);
                 
                 const fechasConNotas = [];
                 for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
-                    const fechaStr = dateToDDMMYYYY(d);
+                    const dia = d.getDate().toString().padStart(2, '0');
+                    const mes = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const anio = d.getFullYear();
+                    const fechaStr = `${dia}/${mes}/${anio}`;
+                    
                     const notasDelDia = notasEvento.filter(nota => {
-                        let fechaNota = formatearFechaParaMostrar(nota.fecha);
+                        let fechaNota = nota.fecha;
+                        if (fechaNota && fechaNota.includes('T')) {
+                            fechaNota = convertirFechaISOtoDDMMYYYY(fechaNota);
+                        }
                         return fechaNota === fechaStr;
                     });
                     fechasConNotas.push({ fecha: fechaStr, notas: notasDelDia });
@@ -1103,7 +1053,6 @@
             cargarEventos();
         }
         
-        // Exponer funciones globalmente
         window.verEvento = verEvento;
         window.cerrarModal = cerrarModal;
         window.mostrarModalCrearEvento = mostrarModalCrearEvento;
