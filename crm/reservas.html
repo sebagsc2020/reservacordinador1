@@ -265,10 +265,10 @@
         .card-estado-header {
             font-weight: 700;
             font-size: 12px;
-            background: rgba(255,255,255,0.25);
             padding: 4px 10px;
             border-radius: 20px;
             letter-spacing: 0.5px;
+            color: white;
         }
         .card-fecha {
             font-size: 10px;
@@ -905,11 +905,23 @@
             for (let idx = 0; idx < reservasFiltradas.length; idx++) {
                 const r = reservasFiltradas[idx];
                 let estadoText = '';
+                let estadoColor = '';
                 switch(r.estado) {
-                    case 'pendiente': estadoText = 'Pendiente'; break;
-                    case 'confirmado': estadoText = 'Confirmado'; break;
-                    case 'pagado': estadoText = 'Pagado'; break;
-                    default: estadoText = 'Confirmado';
+                    case 'pendiente': 
+                        estadoText = 'Pendiente'; 
+                        estadoColor = '#ffc107';
+                        break;
+                    case 'confirmado': 
+                        estadoText = 'Confirmado'; 
+                        estadoColor = '#27ae60';
+                        break;
+                    case 'pagado': 
+                        estadoText = 'Pagado'; 
+                        estadoColor = '#3498db';
+                        break;
+                    default: 
+                        estadoText = 'Confirmado'; 
+                        estadoColor = '#27ae60';
                 }
 
                 let excursionesHtml = '<ul class="excursiones-lista-card">';
@@ -926,7 +938,7 @@
                             '<div class="card-header">' +
                                 '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">' +
                                     '<span class="card-id">ID: ' + escapeHtml(r.id) + '</span>' +
-                                    '<span class="card-estado-header" style="font-weight: 700;">' + estadoText + '</span>' +
+                                    '<span class="card-estado-header" style="font-weight: 700; background: ' + estadoColor + ';">' + estadoText + '</span>' +
                                 '</div>' +
                                 '<span class="card-fecha">' + escapeHtml(r.fecha) + '</span>' +
                             '</div>' +
