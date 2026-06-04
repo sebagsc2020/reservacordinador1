@@ -7,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
-
+        
         /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
         .menu-btn {
             position: fixed;
@@ -26,9 +26,18 @@
             transition: all 0.3s ease;
             border: none;
         }
-        .menu-btn:hover { background: #5a6fd6; transform: scale(1.05); }
-        .menu-btn span { font-size: 24px; color: white; }
-
+        
+        .menu-btn:hover {
+            background: #5a6fd6;
+            transform: scale(1.05);
+        }
+        
+        .menu-btn span {
+            font-size: 24px;
+            color: white;
+        }
+        
+        /* ===== SIDEBAR ===== */
         .sidebar { 
             width: 250px; 
             background: #1a1a2e; 
@@ -42,8 +51,11 @@
             transform: translateX(-100%);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
-        .sidebar.open { transform: translateX(0); }
-
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
         .menu-overlay {
             position: fixed;
             top: 0;
@@ -56,13 +68,17 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        .menu-overlay.active { display: block; opacity: 1; }
-
+        
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
         .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .sidebar-logo .logo-icon { font-size: 40px; } 
         .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } 
         .sidebar-logo h2 span { color: #667eea; }
-
+        
         .nav-menu { list-style: none; padding: 0 15px; } 
         .nav-menu li { margin-bottom: 5px; }
         .nav-menu a { 
@@ -79,7 +95,7 @@
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
         .nav-menu a.active { background: #667eea; }
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-
+        
         .sidebar-footer { 
             position: absolute; 
             bottom: 20px; 
@@ -98,158 +114,281 @@
             font-size: 13px; 
             transition: all 0.2s ease;
         }
-        .btn-logout-sidebar:hover { background: rgba(231,76,60,0.4); }
-
+        .btn-logout-sidebar:hover {
+            background: rgba(231,76,60,0.4);
+        }
+        
+        /* ===== CONTENIDO PRINCIPAL ===== */
         .main-content { 
             margin-left: 0;
             flex: 1; 
             padding: 20px; 
-            min-width: 0;
             transition: margin-left 0.3s ease;
         }
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
         .header h1 { font-size: 26px; color: #1a1a2e; }
-        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 8px 20px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 14px; }
-        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
-
-        /* Panel de creación de evento por rango */
-        .create-event-panel { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
-        .create-event-panel h3 { margin-bottom: 15px; color: #1a1a2e; font-size: 16px; }
-        .range-selector { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 15px; }
-        .date-group { display: flex; flex-direction: column; gap: 5px; }
-        .date-group label { font-size: 12px; color: #666; font-weight: 600; }
-        .date-group input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 13px; }
-        .event-name-group { flex: 2; min-width: 180px; }
-        .event-name-group input { width: 100%; }
-        .btn-crear-evento { padding: 8px 20px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        .btn-compartir-todos { padding: 8px 20px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; margin-left: 10px; }
-
-        /* Lista de eventos creados */
-        .events-list { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
-        .events-list h3 { margin-bottom: 15px; color: #1a1a2e; font-size: 16px; }
-        .event-item-list { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; flex-wrap: wrap; gap: 10px; }
-        .event-info { flex: 1; }
-        .event-name { font-weight: 700; font-size: 14px; color: #1a1a2e; }
-        .event-dates { font-size: 11px; color: #666; margin-top: 3px; }
-        .event-actions { display: flex; gap: 8px; }
-        .btn-ver-evento { background: #3498db; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .btn-apagar-evento { background: #e74c3c; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .btn-compartir-evento { background: #25D366; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .no-events { color: #999; text-align: center; padding: 20px; font-size: 13px; }
-
-        /* Calendario de días del evento seleccionado */
-        .event-calendar-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-top: 20px; }
-        .event-calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .event-calendar-header h3 { font-size: 18px; color: #1a1a2e; }
-        .event-info-header { font-size: 14px; color: #666; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; }
-        .event-days-grid { display: flex; flex-wrap: wrap; gap: 15px; }
-        .event-day-card { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; width: calc(33.33% - 10px); min-width: 200px; transition: all 0.2s; }
-        .event-day-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .event-day-card .day-header { font-weight: 700; font-size: 14px; color: #667eea; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
-        .event-day-card .day-date { font-size: 12px; color: #666; margin-bottom: 10px; }
-        .notas-lista { margin-top: 10px; }
-        .nota-item-cal { background: #fff3cd; border-left: 3px solid #ffc107; padding: 6px 8px; margin-top: 6px; border-radius: 4px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
-        .nota-texto-cal { flex: 1; cursor: pointer; word-break: break-word; }
-        .eliminar-nota-cal { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 10px; margin-left: 6px; }
-        .btn-agregar-nota-cal { background: #ecf0f1; border: none; border-radius: 12px; padding: 4px 8px; font-size: 10px; cursor: pointer; margin-top: 8px; width: 100%; }
-        .btn-agregar-nota-cal:hover { background: #d5dbdb; }
-        .sin-eventos-seleccionado { text-align: center; padding: 40px; color: #999; background: white; border-radius: 15px; }
-
-        /* Modal para notas individuales */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-overlay.show { display: flex; }
-        .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 400px; width: 90%; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .modal-header h2 { color: #667eea; font-size: 18px; }
-        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; }
-        .modal-input { width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
-        textarea.modal-input { resize: vertical; min-height: 80px; }
-        .modal-save { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-
-        /* Preloader */
-        .preloader-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.3s; }
-        .preloader-popup.oculto { opacity: 0; visibility: hidden; }
-        .preloader-popup-contenido { background: white; border-radius: 24px; padding: 35px 45px; text-align: center; animation: popupFadeIn 0.3s; }
-        @keyframes popupFadeIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .preloader-popup-icono { width: 70px; height: 70px; border: 4px solid #e2e8f0; border-top: 4px solid #667eea; border-right: 4px solid #764ba2; border-radius: 50%; animation: spin 1s infinite; margin: 0 auto 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .preloader-popup-titulo { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
-        .preloader-popup-subtitulo { font-size: 14px; color: #666; }
-        .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
-        @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
-
-        /* ===== BOTÓN FLOTANTE PARA CREAR EVENTO ===== */
-        .fab-create {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 60px;
-            height: 60px;
+        
+        .user-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            background: white; 
+            padding: 8px 20px; 
+            border-radius: 50px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            font-size: 14px; 
+        }
+        .user-avatar { 
+            width: 35px; 
+            height: 35px; 
+            background: #667eea; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-weight: 700; 
+        }
+        
+        /* ===== BOTONES ===== */
+        .btn-crear {
             background: #27ae60;
             color: white;
             border: none;
-            border-radius: 50%;
-            font-size: 28px;
+            padding: 12px 24px;
+            border-radius: 12px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            z-index: 99;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
         }
-        .fab-create:hover {
+        .btn-crear:hover {
             background: #219a52;
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            transform: translateY(-2px);
         }
-        .fab-create:active {
-            transform: scale(0.95);
+        
+        /* ===== EVENTOS ===== */
+        .eventos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
-
-        /* Scroll sidebar */
-        .sidebar::-webkit-scrollbar { width: 4px; }
-        .sidebar::-webkit-scrollbar-track { background: #1a1a2e; }
-        .sidebar::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
-
-        /* Desktop */
+        .evento-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .evento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        .evento-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+        }
+        .evento-titulo {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .evento-fechas {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .evento-pax {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .evento-acciones {
+            display: flex;
+            gap: 10px;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        .btn-ver-evento {
+            flex: 1;
+            padding: 8px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        .btn-whatsapp-evento {
+            flex: 1;
+            padding: 8px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        .btn-eliminar-evento {
+            flex: 1;
+            padding: 8px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        /* ===== MODAL ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-contenido {
+            background: white;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 25px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eef2ff;
+            padding-bottom: 12px;
+        }
+        .modal-header h3 {
+            color: #667eea;
+            font-size: 20px;
+        }
+        .cerrar-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        /* ===== FORMULARIO ===== */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        /* ===== DIAS DEL EVENTO ===== */
+        .dias-container {
+            margin-top: 20px;
+        }
+        .dia-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .dia-titulo {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .nota-item {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+        .nota-texto {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .nota-fecha {
+            font-size: 10px;
+            color: #999;
+        }
+        .btn-agregar-nota {
+            width: 100%;
+            padding: 8px;
+            background: #e0e0e0;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        .btn-agregar-nota:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Responsive */
         @media (min-width: 769px) {
             .menu-btn { display: none !important; }
             .sidebar { transform: translateX(0) !important; width: 250px; }
             .menu-overlay { display: none !important; }
             .main-content { margin-left: 250px; padding: 30px; }
         }
-
-        /* Móvil */
+        
         @media (max-width: 768px) {
             .menu-btn { display: flex; }
             .main-content { padding: 60px 12px 20px; }
-            .header h1 { font-size: 20px; }
-            .user-info { padding: 5px 12px; font-size: 12px; }
-            .user-avatar { width: 28px; height: 28px; font-size: 12px; }
-            .range-selector { flex-direction: column; align-items: stretch; }
-            .btn-crear-evento, .btn-compartir-todos { width: 100%; margin-left: 0; margin-top: 5px; }
-            .event-day-card { width: 100%; }
-            .event-item-list { flex-direction: column; align-items: flex-start; }
-            .event-actions { width: 100%; justify-content: flex-end; }
-            .fab-create {
-                bottom: 20px;
-                right: 20px;
-                width: 55px;
-                height: 55px;
-                font-size: 24px;
-            }
+            .eventos-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Botón menú hamburguesa -->
     <button class="menu-btn" id="menuBtn"><span>☰</span></button>
     <div class="menu-overlay" id="menuOverlay"></div>
-
+    
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2></div>
+        <div class="sidebar-logo">
+            <div class="logo-icon">🏔️</div>
+            <h2>Aventura <span>Total</span></h2>
+            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
+        </div>
         <ul class="nav-menu">
             <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
             <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
@@ -259,124 +398,30 @@
             <li><a href="calendario.html" class="active"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
             <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
         </ul>
-        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button></div>
+        <div class="sidebar-footer">
+            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
+        </div>
     </nav>
 
     <div class="main-content">
         <div class="header">
             <div><h1>📅 Calendario de Eventos</h1></div>
-            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
-        </div>
-
-        <!-- Panel de creación -->
-        <div class="create-event-panel">
-            <h3>➕ Crear nuevo evento por rango de fechas</h3>
-            <div class="range-selector">
-                <div class="date-group"><label>📅 Desde</label><input type="date" id="eventoFechaInicio"></div>
-                <div class="date-group"><label>📅 Hasta</label><input type="date" id="eventoFechaFin"></div>
-                <div class="date-group event-name-group"><label>🏷️ Nombre del evento</label><input type="text" id="eventoNombre" placeholder="Ej: Semana de trekking..."></div>
-                <button class="btn-crear-evento" onclick="crearEventoRango()">✅ Crear evento</button>
-                <button class="btn-compartir-todos" onclick="compartirTodosEventos()">📱 Compartir todos</button>
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <span>Admin</span>
             </div>
         </div>
 
-        <!-- Lista de eventos -->
-        <div class="events-list">
-            <h3>📋 Eventos activos</h3>
-            <div id="listaEventosContainer"><div class="no-events">📭 Cargando eventos...</div></div>
-        </div>
+        <button class="btn-crear" onclick="mostrarModalCrearEvento()">➕ Crear nuevo evento</button>
 
-        <!-- Calendario de días del evento seleccionado -->
-        <div id="eventoCalendarioContainer" class="event-calendar-container" style="display: none;">
-            <div class="event-calendar-header">
-                <h3 id="eventoCalendarioTitulo">📅 Días del evento</h3>
-                <button class="btn-compartir-evento" id="btnCompartirEventoActual" style="background:#25D366;">📱 Compartir este evento</button>
-            </div>
-            <div id="eventoInfoHeader" class="event-info-header"></div>
-            <div id="eventDaysGrid" class="event-days-grid"></div>
-        </div>
-        <div id="sinEventoSeleccionado" class="sin-eventos-seleccionado">👈 Selecciona un evento de la lista para ver sus días</div>
-    </div>
-
-    <!-- Modal para notas -->
-    <div class="modal-overlay" id="modalNota">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalNotaTitle">📝 Agregar nota</h2>
-                <button class="modal-close" onclick="cerrarModalNota()">✕</button>
-            </div>
-            <div><p><strong>📅 Fecha:</strong> <span id="modalNotaFecha"></span></p>
-            <textarea id="notaTexto" class="modal-input" placeholder="Escribe aquí la nota..." rows="3"></textarea>
-            <button class="modal-save" onclick="guardarNota()">💾 Guardar nota</button></div>
-        </div>
-    </div>
-
-    <!-- Preloader -->
-    <div id="preloaderPopup" class="preloader-popup oculto">
-        <div class="preloader-popup-contenido">
-            <div class="preloader-popup-icono"></div>
-            <div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div>
-            <div class="preloader-popup-subtitulo">Cargando datos desde la nube...</div>
-        </div>
-    </div>
-
-    <!-- Botón Flotante para crear evento (FAB) -->
-    <button class="fab-create" onclick="abrirModalCreacionRapida()" title="Crear nuevo evento">+</button>
-
-    <!-- Modal rápido para crear evento (versión simplificada) -->
-    <div class="modal-overlay" id="modalCreacionRapida">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>📝 Crear evento rápido</h2>
-                <button class="modal-close" onclick="cerrarModalCreacionRapida()">✕</button>
-            </div>
-            <div class="date-group" style="margin-bottom: 10px;">
-                <label>📅 Desde</label>
-                <input type="date" id="rapidoFechaInicio">
-            </div>
-            <div class="date-group" style="margin-bottom: 10px;">
-                <label>📅 Hasta</label>
-                <input type="date" id="rapidoFechaFin">
-            </div>
-            <div class="date-group" style="margin-bottom: 10px;">
-                <label>🏷️ Nombre del evento</label>
-                <input type="text" id="rapidoNombre" placeholder="Ej: Semana de aventura..." autocomplete="off">
-            </div>
-            <button class="modal-save" onclick="crearEventoRapido()">✅ Crear evento</button>
+        <div id="eventosContainer" class="eventos-grid">
+            <div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando eventos...</div>
         </div>
     </div>
 
     <script>
         // ==================================================
-        // MENÚ FLOTANTE
-        // ==================================================
-        const menuBtn = document.getElementById('menuBtn');
-        const sidebar = document.getElementById('sidebar');
-        const menuOverlay = document.getElementById('menuOverlay');
-        
-        function toggleMenu() {
-            sidebar.classList.toggle('open');
-            menuOverlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-        }
-        
-        function closeMenu() {
-            sidebar.classList.remove('open');
-            menuOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
-        if (menuOverlay) menuOverlay.addEventListener('click', closeMenu);
-        
-        document.querySelectorAll('.nav-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) closeMenu();
-            });
-        });
-
-        // ==================================================
-        // VERIFICAR AUTENTICACIÓN
+        // CONFIGURACIÓN
         // ==================================================
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
@@ -387,417 +432,413 @@
             window.location.href = 'index.html'; 
         }
 
+        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
+        
+        // URLs para las diferentes hojas
+        const EVENTOS_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Eventos`;
+        const NOTAS_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=NotasEvento`;
+        
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwD3AMlNoJuOBWBbdt_S1-MXzUs5oABh0cy4pNqq4c-ES5wuPS0-G_hmxK3U__ajvK/exec'; // ACTUALIZAR CON TU URL
+        
+        let eventos = [];
+        let notas = {};
+        
         // ==================================================
-        // VARIABLES GLOBALES
+        // MENÚ FLOTANTE
         // ==================================================
-        let eventosRango = [];
-        let notasPorDia = {};
-        let eventoSeleccionado = null;
-        let fechaNotaSeleccionada = null;
-        let notaEditIndex = null;
-
-        const preloaderPopup = document.getElementById('preloaderPopup');
-        function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
-        function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
-
-        // ==================================================
-        // FUNCIONES DE ALMACENAMIENTO (localStorage)
-        // ==================================================
-        function cargarDatosLocales() {
-            // Cargar eventos de rango
-            const storedEventos = localStorage.getItem('eventosRangoCalendario');
-            if (storedEventos) {
-                eventosRango = JSON.parse(storedEventos);
-                eventosRango.forEach(ev => {
-                    ev.fechaInicio = new Date(ev.fechaInicio);
-                    ev.fechaFin = new Date(ev.fechaFin);
+        function initMenu() {
+            const menuBtn = document.getElementById('menuBtn');
+            const sidebar = document.getElementById('sidebar');
+            const menuOverlay = document.getElementById('menuOverlay');
+            
+            if (!menuBtn || !sidebar || !menuOverlay) return;
+            
+            function toggleMenu() {
+                sidebar.classList.toggle('open');
+                menuOverlay.classList.toggle('active');
+                document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+            }
+            
+            function closeMenu() {
+                sidebar.classList.remove('open');
+                menuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            menuBtn.addEventListener('click', toggleMenu);
+            menuOverlay.addEventListener('click', closeMenu);
+            
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) closeMenu();
                 });
-            } else {
-                eventosRango = [];
-            }
-
-            // Cargar notas individuales
-            const storedNotas = localStorage.getItem('notasPorDiaCalendario');
-            if (storedNotas) {
-                notasPorDia = JSON.parse(storedNotas);
-            } else {
-                notasPorDia = {};
-            }
+            });
         }
-
-        function guardarEventos() {
-            localStorage.setItem('eventosRangoCalendario', JSON.stringify(eventosRango));
-            renderizarListaEventos();
-        }
-
-        function guardarNotas() {
-            localStorage.setItem('notasPorDiaCalendario', JSON.stringify(notasPorDia));
-        }
-
+        
         // ==================================================
-        // FUNCIONES PRINCIPALES
+        // CARGAR DATOS DESDE SHEETS
         // ==================================================
-        function formatearFecha(fecha) {
-            if (!fecha) return '';
-            if (typeof fecha === 'string') fecha = new Date(fecha);
-            return `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
+        async function cargarDatos() {
+            try {
+                // Cargar eventos
+                const responseEventos = await fetch(EVENTOS_URL + '&t=' + Date.now());
+                const textoEventos = await responseEventos.text();
+                const eventosData = parseJSON(textoEventos);
+                
+                eventos = [];
+                if (eventosData && eventosData.table && eventosData.table.rows) {
+                    for (let i = 0; i < eventosData.table.rows.length; i++) {
+                        const c = eventosData.table.rows[i].c;
+                        if (c && c[0] && c[0].v) {
+                            eventos.push({
+                                id: c[0]?.v || '',
+                                nombre: c[1]?.v || '',
+                                fechaInicio: c[2]?.v || '',
+                                fechaFin: c[3]?.v || '',
+                                pax: c[4]?.v || '0',
+                                estado: c[5]?.v || 'activo',
+                                notasGenerales: c[6]?.v || ''
+                            });
+                        }
+                    }
+                }
+                
+                // Cargar notas
+                const responseNotas = await fetch(NOTAS_URL + '&t=' + Date.now());
+                const textoNotas = await responseNotas.text();
+                const notasData = parseJSON(textoNotas);
+                
+                notas = {};
+                if (notasData && notasData.table && notasData.table.rows) {
+                    for (let i = 0; i < notasData.table.rows.length; i++) {
+                        const c = notasData.table.rows[i].c;
+                        if (c && c[1] && c[1].v) {
+                            const eventoId = c[1].v;
+                            if (!notas[eventoId]) notas[eventoId] = [];
+                            notas[eventoId].push({
+                                id: c[0]?.v || '',
+                                fecha: c[2]?.v || '',
+                                nota: c[3]?.v || '',
+                                tipo: c[4]?.v || 'mañana'
+                            });
+                        }
+                    }
+                }
+                
+                renderizarEventos();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('eventosContainer').innerHTML = '<div style="text-align:center; padding:50px;">❌ Error al cargar eventos</div>';
+            }
         }
-
-        function formatoFechaKey(fecha) {
-            return `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}`;
+        
+        function parseJSON(texto) {
+            let jsonStr = texto;
+            jsonStr = jsonStr.replace("/*O_o*/", "");
+            jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
+            jsonStr = jsonStr.slice(0, -2);
+            return JSON.parse(jsonStr);
         }
+        
+        // ==================================================
+        // RENDERIZAR EVENTOS
+        // ==================================================
+        function renderizarEventos() {
+            const container = document.getElementById('eventosContainer');
+            if (!container) return;
+            
+            if (eventos.length === 0) {
+                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">📭 No hay eventos creados. Haz clic en "Crear nuevo evento"</div>';
+                return;
+            }
+            
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            container.innerHTML = eventos.map(evento => `
+                <div class="evento-card">
+                    <div class="evento-header">
+                        <div class="evento-titulo">${escapeHtml(evento.nombre)}</div>
+                        <div class="evento-fechas">📅 ${formatearFecha(evento.fechaInicio)} - ${formatearFecha(evento.fechaFin)}</div>
+                        <div class="evento-pax">👥 ${evento.pax} pasajeros</div>
+                    </div>
+                    <div class="evento-acciones">
+                        <button class="btn-ver-evento" onclick="verEvento('${evento.id}')">📋 Ver días</button>
+                        <button class="btn-whatsapp-evento" onclick="compartirEvento('${evento.id}')">💬 WhatsApp</button>
+                        <button class="btn-eliminar-evento" onclick="eliminarEvento('${evento.id}')">🗑️ Eliminar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function formatearFecha(fechaStr) {
+            if (!fechaStr) return '';
+            const partes = fechaStr.split('-');
+            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            return fechaStr;
+        }
+        
+        // ==================================================
+        // CREAR EVENTO
+        // ==================================================
+        function mostrarModalCrearEvento() {
+            const modalHtml = `
+                <div id="modalCrearEvento" class="modal">
+                    <div class="modal-contenido">
+                        <div class="modal-header">
+                            <h3>➕ Crear nuevo evento</h3>
+                            <button class="cerrar-modal" onclick="cerrarModal('modalCrearEvento')">✕</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del evento</label>
+                            <input type="text" id="eventoNombre" placeholder="Ej: Camboriu 45 Pax">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de inicio</label>
+                            <input type="date" id="eventoFechaInicio">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de fin</label>
+                            <input type="date" id="eventoFechaFin">
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad de pasajeros</label>
+                            <input type="number" id="eventoPax" placeholder="0">
+                        </div>
+                        <button class="btn-crear" style="width:100%; margin-top:10px;" onclick="crearEvento()">✅ Crear evento</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        async function crearEvento() {
+            const nombre = document.getElementById('eventoNombre')?.value;
+            const fechaInicio = document.getElementById('eventoFechaInicio')?.value;
+            const fechaFin = document.getElementById('eventoFechaFin')?.value;
+            const pax = document.getElementById('eventoPax')?.value || '0';
+            
+            if (!nombre || !fechaInicio || !fechaFin) {
+                alert('⚠️ Por favor, complete todos los campos');
+                return;
+            }
+            
+            const eventoId = 'EV-' + Date.now();
+            
+            // Guardar en localStorage temporalmente
+            const nuevosEventos = [...eventos, {
+                id: eventoId,
+                nombre: nombre,
+                fechaInicio: fechaInicio,
+                fechaFin: fechaFin,
+                pax: pax,
+                estado: 'activo',
+                notasGenerales: ''
+            }];
+            localStorage.setItem('eventosTemp', JSON.stringify(nuevosEventos));
+            
+            alert('✅ Evento creado localmente. Para persistencia en la nube, configura el Google Apps Script.');
+            
+            cerrarModal('modalCrearEvento');
+            await cargarDatos();
+        }
+        
+        // ==================================================
+        // VER DETALLE DEL EVENTO (CON NOTAS POR DÍA)
+        // ==================================================
+        function verEvento(eventoId) {
+            const evento = eventos.find(e => e.id === eventoId);
+            if (!evento) return;
+            
+            const fechas = obtenerFechasEntre(evento.fechaInicio, evento.fechaFin);
+            const notasEvento = notas[eventoId] || [];
+            
+            let diasHtml = '';
+            fechas.forEach(fecha => {
+                const notasDelDia = notasEvento.filter(n => n.fecha === fecha);
+                
+                let notasHtml = '';
+                if (notasDelDia.length === 0) {
+                    notasHtml = '<div style="color:#999; font-size:12px; padding:8px;">Sin notas</div>';
+                } else {
+                    notasDelDia.forEach(nota => {
+                        notasHtml += `
+                            <div class="nota-item">
+                                <div class="nota-texto">${escapeHtml(nota.nota)}</div>
+                                <div class="nota-fecha">${nota.tipo === 'mañana' ? '🌅 Mañana' : '🌙 Tarde'}</div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                diasHtml += `
+                    <div class="dia-card">
+                        <div class="dia-titulo">${formatearFecha(fecha)}</div>
+                        ${notasHtml}
+                        <button class="btn-agregar-nota" onclick="mostrarModalAgregarNota('${eventoId}', '${fecha}')">+ Agregar nota</button>
+                    </div>
+                `;
+            });
+            
+            const modalHtml = `
+                <div id="modalEvento" class="modal">
+                    <div class="modal-contenido">
+                        <div class="modal-header">
+                            <h3>📅 ${escapeHtml(evento.nombre)}</h3>
+                            <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
+                        </div>
+                        <p><strong>📅 Período:</strong> ${formatearFecha(evento.fechaInicio)} - ${formatearFecha(evento.fechaFin)}</p>
+                        <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
+                        <div class="dias-container">
+                            ${diasHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        function obtenerFechasEntre(fechaInicio, fechaFin) {
+            const fechas = [];
+            const inicio = new Date(fechaInicio);
+            const fin = new Date(fechaFin);
+            
+            for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
+                fechas.push(d.toISOString().split('T')[0]);
+            }
+            return fechas;
+        }
+        
+        function mostrarModalAgregarNota(eventoId, fecha) {
+            const modalHtml = `
+                <div id="modalAgregarNota" class="modal">
+                    <div class="modal-contenido">
+                        <div class="modal-header">
+                            <h3>📝 Agregar nota para ${formatearFecha(fecha)}</h3>
+                            <button class="cerrar-modal" onclick="cerrarModal('modalAgregarNota')">✕</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Nota</label>
+                            <textarea id="notaTexto" rows="3" style="width:100%; padding:10px; border-radius:10px; border:2px solid #e0e0e0;" placeholder="Escriba su nota aquí..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Momento del día</label>
+                            <select id="notaTipo">
+                                <option value="mañana">🌅 Mañana</option>
+                                <option value="tarde">🌙 Tarde</option>
+                            </select>
+                        </div>
+                        <button class="btn-crear" style="width:100%; margin-top:10px;" onclick="guardarNota('${eventoId}', '${fecha}')">💾 Guardar nota</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        async function guardarNota(eventoId, fecha) {
+            const texto = document.getElementById('notaTexto')?.value;
+            const tipo = document.getElementById('notaTipo')?.value;
+            
+            if (!texto) {
+                alert('⚠️ Por favor, escriba una nota');
+                return;
+            }
+            
+            // Guardar en localStorage temporalmente
+            const notaId = 'NOTA-' + Date.now();
+            const nuevasNotas = { ...notas };
+            if (!nuevasNotas[eventoId]) nuevasNotas[eventoId] = [];
+            nuevasNotas[eventoId].push({
+                id: notaId,
+                fecha: fecha,
+                nota: texto,
+                tipo: tipo
+            });
+            localStorage.setItem('notasTemp', JSON.stringify(nuevasNotas));
+            
+            alert('✅ Nota guardada localmente');
+            cerrarModal('modalAgregarNota');
+            cerrarModal('modalEvento');
+            verEvento(eventoId);
+        }
+        
+        function compartirEvento(eventoId) {
+            const evento = eventos.find(e => e.id === eventoId);
+            if (!evento) return;
+            
+            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
 
+📅 *EVENTO: ${evento.nombre}*
+📍 Período: ${formatearFecha(evento.fechaInicio)} - ${formatearFecha(evento.fechaFin)}
+👥 Pasajeros: ${evento.pax}
+
+🔗 Para más información, contáctenos.`;
+            
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            window.open(`https://wa.me/?text=${mensajeCodificado}`, '_blank');
+        }
+        
+        function eliminarEvento(eventoId) {
+            if (confirm('⚠️ ¿Estás seguro de eliminar este evento?')) {
+                const nuevosEventos = eventos.filter(e => e.id !== eventoId);
+                localStorage.setItem('eventosTemp', JSON.stringify(nuevosEventos));
+                cargarDatos();
+                alert('✅ Evento eliminado');
+            }
+        }
+        
+        function cerrarModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.remove();
+        }
+        
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-
-        // Crear evento desde el panel normal
-        function crearEventoRango() {
-            const fechaInicioStr = document.getElementById('eventoFechaInicio').value;
-            const fechaFinStr = document.getElementById('eventoFechaFin').value;
-            const nombre = document.getElementById('eventoNombre').value.trim();
-
-            if (!fechaInicioStr || !fechaFinStr) {
-                alert("❌ Selecciona ambas fechas.");
-                return;
-            }
-            if (!nombre) {
-                alert("❌ Escribe un nombre.");
-                return;
-            }
-
-            const fechaInicio = new Date(fechaInicioStr);
-            const fechaFin = new Date(fechaFinStr);
-
-            if (fechaInicio > fechaFin) {
-                alert("❌ La fecha Desde no puede ser mayor que Hasta.");
-                return;
-            }
-
-            const nuevoEvento = {
-                id: Date.now(),
-                nombre: nombre,
-                fechaInicio: fechaInicio,
-                fechaFin: fechaFin
-            };
-
-            eventosRango.push(nuevoEvento);
-            guardarEventos();
-            
-            document.getElementById('eventoFechaInicio').value = '';
-            document.getElementById('eventoFechaFin').value = '';
-            document.getElementById('eventoNombre').value = '';
-
-            renderizarListaEventos();
-            alert(`✅ Evento "${nombre}" creado del ${formatearFecha(fechaInicio)} al ${formatearFecha(fechaFin)}`);
-        }
-
-        // Crear evento desde el modal rápido (FAB)
-        function abrirModalCreacionRapida() {
-            // Preestablecer fechas: hoy y mañana
-            const hoy = new Date();
-            const manana = new Date(hoy);
-            manana.setDate(manana.getDate() + 1);
-            
-            document.getElementById('rapidoFechaInicio').value = hoy.toISOString().split('T')[0];
-            document.getElementById('rapidoFechaFin').value = manana.toISOString().split('T')[0];
-            document.getElementById('rapidoNombre').value = '';
-            document.getElementById('modalCreacionRapida').classList.add('show');
-        }
-
-        function cerrarModalCreacionRapida() {
-            document.getElementById('modalCreacionRapida').classList.remove('show');
-        }
-
-        function crearEventoRapido() {
-            const fechaInicioStr = document.getElementById('rapidoFechaInicio').value;
-            const fechaFinStr = document.getElementById('rapidoFechaFin').value;
-            const nombre = document.getElementById('rapidoNombre').value.trim();
-
-            if (!fechaInicioStr || !fechaFinStr) {
-                alert("❌ Selecciona ambas fechas.");
-                return;
-            }
-            if (!nombre) {
-                alert("❌ Escribe un nombre.");
-                return;
-            }
-
-            const fechaInicio = new Date(fechaInicioStr);
-            const fechaFin = new Date(fechaFinStr);
-
-            if (fechaInicio > fechaFin) {
-                alert("❌ La fecha Desde no puede ser mayor que Hasta.");
-                return;
-            }
-
-            const nuevoEvento = {
-                id: Date.now(),
-                nombre: nombre,
-                fechaInicio: fechaInicio,
-                fechaFin: fechaFin
-            };
-
-            eventosRango.push(nuevoEvento);
-            guardarEventos();
-            
-            cerrarModalCreacionRapida();
-            renderizarListaEventos();
-            alert(`✅ Evento "${nombre}" creado del ${formatearFecha(fechaInicio)} al ${formatearFecha(fechaFin)}`);
-        }
-
-        function eliminarEvento(id) {
-            const evento = eventosRango.find(ev => ev.id === id);
-            if (evento && confirm(`¿Eliminar el evento "${evento.nombre}"?`)) {
-                eventosRango = eventosRango.filter(ev => ev.id !== id);
-                if (eventoSeleccionado && eventoSeleccionado.id === id) {
-                    eventoSeleccionado = null;
-                    ocultarCalendarioEvento();
-                }
-                guardarEventos();
-                renderizarListaEventos();
-            }
-        }
-
-        function verEvento(id) {
-            const evento = eventosRango.find(ev => ev.id === id);
-            if (!evento) return;
-            eventoSeleccionado = evento;
-            mostrarCalendarioEvento();
-        }
-
-        function ocultarCalendarioEvento() {
-            document.getElementById('eventoCalendarioContainer').style.display = 'none';
-            document.getElementById('sinEventoSeleccionado').style.display = 'block';
-        }
-
-        function mostrarCalendarioEvento() {
-            if (!eventoSeleccionado) return;
-            
-            document.getElementById('eventoCalendarioContainer').style.display = 'block';
-            document.getElementById('sinEventoSeleccionado').style.display = 'none';
-            document.getElementById('eventoCalendarioTitulo').innerHTML = `📅 ${escapeHtml(eventoSeleccionado.nombre)}`;
-            document.getElementById('eventoInfoHeader').innerHTML = `📅 Del ${formatearFecha(eventoSeleccionado.fechaInicio)} al ${formatearFecha(eventoSeleccionado.fechaFin)}`;
-
-            // Botón compartir evento actual
-            const btnCompartir = document.getElementById('btnCompartirEventoActual');
-            btnCompartir.onclick = () => compartirEvento(eventoSeleccionado.id);
-
-            const daysGrid = document.getElementById('eventDaysGrid');
-            let dias = [];
-            let fechaActual = new Date(eventoSeleccionado.fechaInicio);
-            while (fechaActual <= eventoSeleccionado.fechaFin) {
-                dias.push(new Date(fechaActual));
-                fechaActual.setDate(fechaActual.getDate() + 1);
-            }
-
-            daysGrid.innerHTML = dias.map(fecha => {
-                const fechaKey = formatoFechaKey(fecha);
-                const notas = notasPorDia[fechaKey] || [];
-                const fechaFormateada = formatearFecha(fecha);
-                const diaSemana = obtenerNombreDia(fecha);
-                
-                let notasHtml = '';
-                notas.forEach((nota, idx) => {
-                    const notaCorta = nota.length > 30 ? nota.substring(0, 27) + '...' : nota;
-                    notasHtml += `
-                        <div class="nota-item-cal">
-                            <span class="nota-texto-cal" onclick='editarNota("${fechaKey}", ${idx}, "${fechaFormateada}")'>📌 ${escapeHtml(notaCorta)}</span>
-                            <button class="eliminar-nota-cal" onclick="eliminarNota('${fechaKey}', ${idx})">✕</button>
-                        </div>
-                    `;
-                });
-                
-                return `
-                    <div class="event-day-card">
-                        <div class="day-header">${diaSemana}</div>
-                        <div class="day-date">${fechaFormateada}</div>
-                        <div class="notas-lista">${notasHtml || '<div style="color:#999; font-size:11px;">Sin notas</div>'}</div>
-                        <button class="btn-agregar-nota-cal" onclick="abrirModalAgregarNota('${fechaKey}', '${fechaFormateada}')">+ Agregar nota</button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function obtenerNombreDia(fecha) {
-            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-            return dias[fecha.getDay()];
-        }
-
-        // ==================================================
-        // FUNCIONES DE NOTAS
-        // ==================================================
-        function abrirModalAgregarNota(fechaKey, fechaTexto) {
-            fechaNotaSeleccionada = fechaKey;
-            notaEditIndex = null;
-            document.getElementById('modalNotaFecha').innerText = fechaTexto;
-            document.getElementById('notaTexto').value = '';
-            document.getElementById('modalNotaTitle').innerText = '📝 Agregar nota';
-            document.getElementById('modalNota').classList.add('show');
-        }
-
-        function editarNota(fechaKey, index, fechaTexto) {
-            fechaNotaSeleccionada = fechaKey;
-            notaEditIndex = index;
-            const notas = notasPorDia[fechaKey] || [];
-            document.getElementById('modalNotaFecha').innerText = fechaTexto;
-            document.getElementById('notaTexto').value = notas[index] || '';
-            document.getElementById('modalNotaTitle').innerText = '✏️ Editar nota';
-            document.getElementById('modalNota').classList.add('show');
-        }
-
-        function guardarNota() {
-            const texto = document.getElementById('notaTexto').value.trim();
-            if (!texto) { alert("Escribe algo."); return; }
-
-            if (!notasPorDia[fechaNotaSeleccionada]) {
-                notasPorDia[fechaNotaSeleccionada] = [];
-            }
-
-            if (notaEditIndex !== null && notasPorDia[fechaNotaSeleccionada][notaEditIndex]) {
-                notasPorDia[fechaNotaSeleccionada][notaEditIndex] = texto;
-            } else {
-                notasPorDia[fechaNotaSeleccionada].push(texto);
-            }
-
-            guardarNotas();
-            cerrarModalNota();
-            if (eventoSeleccionado) {
-                mostrarCalendarioEvento();
-            }
-        }
-
-        function eliminarNota(fechaKey, index) {
-            if (confirm("¿Eliminar esta nota?")) {
-                if (notasPorDia[fechaKey] && notasPorDia[fechaKey][index]) {
-                    notasPorDia[fechaKey].splice(index, 1);
-                    if (notasPorDia[fechaKey].length === 0) {
-                        delete notasPorDia[fechaKey];
-                    }
-                    guardarNotas();
-                    if (eventoSeleccionado) {
-                        mostrarCalendarioEvento();
-                    }
-                }
-            }
-        }
-
-        function cerrarModalNota() {
-            document.getElementById('modalNota').classList.remove('show');
-            fechaNotaSeleccionada = null;
-            notaEditIndex = null;
-        }
-
-        // ==================================================
-        // FUNCIONES DE WHATSAPP
-        // ==================================================
-        function compartirEvento(id) {
-            const evento = eventosRango.find(ev => ev.id === id);
-            if (!evento) return;
-            
-            let mensaje = `🏔️ *${evento.nombre}*\n📅 Del ${formatearFecha(evento.fechaInicio)} al ${formatearFecha(evento.fechaFin)}\n\n*Detalle por día:*\n`;
-            
-            let fechaActual = new Date(evento.fechaInicio);
-            while (fechaActual <= evento.fechaFin) {
-                const fechaKey = formatoFechaKey(fechaActual);
-                const notas = notasPorDia[fechaKey] || [];
-                mensaje += `\n📌 *${formatearFecha(fechaActual)}*:\n`;
-                if (notas.length === 0) mensaje += `   Sin notas\n`;
-                else notas.forEach(nota => mensaje += `   • ${nota}\n`);
-                fechaActual.setDate(fechaActual.getDate() + 1);
-            }
-            mensaje += `\n📱 Enviado desde CRM Aventura Total`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
-        }
-
-        function compartirTodosEventos() {
-            if (eventosRango.length === 0) {
-                alert("No hay eventos para compartir.");
-                return;
-            }
-            
-            let mensaje = `🏔️ *TODOS LOS EVENTOS - CRM Aventura Total*\n\n`;
-            
-            eventosRango.forEach(evento => {
-                mensaje += `━━━━━━━━━━━━━━━━━━━━━\n🎯 *${evento.nombre}*\n📅 Del ${formatearFecha(evento.fechaInicio)} al ${formatearFecha(evento.fechaFin)}\n\n*Detalle por día:*\n`;
-                let fechaActual = new Date(evento.fechaInicio);
-                while (fechaActual <= evento.fechaFin) {
-                    const fechaKey = formatoFechaKey(fechaActual);
-                    const notas = notasPorDia[fechaKey] || [];
-                    mensaje += `\n📌 *${formatearFecha(fechaActual)}*:\n`;
-                    if (notas.length === 0) mensaje += `   Sin notas\n`;
-                    else notas.forEach(nota => mensaje += `   • ${nota}\n`);
-                    fechaActual.setDate(fechaActual.getDate() + 1);
-                }
-                mensaje += `\n`;
-            });
-            mensaje += `━━━━━━━━━━━━━━━━━━━━━\n📱 Enviado desde CRM Aventura Total`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
-        }
-
-        // ==================================================
-        // RENDERIZAR LISTA DE EVENTOS
-        // ==================================================
-        function renderizarListaEventos() {
-            const container = document.getElementById('listaEventosContainer');
-            if (eventosRango.length === 0) {
-                container.innerHTML = '<div class="no-events">📭 No hay eventos activos. Crea uno usando el panel superior o el botón + verde.</div>';
-                return;
-            }
-            
-            container.innerHTML = eventosRango.map(ev => `
-                <div class="event-item-list">
-                    <div class="event-info">
-                        <div class="event-name">🎯 ${escapeHtml(ev.nombre)}</div>
-                        <div class="event-dates">📅 ${formatearFecha(ev.fechaInicio)} → ${formatearFecha(ev.fechaFin)}</div>
-                    </div>
-                    <div class="event-actions">
-                        <button class="btn-ver-evento" onclick="verEvento(${ev.id})">👁️ Ver días</button>
-                        <button class="btn-compartir-evento" onclick="compartirEvento(${ev.id})">📱 WhatsApp</button>
-                        <button class="btn-apagar-evento" onclick="eliminarEvento(${ev.id})">🗑️ Eliminar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
+        
         // ==================================================
         // INICIALIZAR
         // ==================================================
-        window.crearEventoRango = crearEventoRango;
-        window.eliminarEvento = eliminarEvento;
-        window.verEvento = verEvento;
-        window.compartirEvento = compartirEvento;
-        window.compartirTodosEventos = compartirTodosEventos;
-        window.abrirModalAgregarNota = abrirModalAgregarNota;
-        window.editarNota = editarNota;
-        window.eliminarNota = eliminarNota;
-        window.guardarNota = guardarNota;
-        window.cerrarModalNota = cerrarModalNota;
-        window.abrirModalCreacionRapida = abrirModalCreacionRapida;
-        window.crearEventoRapido = crearEventoRapido;
-        window.cerrarModalCreacionRapida = cerrarModalCreacionRapida;
-
-        cargarDatosLocales();
-        renderizarListaEventos();
-        
-        // Cerrar modal con click fuera o ESC
-        document.getElementById('modalNota').addEventListener('click', function(e) {
-            if (e.target === this) cerrarModalNota();
-        });
-        
-        document.getElementById('modalCreacionRapida').addEventListener('click', function(e) {
-            if (e.target === this) cerrarModalCreacionRapida();
-        });
-        
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                cerrarModalNota();
-                cerrarModalCreacionRapida();
+        function init() {
+            initMenu();
+            
+            // Cargar datos guardados localmente
+            const eventosGuardados = localStorage.getItem('eventosTemp');
+            if (eventosGuardados) {
+                eventos = JSON.parse(eventosGuardados);
             }
-        });
+            
+            const notasGuardadas = localStorage.getItem('notasTemp');
+            if (notasGuardadas) {
+                notas = JSON.parse(notasGuardadas);
+            }
+            
+            cargarDatos();
+        }
+        
+        window.verEvento = verEvento;
+        window.cerrarModal = cerrarModal;
+        window.mostrarModalCrearEvento = mostrarModalCrearEvento;
+        window.crearEvento = crearEvento;
+        window.mostrarModalAgregarNota = mostrarModalAgregarNota;
+        window.guardarNota = guardarNota;
+        window.compartirEvento = compartirEvento;
+        window.eliminarEvento = eliminarEvento;
+        window.logout = logout;
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 </body>
 </html>
