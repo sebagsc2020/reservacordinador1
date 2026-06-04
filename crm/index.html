@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     
-    <!-- PWA Configuration -->
+    <!-- ================================================== -->
+    <!-- PWA CONFIGURACIÓN                                      -->
+    <!-- ================================================== -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,8 +14,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1a1a2e">
     <meta name="application-name" content="Aventura Total CRM">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+    <meta name="msapplication-TileImage" content="icons/icon-144.png">
     
-    <!-- Iconos -->
+    <!-- Iconos para diferentes plataformas -->
     <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
@@ -48,7 +52,7 @@
             padding: 20px;
         }
         
-        /* Modo PWA (sin barra de navegación) */
+        /* Modo PWA (sin barra de navegación) - se aplica cuando la app está instalada */
         .pwa-mode {
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
@@ -152,7 +156,7 @@
         
         // Detectar si la app está instalada y se abre desde la pantalla de inicio
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            console.log('📱 App ejecutándose en modo standalone');
+            console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
             document.body.classList.add('pwa-mode');
         }
         
@@ -309,6 +313,18 @@
             if (e.key === 'Enter') {
                 loginForm.dispatchEvent(new Event('submit'));
             }
+        });
+        
+        // Prevenir F12 y DevTools
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+                (e.ctrlKey && e.key === 'U') || (e.ctrlKey && e.key === 'C')) {
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
         });
     </script>
 </body>
