@@ -519,16 +519,17 @@
         }
         
         // ==================================================
-        // FUNCIONES PARA MANEJAR FECHAS (CUALQUIER FORMATO)
+        // FUNCIONES PARA MANEJAR FECHAS - CORREGIDAS
         // ==================================================
         
-        // Convierte cualquier fecha a objeto Date
+        // Convierte cualquier fecha (string, objeto Date, timestamp) a objeto Date
         function convertirAFecha(fechaInput) {
             if (!fechaInput) return null;
             
-            // Si ya es un objeto Date
+            // Si ya es un objeto Date válido
             if (fechaInput instanceof Date) {
-                return new Date(fechaInput);
+                // Clonar para evitar problemas de referencia
+                return new Date(fechaInput.getTime());
             }
             
             // Si es string
@@ -537,14 +538,16 @@
                 if (fechaInput.includes('/')) {
                     const partes = fechaInput.split('/');
                     if (partes.length === 3) {
-                        return new Date(partes[2], partes[1] - 1, partes[0]);
+                        const fecha = new Date(partes[2], partes[1] - 1, partes[0]);
+                        if (!isNaN(fecha.getTime())) return fecha;
                     }
                 }
                 // Formato YYYY-MM-DD
                 if (fechaInput.includes('-')) {
                     const partes = fechaInput.split('-');
                     if (partes.length === 3) {
-                        return new Date(partes[0], partes[1] - 1, partes[2]);
+                        const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+                        if (!isNaN(fecha.getTime())) return fecha;
                     }
                 }
             }
@@ -717,7 +720,7 @@
         }
         
         // ==================================================
-        // VER DETALLE DEL EVENTO (CON NOTAS)
+        // VER DETALLE DEL EVENTO (CON NOTAS) - CORREGIDO
         // ==================================================
         async function verEvento(eventoId) {
             mostrarPreloader();
@@ -741,43 +744,64 @@
                 const notasEvento = data.notas || [];
                 
                 console.log('📝 NOTAS RECIBIDAS:', notasEvento);
+                console.log('📅 Evento fechas raw:', evento.fechaInicio, evento.fechaFin);
                 
-                // Normalizar fechas del evento a objetos Date
-                const fechaInicioDate = convertirAFecha(evento.fechaInicio);
-                const fechaFinDate = convertirAFecha(evento.fechaFin);
+                // Normalizar fechas del evento - convertir a string DD/MM/YYYY primero
+                let fechaInicioStr = evento.fechaInicio;
+                let fechaFinStr = evento.fechaFin;
                 
-                if (!fechaInicioDate || !fechaFinDate) {
-                    console.error('No se pudieron convertir las fechas del evento');
-                    alert('Error: Fechas del evento inválidas');
-                    ocultarPreloader();
-                    return;
+                // Si son objetos Date, convertirlos a string
+                if (fechaInicioStr && typeof fechaInicioStr === 'object') {
+                    fechaInicioStr = formatearFechaDDMMYYYY(fechaInicioStr);
+                }
+                if (fechaFinStr && typeof fechaFinStr === 'object') {
+                    fechaFinStr = formatearFechaDDMMYYYY(fechaFinStr);
                 }
                 
-                console.log('📅 Fechas convertidas:', { 
-                    inicio: fechaInicioDate, 
-                    fin: fechaFinDate 
-                });
+                console.log('📅 Fechas normalizadas:', { fechaInicioStr, fechaFinStr });
                 
-                // Generar array de fechas entre inicio y fin (en formato DD/MM/YYYY)
+                // Generar array de fechas entre inicio y fin
                 const fechas = [];
-                for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
-                    const dia = d.getDate().toString().padStart(2, '0');
-                    const mes = (d.getMonth() + 1).toString().padStart(2, '0');
-                    const año = d.getFullYear();
-                    fechas.push(`${dia}/${mes}/${año}`);
+                if (fechaInicioStr && fechaFinStr) {
+                    const inicioParts = fechaInicioStr.split('/');
+                    const finParts = fechaFinStr.split('/');
+                    
+                    if (inicioParts.length === 3 && finParts.length === 3) {
+                        const inicio = new Date(inicioParts[2], inicioParts[1] - 1, inicioParts[0]);
+                        const fin = new Date(finParts[2], finParts[1] - 1, finParts[0]);
+                        
+                        console.log('📅 Fechas convertidas a Date:', { inicio, fin });
+                        
+                        if (!isNaN(inicio.getTime()) && !isNaN(fin.getTime())) {
+                            for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
+                                const dia = d.getDate().toString().padStart(2, '0');
+                                const mes = (d.getMonth() + 1).toString().padStart(2, '0');
+                                const año = d.getFullYear();
+                                fechas.push(`${dia}/${mes}/${año}`);
+                            }
+                        }
+                    }
                 }
                 
                 console.log('📋 LISTA DE FECHAS DEL EVENTO:', fechas);
                 
-                // Crear un mapa de notas por fecha (normalizando formato de las notas)
+                // Crear un mapa de notas por fecha
                 const notasPorFecha = {};
                 notasEvento.forEach(nota => {
-                    // Normalizar la fecha de la nota a DD/MM/YYYY
-                    let fechaNota = formatearFechaDDMMYYYY(nota.fecha);
-                    if (!notasPorFecha[fechaNota]) {
-                        notasPorFecha[fechaNota] = [];
+                    let fechaNota = nota.fecha;
+                    // Normalizar fecha de la nota
+                    if (fechaNota) {
+                        if (fechaNota.includes('-')) {
+                            const partes = fechaNota.split('-');
+                            if (partes.length === 3) {
+                                fechaNota = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                            }
+                        }
+                        if (!notasPorFecha[fechaNota]) {
+                            notasPorFecha[fechaNota] = [];
+                        }
+                        notasPorFecha[fechaNota].push(nota);
                     }
-                    notasPorFecha[fechaNota].push(nota);
                 });
                 
                 console.log('📊 NOTAS POR FECHA:', notasPorFecha);
@@ -821,7 +845,7 @@
                                 <h3>📅 ${escapeHtml(evento.nombre)}</h3>
                                 <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
                             </div>
-                            <p><strong>📅 Período:</strong> ${formatearFechaDDMMYYYY(evento.fechaInicio)} - ${formatearFechaDDMMYYYY(evento.fechaFin)}</p>
+                            <p><strong>📅 Período:</strong> ${fechaInicioStr} - ${fechaFinStr}</p>
                             <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
                             <div class="dias-container">
                                 ${diasHtml}
