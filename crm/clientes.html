@@ -4,9 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Clientes - CRM Aventura Total</title>
+    
+    <!-- ================================================== -->
+    <!-- PWA CONFIGURACIÓN                                      -->
+    <!-- ================================================== -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AVT CRM">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="application-name" content="Aventura Total CRM">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+    <meta name="msapplication-TileImage" content="icons/icon-144.png">
+    
+    <!-- Iconos para diferentes plataformas -->
+    <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="icons/icon-76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="icons/icon-114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
+        
+        /* Modo PWA (sin barra de navegación) */
+        .pwa-mode {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
         
         /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
         .menu-btn {
@@ -509,7 +544,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaClientes">
-                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>
+                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr
                     </tbody>
                 </table>
             </div>
@@ -520,6 +555,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
+        // ==================================================
+        // REGISTRAR SERVICE WORKER PARA PWA
+        // ==================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registrado con éxito:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Error al registrar Service Worker:', error);
+                    });
+            });
+        }
+        
+        // Detectar si la app está instalada y se abre desde la pantalla de inicio
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
+            document.body.classList.add('pwa-mode');
+        }
+        
         // ==================================================
         // MENÚ FLOTANTE
         // ==================================================
@@ -641,7 +697,7 @@
             
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr';
                 const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -690,7 +746,7 @@
                 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}></td</tr`;
             }
         }
         
@@ -699,7 +755,7 @@
             if (!tbody) return;
             
             if (clientesFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td</tr';
                 return;
             }
             
@@ -712,13 +768,13 @@
             
             tbody.innerHTML = clientesFiltrados.map((cliente) => `
                 <tr>
-                    <td>${cliente.id}</td>
-                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
-                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td>
-                    <td>${escapeHtml(cliente.telefono || 'No registrado')}</td>
-                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td>
-                    <td><span class="badge badge-activo">Activo</span></td>
-                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td>
+                    <td>${cliente.id}</td
+                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td
+                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td
+                    <td>${escapeHtml(cliente.telefono || 'No registrado')}</td
+                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td
+                    <td><span class="badge badge-activo">Activo</span></td
+                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td
                 </tr>
             `).join('');
         }
@@ -760,9 +816,9 @@
             for (const cliente of clientesFiltrados) {
                 filasTabla += `
                     <tr>
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.nombre)}</td>
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.email)}</td>
-                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.telefono || 'No registrado')}</td>
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.nombre)}</td
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.email)}</td
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.telefono || 'No registrado')}</td
                     </tr>
                 `;
             }
