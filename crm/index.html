@@ -14,9 +14,9 @@
         .subtitulo { color: #666; font-size: 14px; margin-bottom: 30px; }
         .form-group { margin-bottom: 20px; text-align: left; }
         label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        input { width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px; }
+        input { width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px; transition: all 0.3s; }
         input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
-        .btn-login { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .btn-login { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: all 0.3s; }
         .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102,126,234,0.4); }
         .btn-login:disabled { background: #95a5a6; cursor: not-allowed; transform: none; }
         .error-message { background: #ffe0e0; color: #c0392b; padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 15px; display: none; font-weight: 600; }
@@ -25,7 +25,7 @@
         .footer-text { margin-top: 20px; font-size: 12px; color: #999; }
         .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; margin-left: 8px; vertical-align: middle; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .sesion-info { font-size: 11px; color: #e74c3c; margin-top: 10px; font-weight: 600; }
+        .sesion-info { font-size: 11px; color: #27ae60; margin-top: 10px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -35,7 +35,7 @@
         <p class="subtitulo">Panel de Administración CRM</p>
         <p class="sesion-info" id="sesionInfo">🔐 Sistema multi-usuario</p>
         <form id="loginForm">
-            <div class="form-group"><label>📧 Email</label><input type="email" id="email" placeholder="admin@aventuratotal.com" required autocomplete="off"></div>
+            <div class="form-group"><label>📧 Email</label><input type="email" id="email" placeholder="tu@email.com" required autocomplete="off"></div>
             <div class="form-group"><label>🔒 Contraseña</label><input type="password" id="password" placeholder="••••••••" required></div>
             <button type="submit" class="btn-login" id="btnLogin">Ingresar al Panel</button>
         </form>
@@ -153,23 +153,20 @@
                 }
                 
                 console.log(`📥 Usuarios cargados: ${usuarios.length}`);
+                
+                if (usuarios.length === 0) {
+                    throw new Error('No hay usuarios activos en el sistema');
+                }
+                
                 usuariosCache = usuarios;
                 ultimaCargaUsuarios = ahora;
                 return usuarios;
                 
             } catch (error) {
                 console.error('Error al cargar usuarios:', error);
-                // Devolver usuario por defecto si no hay conexión
-                if (!usuariosCache) {
-                    return [{
-                        id: '1',
-                        email: 'admin@aventuratotal.com',
-                        password: '2409admin',
-                        rol: 'admin',
-                        activo: true
-                    }];
-                }
-                return usuariosCache;
+                document.getElementById('sesionInfo').innerHTML = '⚠️ Error de conexión. Contacte al administrador.';
+                document.getElementById('sesionInfo').style.color = '#e74c3c';
+                throw error; // Lanzar error para que no permita login
             }
         }
         
@@ -190,7 +187,8 @@
                     localStorage.removeItem('crm_sesion_activa');
                 }
             }
-            if (sesionInfo) sesionInfo.innerHTML = '🔐 Sistema multi-usuario - Verificado con Google Sheets';
+            if (sesionInfo) sesionInfo.innerHTML = '🔐 Ingrese con sus credenciales';
+            sesionInfo.style.color = '#27ae60';
             return false;
         }
         
@@ -216,7 +214,7 @@
         }
         
         // ==================================================
-        // VALIDAR CREDENCIALES CONTRA GOOGLE SHEETS
+        // VALIDAR CREDENCIALES CONTRA GOOGLE SHEETS (SIN FALLBACK)
         // ==================================================
         async function validarCredenciales(email, password) {
             const usuarios = await cargarUsuariosDesdeSheet();
@@ -263,11 +261,11 @@
                 
                 if (resultado.valido) {
                     // Registrar sesión
-                    const sesion = registrarSesion(resultado.email, resultado.rol, email);
+                    registrarSesion(resultado.email, resultado.rol, email);
                     
                     btnLogin.innerHTML = '✅ Ingresando...';
                     
-                    // Redirigir según el rol
+                    // Redirigir al dashboard
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 500);
@@ -282,7 +280,7 @@
                 console.error('Error en login:', error);
                 btnLogin.disabled = false;
                 btnLogin.innerHTML = 'Ingresar al Panel';
-                errorMsg.textContent = '❌ Error de conexión. Intente nuevamente.';
+                errorMsg.textContent = '❌ Error de conexión. No se pudo validar el usuario.';
                 errorMsg.classList.add('show');
                 setTimeout(() => errorMsg.classList.remove('show'), 3000);
             }
@@ -295,8 +293,12 @@
             }
         });
         
-        // Pre-cargar usuarios al inicio
-        cargarUsuariosDesdeSheet().catch(console.error);
+        // Cargar usuarios al inicio para validar conexión
+        cargarUsuariosDesdeSheet().catch(error => {
+            console.error('Error precargando usuarios:', error);
+            document.getElementById('sesionInfo').innerHTML = '⚠️ Error de conexión con el servidor';
+            document.getElementById('sesionInfo').style.color = '#e74c3c';
+        });
     </script>
 </body>
 </html>
