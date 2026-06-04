@@ -647,7 +647,7 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         
-        // URL del Google Apps Script para guardar estados en la nube
+        // URL del Google Apps Script - ACTUALIZAR CON TU URL
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
         let reservasData = [];
@@ -671,15 +671,26 @@
             }
         }
 
+        // ==================================================
+        // GUARDAR ESTADO EN LA NUBE (VERSIÓN CORREGIDA)
+        // ==================================================
         async function guardarEstadoEnNube(id, nuevoEstado) {
             try {
-                await fetch(ESTADOS_SCRIPT_URL, {
+                const formData = new URLSearchParams();
+                formData.append('action', 'guardar');
+                formData.append('id', id);
+                formData.append('estado', nuevoEstado);
+                
+                const response = await fetch(ESTADOS_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'action=guardar&id=' + encodeURIComponent(id) + '&estado=' + encodeURIComponent(nuevoEstado)
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString()
                 });
-                console.log(`✅ Estado guardado en nube: ${id} -> ${nuevoEstado}`);
+                
+                const text = await response.text();
+                console.log(`✅ Estado guardado en nube: ${id} -> ${nuevoEstado}`, text);
                 return true;
             } catch (error) {
                 console.error('Error al guardar en nube:', error);
@@ -687,6 +698,9 @@
             }
         }
 
+        // ==================================================
+        // CARGAR ESTADOS DESDE LA NUBE
+        // ==================================================
         async function cargarEstadosDesdeNube() {
             try {
                 // Intentar cargar desde localStorage primero
@@ -699,7 +713,7 @@
                     }
                 }
                 
-                // Luego intentar con la nube
+                // Luego intentar sincronizar con la nube
                 const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
                 const data = await response.json();
                 if (data.success && data.estados) {
@@ -716,6 +730,9 @@
             }
         }
 
+        // ==================================================
+        // CARGAR RESERVAS
+        // ==================================================
         async function cargarReservas() {
             const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
