@@ -233,20 +233,19 @@
         .card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .card-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #e8ecf1; padding-bottom: 10px; }
         
-        /* ===== GRÁFICO SVG ADAPTATIVO ===== */
-        .chart-line-container { 
-            position: relative; 
+        /* ===== GRÁFICO ADAPTATIVO ===== */
+        .chart-wrapper {
             width: 100%;
             overflow-x: auto;
-            background: #fafbfc; 
-            border-radius: 12px; 
-            padding: 10px 0;
+            -webkit-overflow-scrolling: touch;
+            background: #fafbfc;
+            border-radius: 12px;
         }
-        .chart-line-svg { 
+        .chart-line-svg {
             display: block;
+            min-width: 650px;
             width: 100%;
             height: auto;
-            min-height: 260px;
         }
         .chart-line-path { fill: none; stroke: #667eea; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
         .chart-line-area { opacity: 0.3; }
@@ -259,22 +258,24 @@
         .chart-line-value { font-size: 9px; fill: #333; text-anchor: middle; font-weight: 700; }
         .chart-line-grid { stroke: #e8ecf1; stroke-width: 1; stroke-dasharray: 4; }
         .chart-line-rain-dot { fill: #3498db; opacity: 0.8; }
-        .chart-legend { display: flex; gap: 20px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
-        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .legend-dot.temp { background: #667eea; }
-        .legend-dot.rain { background: #3498db; }
         
-        /* ===== PRONÓSTICO ===== */
+        /* ===== PRONÓSTICO ADAPTATIVO ===== */
+        .forecast-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         .forecast-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(85px, 1fr)); 
-            gap: 10px; 
+            display: flex;
+            gap: 12px;
+            min-width: 600px;
         }
         .forecast-card { 
+            flex: 0 0 auto;
+            width: 100px;
             background: #f8f9fa; 
             border-radius: 12px; 
-            padding: 12px 5px; 
+            padding: 12px 8px; 
             text-align: center; 
             transition: all 0.3s;
         }
@@ -286,12 +287,22 @@
         .forecast-min { font-size: 12px; color: #667eea; font-weight: 600; }
         .forecast-rain { font-size: 10px; color: #3498db; margin-top: 4px; }
         
+        .chart-legend { display: flex; gap: 20px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .legend-dot.temp { background: #667eea; }
+        .legend-dot.rain { background: #3498db; }
+        
         /* ===== RESPONSIVE ===== */
         @media (min-width: 769px) {
             .menu-btn { display: none !important; }
             .sidebar { transform: translateX(0) !important; width: 250px; }
             .menu-overlay { display: none !important; }
             .main-content { margin-left: 250px; padding: 30px; }
+            .forecast-grid { min-width: auto; flex-wrap: wrap; justify-content: center; }
+            .forecast-card { width: auto; flex: 1 1 auto; min-width: 85px; }
+            .chart-wrapper { overflow-x: visible; }
+            .chart-line-svg { min-width: auto; width: 100%; }
         }
         
         @media (max-width: 992px) {
@@ -308,12 +319,9 @@
             .top-bar { flex-direction: column; }
             .top-bar input { width: 100%; }
             .top-bar .btn { width: 100%; text-align: center; justify-content: center; }
-            .forecast-grid { grid-template-columns: repeat(4, 1fr); overflow-x: auto; padding-bottom: 5px; }
-            .forecast-grid::-webkit-scrollbar { height: 3px; }
             .detail-card { padding: 12px; }
             .detail-value { font-size: 18px; }
-            .chart-line-container { overflow-x: auto; }
-            .chart-line-svg { min-width: 650px; }
+            .forecast-card { width: 85px; }
         }
         
         @media (max-width: 480px) {
@@ -327,7 +335,9 @@
             .detail-card { padding: 10px; }
             .detail-icon { font-size: 24px; }
             .detail-value { font-size: 16px; }
-            .chart-line-svg { min-width: 580px; }
+            .forecast-card { width: 80px; padding: 8px 4px; }
+            .forecast-icono { font-size: 24px; }
+            .forecast-max { font-size: 13px; }
         }
         
         /* Scrollbar personalizado */
@@ -384,7 +394,7 @@
             <button class="btn btn-whatsapp" onclick="compartirPorWhatsApp()">💬 Compartir clima</button>
         </div>
         
-        <!-- Alertas meteorológicas (debajo del buscador) -->
+        <!-- Alertas meteorológicas -->
         <div class="alertas-container" id="alertasContainer">
             <div class="alerta verde"><div class="alerta-icono">✅</div><div class="alerta-info"><h4>Cargando...</h4><p>Obteniendo datos meteorológicos.</p></div></div>
         </div>
@@ -425,7 +435,7 @@
         <div class="main-grid">
             <div class="card">
                 <div class="card-title"><span class="icon">📈</span> Temperatura 24 Horas</div>
-                <div class="chart-line-container">
+                <div class="chart-wrapper">
                     <svg class="chart-line-svg" id="graficoLinealSVG" viewBox="0 0 700 240" preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
                 <div class="chart-legend">
@@ -435,7 +445,9 @@
             </div>
             <div class="card">
                 <div class="card-title"><span class="icon">📅</span> Pronóstico 8 Días</div>
-                <div class="forecast-grid" id="pronostico7dias"></div>
+                <div class="forecast-wrapper">
+                    <div class="forecast-grid" id="pronostico7dias"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -552,7 +564,7 @@
                 document.getElementById('amanecer').textContent = dt.amanecer;
                 document.getElementById('atardecer').textContent = dt.atardecer;
                 
-                // Gráfico SVG - Adaptativo
+                // Gráfico
                 dibujarGraficoTemperatura(dt.hourly);
                 
                 // Pronóstico
@@ -600,19 +612,11 @@
             const svg = document.getElementById('graficoLinealSVG');
             svg.innerHTML = '';
             
-            // Obtener dimensiones del contenedor
-            const container = svg.parentElement;
-            const containerWidth = container.clientWidth;
-            
-            // Usar un mínimo de ancho para móviles
-            const width = Math.max(containerWidth, 650);
+            const width = 700;
             const height = 240;
             const pad = { top: 25, right: 30, bottom: 35, left: 45 };
             const cw = width - pad.left - pad.right;
             const ch = height - pad.top - pad.bottom;
-            
-            // Actualizar viewBox del SVG
-            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
             
             const temps = hourly.map(h => h.temp);
             const lluvias = hourly.map(h => h.lluvia);
@@ -684,7 +688,6 @@
             for (let i = 0; i < puntos.length; i++) {
                 const { x, y, temp, lluvia } = puntos[i];
                 
-                // Mostrar puntos cada 2 horas
                 if (i % 2 === 0) {
                     const circle = document.createElementNS(svgNS, 'circle'); 
                     circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', '4');
@@ -710,7 +713,6 @@
                     }
                 }
                 
-                // Etiquetas de horas cada 3 horas
                 if (i % 3 === 0) {
                     const label = document.createElementNS(svgNS, 'text'); 
                     label.setAttribute('x', x); label.setAttribute('y', ch + 18); 
@@ -794,13 +796,6 @@
         
         // Cargar clima inicial
         obtenerClima(-34.6037, -58.3816, 'Buenos Aires, AR');
-        
-        // Redibujar gráfico al redimensionar la ventana
-        window.addEventListener('resize', function() {
-            if (datosClimaActual && datosClimaActual.hourly) {
-                dibujarGraficoTemperatura(datosClimaActual.hourly);
-            }
-        });
     </script>
 </body>
 </html>
