@@ -60,23 +60,24 @@
         }
         
         // ==================================================
-        // USUARIOS PREDEFINIDOS (email + hash + rol)
-        // Para agregar un nuevo usuario, genera su hash y agrégalo aquí
+        // USUARIOS CON SUS HASHES Y ROLES
         // ==================================================
         const USUARIOS = {
+            // Usuario Administrador
             'admin@aventuratotal.com': {
                 hash: '9f85e28811e6d2be994f9d5b89d29bb30a7a6c7be3989c0c9f134b64f2f7e77f',
                 rol: 'admin'
+            },
+            // Usuario 2
+            'user2@aventuratotal.com': {
+                hash: '198d9f61f702b601f362671605562e619a5c9cb7403f14595e74d964703533ad',
+                rol: 'operador'
+            },
+            // Usuario 3
+            'user3@aventuratotal.com': {
+                hash: 'adbf6432511abab8999b991d0cbe675490d5e201209aba867c89b7c7235389b1',
+                rol: 'ventas'
             }
-            // Agrega más usuarios aquí:
-            // 'user2@aventuratotal.com': {
-            //     hash: '198d9f61f702b601f362671605562e619a5c9cb7403f14595e74d964703533ad',
-            //     rol: 'lectura'
-            // },
-            // 'user3@aventuratotal.com': {
-            //     hash: 'adbf6432511abab8999b991d0cbe675490d5e201209aba867c89b7c7235389b1',
-            //     rol: 'ventas'
-            // }
         };
         
         // ==================================================
@@ -120,6 +121,38 @@
         }
         
         // ==================================================
+        // RATE LIMITING (protección contra fuerza bruta)
+        // ==================================================
+        let intentosFallidos = 0;
+        let tiempoBloqueo = null;
+        
+        function verificarRateLimiting() {
+            if (tiempoBloqueo && Date.now() < tiempoBloqueo) {
+                const segundosRestantes = Math.ceil((tiempoBloqueo - Date.now()) / 1000);
+                throw new Error(`Demasiados intentos. Espere ${segundosRestantes} segundos.`);
+            }
+            return true;
+        }
+        
+        function registrarIntentoFallido() {
+            intentosFallidos++;
+            if (intentosFallidos >= 5) {
+                tiempoBloqueo = Date.now() + 300000; // 5 minutos bloqueado
+                intentosFallidos = 0;
+                document.getElementById('btnLogin').disabled = true;
+                setTimeout(() => {
+                    document.getElementById('btnLogin').disabled = false;
+                    tiempoBloqueo = null;
+                }, 300000);
+                throw new Error('Demasiados intentos fallidos. Espere 5 minutos.');
+            }
+        }
+        
+        function resetearIntentos() {
+            intentosFallidos = 0;
+        }
+        
+        // ==================================================
         // MANEJAR LOGIN
         // ==================================================
         const loginForm = document.getElementById('loginForm');
@@ -142,6 +175,16 @@
                 return;
             }
             
+            // Rate limiting
+            try {
+                verificarRateLimiting();
+            } catch (error) {
+                errorMsg.textContent = error.message;
+                errorMsg.classList.add('show');
+                setTimeout(() => errorMsg.classList.remove('show'), 3000);
+                return;
+            }
+            
             btnLogin.disabled = true;
             btnLogin.innerHTML = 'Verificando <span class="loading"></span>';
             
@@ -155,6 +198,7 @@
                 
                 if (usuario && hashIngresado === usuario.hash) {
                     // Login exitoso
+                    resetearIntentos();
                     registrarSesion(email, usuario.rol);
                     btnLogin.innerHTML = '✅ Ingresando...';
                     setTimeout(() => {
@@ -162,6 +206,7 @@
                     }, 500);
                 } else {
                     // Login fallido
+                    registrarIntentoFallido();
                     btnLogin.disabled = false;
                     btnLogin.innerHTML = 'Ingresar al Panel';
                     errorMsg.textContent = '❌ Email o contraseña incorrectos';
