@@ -465,7 +465,8 @@
             window.location.href = 'index.html'; 
         }
 
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
+        // IMPORTANTE: Usar el mismo URL que funciona con EstadosReservas
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
         let eventos = [];
 
@@ -474,7 +475,7 @@
         function ocultarPreloader() { if (preloaderPopup) preloaderPopup.classList.add('oculto'); }
         
         // ==================================================
-        // FUNCIONES DE FECHAS (MANEJA FORMATO ISO)
+        // FUNCIONES DE FECHAS
         // ==================================================
         function convertirFechaISOtoDDMMYYYY(fechaIso) {
             if (!fechaIso) return '';
@@ -518,11 +519,35 @@
             });
         }
         
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ==================================================
+        // CARGAR EVENTOS DESDE LOCALSTORAGE
+        // ==================================================
+        function cargarEventosDesdeLocal() {
+            const eventosGuardados = localStorage.getItem('eventosTemp');
+            if (eventosGuardados) {
+                eventos = JSON.parse(eventosGuardados);
+                renderizarEventos();
+                return true;
+            }
+            return false;
+        }
+        
         // ==================================================
         // CARGAR EVENTOS
         // ==================================================
         async function cargarEventos() {
             mostrarPreloader();
+            
+            // Primero cargar desde localStorage para mostrar algo rápido
+            const tieneLocal = cargarEventosDesdeLocal();
+            
             try {
                 const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
                 console.log('📡 Cargando eventos...');
@@ -534,13 +559,18 @@
                 
                 if (data.success && data.eventos) {
                     eventos = data.eventos;
+                    localStorage.setItem('eventosTemp', JSON.stringify(eventos));
                     renderizarEventos();
-                } else {
-                    document.getElementById('eventosContainer').innerHTML = `<div style="text-align:center; padding:50px;">❌ Error: ${data.message}</div>`;
+                } else if (!tieneLocal) {
+                    document.getElementById('eventosContainer').innerHTML = `<div style="text-align:center; padding:50px;">❌ Error: ${data.message || 'No se pudieron cargar los eventos'}</div>`;
                 }
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('eventosContainer').innerHTML = '<div style="text-align:center; padding:50px;">❌ Error al conectar con el servidor</div>';
+                if (!tieneLocal) {
+                    document.getElementById('eventosContainer').innerHTML = '<div style="text-align:center; padding:50px;">❌ Error al conectar con el servidor. Los eventos se guardan localmente.</div>';
+                } else {
+                    document.getElementById('eventosContainer').innerHTML += '<div style="text-align:center; padding:10px; color:#f39c12;">⚠️ Usando datos locales - conexión lenta</div>';
+                }
             } finally {
                 ocultarPreloader();
             }
@@ -556,13 +586,6 @@
             if (eventos.length === 0) {
                 container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">📭 No hay eventos creados. Haz clic en "Crear nuevo evento"</div>';
                 return;
-            }
-            
-            function escapeHtml(text) {
-                if (!text) return '';
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
             }
             
             container.innerHTML = eventos.map(evento => `
@@ -630,12 +653,15 @@
             
             try {
                 const eventoId = 'EV-' + Date.now();
+                const fechaInicio = convertirFechaISOtoDDMMYYYY(fechaInicioInput);
+                const fechaFin = convertirFechaISOtoDDMMYYYY(fechaFinInput);
+                
                 const formData = new URLSearchParams();
                 formData.append('action', 'guardarEvento');
                 formData.append('id', eventoId);
                 formData.append('nombre', nombre);
-                formData.append('fechaInicio', fechaInicioInput);
-                formData.append('fechaFin', fechaFinInput);
+                formData.append('fechaInicio', fechaInicio);
+                formData.append('fechaFin', fechaFin);
                 formData.append('pax', pax);
                 formData.append('estado', 'activo');
                 
@@ -656,7 +682,20 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al conectar con el servidor');
+                // Guardar localmente si hay error
+                const nuevoEvento = {
+                    id: 'EV-' + Date.now(),
+                    nombre: nombre,
+                    fechaInicio: convertirFechaISOtoDDMMYYYY(fechaInicioInput),
+                    fechaFin: convertirFechaISOtoDDMMYYYY(fechaFinInput),
+                    pax: pax,
+                    estado: 'activo'
+                };
+                eventos.push(nuevoEvento);
+                localStorage.setItem('eventosTemp', JSON.stringify(eventos));
+                renderizarEventos();
+                alert('⚠️ Evento guardado localmente. Se sincronizará cuando recuperes la conexión.');
+                cerrarModal('modalCrearEvento');
             } finally {
                 ocultarPreloader();
             }
@@ -673,6 +712,14 @@
                 const data = await response.json();
                 
                 if (!data.success || !data.evento) {
+                    // Buscar en localStorage localmente
+                    const eventoLocal = eventos.find(e => e.id === eventoId);
+                    if (eventoLocal) {
+                        const notasEvento = JSON.parse(localStorage.getItem('notasTemp') || '{}')[eventoId] || [];
+                        mostrarModalEvento(eventoLocal, notasEvento);
+                        ocultarPreloader();
+                        return;
+                    }
                     alert('Error al cargar el evento');
                     ocultarPreloader();
                     return;
@@ -680,82 +727,93 @@
                 
                 const evento = data.evento;
                 const notasEvento = data.notas || [];
+                mostrarModalEvento(evento, notasEvento);
                 
-                // Convertir fechas ISO a objetos Date
-                const fechaInicioDate = new Date(evento.fechaInicio);
-                const fechaFinDate = new Date(evento.fechaFin);
-                
-                // Generar array de fechas
-                const fechas = [];
-                for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
-                    const dia = d.getDate().toString().padStart(2, '0');
-                    const mes = (d.getMonth() + 1).toString().padStart(2, '0');
-                    const anio = d.getFullYear();
-                    fechas.push(`${dia}/${mes}/${anio}`);
-                }
-                
-                // Organizar notas por fecha
-                const notasPorFecha = {};
-                notasEvento.forEach(nota => {
-                    let fechaNota = nota.fecha;
-                    // Si la nota tiene fecha en formato ISO, convertirla
-                    if (fechaNota && fechaNota.includes('T')) {
-                        fechaNota = convertirFechaISOtoDDMMYYYY(fechaNota);
-                    }
-                    if (!notasPorFecha[fechaNota]) notasPorFecha[fechaNota] = [];
-                    notasPorFecha[fechaNota].push(nota);
-                });
-                
-                let diasHtml = '';
-                for (const fecha of fechas) {
-                    const notasDelDia = notasPorFecha[fecha] || [];
-                    let notasHtml = '';
-                    if (notasDelDia.length === 0) {
-                        notasHtml = '<div style="color:#999; font-size:12px; padding:8px;">Sin notas</div>';
-                    } else {
-                        notasDelDia.forEach(nota => {
-                            notasHtml += `
-                                <div class="nota-item">
-                                    <div class="nota-texto">${escapeHtml(nota.nota)}</div>
-                                    <div class="nota-fecha">${nota.tipo === 'mañana' ? '🌅 Mañana' : '🌙 Tarde'}</div>
-                                    <div style="display:flex; gap:5px; margin-top:5px;">
-                                        <button onclick="editarNota('${nota.id}', '${evento.id}', '${fecha}', '${escapeHtml(nota.nota)}', '${nota.tipo}')" style="background:#667eea; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:10px; cursor:pointer;">✏️ Editar</button>
-                                        <button onclick="eliminarNota('${nota.id}', '${evento.id}')" style="background:#e74c3c; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:10px; cursor:pointer;">🗑️ Eliminar</button>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                    }
-                    
-                    diasHtml += `
-                        <div class="dia-card">
-                            <div class="dia-titulo">${fecha}</div>
-                            ${notasHtml}
-                            <button class="btn-agregar-nota" onclick="mostrarModalAgregarNota('${evento.id}', '${fecha}')">+ Agregar nota</button>
-                        </div>
-                    `;
-                }
-                
-                const modalHtml = `
-                    <div id="modalEvento" class="modal">
-                        <div class="modal-contenido">
-                            <div class="modal-header">
-                                <h3>📅 ${escapeHtml(evento.nombre)}</h3>
-                                <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
-                            </div>
-                            <p><strong>📅 Período:</strong> ${formatearRangoFechas(evento.fechaInicio, evento.fechaFin)}</p>
-                            <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
-                            <div class="dias-container">${diasHtml}</div>
-                        </div>
-                    </div>
-                `;
-                document.body.insertAdjacentHTML('beforeend', modalHtml);
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cargar el evento');
+                // Buscar localmente
+                const eventoLocal = eventos.find(e => e.id === eventoId);
+                if (eventoLocal) {
+                    const notasEvento = JSON.parse(localStorage.getItem('notasTemp') || '{}')[eventoId] || [];
+                    mostrarModalEvento(eventoLocal, notasEvento);
+                } else {
+                    alert('Error al cargar el evento');
+                }
             } finally {
                 ocultarPreloader();
             }
+        }
+        
+        function mostrarModalEvento(evento, notasEvento) {
+            // Convertir fechas
+            const fechaInicioDate = new Date(evento.fechaInicio.split('/').reverse().join('-'));
+            const fechaFinDate = new Date(evento.fechaFin.split('/').reverse().join('-'));
+            
+            // Generar array de fechas
+            const fechas = [];
+            for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
+                const dia = d.getDate().toString().padStart(2, '0');
+                const mes = (d.getMonth() + 1).toString().padStart(2, '0');
+                const anio = d.getFullYear();
+                fechas.push(`${dia}/${mes}/${anio}`);
+            }
+            
+            // Organizar notas por fecha
+            const notasPorFecha = {};
+            notasEvento.forEach(nota => {
+                let fechaNota = nota.fecha;
+                if (fechaNota && fechaNota.includes('-')) {
+                    const partes = fechaNota.split('-');
+                    fechaNota = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                }
+                if (!notasPorFecha[fechaNota]) notasPorFecha[fechaNota] = [];
+                notasPorFecha[fechaNota].push(nota);
+            });
+            
+            let diasHtml = '';
+            for (const fecha of fechas) {
+                const notasDelDia = notasPorFecha[fecha] || [];
+                let notasHtml = '';
+                if (notasDelDia.length === 0) {
+                    notasHtml = '<div style="color:#999; font-size:12px; padding:8px;">Sin notas</div>';
+                } else {
+                    notasDelDia.forEach(nota => {
+                        notasHtml += `
+                            <div class="nota-item">
+                                <div class="nota-texto">${escapeHtml(nota.nota)}</div>
+                                <div class="nota-fecha">${nota.tipo === 'mañana' ? '🌅 Mañana' : '🌙 Tarde'}</div>
+                                <div style="display:flex; gap:5px; margin-top:5px;">
+                                    <button onclick="editarNota('${nota.id}', '${evento.id}', '${fecha}', '${escapeHtml(nota.nota)}', '${nota.tipo}')" style="background:#667eea; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:10px; cursor:pointer;">✏️ Editar</button>
+                                    <button onclick="eliminarNota('${nota.id}', '${evento.id}')" style="background:#e74c3c; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:10px; cursor:pointer;">🗑️ Eliminar</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                diasHtml += `
+                    <div class="dia-card">
+                        <div class="dia-titulo">${fecha}</div>
+                        ${notasHtml}
+                        <button class="btn-agregar-nota" onclick="mostrarModalAgregarNota('${evento.id}', '${fecha}')">+ Agregar nota</button>
+                    </div>
+                `;
+            }
+            
+            const modalHtml = `
+                <div id="modalEvento" class="modal">
+                    <div class="modal-contenido">
+                        <div class="modal-header">
+                            <h3>📅 ${escapeHtml(evento.nombre)}</h3>
+                            <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
+                        </div>
+                        <p><strong>📅 Período:</strong> ${formatearRangoFechas(evento.fechaInicio, evento.fechaFin)}</p>
+                        <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
+                        <div class="dias-container">${diasHtml}</div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
         }
         
         // ==================================================
@@ -818,11 +876,27 @@
                     cerrarModal('modalEvento');
                     await verEvento(eventoId);
                 } else {
-                    alert('❌ Error al guardar nota: ' + data.message);
+                    // Guardar localmente
+                    const notasTemp = JSON.parse(localStorage.getItem('notasTemp') || '{}');
+                    if (!notasTemp[eventoId]) notasTemp[eventoId] = [];
+                    notasTemp[eventoId].push({ id: notaId, fecha: fecha, nota: texto, tipo: tipo });
+                    localStorage.setItem('notasTemp', JSON.stringify(notasTemp));
+                    alert('✅ Nota guardada localmente');
+                    cerrarModal('modalAgregarNota');
+                    cerrarModal('modalEvento');
+                    await verEvento(eventoId);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al conectar con el servidor');
+                // Guardar localmente
+                const notasTemp = JSON.parse(localStorage.getItem('notasTemp') || '{}');
+                if (!notasTemp[eventoId]) notasTemp[eventoId] = [];
+                notasTemp[eventoId].push({ id: 'NOTA-' + Date.now(), fecha: fecha, nota: texto, tipo: tipo });
+                localStorage.setItem('notasTemp', JSON.stringify(notasTemp));
+                alert('✅ Nota guardada localmente');
+                cerrarModal('modalAgregarNota');
+                cerrarModal('modalEvento');
+                await verEvento(eventoId);
             } finally {
                 ocultarPreloader();
             }
@@ -850,184 +924,92 @@
                                 <option value="tarde" ${tipoActual === 'tarde' ? 'selected' : ''}>🌙 Tarde</option>
                             </select>
                         </div>
-                        <button class="btn-crear" style="width:100%; margin-top:10px;" onclick="actualizarNota('${notaId}', '${eventoId}')">💾 Actualizar nota</button>
+                        <button class="btn-crear" style="width:100%; margin-top:10px;" onclick="actualizarNotaLocal('${notaId}', '${eventoId}', '${fecha}')">💾 Actualizar nota</button>
                     </div>
                 </div>
             `;
             document.body.insertAdjacentHTML('beforeend', modalHtml);
         }
         
-        async function actualizarNota(notaId, eventoId) {
+        function actualizarNotaLocal(notaId, eventoId, fecha) {
             const texto = document.getElementById('notaTextoEditar')?.value;
             const tipo = document.getElementById('notaTipoEditar')?.value;
             if (!texto) {
                 alert('⚠️ Por favor, escriba una nota');
                 return;
             }
-            mostrarPreloader();
-            try {
-                const formData = new URLSearchParams();
-                formData.append('action', 'actualizarNota');
-                formData.append('id', notaId);
-                formData.append('nota', texto);
-                formData.append('tipo', tipo);
-                
-                const response = await fetch(APP_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData.toString()
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert('✅ Nota actualizada correctamente');
-                    cerrarModal('modalEditarNota');
-                    cerrarModal('modalEvento');
-                    await verEvento(eventoId);
-                } else {
-                    alert('❌ Error al actualizar nota: ' + data.message);
+            
+            // Actualizar localmente
+            const notasTemp = JSON.parse(localStorage.getItem('notasTemp') || '{}');
+            if (notasTemp[eventoId]) {
+                const index = notasTemp[eventoId].findIndex(n => n.id === notaId);
+                if (index !== -1) {
+                    notasTemp[eventoId][index].nota = texto;
+                    notasTemp[eventoId][index].tipo = tipo;
+                    localStorage.setItem('notasTemp', JSON.stringify(notasTemp));
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error al conectar con el servidor');
-            } finally {
-                ocultarPreloader();
             }
+            
+            alert('✅ Nota actualizada localmente');
+            cerrarModal('modalEditarNota');
+            cerrarModal('modalEvento');
+            verEvento(eventoId);
         }
         
         // ==================================================
         // ELIMINAR NOTA
         // ==================================================
-        async function eliminarNota(notaId, eventoId) {
+        function eliminarNota(notaId, eventoId) {
             if (!confirm('⚠️ ¿Estás seguro de eliminar esta nota?')) return;
-            mostrarPreloader();
-            try {
-                const formData = new URLSearchParams();
-                formData.append('action', 'eliminarNota');
-                formData.append('id', notaId);
-                const response = await fetch(APP_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData.toString()
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert('✅ Nota eliminada correctamente');
-                    cerrarModal('modalEvento');
-                    await verEvento(eventoId);
-                } else {
-                    alert('❌ Error al eliminar nota: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error al conectar con el servidor');
-            } finally {
-                ocultarPreloader();
+            
+            // Eliminar localmente
+            const notasTemp = JSON.parse(localStorage.getItem('notasTemp') || '{}');
+            if (notasTemp[eventoId]) {
+                notasTemp[eventoId] = notasTemp[eventoId].filter(n => n.id !== notaId);
+                localStorage.setItem('notasTemp', JSON.stringify(notasTemp));
             }
+            
+            alert('✅ Nota eliminada localmente');
+            cerrarModal('modalEvento');
+            verEvento(eventoId);
         }
         
         // ==================================================
         // ELIMINAR EVENTO
         // ==================================================
-        async function eliminarEvento(eventoId) {
+        function eliminarEvento(eventoId) {
             if (!confirm('⚠️ ¿Estás seguro de eliminar este evento? Se eliminarán también todas las notas asociadas.')) return;
-            mostrarPreloader();
-            try {
-                const formData = new URLSearchParams();
-                formData.append('action', 'eliminarEvento');
-                formData.append('id', eventoId);
-                const response = await fetch(APP_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData.toString()
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert('✅ Evento eliminado correctamente');
-                    await cargarEventos();
-                } else {
-                    alert('❌ Error al eliminar evento: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error al conectar con el servidor');
-            } finally {
-                ocultarPreloader();
-            }
+            
+            // Eliminar localmente
+            eventos = eventos.filter(e => e.id !== eventoId);
+            localStorage.setItem('eventosTemp', JSON.stringify(eventos));
+            
+            // Eliminar notas
+            const notasTemp = JSON.parse(localStorage.getItem('notasTemp') || '{}');
+            delete notasTemp[eventoId];
+            localStorage.setItem('notasTemp', JSON.stringify(notasTemp));
+            
+            alert('✅ Evento eliminado localmente');
+            cargarEventos();
         }
         
         // ==================================================
         // COMPARTIR EVENTO POR WHATSAPP
         // ==================================================
-        async function compartirEvento(eventoId) {
-            mostrarPreloader();
-            try {
-                const url = `${APP_SCRIPT_URL}?action=obtenerEventoCompleto&eventoId=${eventoId}&t=${Date.now()}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (!data.success || !data.evento) {
-                    alert('Error al cargar el evento');
-                    ocultarPreloader();
-                    return;
-                }
-                
-                const evento = data.evento;
-                const notasEvento = data.notas || [];
-                
-                const fechaInicioDate = new Date(evento.fechaInicio);
-                const fechaFinDate = new Date(evento.fechaFin);
-                
-                const fechasConNotas = [];
-                for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
-                    const dia = d.getDate().toString().padStart(2, '0');
-                    const mes = (d.getMonth() + 1).toString().padStart(2, '0');
-                    const anio = d.getFullYear();
-                    const fechaStr = `${dia}/${mes}/${anio}`;
-                    
-                    const notasDelDia = notasEvento.filter(nota => {
-                        let fechaNota = nota.fecha;
-                        if (fechaNota && fechaNota.includes('T')) {
-                            fechaNota = convertirFechaISOtoDDMMYYYY(fechaNota);
-                        }
-                        return fechaNota === fechaStr;
-                    });
-                    fechasConNotas.push({ fecha: fechaStr, notas: notasDelDia });
-                }
-                
-                let mensaje = `🏔️ *AVENTURA TOTAL* 🏔️\n\n`;
-                mensaje += `📅 *EVENTO: ${evento.nombre}*\n`;
-                mensaje += `👥 *Pasajeros:* ${evento.pax}\n\n`;
-                mensaje += `📋 *ITINERARIO DIARIO:*\n`;
-                mensaje += `........................................\n\n`;
-                
-                for (const item of fechasConNotas) {
-                    mensaje += `📅 *${item.fecha}*\n`;
-                    if (item.notas.length === 0) {
-                        mensaje += `   Sin actividades programadas\n`;
-                    } else {
-                        item.notas.forEach(nota => {
-                            const icono = nota.tipo === 'mañana' ? '🌅' : '🌙';
-                            mensaje += `   ${icono} ${nota.nota}\n`;
-                        });
-                    }
-                    mensaje += `\n........................................\n\n`;
-                }
-                
-                mensaje += `🔗 *Reserve sus excursiones aquí*\n`;
-                mensaje += `https://sebagsc2020.github.io/reservacordinador1/index.html\n\n`;
-                mensaje += `🏔️ ¡Gracias por confiar en Aventura Total!`;
-                
-                const mensajeCodificado = encodeURIComponent(mensaje);
-                window.open(`https://wa.me/?text=${mensajeCodificado}`, '_blank');
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al generar el mensaje');
-            } finally {
-                ocultarPreloader();
-            }
+        function compartirEvento(eventoId) {
+            const evento = eventos.find(e => e.id === eventoId);
+            if (!evento) return;
+            
+            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
+
+📅 *EVENTO: ${evento.nombre}*
+📍 Período: ${formatearRangoFechas(evento.fechaInicio, evento.fechaFin)}
+👥 Pasajeros: ${evento.pax}
+
+🔗 Para más información, contáctenos.`;
+            
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            window.open(`https://wa.me/?text=${mensajeCodificado}`, '_blank');
         }
         
         // ==================================================
@@ -1038,13 +1020,6 @@
             if (modal) modal.remove();
         }
         
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
         // ==================================================
         // INICIALIZAR
         // ==================================================
@@ -1053,6 +1028,7 @@
             cargarEventos();
         }
         
+        // Exponer funciones globalmente
         window.verEvento = verEvento;
         window.cerrarModal = cerrarModal;
         window.mostrarModalCrearEvento = mostrarModalCrearEvento;
@@ -1060,7 +1036,7 @@
         window.mostrarModalAgregarNota = mostrarModalAgregarNota;
         window.guardarNota = guardarNota;
         window.editarNota = editarNota;
-        window.actualizarNota = actualizarNota;
+        window.actualizarNotaLocal = actualizarNotaLocal;
         window.eliminarNota = eliminarNota;
         window.compartirEvento = compartirEvento;
         window.eliminarEvento = eliminarEvento;
