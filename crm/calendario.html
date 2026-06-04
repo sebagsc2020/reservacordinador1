@@ -480,7 +480,6 @@
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuMTCSXLJHflUbUyWE9g5vYO-jgAZc7UGupEL3GM4ahoNw7AOjUyiYnE7uSc031ai7qg/exec';
         
         let eventos = [];
-        let notas = {};
 
         // Preloader
         const preloaderPopup = document.getElementById('preloaderPopup');
@@ -528,16 +527,6 @@
             const partes = fechaStr.split('-');
             if (partes.length === 3) {
                 return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
-            return fechaStr;
-        }
-        
-        function formatFechaParaComparar(fechaStr) {
-            if (!fechaStr) return '';
-            if (fechaStr.includes('-') && fechaStr.length === 10) return fechaStr;
-            const partes = fechaStr.split('/');
-            if (partes.length === 3) {
-                return `${partes[2]}-${partes[1]}-${partes[0]}`;
             }
             return fechaStr;
         }
@@ -711,7 +700,8 @@
                 const evento = data.evento;
                 const notasEvento = data.notas || [];
                 
-                console.log('📝 Notas recibidas:', notasEvento);
+                console.log('📝 NOTAS RECIBIDAS:', notasEvento);
+                console.log('📅 FECHAS DEL EVENTO: inicio=' + evento.fechaInicio + ', fin=' + evento.fechaFin);
                 
                 // Generar array de fechas entre inicio y fin
                 function obtenerFechasEntre(fechaInicio, fechaFin) {
@@ -719,27 +709,43 @@
                     const inicio = new Date(fechaInicio);
                     const fin = new Date(fechaFin);
                     
+                    console.log('📅 Generando fechas desde:', inicio, 'hasta:', fin);
+                    
                     for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
                         const año = d.getFullYear();
                         const mes = String(d.getMonth() + 1).padStart(2, '0');
                         const dia = String(d.getDate()).padStart(2, '0');
-                        fechas.push(`${año}-${mes}-${dia}`);
+                        const fechaStr = `${año}-${mes}-${dia}`;
+                        fechas.push(fechaStr);
+                        console.log('📅 Fecha generada:', fechaStr);
                     }
                     return fechas;
                 }
                 
                 const fechas = obtenerFechasEntre(evento.fechaInicio, evento.fechaFin);
-                console.log('📅 Fechas del evento:', fechas);
+                console.log('📋 LISTA DE FECHAS DEL EVENTO:', fechas);
+                
+                // Crear un mapa de notas por fecha para fácil acceso
+                const notasPorFecha = {};
+                notasEvento.forEach(nota => {
+                    let fechaNota = nota.fecha;
+                    // Asegurar formato YYYY-MM-DD
+                    if (fechaNota && fechaNota.includes('/')) {
+                        const partes = fechaNota.split('/');
+                        fechaNota = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                    }
+                    if (!notasPorFecha[fechaNota]) {
+                        notasPorFecha[fechaNota] = [];
+                    }
+                    notasPorFecha[fechaNota].push(nota);
+                });
+                
+                console.log('📊 NOTAS POR FECHA:', notasPorFecha);
                 
                 let diasHtml = '';
                 fechas.forEach(fecha => {
-                    // Buscar notas que coincidan con esta fecha
-                    const notasDelDia = notasEvento.filter(n => {
-                        const notaFecha = formatFechaParaComparar(n.fecha);
-                        return notaFecha === fecha;
-                    });
-                    
-                    console.log(`Notas para ${fecha}: ${notasDelDia.length}`);
+                    const notasDelDia = notasPorFecha[fecha] || [];
+                    console.log(`🔍 Fecha: ${fecha}, Notas encontradas: ${notasDelDia.length}`);
                     
                     let notasHtml = '';
                     if (notasDelDia.length === 0) {
