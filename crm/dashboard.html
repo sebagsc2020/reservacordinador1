@@ -1,63 +1,802 @@
-// sw.js - Corregido para NO interceptar peticiones a Google
-const CACHE_NAME = 'avt-crm-v1';
-const urlsToCache = [
-    '/',
-    '/dashboard.html',
-    '/reservas.html',
-    '/clientes.html',
-    '/seguimiento.html',
-    '/emails.html',
-    '/calendario.html',
-    '/clima.html',
-    '/manifest.json'
-];
-
-self.addEventListener('install', event => {
-    console.log('✅ Service Worker instalado');
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(urlsToCache))
-            .catch(err => console.log('Error en caché:', err))
-    );
-    self.skipWaiting();
-});
-
-self.addEventListener('activate', event => {
-    console.log('✅ Service Worker activado');
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.filter(name => name !== CACHE_NAME)
-                    .map(name => caches.delete(name))
-            );
-        })
-    );
-    self.clients.claim();
-});
-
-// NO interceptar peticiones a Google Sheets (CRÍTICO para que carguen los datos)
-self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Dashboard - CRM Aventura Total</title>
     
-    // Dejar pasar TODAS las peticiones a Google sin cachear
-    if (url.hostname.includes('google.com') || 
-        url.hostname.includes('gstatic.com') ||
-        url.hostname.includes('script.google.com')) {
-        return; // El navegador maneja directamente
-    }
+    <!-- ================================================== -->
+    <!-- PWA CONFIGURACIÓN                                      -->
+    <!-- ================================================== -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AVT CRM">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="application-name" content="Aventura Total CRM">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+    <meta name="msapplication-TileImage" content="icons/icon-144.png">
     
-    // Solo cachear recursos locales
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                if (response) return response;
-                return fetch(event.request);
-            })
-            .catch(() => {
-                if (event.request.mode === 'navigate') {
-                    return caches.match('/dashboard.html');
+    <!-- Iconos para diferentes plataformas -->
+    <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="icons/icon-76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="icons/icon-114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+    
+    <!-- Chart.js CDN para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
+        
+        /* Modo PWA (sin barra de navegación) */
+        .pwa-mode {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
+        .menu-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 50px;
+            height: 50px;
+            background: #667eea;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .menu-btn:hover {
+            background: #5a6fd6;
+            transform: scale(1.05);
+        }
+        
+        .menu-btn span {
+            font-size: 24px;
+            color: white;
+        }
+        
+        /* ========== SIDEBAR ========== */
+        .sidebar { 
+            width: 200px; 
+            background: #1a1a2e; 
+            color: white; 
+            padding: 20px 0; 
+            position: fixed; 
+            height: 100vh; 
+            overflow-y: auto; 
+            z-index: 1001;
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        .sidebar-logo { 
+            text-align: center; 
+            padding: 0 12px 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            margin-bottom: 15px; 
+        }
+        .sidebar-logo .logo-icon { font-size: 32px; } 
+        .sidebar-logo h2 { font-size: 14px; margin-top: 5px; } 
+        .sidebar-logo h2 span { color: #667eea; }
+        
+        .nav-menu { list-style: none; padding: 0 10px; } 
+        .nav-menu li { margin-bottom: 3px; }
+        .nav-menu a { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            padding: 10px 12px; 
+            color: rgba(255,255,255,0.7); 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
+        .nav-menu a.active { background: #667eea; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        
+        .sidebar-footer { 
+            position: absolute; 
+            bottom: 15px; 
+            left: 10px; 
+            right: 10px; 
+        }
+        .btn-logout-sidebar { 
+            width: 100%; 
+            padding: 10px; 
+            background: rgba(231,76,60,0.2); 
+            color: #e74c3c; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 12px; 
+            border: none; 
+            transition: all 0.2s;
+        }
+        .btn-logout-sidebar:hover {
+            background: rgba(231,76,60,0.4);
+        }
+        
+        /* ========== CONTENIDO PRINCIPAL ========== */
+        .main-content { 
+            margin-left: 0;
+            flex: 1; 
+            padding: 20px; 
+            min-width: 0;
+            transition: margin-left 0.3s ease;
+        }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
+        .header h1 { font-size: 22px; color: #1a1a2e; }
+        .user-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            background: white; 
+            padding: 6px 15px; 
+            border-radius: 40px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+            font-size: 13px; 
+        }
+        .user-avatar { 
+            width: 30px; 
+            height: 30px; 
+            background: #667eea; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-weight: 700; 
+            font-size: 12px;
+        }
+        
+        /* ========== TARJETAS DE MÉTRICAS ========== */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 25px; 
+        }
+        .stat-card { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 15px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            transition: transform 0.2s;
+        }
+        .stat-card:active { transform: scale(0.98); }
+        .stat-icon { font-size: 32px; }
+        .stat-info h3 { font-size: 11px; color: #666; margin-bottom: 5px; text-transform: uppercase; }
+        .stat-info .number { font-size: 28px; font-weight: 700; color: #1a1a2e; }
+        
+        /* ========== GRÁFICOS ========== */
+        .charts-row { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 25px; 
+        }
+        .chart-container { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+        }
+        .chart-container h3 { margin-bottom: 15px; color: #333; font-size: 14px; }
+        canvas { max-height: 250px; width: 100% !important; }
+        
+        /* ========== TABLA ÚLTIMAS RESERVAS ========== */
+        .recent-section { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+        }
+        .recent-section h3 { margin-bottom: 15px; color: #333; font-size: 15px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; padding: 10px 8px; background: #f8f9fa; font-size: 11px; color: #666; text-transform: uppercase; }
+        td { padding: 10px 8px; border-bottom: 1px solid #f0f0f0; }
+        .badge { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+        .badge-pendiente { background: #fff3cd; color: #856404; }
+        .badge-confirmado { background: #d4edda; color: #155724; }
+        .badge-pagado { background: #d1ecf1; color: #0c5460; }
+        
+        /* Desktop */
+        @media (min-width: 769px) {
+            .menu-btn {
+                display: none !important;
+            }
+            
+            .sidebar {
+                transform: translateX(0) !important;
+                width: 200px;
+            }
+            
+            .menu-overlay {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 200px;
+                padding: 20px;
+            }
+        }
+        
+        /* Móvil */
+        @media (max-width: 768px) { 
+            .menu-btn {
+                display: flex;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 60px 12px 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .charts-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .stat-icon {
+                font-size: 28px;
+            }
+            
+            .stat-info .number {
+                font-size: 22px;
+            }
+            
+            .stat-info h3 {
+                font-size: 10px;
+            }
+            
+            .chart-container {
+                padding: 15px;
+            }
+            
+            .recent-section {
+                padding: 15px;
+                overflow-x: auto;
+            }
+            
+            table {
+                font-size: 11px;
+                min-width: 500px;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .user-info {
+                padding: 4px 12px;
+                font-size: 11px;
+            }
+            
+            .user-avatar {
+                width: 26px;
+                height: 26px;
+                font-size: 11px;
+            }
+        }
+        
+        /* Scroll suave */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Botón menú hamburguesa (solo móvil) -->
+    <button class="menu-btn" id="menuBtn">
+        <span>☰</span>
+    </button>
+    
+    <!-- Overlay para cerrar menú -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2></div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html" class="active"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
+            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
+            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
+        </ul>
+        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button></div>
+    </nav>
+
+    <div class="main-content">
+        <div class="header">
+            <div><h1>📊 Dashboard</h1></div>
+            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+        </div>
+
+        <!-- Tarjetas de métricas -->
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-info"><h3>Total Reservas</h3><div class="number" id="totalReservas">0</div></div></div>
+            <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-info"><h3>Pendientes</h3><div class="number" id="totalPendientes">0</div></div></div>
+            <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-info"><h3>Confirmadas</h3><div class="number" id="totalConfirmadas">0</div></div></div>
+            <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-info"><h3>Pagadas</h3><div class="number" id="totalPagadas">0</div></div></div>
+            <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-info"><h3>Clientes</h3><div class="number" id="totalClientes">0</div></div></div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="charts-row">
+            <div class="chart-container">
+                <h3>📈 Reservas por mes (últimos 6 meses)</h3>
+                <canvas id="reservasPorMesChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>🥧 Distribución por estado</h3>
+                <canvas id="estadosChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Últimas reservas -->
+        <div class="recent-section">
+            <h3>📋 Últimas reservas</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Excursión</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaUltimasReservas">
+                        <tr><td colspan="5">Cargando...</td</tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================================================
+        // REGISTRAR SERVICE WORKER PARA PWA
+        // ==================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registrado con éxito:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Error al registrar Service Worker:', error);
+                    });
+            });
+        }
+        
+        // Detectar si la app está instalada y se abre desde la pantalla de inicio
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
+            document.body.classList.add('pwa-mode');
+        }
+        
+        // ==================================================
+        // MENÚ FLOTANTE
+        // ==================================================
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const menuOverlay = document.getElementById('menuOverlay');
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('open');
+            menuOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+        
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (menuBtn) {
+            menuBtn.addEventListener('click', toggleMenu);
+        }
+        
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', closeMenu);
+        }
+        
+        // Cerrar menú al hacer clic en un enlace
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeMenu();
                 }
-                return new Response('Offline', { status: 503 });
-            })
-    );
-});
+            });
+        });
+        
+        // ==================================================
+        // CONFIGURACIÓN
+        // ==================================================
+        if (sessionStorage.getItem('crm_logged') !== 'true') { 
+            window.location.href = 'index.html'; 
+        }
+        
+        function logout() { 
+            sessionStorage.clear(); 
+            window.location.href = 'index.html'; 
+        }
+
+        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
+        const SHEET_NAME = 'Hoja 1';
+        // USAR EL MISMO MÉTODO JSON QUE FUNCIONA EN RESERVAS
+        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
+        
+        // URL del Google Apps Script para obtener estados
+        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
+        
+        // ==================================================
+        // VARIABLES GLOBALES
+        // ==================================================
+        let reservasData = [];
+        let clientesSet = new Set();
+        let reservasPorMesChart = null;
+        let estadosChart = null;
+        let estadosGlobales = {};
+        
+        // ==================================================
+        // CARGAR ESTADOS DESDE LA NUBE
+        // ==================================================
+        async function cargarEstadosDesdeNube() {
+            try {
+                // Primero intentar desde localStorage
+                const localEstados = localStorage.getItem('estadosReservasCloud');
+                if (localEstados) {
+                    const parsed = JSON.parse(localEstados);
+                    if (Object.keys(parsed).length > 0) {
+                        estadosGlobales = parsed;
+                        console.log('📥 Estados cargados desde localStorage:', Object.keys(estadosGlobales).length);
+                    }
+                }
+                
+                // Luego sincronizar con la nube
+                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
+                const data = await response.json();
+                if (data.success && data.estados) {
+                    estadosGlobales = data.estados;
+                    localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
+                    console.log('📥 Estados sincronizados desde nube:', Object.keys(estadosGlobales).length);
+                }
+                return estadosGlobales;
+            } catch (error) {
+                console.error('Error al cargar desde nube:', error);
+                const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
+                estadosGlobales = estadosLocal;
+                return estadosLocal;
+            }
+        }
+        
+        // ==================================================
+        // CARGAR DATOS DESDE GOOGLE SHEETS (MÉTODO JSON - IGUAL QUE RESERVAS)
+        // ==================================================
+        async function cargarDatos() {
+            try {
+                console.log('📡 Cargando datos desde:', JSON_URL);
+                
+                // Primero cargar los estados desde la nube
+                await cargarEstadosDesdeNube();
+                
+                const response = await fetch(JSON_URL + '&t=' + Date.now());
+                const texto = await response.text();
+                
+                // Limpiar la respuesta de Google (mismo método que reservas.html)
+                let jsonStr = texto;
+                jsonStr = jsonStr.replace("/*O_o*/", "");
+                jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
+                jsonStr = jsonStr.slice(0, -2);
+                
+                const data = JSON.parse(jsonStr);
+                const rows = data.table.rows;
+                
+                if (!rows || rows.length === 0) {
+                    throw new Error('No se encontraron datos en la planilla');
+                }
+                
+                reservasData = [];
+                clientesSet.clear();
+                const nombresEditados = JSON.parse(localStorage.getItem('nombresEditados') || '{}');
+                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const c = rows[i].c;
+                    if (!c || c.length < 5) continue;
+                    
+                    const id = (c[1] && c[1].v) ? String(c[1].v) : '';
+                    if (!id || excluidos.includes(id)) continue;
+                    
+                    const nombre = (c[2] && c[2].v) ? String(c[2].v) : '';
+                    const apellido = (c[3] && c[3].v) ? String(c[3].v) : '';
+                    const email = (c[4] && c[4].v) ? String(c[4].v) : '';
+                    
+                    let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
+                    if (nombresEditados[id]) {
+                        nombreCompleto = nombresEditados[id];
+                    }
+                    
+                    // Parsear excursiones
+                    let excursionesLista = [];
+                    const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
+                    if (excursionesRaw) {
+                        if (excursionesRaw.includes('\n')) {
+                            excursionesLista = excursionesRaw.split('\n');
+                        } else if (excursionesRaw.includes(' | ')) {
+                            excursionesLista = excursionesRaw.split(' | ');
+                        } else {
+                            excursionesLista = [excursionesRaw];
+                        }
+                        excursionesLista = excursionesLista.map(function(e) { 
+                            return e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
+                        }).filter(function(e) { return e; });
+                    }
+                    
+                    const primeraExcursion = excursionesLista.length > 0 ? excursionesLista[0].substring(0, 40) : 'Sin excursión';
+                    
+                    // Parsear fecha
+                    let fecha = '';
+                    const timestamp = (c[0] && c[0].v) ? c[0].v : null;
+                    if (timestamp) {
+                        const fechaObj = new Date(timestamp);
+                        if (!isNaN(fechaObj.getTime())) {
+                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
+                        }
+                    }
+                    
+                    // Usar el estado desde la nube
+                    let estado = estadosGlobales[id];
+                    if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
+                        estado = 'confirmado';
+                    }
+                    
+                    const reserva = {
+                        id: id,
+                        fecha: fecha,
+                        nombre: nombreCompleto,
+                        email: email,
+                        excursion: primeraExcursion,
+                        estado: estado
+                    };
+                    reservasData.push(reserva);
+                    
+                    if (email) clientesSet.add(email);
+                }
+                
+                console.log(`📊 Cargadas ${reservasData.length} reservas`);
+                console.log(`👥 Clientes únicos: ${clientesSet.size}`);
+                console.log(`📊 Estados: Pendientes=${reservasData.filter(r => r.estado === 'pendiente').length}, Confirmadas=${reservasData.filter(r => r.estado === 'confirmado').length}, Pagadas=${reservasData.filter(r => r.estado === 'pagado').length}`);
+                
+                // Ordenar por ID (más reciente primero)
+                reservasData.sort((a, b) => {
+                    const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
+                    const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
+                    return numB - numA;
+                });
+                
+                actualizarDashboard();
+                
+            } catch (error) {
+                console.error('❌ Error cargando datos:', error);
+                document.getElementById('tablaUltimasReservas').innerHTML = `<tr><td colspan="5">❌ Error: ${error.message}</td></tr>`;
+            }
+        }
+        
+        // ==================================================
+        // ACTUALIZAR DASHBOARD
+        // ==================================================
+        function actualizarDashboard() {
+            const total = reservasData.length;
+            const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
+            const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
+            const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
+            const clientes = clientesSet.size;
+            
+            document.getElementById('totalReservas').innerText = total;
+            document.getElementById('totalPendientes').innerText = pendientes;
+            document.getElementById('totalConfirmadas').innerText = confirmadas;
+            document.getElementById('totalPagadas').innerText = pagadas;
+            document.getElementById('totalClientes').innerText = clientes;
+            
+            const meses = obtenerUltimos6Meses();
+            const reservasPorMesData = contarReservasPorMes(meses);
+            
+            if (reservasPorMesChart) reservasPorMesChart.destroy();
+            const ctxLineal = document.getElementById('reservasPorMesChart').getContext('2d');
+            reservasPorMesChart = new Chart(ctxLineal, {
+                type: 'line',
+                data: {
+                    labels: meses.map(m => m.nombre),
+                    datasets: [{
+                        label: 'Reservas',
+                        data: reservasPorMesData,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+            
+            if (estadosChart) estadosChart.destroy();
+            const ctxDona = document.getElementById('estadosChart').getContext('2d');
+            estadosChart = new Chart(ctxDona, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pendientes', 'Confirmadas', 'Pagadas'],
+                    datasets: [{
+                        data: [pendientes, confirmadas, pagadas],
+                        backgroundColor: ['#ffc107', '#27ae60', '#3498db'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+            
+            const ultimas = reservasData.slice(0, 5);
+            const tbody = document.getElementById('tablaUltimasReservas');
+            if (ultimas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No hay reservas</td></tr>';
+            } else {
+                tbody.innerHTML = ultimas.map(r => `
+                    <tr>
+                        <td><strong>${escapeHtml(r.id)}</strong></td>
+                        <td>${escapeHtml(r.nombre)}</td>
+                        <td>${escapeHtml(r.excursion)}</td>
+                        <td>${escapeHtml(r.fecha)}</td>
+                        <td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        function obtenerUltimos6Meses() {
+            const hoy = new Date();
+            const meses = [];
+            for (let i = 5; i >= 0; i--) {
+                const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+                const nombre = fecha.toLocaleString('es', { month: 'short' }).toUpperCase();
+                const año = fecha.getFullYear();
+                meses.push({ nombre: `${nombre} ${año}`, año, mes: fecha.getMonth(), fecha });
+            }
+            return meses;
+        }
+        
+        function contarReservasPorMes(meses) {
+            return meses.map(m => {
+                let count = 0;
+                for (const reserva of reservasData) {
+                    if (!reserva.fecha) continue;
+                    const partes = reserva.fecha.split('/');
+                    if (partes.length === 3) {
+                        const mes = parseInt(partes[1]) - 1;
+                        const año = parseInt(partes[2]);
+                        if (año === m.año && mes === m.mes) {
+                            count++;
+                        }
+                    }
+                }
+                return count;
+            });
+        }
+        
+        function escapeHtml(text) { 
+            if (!text) return ''; 
+            const div = document.createElement('div'); 
+            div.textContent = text; 
+            return div.innerHTML; 
+        }
+        
+        // Iniciar carga de datos
+        cargarDatos();
+        // Recargar cada 60 segundos
+        setInterval(cargarDatos, 60000);
+    </script>
+</body>
+</html>
