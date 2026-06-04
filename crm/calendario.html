@@ -531,7 +531,7 @@
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                console.log('📦 Respuesta:', data);
+                console.log('📦 Respuesta eventos:', data);
                 
                 if (data.success && data.eventos) {
                     eventos = data.eventos;
@@ -549,18 +549,54 @@
         }
         
         // ==================================================
+        // FUNCIÓN PARA FORMATEAR FECHAS (YYYY-MM-DD a DD/MM/YYYY)
+        // ==================================================
+        function formatFechaParaMostrar(fechaStr) {
+            if (!fechaStr) return '';
+            // Si ya viene en formato DD/MM/YYYY
+            if (fechaStr.includes('/')) return fechaStr;
+            // Si viene en formato YYYY-MM-DD
+            const partes = fechaStr.split('-');
+            if (partes.length === 3) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            return fechaStr;
+        }
+        
+        // ==================================================
+        // FUNCIÓN PARA FORMATEAR FECHA PARA COMPARAR (DD/MM/YYYY a YYYY-MM-DD)
+        // ==================================================
+        function formatFechaParaComparar(fechaStr) {
+            if (!fechaStr) return '';
+            // Si ya viene en formato YYYY-MM-DD
+            if (fechaStr.includes('-') && fechaStr.length === 10) return fechaStr;
+            // Si viene en formato DD/MM/YYYY
+            const partes = fechaStr.split('/');
+            if (partes.length === 3) {
+                return `${partes[2]}-${partes[1]}-${partes[0]}`;
+            }
+            return fechaStr;
+        }
+        
+        // ==================================================
         // CARGAR NOTAS DE UN EVENTO
         // ==================================================
         async function cargarNotas(eventoId) {
             try {
                 const url = `${APP_SCRIPT_URL}?action=obtenerNotas&eventoId=${eventoId}&t=${Date.now()}`;
+                console.log('🔍 Cargando notas para evento:', eventoId);
+                
                 const response = await fetch(url);
                 const data = await response.json();
                 
+                console.log('📦 Respuesta notas:', data);
+                
                 if (data.success && data.notas) {
                     notas[eventoId] = data.notas;
+                    console.log(`📝 Notas cargadas para ${eventoId}:`, data.notas.length);
+                    return data.notas;
                 }
-                return notas[eventoId] || [];
+                return [];
             } catch (error) {
                 console.error('Error al cargar notas:', error);
                 return [];
@@ -586,18 +622,11 @@
                 return div.innerHTML;
             }
             
-            function formatearFecha(fechaStr) {
-                if (!fechaStr) return '';
-                const partes = fechaStr.split('-');
-                if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
-                return fechaStr;
-            }
-            
             container.innerHTML = eventos.map(evento => `
                 <div class="evento-card">
                     <div class="evento-header">
                         <div class="evento-titulo">${escapeHtml(evento.nombre)}</div>
-                        <div class="evento-fechas">📅 ${formatearFecha(evento.fechaInicio)} - ${formatearFecha(evento.fechaFin)}</div>
+                        <div class="evento-fechas">📅 ${formatFechaParaMostrar(evento.fechaInicio)} - ${formatFechaParaMostrar(evento.fechaFin)}</div>
                         <div class="evento-pax">👥 ${evento.pax} pasajeros</div>
                     </div>
                     <div class="evento-acciones">
@@ -691,48 +720,56 @@
         }
         
         // ==================================================
-        // VER DETALLE DEL EVENTO
+        // VER DETALLE DEL EVENTO CON NOTAS
         // ==================================================
         async function verEvento(eventoId) {
             mostrarPreloader();
             
             try {
-                const url = `${APP_SCRIPT_URL}?action=obtenerEventoCompleto&eventoId=${eventoId}&t=${Date.now()}`;
-                const response = await fetch(url);
-                const data = await response.json();
+                // Primero obtener el evento
+                const urlEvento = `${APP_SCRIPT_URL}?action=obtenerEventoCompleto&eventoId=${eventoId}&t=${Date.now()}`;
+                const responseEvento = await fetch(urlEvento);
+                const dataEvento = await responseEvento.json();
                 
-                if (!data.success || !data.evento) {
+                if (!dataEvento.success || !dataEvento.evento) {
                     alert('Error al cargar el evento');
                     ocultarPreloader();
                     return;
                 }
                 
-                const evento = data.evento;
-                const notasEvento = data.notas || [];
+                const evento = dataEvento.evento;
+                const notasEvento = dataEvento.notas || [];
                 
-                function formatearFecha(fechaStr) {
-                    if (!fechaStr) return '';
-                    const partes = fechaStr.split('-');
-                    if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
-                    return fechaStr;
-                }
+                console.log('📝 Notas recibidas:', notasEvento);
                 
+                // Generar array de fechas entre inicio y fin
                 function obtenerFechasEntre(fechaInicio, fechaFin) {
                     const fechas = [];
                     const inicio = new Date(fechaInicio);
                     const fin = new Date(fechaFin);
                     
                     for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
-                        fechas.push(d.toISOString().split('T')[0]);
+                        const año = d.getFullYear();
+                        const mes = String(d.getMonth() + 1).padStart(2, '0');
+                        const dia = String(d.getDate()).padStart(2, '0');
+                        fechas.push(`${año}-${mes}-${dia}`);
                     }
                     return fechas;
                 }
                 
                 const fechas = obtenerFechasEntre(evento.fechaInicio, evento.fechaFin);
+                console.log('📅 Fechas del evento:', fechas);
                 
                 let diasHtml = '';
                 fechas.forEach(fecha => {
-                    const notasDelDia = notasEvento.filter(n => n.fecha === fecha);
+                    // Buscar notas que coincidan con esta fecha (comparar en formato YYYY-MM-DD)
+                    const notasDelDia = notasEvento.filter(n => {
+                        const notaFecha = formatFechaParaComparar(n.fecha);
+                        console.log(`Comparando: notaFecha=${notaFecha} vs fecha=${fecha}`);
+                        return notaFecha === fecha;
+                    });
+                    
+                    console.log(`Notas para ${fecha}:`, notasDelDia.length);
                     
                     let notasHtml = '';
                     if (notasDelDia.length === 0) {
@@ -748,9 +785,12 @@
                         });
                     }
                     
+                    // Formatear fecha para mostrar (YYYY-MM-DD a DD/MM/YYYY)
+                    const fechaMostrar = formatFechaParaMostrar(fecha);
+                    
                     diasHtml += `
                         <div class="dia-card">
-                            <div class="dia-titulo">${formatearFecha(fecha)}</div>
+                            <div class="dia-titulo">${fechaMostrar}</div>
                             ${notasHtml}
                             <button class="btn-agregar-nota" onclick="mostrarModalAgregarNota('${evento.id}', '${fecha}')">+ Agregar nota</button>
                         </div>
@@ -764,7 +804,7 @@
                                 <h3>📅 ${escapeHtml(evento.nombre)}</h3>
                                 <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
                             </div>
-                            <p><strong>📅 Período:</strong> ${formatearFecha(evento.fechaInicio)} - ${formatearFecha(evento.fechaFin)}</p>
+                            <p><strong>📅 Período:</strong> ${formatFechaParaMostrar(evento.fechaInicio)} - ${formatFechaParaMostrar(evento.fechaFin)}</p>
                             <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
                             <div class="dias-container">
                                 ${diasHtml}
@@ -786,7 +826,7 @@
         // AGREGAR NOTA
         // ==================================================
         function mostrarModalAgregarNota(eventoId, fecha) {
-            const fechaFormateada = fecha.split('-').reverse().join('/');
+            const fechaFormateada = formatFechaParaMostrar(fecha);
             const modalHtml = `
                 <div id="modalAgregarNota" class="modal">
                     <div class="modal-contenido">
@@ -829,9 +869,11 @@
                 formData.append('action', 'guardarNota');
                 formData.append('id', notaId);
                 formData.append('eventoId', eventoId);
-                formData.append('fecha', fecha);
+                formData.append('fecha', fecha); // Guardar en formato YYYY-MM-DD
                 formData.append('nota', texto);
                 formData.append('tipo', tipo);
+                
+                console.log('📝 Guardando nota:', { eventoId, fecha, texto, tipo });
                 
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
@@ -845,6 +887,7 @@
                     alert('✅ Nota guardada correctamente');
                     cerrarModal('modalAgregarNota');
                     cerrarModal('modalEvento');
+                    // Recargar el evento para mostrar la nueva nota
                     await verEvento(eventoId);
                 } else {
                     alert('❌ Error al guardar nota: ' + data.message);
@@ -899,17 +942,10 @@
             const evento = eventos.find(e => e.id === eventoId);
             if (!evento) return;
             
-            function formatearFecha(fechaStr) {
-                if (!fechaStr) return '';
-                const partes = fechaStr.split('-');
-                if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
-                return fechaStr;
-            }
-            
             const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
 
 📅 *EVENTO: ${evento.nombre}*
-📍 Período: ${formatearFecha(evento.fechaInicio)} - ${formatearFecha(evento.fechaFin)}
+📍 Período: ${formatFechaParaMostrar(evento.fechaInicio)} - ${formatFechaParaMostrar(evento.fechaFin)}
 👥 Pasajeros: ${evento.pax}
 
 🔗 Para más información, contáctenos.`;
