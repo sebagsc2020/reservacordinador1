@@ -233,28 +233,33 @@
         .card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .card-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #e8ecf1; padding-bottom: 10px; }
         
-        /* ===== GRÁFICO SVG ===== */
+        /* ===== GRÁFICO SVG ADAPTATIVO ===== */
         .chart-line-container { 
             position: relative; 
-            height: 240px; 
-            padding: 5px; 
+            width: 100%;
+            overflow-x: auto;
             background: #fafbfc; 
             border-radius: 12px; 
-            overflow-x: auto; 
+            padding: 10px 0;
         }
-        .chart-line-svg { width: 100%; height: 100%; min-width: 600px; }
-        .chart-line-path { fill: none; stroke: #667eea; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-        .chart-line-area { fill: url(#gradienteArea); opacity: 0.3; }
-        .chart-line-dot { fill: white; stroke: #667eea; stroke-width: 2.5; cursor: pointer; transition: all 0.2s; }
+        .chart-line-svg { 
+            display: block;
+            width: 100%;
+            height: auto;
+            min-height: 260px;
+        }
+        .chart-line-path { fill: none; stroke: #667eea; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .chart-line-area { opacity: 0.3; }
+        .chart-line-dot { fill: white; stroke: #667eea; stroke-width: 2; cursor: pointer; transition: all 0.2s; }
         .chart-line-dot:hover { r: 6px; }
         .chart-line-dot.caliente { stroke: #e74c3c; }
         .chart-line-dot.templado { stroke: #f39c12; }
         .chart-line-dot.frio { stroke: #667eea; }
         .chart-line-label { font-size: 9px; fill: #999; text-anchor: middle; font-weight: 600; }
-        .chart-line-value { font-size: 10px; fill: #333; text-anchor: middle; font-weight: 700; }
+        .chart-line-value { font-size: 9px; fill: #333; text-anchor: middle; font-weight: 700; }
         .chart-line-grid { stroke: #e8ecf1; stroke-width: 1; stroke-dasharray: 4; }
         .chart-line-rain-dot { fill: #3498db; opacity: 0.8; }
-        .chart-legend { display: flex; gap: 20px; justify-content: center; margin-top: 15px; }
+        .chart-legend { display: flex; gap: 20px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666; }
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
         .legend-dot.temp { background: #667eea; }
@@ -280,17 +285,6 @@
         .forecast-max { font-size: 15px; font-weight: 800; color: #e74c3c; }
         .forecast-min { font-size: 12px; color: #667eea; font-weight: 600; }
         .forecast-rain { font-size: 10px; color: #3498db; margin-top: 4px; }
-        
-        /* ===== TÍTULO SECCIÓN ===== */
-        .section-title {
-            font-size: 16px;
-            color: #1a1a2e;
-            margin-bottom: 15px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
         
         /* ===== RESPONSIVE ===== */
         @media (min-width: 769px) {
@@ -318,6 +312,8 @@
             .forecast-grid::-webkit-scrollbar { height: 3px; }
             .detail-card { padding: 12px; }
             .detail-value { font-size: 18px; }
+            .chart-line-container { overflow-x: auto; }
+            .chart-line-svg { min-width: 650px; }
         }
         
         @media (max-width: 480px) {
@@ -331,6 +327,7 @@
             .detail-card { padding: 10px; }
             .detail-icon { font-size: 24px; }
             .detail-value { font-size: 16px; }
+            .chart-line-svg { min-width: 580px; }
         }
         
         /* Scrollbar personalizado */
@@ -429,7 +426,7 @@
             <div class="card">
                 <div class="card-title"><span class="icon">📈</span> Temperatura 24 Horas</div>
                 <div class="chart-line-container">
-                    <svg class="chart-line-svg" id="graficoLinealSVG" viewBox="0 0 700 220" preserveAspectRatio="xMidYMid meet"></svg>
+                    <svg class="chart-line-svg" id="graficoLinealSVG" viewBox="0 0 700 240" preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
                 <div class="chart-legend">
                     <div class="legend-item"><div class="legend-dot temp"></div> Temperatura</div>
@@ -555,7 +552,7 @@
                 document.getElementById('amanecer').textContent = dt.amanecer;
                 document.getElementById('atardecer').textContent = dt.atardecer;
                 
-                // Gráfico SVG
+                // Gráfico SVG - Adaptativo
                 dibujarGraficoTemperatura(dt.hourly);
                 
                 // Pronóstico
@@ -603,14 +600,23 @@
             const svg = document.getElementById('graficoLinealSVG');
             svg.innerHTML = '';
             
-            const width = 700, height = 220;
-            const pad = { top: 30, right: 20, bottom: 40, left: 40 };
+            // Obtener dimensiones del contenedor
+            const container = svg.parentElement;
+            const containerWidth = container.clientWidth;
+            
+            // Usar un mínimo de ancho para móviles
+            const width = Math.max(containerWidth, 650);
+            const height = 240;
+            const pad = { top: 25, right: 30, bottom: 35, left: 45 };
             const cw = width - pad.left - pad.right;
             const ch = height - pad.top - pad.bottom;
             
+            // Actualizar viewBox del SVG
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            
             const temps = hourly.map(h => h.temp);
             const lluvias = hourly.map(h => h.lluvia);
-            const maxT = Math.max(...temps, 25);
+            const maxT = Math.max(...temps, 30);
             const minT = Math.min(...temps, 5);
             const rango = maxT - minT || 1;
             
@@ -629,7 +635,7 @@
             defs.appendChild(grad); 
             svg.insertBefore(defs, g);
             
-            // Grid
+            // Grid horizontal
             for (let i = 0; i <= 4; i++) {
                 const y = (ch / 4) * i;
                 const line = document.createElementNS(svgNS, 'line'); 
@@ -638,7 +644,7 @@
                 g.appendChild(line);
                 
                 const label = document.createElementNS(svgNS, 'text'); 
-                label.setAttribute('x', -8); label.setAttribute('y', y + 4); 
+                label.setAttribute('x', -5); label.setAttribute('y', y + 4); 
                 label.setAttribute('class', 'chart-line-label'); 
                 label.setAttribute('text-anchor', 'end'); 
                 label.textContent = Math.round(maxT - (rango / 4) * i) + '°'; 
@@ -647,9 +653,12 @@
             
             // Línea y área
             let pathD = '', areaD = '';
+            const puntos = [];
+            
             for (let i = 0; i < 24; i++) {
                 const x = (cw / 23) * i;
                 const y = ch - ((temps[i] - minT) / rango) * ch;
+                puntos.push({ x, y, temp: temps[i], lluvia: lluvias[i] });
                 if (i === 0) { 
                     pathD += `M${x},${y}`; 
                     areaD += `M${x},${y}`; 
@@ -663,6 +672,7 @@
             const area = document.createElementNS(svgNS, 'path'); 
             area.setAttribute('d', areaD); 
             area.setAttribute('class', 'chart-line-area'); 
+            area.setAttribute('fill', 'url(#gradienteArea)');
             g.appendChild(area);
             
             const path = document.createElementNS(svgNS, 'path'); 
@@ -671,37 +681,39 @@
             g.appendChild(path);
             
             // Puntos y etiquetas
-            for (let i = 0; i < 24; i++) {
-                const x = (cw / 23) * i;
-                const y = ch - ((temps[i] - minT) / rango) * ch;
+            for (let i = 0; i < puntos.length; i++) {
+                const { x, y, temp, lluvia } = puntos[i];
                 
+                // Mostrar puntos cada 2 horas
                 if (i % 2 === 0) {
                     const circle = document.createElementNS(svgNS, 'circle'); 
                     circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', '4');
                     let cls = 'frio'; 
-                    if (temps[i] > 30) cls = 'caliente'; 
-                    else if (temps[i] > 18) cls = 'templado';
+                    if (temp > 30) cls = 'caliente'; 
+                    else if (temp > 18) cls = 'templado';
                     circle.setAttribute('class', `chart-line-dot ${cls}`); 
                     g.appendChild(circle);
                     
                     const val = document.createElementNS(svgNS, 'text'); 
-                    val.setAttribute('x', x); val.setAttribute('y', y - 12); 
+                    val.setAttribute('x', x); val.setAttribute('y', y - 10); 
                     val.setAttribute('class', 'chart-line-value'); 
-                    val.textContent = temps[i] + '°'; 
+                    val.textContent = temp + '°'; 
                     g.appendChild(val);
                     
-                    if (lluvias[i] > 20) {
+                    if (lluvia > 20) {
                         const rd = document.createElementNS(svgNS, 'circle'); 
                         rd.setAttribute('cx', x); rd.setAttribute('cy', ch - 5); 
-                        rd.setAttribute('r', lluvias[i] / 12); 
+                        rd.setAttribute('r', Math.max(3, lluvia / 12)); 
                         rd.setAttribute('class', 'chart-line-rain-dot'); 
-                        rd.setAttribute('opacity', Math.min(lluvias[i] / 100, 0.8)); 
+                        rd.setAttribute('opacity', Math.min(lluvia / 100, 0.8)); 
                         g.appendChild(rd);
                     }
                 }
+                
+                // Etiquetas de horas cada 3 horas
                 if (i % 3 === 0) {
                     const label = document.createElementNS(svgNS, 'text'); 
-                    label.setAttribute('x', x); label.setAttribute('y', ch + 20); 
+                    label.setAttribute('x', x); label.setAttribute('y', ch + 18); 
                     label.setAttribute('class', 'chart-line-label'); 
                     label.textContent = hourly[i].hora + 'h'; 
                     g.appendChild(label);
@@ -782,6 +794,13 @@
         
         // Cargar clima inicial
         obtenerClima(-34.6037, -58.3816, 'Buenos Aires, AR');
+        
+        // Redibujar gráfico al redimensionar la ventana
+        window.addEventListener('resize', function() {
+            if (datosClimaActual && datosClimaActual.hourly) {
+                dibujarGraficoTemperatura(datosClimaActual.hourly);
+            }
+        });
     </script>
 </body>
 </html>
