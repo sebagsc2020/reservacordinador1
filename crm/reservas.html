@@ -5,589 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Reservas - CRM Aventura Total</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
-
-        /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
-        .menu-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            width: 50px;
-            height: 50px;
-            background: #667eea;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            border: none;
-        }
-        
-        .menu-btn:hover {
-            background: #5a6fd6;
-            transform: scale(1.05);
-        }
-        
-        .menu-btn span {
-            font-size: 24px;
-            color: white;
-        }
-        
-        /* ===== SIDEBAR ===== */
-        .sidebar { 
-            width: 250px; 
-            background: #1a1a2e; 
-            color: white; 
-            padding: 25px 0; 
-            position: fixed; 
-            height: 100vh; 
-            overflow-y: auto; 
-            z-index: 1001;
-            transition: transform 0.3s ease;
-            transform: translateX(-100%);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        
-        .sidebar.open {
-            transform: translateX(0);
-        }
-        
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .menu-overlay.active {
-            display: block;
-            opacity: 1;
-        }
-        
-        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; } 
-        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } 
-        .sidebar-logo h2 span { color: #667eea; }
-        
-        .nav-menu { list-style: none; padding: 0 15px; } 
-        .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            padding: 12px 15px; 
-            color: rgba(255,255,255,0.7); 
-            text-decoration: none; 
-            border-radius: 10px; 
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
-        .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        
-        .sidebar-footer { 
-            position: absolute; 
-            bottom: 20px; 
-            left: 15px; 
-            right: 15px; 
-        }
-        .btn-logout-sidebar { 
-            width: 100%; 
-            padding: 12px; 
-            background: rgba(231,76,60,0.2); 
-            color: #e74c3c; 
-            border: 1px solid rgba(231,76,60,0.3);
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 13px; 
-            transition: all 0.2s ease;
-        }
-        .btn-logout-sidebar:hover {
-            background: rgba(231,76,60,0.4);
-        }
-
-        /* ===== CONTENIDO PRINCIPAL ===== */
-        .main-content { 
-            margin-left: 0;
-            flex: 1; 
-            padding: 20px; 
-            min-width: 0;
-            transition: margin-left 0.3s ease;
-        }
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 30px; 
-            flex-wrap: wrap; 
-            gap: 10px; 
-        }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
-        
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .user-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            background: white; 
-            padding: 8px 20px; 
-            border-radius: 50px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-            font-size: 14px; 
-        }
-        .user-avatar { 
-            width: 35px; 
-            height: 35px; 
-            background: #667eea; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: 700; 
-        }
-        
-        .btn-reserva-manual {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .btn-reserva-manual:hover {
-            background: #c0392b;
-            transform: scale(1.02);
-        }
-        .btn-reserva-manual:active {
-            transform: scale(0.98);
-        }
-
-        .filters-bar { 
-            background: white; 
-            padding: 15px 20px; 
-            border-radius: 15px; 
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); 
-            margin-bottom: 20px; 
-            display: flex; 
-            gap: 10px; 
-            align-items: center; 
-            flex-wrap: wrap; 
-        }
-        .filter-input { 
-            padding: 12px 15px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 10px; 
-            font-size: 13px; 
-            flex: 2; 
-            min-width: 200px; 
-        }
-        .filter-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .btn-filtrar, .btn-recargar, .btn-pdf { 
-            padding: 10px 18px; 
-            border: none; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 12px; 
-            white-space: nowrap; 
-            transition: all 0.2s;
-        }
-        .btn-filtrar:active, .btn-recargar:active, .btn-pdf:active {
-            transform: scale(0.96);
-        }
-        .btn-filtrar { background: #667eea; color: white; }
-        .btn-recargar { background: #27ae60; color: white; }
-        .btn-pdf { background: #2c7da0; color: white; }
-
-        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-
-        .reserva-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .reserva-card:active {
-            transform: scale(0.99);
-        }
-        .reserva-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .card-id {
-            font-weight: 700;
-            font-size: 13px;
-            background: rgba(255,255,255,0.2);
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
-        .card-estado-header {
-            font-weight: 700;
-            font-size: 12px;
-            background: rgba(255,255,255,0.25);
-            padding: 4px 10px;
-            border-radius: 20px;
-            letter-spacing: 0.5px;
-        }
-        .card-fecha {
-            font-size: 10px;
-            opacity: 0.85;
-        }
-
-        .card-body { padding: 15px; }
-        .card-info { margin-bottom: 12px; }
-        .card-label { font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .card-value { font-size: 13px; font-weight: 500; color: #333; word-break: break-word; }
-
-        .excursiones-lista-card { margin: 0; padding-left: 16px; list-style: none; }
-        .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: #555; border-bottom: 1px dashed #eee; }
-        .excursiones-lista-card li:last-child { border-bottom: none; }
-
-        .card-actions {
-            display: flex;
-            gap: 8px;
-            padding: 12px 15px;
-            background: #f8f9fa;
-            border-top: 1px solid #f0f0f0;
-            flex-wrap: wrap;
-        }
-        .btn-card {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.2s;
-            text-align: center;
-        }
-        .btn-card:active {
-            transform: scale(0.96);
-        }
-        .btn-card:hover { opacity: 0.9; }
-        .btn-confirmar-card { background: #27ae60; color: white; }
-        .btn-pendiente-card { background: #ffc107; color: #856404; }
-        .btn-pagar-card { background: #3498db; color: white; }
-        .btn-whatsapp-card { background: #25D366; color: white; }
-        .btn-excluir-card { background: #e74c3c; color: white; }
-
-        .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
-
-        /* ===== PRELOADER POPUP ===== */
-        .preloader-popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 0.3s ease;
-        }
-        .preloader-popup.oculto {
-            opacity: 0;
-            visibility: hidden;
-        }
-        .preloader-popup-contenido {
-            background: white;
-            border-radius: 24px;
-            padding: 35px 45px;
-            text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: popupFadeIn 0.3s ease;
-        }
-        @keyframes popupFadeIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .preloader-popup-icono {
-            width: 70px;
-            height: 70px;
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #667eea;
-            border-right: 4px solid #764ba2;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .preloader-popup-titulo {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 8px;
-        }
-        .preloader-popup-subtitulo {
-            font-size: 14px;
-            color: #666;
-        }
-        .puntos::after {
-            content: '';
-            animation: puntosAnim 1.5s infinite;
-        }
-        @keyframes puntosAnim {
-            0% { content: ''; }
-            25% { content: '.'; }
-            50% { content: '..'; }
-            75% { content: '...'; }
-            100% { content: ''; }
-        }
-
-        /* Scroll sidebar */
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar::-webkit-scrollbar-track {
-            background: #1a1a2e;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
-        }
-
-        /* Desktop */
-        @media (min-width: 1201px) {
-            .cards-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        /* Tablet */
-        @media (min-width: 769px) and (max-width: 1200px) {
-            .cards-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        /* Desktop menú */
-        @media (min-width: 769px) {
-            .menu-btn {
-                display: none !important;
-            }
-            
-            .sidebar {
-                transform: translateX(0) !important;
-                width: 250px;
-            }
-            
-            .menu-overlay {
-                display: none !important;
-            }
-            
-            .main-content {
-                margin-left: 250px;
-                padding: 30px;
-            }
-        }
-
-        /* Móvil */
-        @media (max-width: 768px) {
-            .menu-btn {
-                display: flex;
-            }
-            
-            .main-content {
-                padding: 60px 12px 20px;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            .user-area {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .user-info {
-                padding: 5px 12px;
-                font-size: 12px;
-            }
-            
-            .user-avatar {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
-            
-            .btn-reserva-manual {
-                padding: 5px 12px;
-                font-size: 11px;
-            }
-            
-            .cards-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .filters-bar {
-                flex-direction: column;
-            }
-            
-            .filter-input {
-                width: 100%;
-            }
-            
-            .btn-filtrar, .btn-recargar, .btn-pdf {
-                width: 100%;
-                text-align: center;
-            }
-            
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .card-actions {
-                flex-direction: column;
-            }
-            
-            .btn-card {
-                width: 100%;
-            }
-            
-            .preloader-popup-contenido {
-                padding: 25px 35px;
-            }
-            
-            .preloader-popup-icono {
-                width: 55px;
-                height: 55px;
-            }
-            
-            .preloader-popup-titulo {
-                font-size: 18px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .user-area {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .btn-reserva-manual {
-                justify-content: center;
-            }
-        }
+        /* ... tus estilos existentes ... */
     </style>
 </head>
 <body>
-    <!-- Botón menú hamburguesa (solo móvil) -->
-    <button class="menu-btn" id="menuBtn">
-        <span>☰</span>
-    </button>
-    
-    <!-- Overlay para cerrar menú -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-    
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🏔️</div>
-            <h2>Aventura <span>Total</span></h2>
-            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
-            <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
-            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
-            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
-            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
-        </div>
-    </nav>
-
-    <div class="main-content">
-        <div class="header">
-            <div><h1>📋 Reservas</h1></div>
-            <div class="user-area">
-                <div class="user-info">
-                    <div class="user-avatar">A</div>
-                    <span>Admin</span>
-                </div>
-                <button class="btn-reserva-manual" onclick="abrirReservaManual()">
-                    ➕ Reserva manual
-                </button>
-            </div>
-        </div>
-
-        <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
-            <button class="btn-filtrar" id="btnFiltrar">🔍 Filtrar</button>
-            <button class="btn-recargar" id="btnRecargar">🔄 Recargar</button>
-            <button class="btn-pdf" id="btnPDFExterno">📄 Generar PDF</button>
-        </div>
-
-        <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
-
-        <div id="cardsContainer" class="cards-grid">
-            <div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>
-        </div>
-    </div>
-
-    <!-- PRELOADER POPUP -->
-    <div id="preloaderPopup" class="preloader-popup oculto">
-        <div class="preloader-popup-contenido">
-            <div class="preloader-popup-icono"></div>
-            <div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div>
-            <div class="preloader-popup-subtitulo">Guardando datos en el servidor...</div>
-        </div>
-    </div>
+    <!-- ... tu HTML existente ... -->
 
     <script>
         // ==================================================
@@ -624,7 +46,6 @@
             menuOverlay.addEventListener('click', closeMenu);
         }
         
-        // Cerrar menú al hacer clic en un enlace
         document.querySelectorAll('.nav-menu a').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 768) {
@@ -649,7 +70,7 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         
-        // URL del Google Apps Script para guardar estados en la nube
+        // URL del Google Apps Script para actualizar el estado en la columna N
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
         let reservasData = [];
@@ -673,53 +94,73 @@
             }
         }
 
-        async function guardarEstadoEnNube(id, nuevoEstado) {
+        // ==================================================
+        // ACTUALIZAR ESTADO EN LA COLUMNA N DE GOOGLE SHEETS
+        // ==================================================
+        async function actualizarEstadoEnSheet(id, nuevoEstado) {
             try {
-                // Intentar guardar en el servidor
                 const response = await fetch(ESTADOS_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Importante para Apps Script
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'action=guardar&id=' + encodeURIComponent(id) + '&estado=' + encodeURIComponent(nuevoEstado)
+                    body: 'action=actualizarEstado&id=' + encodeURIComponent(id) + '&estado=' + encodeURIComponent(nuevoEstado)
                 });
-                console.log(`✅ Estado guardado en nube: ${id} -> ${nuevoEstado}`);
+                console.log(`✅ Estado actualizado en columna N: ${id} -> ${nuevoEstado}`);
                 return true;
             } catch (error) {
-                console.error('Error al guardar en nube:', error);
+                console.error('Error al actualizar en Sheet:', error);
                 return false;
             }
         }
 
-        async function cargarEstadosDesdeNube() {
+        // ==================================================
+        // CARGAR ESTADOS DESDE LA COLUMNA N DE GOOGLE SHEETS
+        // ==================================================
+        async function cargarEstadosDesdeSheet() {
             try {
-                // Intentar cargar desde localStorage primero (más rápido)
-                const localEstados = localStorage.getItem('estadosReservasCloud');
-                if (localEstados) {
-                    const parsed = JSON.parse(localEstados);
-                    if (Object.keys(parsed).length > 0) {
-                        estadosGlobales = parsed;
-                        console.log('📥 Estados cargados desde localStorage:', Object.keys(estadosGlobales).length);
+                const response = await fetch(JSON_URL + '&t=' + Date.now());
+                const texto = await response.text();
+                
+                let jsonStr = texto;
+                jsonStr = jsonStr.replace("/*O_o*/", "");
+                jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
+                jsonStr = jsonStr.slice(0, -2);
+                
+                const data = JSON.parse(jsonStr);
+                const rows = data.table.rows;
+                
+                const estadosTemp = {};
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const c = rows[i].c;
+                    if (!c || c.length < 14) continue; // Esperamos al menos 14 columnas (A-N)
+                    
+                    const id = (c[1] && c[1].v) ? String(c[1].v) : '';
+                    if (!id) continue;
+                    
+                    // Leer el estado de la columna N (índice 13)
+                    let estado = (c[13] && c[13].v) ? String(c[13].v) : '';
+                    
+                    // Validar estado
+                    if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
+                        estado = 'confirmado';
                     }
+                    
+                    estadosTemp[id] = estado;
                 }
                 
-                // Luego intentar sincronizar con la nube
-                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
-                const data = await response.json();
-                if (data.success && data.estados) {
-                    estadosGlobales = data.estados;
-                    localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
-                    console.log('📥 Estados sincronizados desde nube:', Object.keys(estadosGlobales).length);
-                }
-                return estadosGlobales;
+                console.log('📥 Estados cargados desde columna N:', Object.keys(estadosTemp).length);
+                return estadosTemp;
+                
             } catch (error) {
-                console.error('Error al cargar desde nube, usando localStorage:', error);
-                // Si falla la nube, usar lo que tenemos en localStorage
-                const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
-                estadosGlobales = estadosLocal;
-                return estadosLocal;
+                console.error('Error al cargar estados desde Sheet:', error);
+                return {};
             }
         }
 
+        // ==================================================
+        // CARGAR RESERVAS
+        // ==================================================
         async function cargarReservas() {
             const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
@@ -728,8 +169,8 @@
             try {
                 mostrarPreloader();
 
-                // Primero cargar los estados guardados
-                await cargarEstadosDesdeNube();
+                // Cargar estados desde la columna N de Google Sheets
+                estadosGlobales = await cargarEstadosDesdeSheet();
 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
                 const texto = await response.text();
@@ -789,12 +230,10 @@
                     const lugar = (c[12] && c[12].v) ? String(c[12].v) : 'No especificado';
                     const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
 
-                    // Usar el estado guardado
+                    // Usar el estado de la columna N
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
-                        // Guardar el estado inicial
-                        estadosGlobales[id] = estado;
                     }
 
                     reservasData.push({
@@ -811,9 +250,6 @@
                         estado: estado
                     });
                 }
-
-                // Guardar estados actualizados
-                localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
 
                 reservasData.sort(function(a, b) {
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
@@ -833,6 +269,9 @@
             }
         }
 
+        // ==================================================
+        // CAMBIAR ESTADO (ACTUALIZA COLUMNA N)
+        // ==================================================
         async function cambiarEstado(id, nuevoEstado) {
             const reserva = reservasData.find(function(r) { return r.id === id; });
             if (reserva) {
@@ -844,11 +283,11 @@
                 const indexFiltrada = reservasFiltradas.findIndex(function(r) { return r.id === id; });
                 if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
                 
-                // Guardar en localStorage inmediatamente (backup rápido)
+                // Guardar en localStorage como backup
                 localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
                 
-                // Intentar guardar en la nube (en segundo plano, no esperamos)
-                guardarEstadoEnNube(id, nuevoEstado).catch(err => console.error('Error en guardado en nube:', err));
+                // Actualizar en la columna N de Google Sheets
+                await actualizarEstadoEnSheet(id, nuevoEstado);
                 
                 // Mostrar mensaje de confirmación
                 const estadoText = nuevoEstado === 'confirmado' ? 'Confirmada' : (nuevoEstado === 'pendiente' ? 'Pendiente' : 'Pagada');
@@ -859,6 +298,9 @@
             }
         }
 
+        // ==================================================
+        // ENVIAR WHATSAPP
+        // ==================================================
         function enviarWhatsApp(reserva) {
             let telefono = reserva.telefono.replace(/\D/g, '');
             if (telefono.length === 10) {
@@ -886,6 +328,9 @@
             window.open('https://wa.me/' + telefono + '?text=' + mensajeCodificado, '_blank');
         }
 
+        // ==================================================
+        // RENDERIZAR CARDS (NO MUESTRA LA COLUMNA N)
+        // ==================================================
         function renderizarCards() {
             const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
@@ -908,12 +353,11 @@
             for (let idx = 0; idx < reservasFiltradas.length; idx++) {
                 const r = reservasFiltradas[idx];
                 let estadoText = '';
-                let estadoClass = '';
                 switch(r.estado) {
-                    case 'pendiente': estadoText = 'Pendiente'; estadoClass = 'pendiente'; break;
-                    case 'confirmado': estadoText = 'Confirmado'; estadoClass = 'confirmado'; break;
-                    case 'pagado': estadoText = 'Pagado'; estadoClass = 'pagado'; break;
-                    default: estadoText = 'Confirmado'; estadoClass = 'confirmado';
+                    case 'pendiente': estadoText = 'Pendiente'; break;
+                    case 'confirmado': estadoText = 'Confirmado'; break;
+                    case 'pagado': estadoText = 'Pagado'; break;
+                    default: estadoText = 'Confirmado';
                 }
 
                 let excursionesHtml = '<ul class="excursiones-lista-card">';
@@ -1049,7 +493,6 @@
 
         // Inicializar
         cargarReservas();
-        // Recargar cada 30 segundos
         setInterval(() => cargarReservas(), 30000);
     </script>
 </body>
