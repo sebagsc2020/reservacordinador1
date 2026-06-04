@@ -465,7 +465,8 @@
             window.location.href = 'index.html'; 
         }
 
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuMTCSXLJHflUbUyWE9g5vYO-jgAZc7UGupEL3GM4ahoNw7AOjUyiYnE7uSc031ai7qg/exec';
+        // IMPORTANTE: Reemplaza con la URL de tu Google Apps Script
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
         
         let eventos = [];
 
@@ -474,7 +475,7 @@
         function ocultarPreloader() { if (preloaderPopup) preloaderPopup.classList.add('oculto'); }
         
         // ==================================================
-        // FUNCIÓN: Convierte OBJETO DATE a string DD/MM/YYYY
+        // FUNCIONES DE FECHAS
         // ==================================================
         function dateToDDMMYYYY(fecha) {
             if (!fecha) return '';
@@ -484,82 +485,19 @@
             return `${dia}/${mes}/${anio}`;
         }
         
-        // ==================================================
-        // FUNCIÓN: Convierte CUALQUIER cosa a DD/MM/YYYY
-        // ==================================================
         function cualquierFechaToDDMMYYYY(fechaInput) {
             if (!fechaInput) return '';
-            
-            // Si es un objeto Date
-            if (fechaInput instanceof Date) {
-                return dateToDDMMYYYY(fechaInput);
-            }
-            
-            // Si es un string
+            if (fechaInput instanceof Date) return dateToDDMMYYYY(fechaInput);
             if (typeof fechaInput === 'string') {
-                // Si ya está en DD/MM/YYYY
-                if (fechaInput.includes('/')) {
-                    return fechaInput;
-                }
-                // Si está en YYYY-MM-DD
+                if (fechaInput.includes('/')) return fechaInput;
                 if (fechaInput.includes('-')) {
                     const partes = fechaInput.split('-');
-                    if (partes.length === 3) {
-                        return `${partes[2]}/${partes[1]}/${partes[0]}`;
-                    }
+                    if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
                 }
             }
-            
-            // Intentar crear un objeto Date
             const fecha = new Date(fechaInput);
-            if (!isNaN(fecha.getTime())) {
-                return dateToDDMMYYYY(fecha);
-            }
-            
+            if (!isNaN(fecha.getTime())) return dateToDDMMYYYY(fecha);
             return String(fechaInput);
-        }
-        
-        // ==================================================
-        // FUNCIÓN: Genera array de fechas entre dos fechas (en DD/MM/YYYY)
-        // ==================================================
-        function generarFechasEntre(fechaInicio, fechaFin) {
-            const fechas = [];
-            
-            // Asegurar que son objetos Date
-            let inicio, fin;
-            
-            if (fechaInicio instanceof Date) {
-                inicio = new Date(fechaInicio);
-            } else {
-                const partes = String(fechaInicio).split('/');
-                if (partes.length === 3) {
-                    inicio = new Date(partes[2], partes[1] - 1, partes[0]);
-                } else {
-                    inicio = new Date(fechaInicio);
-                }
-            }
-            
-            if (fechaFin instanceof Date) {
-                fin = new Date(fechaFin);
-            } else {
-                const partes = String(fechaFin).split('/');
-                if (partes.length === 3) {
-                    fin = new Date(partes[2], partes[1] - 1, partes[0]);
-                } else {
-                    fin = new Date(fechaFin);
-                }
-            }
-            
-            if (isNaN(inicio.getTime()) || isNaN(fin.getTime())) {
-                console.error('No se pudieron parsear las fechas:', fechaInicio, fechaFin);
-                return fechas;
-            }
-            
-            for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
-                fechas.push(dateToDDMMYYYY(d));
-            }
-            
-            return fechas;
         }
         
         // ==================================================
@@ -569,7 +507,6 @@
             const menuBtn = document.getElementById('menuBtn');
             const sidebar = document.getElementById('sidebar');
             const menuOverlay = document.getElementById('menuOverlay');
-            
             if (!menuBtn || !sidebar || !menuOverlay) return;
             
             function toggleMenu() {
@@ -577,20 +514,15 @@
                 menuOverlay.classList.toggle('active');
                 document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
             }
-            
             function closeMenu() {
                 sidebar.classList.remove('open');
                 menuOverlay.classList.remove('active');
                 document.body.style.overflow = '';
             }
-            
             menuBtn.addEventListener('click', toggleMenu);
             menuOverlay.addEventListener('click', closeMenu);
-            
             document.querySelectorAll('.nav-menu a').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth <= 768) closeMenu();
-                });
+                link.addEventListener('click', () => { if (window.innerWidth <= 768) closeMenu(); });
             });
         }
         
@@ -603,7 +535,6 @@
                 const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
                 const response = await fetch(url);
                 const data = await response.json();
-                
                 if (data.success && data.eventos) {
                     eventos = data.eventos;
                     renderizarEventos();
@@ -624,19 +555,16 @@
         function renderizarEventos() {
             const container = document.getElementById('eventosContainer');
             if (!container) return;
-            
             if (eventos.length === 0) {
                 container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">📭 No hay eventos creados. Haz clic en "Crear nuevo evento"</div>';
                 return;
             }
-            
             function escapeHtml(text) {
                 if (!text) return '';
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
             }
-            
             container.innerHTML = eventos.map(evento => `
                 <div class="evento-card">
                     <div class="evento-header">
@@ -692,17 +620,13 @@
             const fechaInicioInput = document.getElementById('eventoFechaInicio')?.value;
             const fechaFinInput = document.getElementById('eventoFechaFin')?.value;
             const pax = document.getElementById('eventoPax')?.value || '0';
-            
             if (!nombre || !fechaInicioInput || !fechaFinInput) {
                 alert('⚠️ Por favor, complete todos los campos');
                 return;
             }
-            
             const fechaInicio = cualquierFechaToDDMMYYYY(fechaInicioInput);
             const fechaFin = cualquierFechaToDDMMYYYY(fechaFinInput);
-            
             mostrarPreloader();
-            
             try {
                 const eventoId = 'EV-' + Date.now();
                 const formData = new URLSearchParams();
@@ -713,15 +637,12 @@
                 formData.append('fechaFin', fechaFin);
                 formData.append('pax', pax);
                 formData.append('estado', 'activo');
-                
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData.toString()
                 });
-                
                 const data = await response.json();
-                
                 if (data.success) {
                     alert('✅ Evento creado correctamente');
                     cerrarModal('modalCrearEvento');
@@ -738,56 +659,38 @@
         }
         
         // ==================================================
-        // VER EVENTO - FUNCIÓN PRINCIPAL CORREGIDA
+        // VER EVENTO
         // ==================================================
         async function verEvento(eventoId) {
             mostrarPreloader();
-            
             try {
                 const url = `${APP_SCRIPT_URL}?action=obtenerEventoCompleto&eventoId=${eventoId}&t=${Date.now()}`;
                 const response = await fetch(url);
                 const data = await response.json();
-                
                 if (!data.success || !data.evento) {
                     alert('Error al cargar el evento');
                     ocultarPreloader();
                     return;
                 }
-                
                 const evento = data.evento;
                 const notasEvento = data.notas || [];
-                
-                // CREAR OBJETOS DATE a partir de las fechas del evento
                 let fechaInicioDate, fechaFinDate;
-                
-                // Si la fecha es un string en DD/MM/YYYY
                 if (typeof evento.fechaInicio === 'string' && evento.fechaInicio.includes('/')) {
                     const partes = evento.fechaInicio.split('/');
                     fechaInicioDate = new Date(partes[2], partes[1] - 1, partes[0]);
-                } 
-                // Si es un objeto Date
-                else if (evento.fechaInicio instanceof Date) {
+                } else if (evento.fechaInicio instanceof Date) {
                     fechaInicioDate = evento.fechaInicio;
-                }
-                // Si es otro formato
-                else {
+                } else {
                     fechaInicioDate = new Date(evento.fechaInicio);
                 }
-                
                 if (typeof evento.fechaFin === 'string' && evento.fechaFin.includes('/')) {
                     const partes = evento.fechaFin.split('/');
                     fechaFinDate = new Date(partes[2], partes[1] - 1, partes[0]);
-                } 
-                else if (evento.fechaFin instanceof Date) {
+                } else if (evento.fechaFin instanceof Date) {
                     fechaFinDate = evento.fechaFin;
-                }
-                else {
+                } else {
                     fechaFinDate = new Date(evento.fechaFin);
                 }
-                
-                console.log('Fechas como Date:', fechaInicioDate, fechaFinDate);
-                
-                // Generar array de fechas entre inicio y fin
                 const fechas = [];
                 for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
                     const dia = d.getDate().toString().padStart(2, '0');
@@ -795,26 +698,15 @@
                     const anio = d.getFullYear();
                     fechas.push(`${dia}/${mes}/${anio}`);
                 }
-                
-                console.log('Fechas generadas:', fechas);
-                
-                // Crear mapa de notas por fecha
                 const notasPorFecha = {};
                 notasEvento.forEach(nota => {
                     let fechaNota = cualquierFechaToDDMMYYYY(nota.fecha);
-                    if (!notasPorFecha[fechaNota]) {
-                        notasPorFecha[fechaNota] = [];
-                    }
+                    if (!notasPorFecha[fechaNota]) notasPorFecha[fechaNota] = [];
                     notasPorFecha[fechaNota].push(nota);
                 });
-                
-                console.log('Notas por fecha:', notasPorFecha);
-                
-                // Generar HTML de días
                 let diasHtml = '';
                 for (const fecha of fechas) {
                     const notasDelDia = notasPorFecha[fecha] || [];
-                    
                     let notasHtml = '';
                     if (notasDelDia.length === 0) {
                         notasHtml = '<div style="color:#999; font-size:12px; padding:8px;">Sin notas</div>';
@@ -832,7 +724,6 @@
                             `;
                         });
                     }
-                    
                     diasHtml += `
                         <div class="dia-card">
                             <div class="dia-titulo">${fecha}</div>
@@ -841,10 +732,6 @@
                         </div>
                     `;
                 }
-                
-                const fechaInicioMostrar = dateToDDMMYYYY(fechaInicioDate);
-                const fechaFinMostrar = dateToDDMMYYYY(fechaFinDate);
-                
                 const modalHtml = `
                     <div id="modalEvento" class="modal">
                         <div class="modal-contenido">
@@ -852,16 +739,13 @@
                                 <h3>📅 ${escapeHtml(evento.nombre)}</h3>
                                 <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
                             </div>
-                            <p><strong>📅 Período:</strong> ${fechaInicioMostrar} - ${fechaFinMostrar}</p>
+                            <p><strong>📅 Período:</strong> ${dateToDDMMYYYY(fechaInicioDate)} - ${dateToDDMMYYYY(fechaFinDate)}</p>
                             <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
-                            <div class="dias-container">
-                                ${diasHtml}
-                            </div>
+                            <div class="dias-container">${diasHtml}</div>
                         </div>
                     </div>
                 `;
                 document.body.insertAdjacentHTML('beforeend', modalHtml);
-                
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error al cargar el evento');
@@ -902,14 +786,11 @@
         async function guardarNota(eventoId, fecha) {
             const texto = document.getElementById('notaTexto')?.value;
             const tipo = document.getElementById('notaTipo')?.value;
-            
             if (!texto) {
                 alert('⚠️ Por favor, escriba una nota');
                 return;
             }
-            
             mostrarPreloader();
-            
             try {
                 const notaId = 'NOTA-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
                 const formData = new URLSearchParams();
@@ -919,15 +800,12 @@
                 formData.append('fecha', fecha);
                 formData.append('nota', texto);
                 formData.append('tipo', tipo);
-                
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData.toString()
                 });
-                
                 const data = await response.json();
-                
                 if (data.success) {
                     alert('✅ Nota guardada correctamente');
                     cerrarModal('modalAgregarNota');
@@ -976,29 +854,23 @@
         async function actualizarNota(notaId, eventoId) {
             const texto = document.getElementById('notaTextoEditar')?.value;
             const tipo = document.getElementById('notaTipoEditar')?.value;
-            
             if (!texto) {
                 alert('⚠️ Por favor, escriba una nota');
                 return;
             }
-            
             mostrarPreloader();
-            
             try {
                 const formData = new URLSearchParams();
                 formData.append('action', 'actualizarNota');
                 formData.append('id', notaId);
                 formData.append('nota', texto);
                 formData.append('tipo', tipo);
-                
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData.toString()
                 });
-                
                 const data = await response.json();
-                
                 if (data.success) {
                     alert('✅ Nota actualizada correctamente');
                     cerrarModal('modalEditarNota');
@@ -1020,22 +892,17 @@
         // ==================================================
         async function eliminarNota(notaId, eventoId) {
             if (!confirm('⚠️ ¿Estás seguro de eliminar esta nota?')) return;
-            
             mostrarPreloader();
-            
             try {
                 const formData = new URLSearchParams();
                 formData.append('action', 'eliminarNota');
                 formData.append('id', notaId);
-                
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData.toString()
                 });
-                
                 const data = await response.json();
-                
                 if (data.success) {
                     alert('✅ Nota eliminada correctamente');
                     cerrarModal('modalEvento');
@@ -1056,22 +923,17 @@
         // ==================================================
         async function eliminarEvento(eventoId) {
             if (!confirm('⚠️ ¿Estás seguro de eliminar este evento? Se eliminarán también todas las notas asociadas.')) return;
-            
             mostrarPreloader();
-            
             try {
                 const formData = new URLSearchParams();
                 formData.append('action', 'eliminarEvento');
                 formData.append('id', eventoId);
-                
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData.toString()
                 });
-                
                 const data = await response.json();
-                
                 if (data.success) {
                     alert('✅ Evento eliminado correctamente');
                     await cargarEventos();
@@ -1087,22 +949,82 @@
         }
         
         // ==================================================
-        // COMPARTIR EVENTO
+        // COMPARTIR EVENTO POR WHATSAPP
         // ==================================================
-        function compartirEvento(eventoId) {
-            const evento = eventos.find(e => e.id === eventoId);
-            if (!evento) return;
-            
-            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
-
-📅 *EVENTO: ${evento.nombre}*
-📍 Período: ${cualquierFechaToDDMMYYYY(evento.fechaInicio)} - ${cualquierFechaToDDMMYYYY(evento.fechaFin)}
-👥 Pasajeros: ${evento.pax}
-
-🔗 Para más información, contáctenos.`;
-            
-            const mensajeCodificado = encodeURIComponent(mensaje);
-            window.open(`https://wa.me/?text=${mensajeCodificado}`, '_blank');
+        async function compartirEvento(eventoId) {
+            mostrarPreloader();
+            try {
+                const url = `${APP_SCRIPT_URL}?action=obtenerEventoCompleto&eventoId=${eventoId}&t=${Date.now()}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (!data.success || !data.evento) {
+                    alert('Error al cargar el evento');
+                    ocultarPreloader();
+                    return;
+                }
+                const evento = data.evento;
+                const notasEvento = data.notas || [];
+                let fechaInicioDate, fechaFinDate;
+                if (typeof evento.fechaInicio === 'string' && evento.fechaInicio.includes('/')) {
+                    const partes = evento.fechaInicio.split('/');
+                    fechaInicioDate = new Date(partes[2], partes[1] - 1, partes[0]);
+                } else if (evento.fechaInicio instanceof Date) {
+                    fechaInicioDate = evento.fechaInicio;
+                } else {
+                    fechaInicioDate = new Date(evento.fechaInicio);
+                }
+                if (typeof evento.fechaFin === 'string' && evento.fechaFin.includes('/')) {
+                    const partes = evento.fechaFin.split('/');
+                    fechaFinDate = new Date(partes[2], partes[1] - 1, partes[0]);
+                } else if (evento.fechaFin instanceof Date) {
+                    fechaFinDate = evento.fechaFin;
+                } else {
+                    fechaFinDate = new Date(evento.fechaFin);
+                }
+                const fechasConNotas = [];
+                for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
+                    const dia = d.getDate().toString().padStart(2, '0');
+                    const mes = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const anio = d.getFullYear();
+                    const fechaStr = `${dia}/${mes}/${anio}`;
+                    const notasDelDia = notasEvento.filter(nota => {
+                        let fechaNota = nota.fecha;
+                        if (fechaNota && fechaNota.includes('-')) {
+                            const partes = fechaNota.split('-');
+                            fechaNota = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                        }
+                        return fechaNota === fechaStr;
+                    });
+                    fechasConNotas.push({ fecha: fechaStr, notas: notasDelDia });
+                }
+                let mensaje = `🏔️ *AVENTURA TOTAL* 🏔️\n\n`;
+                mensaje += `📅 *EVENTO: ${evento.nombre}*\n`;
+                mensaje += `👥 *Pasajeros:* ${evento.pax}\n\n`;
+                mensaje += `📋 *ITINERARIO DIARIO:*\n`;
+                mensaje += `........................................\n\n`;
+                for (const item of fechasConNotas) {
+                    mensaje += `📅 *${item.fecha}*\n`;
+                    if (item.notas.length === 0) {
+                        mensaje += `   Sin actividades programadas\n`;
+                    } else {
+                        item.notas.forEach(nota => {
+                            const icono = nota.tipo === 'mañana' ? '🌅' : '🌙';
+                            mensaje += `   ${icono} ${nota.nota}\n`;
+                        });
+                    }
+                    mensaje += `\n........................................\n\n`;
+                }
+                mensaje += `🔗 *Reserve sus excursiones aquí*\n`;
+                mensaje += `https://sebagsc2020.github.io/reservacordinador1/index.html\n\n`;
+                mensaje += `🏔️ ¡Gracias por confiar en Aventura Total!`;
+                const mensajeCodificado = encodeURIComponent(mensaje);
+                window.open(`https://wa.me/?text=${mensajeCodificado}`, '_blank');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al generar el mensaje');
+            } finally {
+                ocultarPreloader();
+            }
         }
         
         // ==================================================
