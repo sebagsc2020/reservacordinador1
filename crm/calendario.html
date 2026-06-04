@@ -519,32 +519,64 @@
         }
         
         // ==================================================
-        // FUNCIONES PARA FORMATEAR FECHAS
+        // FUNCIONES PARA FORMATEAR FECHAS (MANEJA STRING Y OBJECT DATE)
         // ==================================================
-        function formatFechaParaMostrar(fechaStr) {
-            if (!fechaStr) return '';
-            if (fechaStr.includes('/')) return fechaStr;
-            const partes = fechaStr.split('-');
-            if (partes.length === 3) {
-                return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
-            return fechaStr;
-        }
-        
-        function extraerSoloFecha(fechaStr) {
-            if (!fechaStr) return '';
-            // Si la fecha tiene espacios, tomar solo la primera parte
-            if (fechaStr.includes(' ')) {
-                fechaStr = fechaStr.split(' ')[0];
-            }
-            // Si la fecha está en formato DD/MM/YYYY
-            if (fechaStr.includes('/')) {
-                const partes = fechaStr.split('/');
-                if (partes.length === 3) {
-                    return `${partes[2]}-${partes[1]}-${partes[0]}`;
+        function formatearFechaParaMostrar(fechaInput) {
+            if (!fechaInput) return '';
+            
+            let fecha = new Date(fechaInput);
+            if (isNaN(fecha.getTime())) {
+                // Si no es una fecha válida, intentar como string
+                if (typeof fechaInput === 'string') {
+                    if (fechaInput.includes('/')) {
+                        const partes = fechaInput.split('/');
+                        if (partes.length === 3) {
+                            fecha = new Date(partes[2], partes[1] - 1, partes[0]);
+                        }
+                    } else if (fechaInput.includes('-')) {
+                        const partes = fechaInput.split('-');
+                        if (partes.length === 3) {
+                            fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+                        }
+                    }
                 }
             }
-            return fechaStr;
+            
+            if (isNaN(fecha.getTime())) return String(fechaInput);
+            
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const año = fecha.getFullYear();
+            return `${dia}/${mes}/${año}`;
+        }
+        
+        function obtenerFechaEnFormatoYYYYMMDD(fechaInput) {
+            if (!fechaInput) return '';
+            
+            let fecha = new Date(fechaInput);
+            if (isNaN(fecha.getTime())) {
+                // Si no es una fecha válida, intentar como string
+                if (typeof fechaInput === 'string') {
+                    if (fechaInput.includes('/')) {
+                        const partes = fechaInput.split('/');
+                        if (partes.length === 3) {
+                            fecha = new Date(partes[2], partes[1] - 1, partes[0]);
+                        }
+                    } else if (fechaInput.includes('-')) {
+                        const partes = fechaInput.split('-');
+                        if (partes.length === 3 && partes[0].length === 4) {
+                            return fechaInput; // Ya está en formato YYYY-MM-DD
+                        }
+                    }
+                }
+            }
+            
+            if (isNaN(fecha.getTime())) return String(fechaInput);
+            
+            const año = fecha.getFullYear();
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            return `${año}-${mes}-${dia}`;
         }
         
         // ==================================================
@@ -599,7 +631,7 @@
                 <div class="evento-card">
                     <div class="evento-header">
                         <div class="evento-titulo">${escapeHtml(evento.nombre)}</div>
-                        <div class="evento-fechas">📅 ${formatFechaParaMostrar(evento.fechaInicio)} - ${formatFechaParaMostrar(evento.fechaFin)}</div>
+                        <div class="evento-fechas">📅 ${formatearFechaParaMostrar(evento.fechaInicio)} - ${formatearFechaParaMostrar(evento.fechaFin)}</div>
                         <div class="evento-pax">👥 ${evento.pax} pasajeros</div>
                     </div>
                     <div class="evento-acciones">
@@ -716,20 +748,13 @@
                 const evento = data.evento;
                 let notasEvento = data.notas || [];
                 
-                console.log('📝 NOTAS RECIBIDAS (originales):', notasEvento);
+                console.log('📝 NOTAS RECIBIDAS:', notasEvento);
                 
-                // Limpiar las fechas de las notas (eliminar texto adicional)
-                notasEvento = notasEvento.map(nota => {
-                    let fechaLimpia = nota.fecha;
-                    if (fechaLimpia && fechaLimpia.includes(' ')) {
-                        fechaLimpia = fechaLimpia.split(' ')[0];
-                        console.log(`🔧 Limpiando fecha: "${nota.fecha}" -> "${fechaLimpia}"`);
-                    }
-                    return { ...nota, fecha: fechaLimpia };
-                });
+                // Obtener fechas en formato YYYY-MM-DD para comparar
+                const fechaInicioStr = obtenerFechaEnFormatoYYYYMMDD(evento.fechaInicio);
+                const fechaFinStr = obtenerFechaEnFormatoYYYYMMDD(evento.fechaFin);
                 
-                console.log('📝 NOTAS CON FECHAS LIMPIAS:', notasEvento);
-                console.log('📅 FECHAS DEL EVENTO: inicio=' + evento.fechaInicio + ', fin=' + evento.fechaFin);
+                console.log('📅 Fechas normalizadas:', { fechaInicioStr, fechaFinStr });
                 
                 // Generar array de fechas entre inicio y fin
                 function obtenerFechasEntre(fechaInicio, fechaFin) {
@@ -737,32 +762,49 @@
                     const inicio = new Date(fechaInicio);
                     const fin = new Date(fechaFin);
                     
+                    if (isNaN(inicio.getTime()) || isNaN(fin.getTime())) {
+                        console.error('Fechas inválidas:', fechaInicio, fechaFin);
+                        return fechas;
+                    }
+                    
                     for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
                         const año = d.getFullYear();
                         const mes = String(d.getMonth() + 1).padStart(2, '0');
                         const dia = String(d.getDate()).padStart(2, '0');
-                        const fechaStr = `${año}-${mes}-${dia}`;
-                        fechas.push(fechaStr);
+                        fechas.push(`${año}-${mes}-${dia}`);
                     }
                     return fechas;
                 }
                 
-                const fechas = obtenerFechasEntre(evento.fechaInicio, evento.fechaFin);
+                const fechas = obtenerFechasEntre(fechaInicioStr, fechaFinStr);
                 console.log('📋 LISTA DE FECHAS DEL EVENTO:', fechas);
                 
-                // Crear un mapa de notas por fecha para fácil acceso
+                // Limpiar las fechas de las notas
+                const notasLimpia = notasEvento.map(nota => {
+                    let fechaLimpia = nota.fecha;
+                    if (fechaLimpia && typeof fechaLimpia === 'string') {
+                        if (fechaLimpia.includes(' ')) {
+                            fechaLimpia = fechaLimpia.split(' ')[0];
+                        }
+                        if (fechaLimpia.includes('/')) {
+                            const partes = fechaLimpia.split('/');
+                            if (partes.length === 3) {
+                                fechaLimpia = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                            }
+                        }
+                    }
+                    return { ...nota, fecha: fechaLimpia };
+                });
+                
+                console.log('📝 NOTAS CON FECHAS LIMPIAS:', notasLimpia);
+                
+                // Crear un mapa de notas por fecha
                 const notasPorFecha = {};
-                notasEvento.forEach(nota => {
-                    let fechaNota = nota.fecha;
-                    // Asegurar formato YYYY-MM-DD
-                    if (fechaNota && fechaNota.includes('/')) {
-                        const partes = fechaNota.split('/');
-                        fechaNota = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                notasLimpia.forEach(nota => {
+                    if (!notasPorFecha[nota.fecha]) {
+                        notasPorFecha[nota.fecha] = [];
                     }
-                    if (!notasPorFecha[fechaNota]) {
-                        notasPorFecha[fechaNota] = [];
-                    }
-                    notasPorFecha[fechaNota].push(nota);
+                    notasPorFecha[nota.fecha].push(nota);
                 });
                 
                 console.log('📊 NOTAS POR FECHA:', notasPorFecha);
@@ -786,7 +828,7 @@
                         });
                     }
                     
-                    const fechaMostrar = formatFechaParaMostrar(fecha);
+                    const fechaMostrar = formatearFechaParaMostrar(fecha);
                     
                     diasHtml += `
                         <div class="dia-card">
@@ -804,7 +846,7 @@
                                 <h3>📅 ${escapeHtml(evento.nombre)}</h3>
                                 <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
                             </div>
-                            <p><strong>📅 Período:</strong> ${formatFechaParaMostrar(evento.fechaInicio)} - ${formatFechaParaMostrar(evento.fechaFin)}</p>
+                            <p><strong>📅 Período:</strong> ${formatearFechaParaMostrar(evento.fechaInicio)} - ${formatearFechaParaMostrar(evento.fechaFin)}</p>
                             <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
                             <div class="dias-container">
                                 ${diasHtml}
@@ -823,10 +865,10 @@
         }
         
         // ==================================================
-        // AGREGAR NOTA (CORREGIDO - guarda solo la fecha)
+        // AGREGAR NOTA
         // ==================================================
         function mostrarModalAgregarNota(eventoId, fecha) {
-            const fechaFormateada = formatFechaParaMostrar(fecha);
+            const fechaFormateada = formatearFechaParaMostrar(fecha);
             const modalHtml = `
                 <div id="modalAgregarNota" class="modal">
                     <div class="modal-contenido">
@@ -861,10 +903,18 @@
                 return;
             }
             
-            // Asegurar que la fecha se guarda en formato YYYY-MM-DD sin texto adicional
+            // Asegurar fecha en formato YYYY-MM-DD
             let fechaLimpia = fecha;
-            if (fechaLimpia && fechaLimpia.includes(' ')) {
-                fechaLimpia = fechaLimpia.split(' ')[0];
+            if (fechaLimpia && typeof fechaLimpia === 'string') {
+                if (fechaLimpia.includes(' ')) {
+                    fechaLimpia = fechaLimpia.split(' ')[0];
+                }
+                if (fechaLimpia.includes('/')) {
+                    const partes = fechaLimpia.split('/');
+                    if (partes.length === 3) {
+                        fechaLimpia = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                    }
+                }
             }
             
             mostrarPreloader();
@@ -950,7 +1000,7 @@
             const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
 
 📅 *EVENTO: ${evento.nombre}*
-📍 Período: ${formatFechaParaMostrar(evento.fechaInicio)} - ${formatFechaParaMostrar(evento.fechaFin)}
+📍 Período: ${formatearFechaParaMostrar(evento.fechaInicio)} - ${formatearFechaParaMostrar(evento.fechaFin)}
 👥 Pasajeros: ${evento.pax}
 
 🔗 Para más información, contáctenos.`;
