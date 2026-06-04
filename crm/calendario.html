@@ -4,10 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Calendario - CRM Aventura Total</title>
+    
+    <!-- Precarga de recursos críticos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
         
+        /* ===== INDICADOR DE VELOCIDAD ===== */
+        .speed-indicator {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            z-index: 9999;
+            font-family: monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .speed-indicator:hover {
+            background: rgba(0,0,0,0.9);
+            transform: scale(1.05);
+        }
+        .speed-fast { border-left: 3px solid #27ae60; }
+        .speed-medium { border-left: 3px solid #f39c12; }
+        .speed-slow { border-left: 3px solid #e74c3c; }
+        
+        /* ===== MENÚ FLOTANTE ===== */
         .menu-btn {
             position: fixed;
             top: 15px;
@@ -36,6 +65,7 @@
             color: white;
         }
         
+        /* ===== SIDEBAR ===== */
         .sidebar { 
             width: 250px; 
             background: #1a1a2e; 
@@ -116,6 +146,7 @@
             background: rgba(231,76,60,0.4);
         }
         
+        /* ===== CONTENIDO PRINCIPAL ===== */
         .main-content { 
             margin-left: 0;
             flex: 1; 
@@ -183,6 +214,7 @@
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             transition: transform 0.2s;
+            will-change: transform;
         }
         .evento-card:hover {
             transform: translateY(-4px);
@@ -213,38 +245,21 @@
             background: #f8f9fa;
             border-top: 1px solid #e0e0e0;
         }
-        .btn-ver-evento {
+        .btn-ver-evento, .btn-whatsapp-evento, .btn-eliminar-evento {
             flex: 1;
             padding: 8px;
-            background: #667eea;
-            color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
             font-size: 12px;
+            transition: all 0.2s;
         }
-        .btn-whatsapp-evento {
-            flex: 1;
-            padding: 8px;
-            background: #25D366;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
-        }
-        .btn-eliminar-evento {
-            flex: 1;
-            padding: 8px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
+        .btn-ver-evento { background: #667eea; color: white; }
+        .btn-whatsapp-evento { background: #25D366; color: white; }
+        .btn-eliminar-evento { background: #e74c3c; color: white; }
+        .btn-ver-evento:active, .btn-whatsapp-evento:active, .btn-eliminar-evento:active {
+            transform: scale(0.96);
         }
         
         .modal {
@@ -276,10 +291,7 @@
             border-bottom: 2px solid #eef2ff;
             padding-bottom: 12px;
         }
-        .modal-header h3 {
-            color: #667eea;
-            font-size: 20px;
-        }
+        .modal-header h3 { color: #667eea; font-size: 20px; }
         .cerrar-modal {
             background: none;
             border: none;
@@ -288,9 +300,7 @@
             color: #999;
         }
         
-        .form-group {
-            margin-bottom: 15px;
-        }
+        .form-group { margin-bottom: 15px; }
         .form-group label {
             display: block;
             margin-bottom: 5px;
@@ -311,9 +321,7 @@
             border-color: #667eea;
         }
         
-        .dias-container {
-            margin-top: 20px;
-        }
+        .dias-container { margin-top: 20px; }
         .dia-card {
             background: #f8f9fa;
             border-radius: 12px;
@@ -333,15 +341,8 @@
             margin-bottom: 10px;
             border-left: 3px solid #667eea;
         }
-        .nota-texto {
-            font-size: 13px;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        .nota-fecha {
-            font-size: 10px;
-            color: #999;
-        }
+        .nota-texto { font-size: 13px; color: #333; margin-bottom: 8px; }
+        .nota-fecha { font-size: 10px; color: #999; }
         .btn-agregar-nota {
             width: 100%;
             padding: 8px;
@@ -353,10 +354,7 @@
             font-size: 12px;
             margin-top: 8px;
         }
-        .btn-agregar-nota:hover {
-            background: #667eea;
-            color: white;
-        }
+        .btn-agregar-nota:hover { background: #667eea; color: white; }
         
         .preloader-popup {
             position: fixed;
@@ -406,6 +404,11 @@
     </style>
 </head>
 <body>
+    <!-- Indicador de velocidad de conexión -->
+    <div id="speedIndicator" class="speed-indicator speed-medium" onclick="medirVelocidad()">
+        📡 Medir velocidad
+    </div>
+    
     <button class="menu-btn" id="menuBtn"><span>☰</span></button>
     <div class="menu-overlay" id="menuOverlay"></div>
     
@@ -454,6 +457,95 @@
 
     <script>
         // ==================================================
+        // MEDIDOR DE VELOCIDAD DE CONEXIÓN
+        // ==================================================
+        let velocidadActual = { velocidad: 0, tipo: 'desconocido', tiempo: 0 };
+        
+        async function medirVelocidad() {
+            const indicator = document.getElementById('speedIndicator');
+            indicator.innerHTML = '📡 Midiendo...';
+            indicator.style.opacity = '0.7';
+            
+            const startTime = performance.now();
+            const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/GoogleDriveIcon.svg/120px-GoogleDriveIcon.svg.png';
+            const fileSizeMB = 0.01; // ~10KB
+            
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                
+                const response = await fetch(imageUrl, {
+                    method: 'GET',
+                    mode: 'no-cors',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                const endTime = performance.now();
+                const duration = (endTime - startTime) / 1000;
+                const speedMbps = (fileSizeMB * 8) / duration;
+                
+                velocidadActual = {
+                    velocidad: speedMbps,
+                    tipo: speedMbps > 5 ? 'rápida' : (speedMbps > 2 ? 'media' : 'lenta'),
+                    tiempo: duration
+                };
+                
+                let icono = speedMbps > 5 ? '🚀' : (speedMbps > 2 ? '📱' : '🐢');
+                let clase = speedMbps > 5 ? 'speed-fast' : (speedMbps > 2 ? 'speed-medium' : 'speed-slow');
+                indicator.className = `speed-indicator ${clase}`;
+                indicator.innerHTML = `${icono} ${speedMbps.toFixed(1)} Mbps | ${velocidadActual.tipo}`;
+                
+                // Ajustar intervalo de actualización según velocidad
+                ajustarIntervaloSegunVelocidad(speedMbps);
+                
+                setTimeout(() => {
+                    indicator.innerHTML = `📡 ${velocidadActual.tipo} (${velocidadActual.velocidad.toFixed(1)} Mbps)`;
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Error midiendo velocidad:', error);
+                velocidadActual = { velocidad: 0, tipo: 'desconocido', tiempo: 0 };
+                indicator.className = 'speed-indicator speed-medium';
+                indicator.innerHTML = '📡 Red limitada - modo ahorro';
+                
+                // Modo ahorro: intervalo más largo
+                ajustarIntervaloSegunVelocidad(1);
+            }
+            
+            indicator.style.opacity = '1';
+            
+            setTimeout(() => {
+                indicator.innerHTML = `📡 ${velocidadActual.tipo} (${velocidadActual.velocidad.toFixed(1)} Mbps)`;
+            }, 4000);
+        }
+        
+        function ajustarIntervaloSegunVelocidad(speedMbps) {
+            if (window.refreshInterval) {
+                clearInterval(window.refreshInterval);
+            }
+            
+            let intervalo = 60000; // por defecto 60 segundos
+            
+            if (speedMbps > 5) {
+                intervalo = 30000; // rápida: 30 segundos
+                console.log('🚀 Conexión rápida - Intervalo de refresco: 30 segundos');
+            } else if (speedMbps > 2) {
+                intervalo = 60000; // media: 60 segundos
+                console.log('📱 Conexión media - Intervalo de refresco: 60 segundos');
+            } else {
+                intervalo = 120000; // lenta: 120 segundos
+                console.log('🐢 Conexión lenta - Intervalo de refresco: 120 segundos (modo ahorro)');
+            }
+            
+            window.refreshInterval = setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    cargarEventos();
+                }
+            }, intervalo);
+        }
+        
+        // ==================================================
         // CONFIGURACIÓN
         // ==================================================
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
@@ -469,62 +561,36 @@
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
         
         let eventos = [];
+        let cargaEnProgreso = false;
 
         const preloaderPopup = document.getElementById('preloaderPopup');
-        function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
-        function ocultarPreloader() { if (preloaderPopup) preloaderPopup.classList.add('oculto'); }
+        function mostrarPreloader() { if (preloaderPopup && !preloaderPopup.classList.contains('oculto')) return; if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
+        function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
         
         // ==================================================
-        // FUNCIONES DE FECHAS OPTIMIZADAS
+        // FUNCIONES DE FECHAS (optimizadas)
         // ==================================================
         function dateToDDMMYYYY(fecha) {
             if (!fecha) return '';
-            if (fecha instanceof Date && !isNaN(fecha.getTime())) {
-                const dia = fecha.getDate().toString().padStart(2, '0');
-                const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-                const anio = fecha.getFullYear();
-                return `${dia}/${mes}/${anio}`;
-            }
-            return '';
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const anio = fecha.getFullYear();
+            return `${dia}/${mes}/${anio}`;
         }
-
-        function formatearFechaParaMostrar(fechaInput) {
+        
+        function cualquierFechaToDDMMYYYY(fechaInput) {
             if (!fechaInput) return '';
-            
-            if (typeof fechaInput === 'string' && fechaInput.includes('/') && fechaInput.length === 10) {
-                return fechaInput;
-            }
-            
-            let fecha = null;
-            
-            if (fechaInput instanceof Date) {
-                fecha = fechaInput;
-            }
-            else if (typeof fechaInput === 'string') {
-                let fechaLimpia = fechaInput;
-                if (fechaLimpia.includes('T')) {
-                    const match = fechaLimpia.match(/(\d{1,2})T.*?(\d{1,2})\/(\d{4})/);
-                    if (match) {
-                        return `${match[1].padStart(2,'0')}/${match[2].padStart(2,'0')}/${match[3]}`;
-                    }
+            if (fechaInput instanceof Date) return dateToDDMMYYYY(fechaInput);
+            if (typeof fechaInput === 'string') {
+                if (fechaInput.includes('/')) return fechaInput;
+                if (fechaInput.includes('-')) {
+                    const partes = fechaInput.split('-');
+                    if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
                 }
-                fecha = new Date(fechaLimpia);
             }
-            
-            if (fecha && !isNaN(fecha.getTime())) {
-                const dia = fecha.getDate().toString().padStart(2, '0');
-                const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-                const anio = fecha.getFullYear();
-                return `${dia}/${mes}/${anio}`;
-            }
-            
+            const fecha = new Date(fechaInput);
+            if (!isNaN(fecha.getTime())) return dateToDDMMYYYY(fecha);
             return String(fechaInput);
-        }
-
-        function formatearRangoFechas(fechaInicio, fechaFin) {
-            const inicio = formatearFechaParaMostrar(fechaInicio);
-            const fin = formatearFechaParaMostrar(fechaFin);
-            return `Del ${inicio} al ${fin}`;
         }
         
         // ==================================================
@@ -554,31 +620,59 @@
         }
         
         // ==================================================
-        // CARGAR EVENTOS
+        // CARGAR EVENTOS (con caché y optimización)
         // ==================================================
-        async function cargarEventos() {
+        let cacheEventos = null;
+        let ultimaCarga = 0;
+        const CACHE_DURACION = 30000; // 30 segundos
+        
+        async function cargarEventos(forzar = false) {
+            const ahora = Date.now();
+            if (!forzar && cacheEventos && (ahora - ultimaCarga) < CACHE_DURACION) {
+                console.log('📦 Usando caché de eventos');
+                eventos = cacheEventos;
+                renderizarEventos();
+                return;
+            }
+            
+            if (cargaEnProgreso) {
+                console.log('⏳ Carga en progreso, esperando...');
+                return;
+            }
+            
+            cargaEnProgreso = true;
             mostrarPreloader();
+            
             try {
-                const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
+                const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${ahora}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
                 if (data.success && data.eventos) {
                     eventos = data.eventos;
+                    cacheEventos = [...eventos];
+                    ultimaCarga = ahora;
                     renderizarEventos();
                 } else {
                     document.getElementById('eventosContainer').innerHTML = `<div style="text-align:center; padding:50px;">❌ Error: ${data.message}</div>`;
                 }
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('eventosContainer').innerHTML = '<div style="text-align:center; padding:50px;">❌ Error al conectar con el servidor</div>';
+                if (cacheEventos) {
+                    eventos = cacheEventos;
+                    renderizarEventos();
+                    document.getElementById('eventosContainer').innerHTML += '<div style="text-align:center; padding:10px; color:#f39c12;">⚠️ Usando datos en caché - conexión lenta</div>';
+                } else {
+                    document.getElementById('eventosContainer').innerHTML = '<div style="text-align:center; padding:50px;">❌ Error al conectar con el servidor</div>';
+                }
             } finally {
+                cargaEnProgreso = false;
                 ocultarPreloader();
             }
         }
         
         // ==================================================
-        // RENDERIZAR EVENTOS
+        // RENDERIZAR EVENTOS (optimizado)
         // ==================================================
         function renderizarEventos() {
             const container = document.getElementById('eventosContainer');
@@ -596,11 +690,15 @@
                 return div.innerHTML;
             }
             
-            container.innerHTML = eventos.map(evento => `
+            // Usar DocumentFragment para mejor rendimiento
+            const fragment = document.createDocumentFragment();
+            const tempDiv = document.createElement('div');
+            
+            tempDiv.innerHTML = eventos.map(evento => `
                 <div class="evento-card">
                     <div class="evento-header">
                         <div class="evento-titulo">${escapeHtml(evento.nombre)}</div>
-                        <div class="evento-fechas">📅 ${formatearRangoFechas(evento.fechaInicio, evento.fechaFin)}</div>
+                        <div class="evento-fechas">📅 ${cualquierFechaToDDMMYYYY(evento.fechaInicio)} - ${cualquierFechaToDDMMYYYY(evento.fechaFin)}</div>
                         <div class="evento-pax">👥 ${evento.pax} pasajeros</div>
                     </div>
                     <div class="evento-acciones">
@@ -610,6 +708,13 @@
                     </div>
                 </div>
             `).join('');
+            
+            while (tempDiv.firstChild) {
+                fragment.appendChild(tempDiv.firstChild);
+            }
+            
+            container.innerHTML = '';
+            container.appendChild(fragment);
         }
         
         // ==================================================
@@ -657,8 +762,8 @@
                 return;
             }
             
-            const fechaInicio = formatearFechaParaMostrar(fechaInicioInput);
-            const fechaFin = formatearFechaParaMostrar(fechaFinInput);
+            const fechaInicio = cualquierFechaToDDMMYYYY(fechaInicioInput);
+            const fechaFin = cualquierFechaToDDMMYYYY(fechaFinInput);
             mostrarPreloader();
             
             try {
@@ -683,7 +788,8 @@
                 if (data.success) {
                     alert('✅ Evento creado correctamente');
                     cerrarModal('modalCrearEvento');
-                    await cargarEventos();
+                    cacheEventos = null; // Invalidar caché
+                    await cargarEventos(true);
                 } else {
                     alert('❌ Error al crear evento: ' + data.message);
                 }
@@ -713,7 +819,6 @@
                 
                 const evento = data.evento;
                 const notasEvento = data.notas || [];
-                
                 let fechaInicioDate, fechaFinDate;
                 
                 if (typeof evento.fechaInicio === 'string' && evento.fechaInicio.includes('/')) {
@@ -741,7 +846,7 @@
                 
                 const notasPorFecha = {};
                 notasEvento.forEach(nota => {
-                    let fechaNota = formatearFechaParaMostrar(nota.fecha);
+                    let fechaNota = cualquierFechaToDDMMYYYY(nota.fecha);
                     if (!notasPorFecha[fechaNota]) notasPorFecha[fechaNota] = [];
                     notasPorFecha[fechaNota].push(nota);
                 });
@@ -749,28 +854,24 @@
                 let diasHtml = '';
                 for (const fecha of fechas) {
                     const notasDelDia = notasPorFecha[fecha] || [];
-                    let notasHtml = '';
-                    if (notasDelDia.length === 0) {
-                        notasHtml = '<div style="color:#999; font-size:12px; padding:8px;">Sin notas</div>';
-                    } else {
-                        notasDelDia.forEach(nota => {
-                            notasHtml += `
-                                <div class="nota-item">
-                                    <div class="nota-texto">${escapeHtml(nota.nota)}</div>
-                                    <div class="nota-fecha">${nota.tipo === 'mañana' ? '🌅 Mañana' : '🌙 Tarde'}</div>
-                                    <div style="display:flex; gap:5px; margin-top:5px;">
-                                        <button onclick="editarNota('${nota.id}', '${evento.id}', '${fecha}', '${escapeHtml(nota.nota)}', '${nota.tipo}')" style="background:#667eea; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:10px; cursor:pointer;">✏️ Editar</button>
-                                        <button onclick="eliminarNota('${nota.id}', '${evento.id}')" style="background:#e74c3c; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:10px; cursor:pointer;">🗑️ Eliminar</button>
-                                    </div>
+                    let notasHtml = notasDelDia.length === 0 ? '<div style="color:#999; font-size:12px; padding:8px;">Sin notas</div>' : '';
+                    notasDelDia.forEach(nota => {
+                        notasHtml += `
+                            <div class="nota-item">
+                                <div class="nota-texto">${escapeHtml(nota.nota)}</div>
+                                <div class="nota-fecha">${nota.tipo === 'mañana' ? '🌅 Mañana' : '🌙 Tarde'}</div>
+                                <div style="display:flex; gap:5px; margin-top:5px;">
+                                    <button onclick="editarNota('${nota.id}', '${evento.id}', '${fecha}', '${escapeHtml(nota.nota)}', '${nota.tipo}')" style="background:#667eea; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:10px; cursor:pointer;">✏️ Editar</button>
+                                    <button onclick="eliminarNota('${nota.id}', '${evento.id}')" style="background:#e74c3c; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:10px; cursor:pointer;">🗑️ Eliminar</button>
                                 </div>
-                            `;
-                        });
-                    }
+                            </div>
+                        `;
+                    });
                     
                     diasHtml += `
                         <div class="dia-card">
                             <div class="dia-titulo">${fecha}</div>
-                            ${notasHtml}
+                            ${notasHtml || '<div style="color:#999; font-size:12px; padding:8px;">Sin notas</div>'}
                             <button class="btn-agregar-nota" onclick="mostrarModalAgregarNota('${evento.id}', '${fecha}')">+ Agregar nota</button>
                         </div>
                     `;
@@ -783,7 +884,7 @@
                                 <h3>📅 ${escapeHtml(evento.nombre)}</h3>
                                 <button class="cerrar-modal" onclick="cerrarModal('modalEvento')">✕</button>
                             </div>
-                            <p><strong>📅 Período:</strong> ${formatearRangoFechas(evento.fechaInicio, evento.fechaFin)}</p>
+                            <p><strong>📅 Período:</strong> ${dateToDDMMYYYY(fechaInicioDate)} - ${dateToDDMMYYYY(fechaFinDate)}</p>
                             <p><strong>👥 Pasajeros:</strong> ${evento.pax}</p>
                             <div class="dias-container">${diasHtml}</div>
                         </div>
@@ -986,7 +1087,8 @@
                 
                 if (data.success) {
                     alert('✅ Evento eliminado correctamente');
-                    await cargarEventos();
+                    cacheEventos = null;
+                    await cargarEventos(true);
                 } else {
                     alert('❌ Error al eliminar evento: ' + data.message);
                 }
@@ -1016,7 +1118,6 @@
                 
                 const evento = data.evento;
                 const notasEvento = data.notas || [];
-                
                 let fechaInicioDate, fechaFinDate;
                 
                 if (typeof evento.fechaInicio === 'string' && evento.fechaInicio.includes('/')) {
@@ -1041,7 +1142,11 @@
                 for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
                     const fechaStr = dateToDDMMYYYY(d);
                     const notasDelDia = notasEvento.filter(nota => {
-                        let fechaNota = formatearFechaParaMostrar(nota.fecha);
+                        let fechaNota = nota.fecha;
+                        if (fechaNota && fechaNota.includes('-')) {
+                            const partes = fechaNota.split('-');
+                            fechaNota = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                        }
                         return fechaNota === fechaStr;
                     });
                     fechasConNotas.push({ fecha: fechaStr, notas: notasDelDia });
@@ -1100,10 +1205,17 @@
         // ==================================================
         function init() {
             initMenu();
+            medirVelocidad(); // Medir velocidad al inicio
             cargarEventos();
+            
+            // Detectar cambios de visibilidad para optimizar
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    cargarEventos();
+                }
+            });
         }
         
-        // Exponer funciones globalmente
         window.verEvento = verEvento;
         window.cerrarModal = cerrarModal;
         window.mostrarModalCrearEvento = mostrarModalCrearEvento;
@@ -1116,6 +1228,7 @@
         window.compartirEvento = compartirEvento;
         window.eliminarEvento = eliminarEvento;
         window.logout = logout;
+        window.medirVelocidad = medirVelocidad;
         
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
