@@ -512,36 +512,38 @@
         // ==================================================
         // MENÚ FLOTANTE
         // ==================================================
-        function initMenu() {
-            const menuBtn = document.getElementById('menuBtn');
-            const sidebar = document.getElementById('sidebar');
-            const menuOverlay = document.getElementById('menuOverlay');
-            
-            if (!menuBtn || !sidebar || !menuOverlay) return;
-            
-            function toggleMenu() {
-                sidebar.classList.toggle('open');
-                menuOverlay.classList.toggle('active');
-                document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-            }
-            
-            function closeMenu() {
-                sidebar.classList.remove('open');
-                menuOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-            
-            menuBtn.addEventListener('click', toggleMenu);
-            menuOverlay.addEventListener('click', closeMenu);
-            
-            document.querySelectorAll('.nav-menu a').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth <= 768) {
-                        closeMenu();
-                    }
-                });
-            });
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const menuOverlay = document.getElementById('menuOverlay');
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('open');
+            menuOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
         }
+        
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (menuBtn) {
+            menuBtn.addEventListener('click', toggleMenu);
+        }
+        
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', closeMenu);
+        }
+        
+        // Cerrar menú al hacer clic en un enlace
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeMenu();
+                }
+            });
+        });
         
         // ==================================================
         // CONFIGURACIÓN
@@ -559,8 +561,8 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         
-        // URL del Google Apps Script - ACTUALIZAR CON TU URL
-        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0HFsdajR5wgLlqnpc1p-pzW7YOTGynhFCwsCgp_jPRQ_RUDBAX8I4aw1YHCcKGN2utQ/exec';
+        // URL del Google Apps Script (misma que reservas.html y dashboard.html)
+        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
         // Link de Mercado Pago
         const MERCADO_PAGO_LINK = 'https://link.mercadopago.com.ar/scphotobr';
@@ -575,11 +577,11 @@
         function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
 
         // ==================================================
-        // CARGAR ESTADOS DESDE LA NUBE
+        // CARGAR ESTADOS DESDE LA NUBE (mismo que reservas.html)
         // ==================================================
         async function cargarEstadosDesdeNube() {
             try {
-                // Primero intentar cargar desde localStorage
+                // Primero intentar desde localStorage
                 const localEstados = localStorage.getItem('estadosReservasCloud');
                 if (localEstados) {
                     const parsed = JSON.parse(localEstados);
@@ -590,24 +592,16 @@
                 }
                 
                 // Luego sincronizar con la nube
-                const url = ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now();
-                console.log('🔍 Consultando estados desde:', url);
-                
-                const response = await fetch(url);
+                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
                 const data = await response.json();
-                
-                console.log('📦 Respuesta del servidor:', data);
-                
                 if (data.success && data.estados) {
                     estadosGlobales = data.estados;
                     localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
                     console.log('📥 Estados sincronizados desde nube:', Object.keys(estadosGlobales).length);
-                } else {
-                    console.warn('⚠️ No se pudieron obtener estados desde nube, usando localStorage');
                 }
                 return estadosGlobales;
             } catch (error) {
-                console.error('❌ Error al cargar desde nube:', error);
+                console.error('Error al cargar desde nube:', error);
                 const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
                 estadosGlobales = estadosLocal;
                 return estadosLocal;
@@ -689,7 +683,7 @@
                     const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
                     const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
 
-                    // Obtener estado desde estadosGlobales
+                    // Obtener estado desde estadosGlobales (cargado desde la nube)
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
@@ -710,7 +704,7 @@
                 }
 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
-                console.log('📋 Estados por reserva:', reservasData.map(r => ({ id: r.id, estado: r.estado })));
+                console.log(`📋 Estados: Pendientes=${reservasData.filter(r => r.estado === 'pendiente').length}, Confirmadas=${reservasData.filter(r => r.estado === 'confirmado').length}, Pagadas=${reservasData.filter(r => r.estado === 'pagado').length}`);
 
                 // Actualizar métricas
                 const total = reservasData.length;
@@ -732,7 +726,7 @@
                 document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'confirmado'));
                 document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pagado'));
                 
-                console.log('✅ Dashboard actualizado correctamente');
+                console.log('✅ Kanban actualizado correctamente');
                 
             } catch (error) {
                 console.error('❌ Error:', error);
@@ -864,13 +858,8 @@ ${MERCADO_PAGO_LINK}
         }
 
         // ==================================================
-        // INICIALIZAR
+        // INICIALIZAR - SIN ACTUALIZACIÓN AUTOMÁTICA
         // ==================================================
-        function init() {
-            initMenu();
-            cargarDatos();
-            setInterval(cargarDatos, 30000);
-        }
         
         // Exponer funciones globalmente
         window.verDetalle = verDetalle;
@@ -878,13 +867,11 @@ ${MERCADO_PAGO_LINK}
         window.cargarDatos = cargarDatos;
         window.logout = logout;
         window.enviarLinkPagoWhatsApp = enviarLinkPagoWhatsApp;
+
+        // Iniciar carga de datos (solo una vez al cargar la página)
+        cargarDatos();
         
-        // Iniciar cuando el DOM esté listo
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
+        // NO hay setInterval - solo carga al iniciar y con el botón "Recargar"
     </script>
 </body>
 </html>
