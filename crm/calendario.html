@@ -531,6 +531,22 @@
             return fechaStr;
         }
         
+        function extraerSoloFecha(fechaStr) {
+            if (!fechaStr) return '';
+            // Si la fecha tiene espacios, tomar solo la primera parte
+            if (fechaStr.includes(' ')) {
+                fechaStr = fechaStr.split(' ')[0];
+            }
+            // Si la fecha está en formato DD/MM/YYYY
+            if (fechaStr.includes('/')) {
+                const partes = fechaStr.split('/');
+                if (partes.length === 3) {
+                    return `${partes[2]}-${partes[1]}-${partes[0]}`;
+                }
+            }
+            return fechaStr;
+        }
+        
         // ==================================================
         // CARGAR EVENTOS DESDE LA NUBE
         // ==================================================
@@ -698,9 +714,21 @@
                 }
                 
                 const evento = data.evento;
-                const notasEvento = data.notas || [];
+                let notasEvento = data.notas || [];
                 
-                console.log('📝 NOTAS RECIBIDAS:', notasEvento);
+                console.log('📝 NOTAS RECIBIDAS (originales):', notasEvento);
+                
+                // Limpiar las fechas de las notas (eliminar texto adicional)
+                notasEvento = notasEvento.map(nota => {
+                    let fechaLimpia = nota.fecha;
+                    if (fechaLimpia && fechaLimpia.includes(' ')) {
+                        fechaLimpia = fechaLimpia.split(' ')[0];
+                        console.log(`🔧 Limpiando fecha: "${nota.fecha}" -> "${fechaLimpia}"`);
+                    }
+                    return { ...nota, fecha: fechaLimpia };
+                });
+                
+                console.log('📝 NOTAS CON FECHAS LIMPIAS:', notasEvento);
                 console.log('📅 FECHAS DEL EVENTO: inicio=' + evento.fechaInicio + ', fin=' + evento.fechaFin);
                 
                 // Generar array de fechas entre inicio y fin
@@ -709,15 +737,12 @@
                     const inicio = new Date(fechaInicio);
                     const fin = new Date(fechaFin);
                     
-                    console.log('📅 Generando fechas desde:', inicio, 'hasta:', fin);
-                    
                     for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
                         const año = d.getFullYear();
                         const mes = String(d.getMonth() + 1).padStart(2, '0');
                         const dia = String(d.getDate()).padStart(2, '0');
                         const fechaStr = `${año}-${mes}-${dia}`;
                         fechas.push(fechaStr);
-                        console.log('📅 Fecha generada:', fechaStr);
                     }
                     return fechas;
                 }
@@ -743,7 +768,7 @@
                 console.log('📊 NOTAS POR FECHA:', notasPorFecha);
                 
                 let diasHtml = '';
-                fechas.forEach(fecha => {
+                for (const fecha of fechas) {
                     const notasDelDia = notasPorFecha[fecha] || [];
                     console.log(`🔍 Fecha: ${fecha}, Notas encontradas: ${notasDelDia.length}`);
                     
@@ -770,7 +795,7 @@
                             <button class="btn-agregar-nota" onclick="mostrarModalAgregarNota('${evento.id}', '${fecha}')">+ Agregar nota</button>
                         </div>
                     `;
-                });
+                }
                 
                 const modalHtml = `
                     <div id="modalEvento" class="modal">
@@ -798,7 +823,7 @@
         }
         
         // ==================================================
-        // AGREGAR NOTA
+        // AGREGAR NOTA (CORREGIDO - guarda solo la fecha)
         // ==================================================
         function mostrarModalAgregarNota(eventoId, fecha) {
             const fechaFormateada = formatFechaParaMostrar(fecha);
@@ -836,6 +861,12 @@
                 return;
             }
             
+            // Asegurar que la fecha se guarda en formato YYYY-MM-DD sin texto adicional
+            let fechaLimpia = fecha;
+            if (fechaLimpia && fechaLimpia.includes(' ')) {
+                fechaLimpia = fechaLimpia.split(' ')[0];
+            }
+            
             mostrarPreloader();
             
             try {
@@ -844,11 +875,11 @@
                 formData.append('action', 'guardarNota');
                 formData.append('id', notaId);
                 formData.append('eventoId', eventoId);
-                formData.append('fecha', fecha);
+                formData.append('fecha', fechaLimpia);
                 formData.append('nota', texto);
                 formData.append('tipo', tipo);
                 
-                console.log('📝 Guardando nota:', { eventoId, fecha, texto, tipo });
+                console.log('📝 Guardando nota:', { eventoId, fecha: fechaLimpia, texto, tipo });
                 
                 const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
