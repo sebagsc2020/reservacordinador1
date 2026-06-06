@@ -33,7 +33,106 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
+        
+        /* ========== MODO OSCURO ========== */
+        body.dark-mode {
+            background: #0f0f1a;
+        }
+        
+        body.dark-mode .metrica-card,
+        body.dark-mode .kanban-column,
+        body.dark-mode .kanban-card,
+        body.dark-mode .preloader-popup-contenido,
+        body.dark-mode .user-info {
+            background: #1e1e2e;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .metrica-valor {
+            color: #667eea;
+        }
+        
+        body.dark-mode .metrica-label {
+            color: #aaa;
+        }
+        
+        body.dark-mode .kanban-header {
+            border-bottom-color: #3a3a4e;
+        }
+        
+        body.dark-mode .kanban-card-cliente {
+            color: #ffffff;
+        }
+        
+        body.dark-mode .kanban-card-excursion {
+            color: #aaa;
+        }
+        
+        body.dark-mode .kanban-card-fecha {
+            color: #888;
+        }
+        
+        body.dark-mode .kanban-card-formapago {
+            color: #aaa;
+        }
+        
+        body.dark-mode .kanban-card-personas {
+            background: #2a2a3e;
+            color: #667eea;
+        }
+        
+        body.dark-mode .kanban-cards::-webkit-scrollbar-track {
+            background: #2a2a3e;
+        }
+        
+        body.dark-mode .loading-text {
+            color: #aaa;
+        }
+        
+        body.dark-mode .header h1 {
+            color: white;
+        }
+        
+        body.dark-mode .header p {
+            color: #aaa !important;
+        }
+        
+        body.dark-mode .btn-recargar {
+            background: #27ae60;
+        }
+        
+        body.dark-mode .btn-recargar:hover {
+            background: #219a52;
+        }
+        
+        body.dark-mode .btn-theme {
+            color: white;
+        }
+        
+        body.dark-mode .btn-theme:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        body.dark-mode .aviso-pago {
+            background: #2a2a3e;
+            border-color: #3a3a4e;
+            color: #ffc107;
+        }
+        
+        body.dark-mode #modalDetalle > div {
+            background: #1e1e2e !important;
+        }
+        
+        body.dark-mode #modalDetalle h2,
+        body.dark-mode #modalDetalle p,
+        body.dark-mode #modalDetalle strong {
+            color: #ddd !important;
+        }
+        
+        body.dark-mode #modalDetalle .aviso-pago {
+            background: #2a2a3e;
+        }
         
         /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
         .menu-btn {
@@ -160,7 +259,33 @@
             flex-wrap: wrap; 
             gap: 15px; 
         }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
+        .header h1 { font-size: 26px; color: #1a1a2e; transition: color 0.3s; }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-theme:hover {
+            background: rgba(0,0,0,0.1);
+            transform: scale(1.1);
+        }
+        
         .user-info { 
             display: flex; 
             align-items: center; 
@@ -170,6 +295,7 @@
             border-radius: 50px; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
             font-size: 14px; 
+            transition: background 0.3s;
         }
         .user-avatar { 
             width: 35px; 
@@ -195,12 +321,12 @@
             border-radius: 20px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
             text-align: center; 
-            transition: transform 0.2s; 
+            transition: transform 0.2s, background 0.3s; 
         }
         .metrica-card:active { transform: scale(0.98); }
         .metrica-card:hover { transform: translateY(-3px); }
-        .metrica-valor { font-size: 32px; font-weight: 800; color: #667eea; } 
-        .metrica-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        .metrica-valor { font-size: 32px; font-weight: 800; color: #667eea; transition: color 0.3s; } 
+        .metrica-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; transition: color 0.3s; }
         
         .btn-recargar { 
             padding: 10px 20px; 
@@ -216,8 +342,8 @@
         .btn-recargar:hover { background: #219a52; transform: translateY(-2px); }
         
         .kanban-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .kanban-column { background: #f8f9fa; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; }
-        .kanban-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e0e0e0; }
+        .kanban-column { background: #f8f9fa; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; transition: background 0.3s; }
+        .kanban-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e0e0e0; transition: border-color 0.3s; }
         .kanban-title { font-size: 16px; font-weight: 700; } 
         .kanban-count { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
         .kanban-column.pendiente .kanban-header { border-bottom-color: #ffc107; } 
@@ -237,7 +363,7 @@
             padding-right: 5px; 
         }
         .kanban-cards::-webkit-scrollbar { width: 5px; }
-        .kanban-cards::-webkit-scrollbar-track { background: #e0e0e0; border-radius: 10px; }
+        .kanban-cards::-webkit-scrollbar-track { background: #e0e0e0; border-radius: 10px; transition: background 0.3s; }
         .kanban-cards::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
         
         .kanban-card { 
@@ -246,7 +372,7 @@
             padding: 15px; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
             border-left: 4px solid #667eea; 
-            transition: all 0.2s; 
+            transition: all 0.2s, background 0.3s; 
             cursor: pointer; 
         }
         .kanban-card:active { transform: scale(0.98); }
@@ -255,15 +381,15 @@
         .kanban-card.confirmado { border-left-color: #27ae60; }
         .kanban-card.pagado { border-left-color: #3498db; }
         .kanban-card-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .kanban-card-id { font-size: 10px; font-weight: 700; color: #667eea; background: #f0f0ff; padding: 2px 8px; border-radius: 12px; } 
-        .kanban-card-fecha { font-size: 10px; color: #999; }
-        .kanban-card-cliente { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 5px; }
-        .kanban-card-excursion { font-size: 11px; color: #666; margin-bottom: 8px; }
+        .kanban-card-id { font-size: 10px; font-weight: 700; color: #667eea; background: #f0f0ff; padding: 2px 8px; border-radius: 12px; transition: background 0.3s; } 
+        .kanban-card-fecha { font-size: 10px; color: #999; transition: color 0.3s; }
+        .kanban-card-cliente { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 5px; transition: color 0.3s; }
+        .kanban-card-excursion { font-size: 11px; color: #666; margin-bottom: 8px; transition: color 0.3s; }
         .kanban-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-        .kanban-card-personas { background: #f0f0ff; color: #667eea; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
-        .kanban-card-formapago { color: #888; }
+        .kanban-card-personas { background: #f0f0ff; color: #667eea; padding: 3px 10px; border-radius: 20px; font-weight: 600; transition: background 0.3s; }
+        .kanban-card-formapago { color: #888; transition: color 0.3s; }
         
-        .loading-text { text-align: center; padding: 30px; color: #999; }
+        .loading-text { text-align: center; padding: 30px; color: #999; transition: color 0.3s; }
         
         /* ===== PRELOADER POPUP ===== */
         .preloader-popup {
@@ -288,6 +414,7 @@
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             animation: popupFadeIn 0.3s ease;
+            transition: background 0.3s;
         }
         @keyframes popupFadeIn {
             from { transform: scale(0.9); opacity: 0; }
@@ -304,8 +431,8 @@
             margin: 0 auto 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .preloader-popup-titulo { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
-        .preloader-popup-subtitulo { font-size: 14px; color: #666; }
+        .preloader-popup-titulo { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; transition: color 0.3s; }
+        .preloader-popup-subtitulo { font-size: 14px; color: #666; transition: color 0.3s; }
         .puntos::after { content: ''; animation: puntosAnim 1.5s infinite; }
         @keyframes puntosAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
         
@@ -344,6 +471,7 @@
             font-size: 12px;
             color: #856404;
             text-align: center;
+            transition: background 0.3s, border-color 0.3s, color 0.3s;
         }
         
         /* Scroll sidebar */
@@ -440,6 +568,12 @@
             .preloader-popup-titulo {
                 font-size: 18px;
             }
+            
+            .btn-theme {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -448,8 +582,9 @@
                 align-items: flex-start;
             }
             
-            .header div:first-child {
+            .header-actions {
                 width: 100%;
+                justify-content: flex-start;
             }
             
             .metricas-grid {
@@ -494,7 +629,8 @@
                 <h1>📈 Seguimiento</h1>
                 <p style="color:#999;font-size:13px;">Pipeline de reservas - Estado actual</p>
             </div>
-            <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
+            <div class="header-actions">
+                <button class="btn-theme" onclick="toggleTheme()" title="Modo oscuro/claro">🌙</button>
                 <button class="btn-recargar" onclick="cargarDatos()">🔄 Recargar</button>
                 <div class="user-info">
                     <div class="user-avatar">A</div>
@@ -537,6 +673,28 @@
 
     <script>
         // ==================================================
+        // MODO OSCURO
+        // ==================================================
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            const btn = document.querySelector('.btn-theme');
+            if (btn) {
+                btn.textContent = isDark ? '☀️' : '🌙';
+            }
+        }
+        
+        // Cargar preferencia de modo oscuro
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            const btn = document.querySelector('.btn-theme');
+            if (btn) {
+                btn.textContent = '☀️';
+            }
+        }
+        
+        // ==================================================
         // MENÚ FLOTANTE
         // ==================================================
         const menuBtn = document.getElementById('menuBtn');
@@ -563,7 +721,6 @@
             menuOverlay.addEventListener('click', closeMenu);
         }
         
-        // Cerrar menú al hacer clic en un enlace
         document.querySelectorAll('.nav-menu a').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 768) {
@@ -894,6 +1051,7 @@ ${MERCADO_PAGO_LINK}
         window.cargarDatos = cargarDatos;
         window.logout = logout;
         window.enviarLinkPagoWhatsApp = enviarLinkPagoWhatsApp;
+        window.toggleTheme = toggleTheme;
 
         // Iniciar carga de datos (solo una vez al cargar la página)
         cargarDatos();
@@ -907,7 +1065,7 @@ ${MERCADO_PAGO_LINK}
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('sw.js')
                     .then(function(registration) {
                         console.log('✅ Service Worker registrado con éxito:', registration.scope);
                     })
