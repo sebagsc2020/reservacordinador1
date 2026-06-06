@@ -93,12 +93,29 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* ===== MENÚ HAMBURGUESA - SIN FONDO AZUL ===== */
         .menu-btn {
-            position: fixed; top: 15px; left: 15px; width: 50px; height: 50px;
-            background: #667eea; border-radius: 50%; display: none; align-items: center;
-            justify-content: center; cursor: pointer; z-index: 1000; border: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 50px;
+            height: 50px;
+            background: transparent;
+            border-radius: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            border: none;
         }
-        .menu-btn span { font-size: 24px; color: white; }
+        .menu-btn span { 
+            font-size: 24px; 
+            color: #333; 
+        }
+        body.dark-mode .menu-btn span { 
+            color: white; 
+        }
         
         .sidebar {
             width: 200px; background: #1a1a2e; color: white; padding: 20px 0;
@@ -333,7 +350,7 @@
             <h3>🏆 Top Clientes por Pasajeros</h3>
             <div class="table-wrapper">
                 <table>
-                    <thead><tr><th>Cliente</th><th>Email</th><th>Reservas</th><th>Total Pasajeros</th><th>Acciones</th></tr></thead>
+                    <thead><tr><th>Cliente</th><th>Email</th><th>Reservas</th><th>Total Pasajeros</th><th>Acciones</th><tr></thead>
                     <tbody id="topClientesBody"><tr><td colspan="5"><div class="loader"></div></td</tr</tbody>
                 </table>
             </div>
@@ -635,10 +652,11 @@
             document.getElementById('topClientesBody').innerHTML = topClientes.map(c => 
                 `<tr>
                     <td><strong>${escapeHtml(c.nombre)}</strong></td>
-                    <td>${escapeHtml(c.email)}</td><td>${c.reservas}</td>
+                    <td>${escapeHtml(c.email)}</td>
+                    <td>${c.reservas}</td>
                     <td><strong>${c.totalPasajeros}</strong></td>
                     <td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td>
-                 `
+                </tr>`
             ).join('');
             
             // Últimas reservas
@@ -646,10 +664,12 @@
             document.getElementById('tablaUltimasReservas').innerHTML = ultimas.map(r => 
                 `<tr>
                     <td><strong>${escapeHtml(r.id)}</strong></td>
-                    <td>${escapeHtml(r.nombre)}</td><td>${escapeHtml(r.excursion)}</td>
-                    <td>${escapeHtml(r.fecha)}</td><td>${r.personas || 0}</td>
+                    <td>${escapeHtml(r.nombre)}</td>
+                    <td>${escapeHtml(r.excursion)}</td>
+                    <td>${escapeHtml(r.fecha)}</td>
+                    <td>${r.personas || 0}</td>
                     <td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td>
-                 `
+                </tr>`
             ).join('');
             
             actualizarGraficos(reservas);
@@ -687,8 +707,8 @@
         // ==================================================
         async function cargarDatos() {
             // Mostrar spinner en tablas
-            document.getElementById('topClientesBody').innerHTML = '<tr><td colspan="5"><div class="loader"></div></td</tr';
-            document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6"><div class="loader"></div></td</tr';
+            document.getElementById('topClientesBody').innerHTML = '<tr><td colspan="5"><div class="loader"></div></td></tr>';
+            document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6"><div class="loader"></div></td></tr>';
             
             // Intentar caché primero
             const cache = obtenerDeCache();
@@ -767,8 +787,8 @@
                 console.log('✅ Dashboard actualizado con', reservasData.length, 'reservas');
             } catch(e) { 
                 console.error('Error cargando datos:', e);
-                document.getElementById('tablaUltimasReservas').innerHTML = `<tr><td colspan="6">❌ Error: ${e.message}</td</tr`;
-                document.getElementById('topClientesBody').innerHTML = `<tr><td colspan="5">❌ Error: ${e.message}</td</tr`;
+                document.getElementById('tablaUltimasReservas').innerHTML = `<tr><td colspan="6">❌ Error: ${e.message}</td></tr>`;
+                document.getElementById('topClientesBody').innerHTML = `<tr><td colspan="5">❌ Error: ${e.message}</td></tr>`;
             }
         }
         
