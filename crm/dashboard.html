@@ -75,16 +75,10 @@
         .stat-icon { font-size: 32px; flex-shrink: 0; }
         .stat-info { flex: 1; min-width: 0; }
         .stat-info h3 { font-size: 11px; color: #666; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-info .number { font-size: 28px; font-weight: 700; color: #1a1a2e; line-height: 1.2; }
+        .stat-info .number { font-size: 28px; font-weight: 700; color: #1a1a2e; line-height: 1.2; word-break: break-word; }
         .stat-info small { font-size: 9px; color: #999; display: block; margin-top: 3px; }
         
         /* Spinner de carga simple */
-        .loader-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 50px;
-        }
         .loader {
             width: 40px;
             height: 40px;
@@ -92,6 +86,7 @@
             border-top: 4px solid #667eea;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin: 0 auto;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -265,12 +260,54 @@
 
         <!-- Métricas -->
         <div class="metrics-advanced" id="metricsContainer">
-            <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-info"><h3>Total Pasajeros</h3><div class="number" id="totalPasajeros">0</div><small>suma de todas las reservas</small></div></div>
-            <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-info"><h3>Tasa Confirmación</h3><div class="number" id="tasaConfirmacion">0%</div><small>confirmadas / total</small></div></div>
-            <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-info"><h3>Tasa Pago</h3><div class="number" id="tasaPago">0%</div><small>pagadas / total</small></div></div>
-            <div class="stat-card"><div class="stat-icon">👨‍👩‍👧‍👦</div><div class="stat-info"><h3>Grupo Promedio</h3><div class="number" id="grupoPromedio">0</div><small>personas por reserva</small></div></div>
-            <div class="stat-card"><div class="stat-icon">🔄</div><div class="stat-info"><h3>Clientes Recurrentes</h3><div class="number" id="clientesRecurrentes">0%</div><small>con más de 1 reserva</small></div></div>
-            <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-info"><h3>Pasajeros/Día</h3><div class="number" id="pasajerosPorDia">0</div><small>promedio diario</small></div></div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <h3>Total Pasajeros</h3>
+                    <div class="number" id="totalPasajeros">0</div>
+                    <small>suma de todas las reservas</small>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-info">
+                    <h3>Tasa Confirmación</h3>
+                    <div class="number" id="tasaConfirmacion">0%</div>
+                    <small>confirmadas / total</small>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-info">
+                    <h3>Tasa Pago</h3>
+                    <div class="number" id="tasaPago">0%</div>
+                    <small>pagadas / total</small>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👨‍👩‍👧‍👦</div>
+                <div class="stat-info">
+                    <h3>Grupo Promedio</h3>
+                    <div class="number" id="grupoPromedio">0</div>
+                    <small>personas por reserva</small>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔄</div>
+                <div class="stat-info">
+                    <h3>Clientes Recurrentes</h3>
+                    <div class="number" id="clientesRecurrentes">0%</div>
+                    <small>con más de 1 reserva</small>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏔️</div>
+                <div class="stat-info">
+                    <h3>Top Excursión</h3>
+                    <div class="number" id="topExcursion" style="font-size: 16px; word-break: break-word;">--</div>
+                    <small>excursión con más pasajeros</small>
+                </div>
+            </div>
         </div>
 
         <!-- Filtro fechas -->
@@ -452,6 +489,53 @@
         }
         
         // ==================================================
+        // ACTUALIZAR TOP EXCURSIÓN (reemplaza Pasajeros/Día)
+        // ==================================================
+        function actualizarTopExcursion(reservas) {
+            if (!reservas || reservas.length === 0) {
+                document.getElementById('topExcursion').innerHTML = '--';
+                return;
+            }
+            
+            const excursionMap = new Map();
+            
+            reservas.forEach(r => {
+                if (!r.excursionesLista || r.excursionesLista.length === 0) return;
+                
+                r.excursionesLista.forEach(excursion => {
+                    if (!excursion) return;
+                    const total = excursionMap.get(excursion) || 0;
+                    excursionMap.set(excursion, total + (r.personas || 0));
+                });
+            });
+            
+            let topExcursion = '';
+            let maxPasajeros = 0;
+            let segundaExcursion = '';
+            let segundaPasajeros = 0;
+            
+            for (const [excursion, total] of excursionMap) {
+                if (total > maxPasajeros) {
+                    segundaExcursion = topExcursion;
+                    segundaPasajeros = maxPasajeros;
+                    maxPasajeros = total;
+                    topExcursion = excursion;
+                } else if (total > segundaPasajeros) {
+                    segundaPasajeros = total;
+                    segundaExcursion = excursion;
+                }
+            }
+            
+            const topElement = document.getElementById('topExcursion');
+            topElement.innerHTML = topExcursion || 'Sin datos';
+            if (segundaExcursion) {
+                topElement.title = `🥇 ${topExcursion}: ${maxPasajeros} pasajeros\n🥈 ${segundaExcursion}: ${segundaPasajeros} pasajeros`;
+            } else if (topExcursion) {
+                topElement.title = `${topExcursion}: ${maxPasajeros} pasajeros`;
+            }
+        }
+        
+        // ==================================================
         // ACTUALIZAR GRÁFICOS
         // ==================================================
         function actualizarGraficos(reservas) {
@@ -508,6 +592,7 @@
                 document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6">No hay reservas</td</tr';
                 document.getElementById('topClientesBody').innerHTML = '<tr><td colspan="5">No hay datos</td</tr';
                 actualizarGraficos([]);
+                actualizarTopExcursion([]);
                 return;
             }
             
@@ -523,9 +608,6 @@
             const recurrentes = Object.values(reservasPorEmail).filter(c => c > 1).length;
             const porcentajeRecurrentes = Object.keys(reservasPorEmail).length > 0 ? Math.round((recurrentes / Object.keys(reservasPorEmail).length) * 100) : 0;
             
-            const diasUnicos = new Set(reservas.filter(r => r.fecha).map(r => r.fecha));
-            const pasajerosPorDia = diasUnicos.size > 0 ? Math.round(totalPasajeros / diasUnicos.size) : 0;
-            
             document.getElementById('totalPasajeros').innerHTML = totalPasajeros.toLocaleString();
             const tcElem = document.getElementById('tasaConfirmacion');
             tcElem.innerHTML = `${tasaConfirmacion}%`;
@@ -535,8 +617,10 @@
             tpElem.style.color = tasaPago >= 60 ? '#27ae60' : (tasaPago >= 30 ? '#f39c12' : '#e74c3c');
             document.getElementById('grupoPromedio').innerHTML = grupoPromedio;
             document.getElementById('clientesRecurrentes').innerHTML = `${porcentajeRecurrentes}%`;
-            document.getElementById('pasajerosPorDia').innerHTML = pasajerosPorDia.toLocaleString();
             document.getElementById('totalReservasSpan').innerHTML = `${reservas.length} reservas`;
+            
+            // Top Excursión
+            actualizarTopExcursion(reservas);
             
             // Top clientes
             const clientesMap = new Map();
@@ -549,9 +633,10 @@
             });
             const topClientes = Array.from(clientesMap.values()).sort((a,b) => b.totalPasajeros - a.totalPasajeros).slice(0, 10);
             document.getElementById('topClientesBody').innerHTML = topClientes.map(c => 
-                `<table>
+                `<tr>
                     <td><strong>${escapeHtml(c.nombre)}</strong></td>
-                    <td>${escapeHtml(c.email)}</td><td>${c.reservas}</td><td><strong>${c.totalPasajeros}</strong></td>
+                    <td>${escapeHtml(c.email)}</td><td>${c.reservas}</td>
+                    <td><strong>${c.totalPasajeros}</strong></td>
                     <td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td>
                  `
             ).join('');
@@ -561,7 +646,8 @@
             document.getElementById('tablaUltimasReservas').innerHTML = ultimas.map(r => 
                 `<tr>
                     <td><strong>${escapeHtml(r.id)}</strong></td>
-                    <td>${escapeHtml(r.nombre)}</td><td>${escapeHtml(r.excursion)}</td><td>${escapeHtml(r.fecha)}</td><td>${r.personas || 0}</td>
+                    <td>${escapeHtml(r.nombre)}</td><td>${escapeHtml(r.excursion)}</td>
+                    <td>${escapeHtml(r.fecha)}</td><td>${r.personas || 0}</td>
                     <td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td>
                  `
             ).join('');
