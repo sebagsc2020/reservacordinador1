@@ -315,6 +315,21 @@
             box-shadow: 0 4px 12px rgba(39,174,96,0.3);
         }
         
+        .btn-editar-evento {
+            background: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            flex: 1;
+        }
+        .btn-editar-evento:hover {
+            background: #e67e22;
+        }
+        
         .eventos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -558,6 +573,9 @@
             .main-content { padding: 60px 12px 20px; }
             .eventos-grid { grid-template-columns: 1fr; }
             .btn-theme { width: 40px; height: 40px; font-size: 20px; }
+            .evento-acciones {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -772,6 +790,7 @@
                     <div class="evento-acciones">
                         <button class="btn-ver-evento" onclick="verEvento('${evento.id}')">📋 Ver días</button>
                         <button class="btn-whatsapp-evento" onclick="compartirEvento('${evento.id}')">💬 WhatsApp</button>
+                        <button class="btn-editar-evento" onclick="editarEvento('${evento.id}')">✏️ Editar</button>
                         <button class="btn-eliminar-evento" onclick="eliminarEvento('${evento.id}')">🗑️ Eliminar</button>
                     </div>
                 </div>
@@ -898,6 +917,92 @@
                     await cargarEventosDesdeRed();
                 } else {
                     alert('❌ Error al crear evento: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al conectar con el servidor');
+            } finally {
+                ocultarPreloader();
+            }
+        }
+        
+        // ==================================================
+        // ✏️ EDITAR EVENTO (NUEVA FUNCIÓN)
+        // ==================================================
+        async function editarEvento(eventoId) {
+            const evento = eventos.find(e => e.id === eventoId);
+            if (!evento) {
+                alert('❌ Evento no encontrado');
+                return;
+            }
+            
+            // Mostrar modal de edición
+            const modalHtml = `
+                <div id="modalEditarEvento" class="modal">
+                    <div class="modal-contenido">
+                        <div class="modal-header">
+                            <h3>✏️ Editar evento</h3>
+                            <button class="cerrar-modal" onclick="cerrarModal('modalEditarEvento')">✕</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del evento</label>
+                            <input type="text" id="editarEventoNombre" value="${escapeHtml(evento.nombre)}" placeholder="Nombre del evento">
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad de pasajeros</label>
+                            <input type="number" id="editarEventoPax" value="${evento.pax}" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de inicio</label>
+                            <input type="date" id="editarEventoFechaInicio" value="${evento.fechaInicio.split('T')[0] || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de fin</label>
+                            <input type="date" id="editarEventoFechaFin" value="${evento.fechaFin.split('T')[0] || ''}">
+                        </div>
+                        <button class="btn-crear" style="width:100%; margin-top:10px;" onclick="actualizarEvento('${eventoId}')">💾 Guardar cambios</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        async function actualizarEvento(eventoId) {
+            const nuevoNombre = document.getElementById('editarEventoNombre')?.value;
+            const nuevoPax = document.getElementById('editarEventoPax')?.value;
+            const nuevaFechaInicio = document.getElementById('editarEventoFechaInicio')?.value;
+            const nuevaFechaFin = document.getElementById('editarEventoFechaFin')?.value;
+            
+            if (!nuevoNombre) {
+                alert('⚠️ El nombre del evento es obligatorio');
+                return;
+            }
+            
+            mostrarPreloader();
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('action', 'actualizarEvento');
+                formData.append('id', eventoId);
+                formData.append('nombre', nuevoNombre);
+                formData.append('pax', nuevoPax || '0');
+                if (nuevaFechaInicio) formData.append('fechaInicio', nuevaFechaInicio);
+                if (nuevaFechaFin) formData.append('fechaFin', nuevaFechaFin);
+                
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Evento actualizado correctamente');
+                    cerrarModal('modalEditarEvento');
+                    await cargarEventosDesdeRed();
+                } else {
+                    alert('❌ Error al actualizar evento: ' + data.message);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -1307,6 +1412,8 @@
         window.cerrarModal = cerrarModal;
         window.mostrarModalCrearEvento = mostrarModalCrearEvento;
         window.crearEvento = crearEvento;
+        window.editarEvento = editarEvento;
+        window.actualizarEvento = actualizarEvento;
         window.mostrarModalAgregarNota = mostrarModalAgregarNota;
         window.guardarNota = guardarNota;
         window.editarNota = editarNota;
