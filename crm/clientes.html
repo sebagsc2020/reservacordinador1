@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AVT CRM">
     <meta name="mobile-web-app-capable" content="yes">
-    meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#1a1a2e">
     
     <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
@@ -101,7 +101,8 @@
         .stats-label { font-size: 13px; color: #666; margin-top: 5px; }
         
         .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-input { padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
+        .filter-input { padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; transition: all 0.3s; }
+        .filter-input:focus { outline: none; border-color: #667eea; }
         .btn-filtrar, .btn-recargar, .btn-pdf, .btn-etiqueta { padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
@@ -145,6 +146,16 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eef2ff; padding-bottom: 12px; }
         .modal-header h3 { color: #667eea; }
         .cerrar-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        
+        /* Indicador de búsqueda activa */
+        .busqueda-activa {
+            background: #e8f5e9 !important;
+            border-color: #27ae60 !important;
+        }
+        body.dark-mode .busqueda-activa {
+            background: #2a3a2e !important;
+            border-color: #27ae60 !important;
+        }
         
         @media (min-width: 769px) {
             .menu-btn { display: none !important; }
@@ -204,8 +215,8 @@
         </div>
 
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono..." id="busquedaCliente">
-            <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Filtrar</button>
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono... (mínimo 2 caracteres)" id="busquedaCliente">
+            <button class="btn-filtrar" onclick="filtrarClientes()" style="background:#27ae60;">🔍 Buscar</button>
             <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
             <button class="btn-pdf" onclick="descargarPDF()">📄 Descargar PDF</button>
             <button class="btn-etiqueta" onclick="filtrarPorEtiqueta()">🏷️ Filtrar por etiqueta</button>
@@ -323,7 +334,7 @@
         function aplicarFiltros() {
             const texto = document.getElementById('busquedaCliente').value.toLowerCase().trim();
             let filtrados = [...clientesData];
-            if (texto) {
+            if (texto && texto.length >= 2) {
                 filtrados = filtrados.filter(c => c.nombre.toLowerCase().includes(texto) || c.email.toLowerCase().includes(texto) || (c.telefono && c.telefono.includes(texto)));
             }
             if (filtroEtiquetaActual) {
@@ -331,6 +342,40 @@
             }
             clientesFiltrados = filtrados;
             renderizarTabla();
+        }
+        
+        // ==================================================
+        // BÚSQUEDA INSTANTÁNEA (mientras escribe)
+        // ==================================================
+        function initBusquedaInstantanea() {
+            const input = document.getElementById('busquedaCliente');
+            if (!input) return;
+            
+            input.addEventListener('input', function(e) {
+                const texto = e.target.value.toLowerCase().trim();
+                
+                // Marcar visualmente que hay búsqueda activa
+                if (texto.length >= 2) {
+                    input.classList.add('busqueda-activa');
+                } else {
+                    input.classList.remove('busqueda-activa');
+                }
+                
+                if (texto.length === 0) {
+                    // Sin texto: mostrar todos los clientes
+                    clientesFiltrados = [...clientesData];
+                    renderizarTabla();
+                } else if (texto.length >= 2) {
+                    // Buscar después de 2 caracteres
+                    clientesFiltrados = clientesData.filter(c => 
+                        c.nombre.toLowerCase().includes(texto) || 
+                        c.email.toLowerCase().includes(texto) ||
+                        (c.telefono && c.telefono.includes(texto))
+                    );
+                    renderizarTabla();
+                }
+                // Si tiene 1 carácter, no hace nada (espera más)
+            });
         }
         
         async function cargarClientes() {
@@ -362,13 +407,17 @@
                 aplicarFiltros();
                 document.getElementById('totalClientes').textContent = clientesData.length;
                 document.getElementById('totalClientesSpan').textContent = `${clientesData.length} clientes`;
-            } catch(e) { console.error(e); tbody.innerHTML = `<tr><td colspan="8" style="color:red;">❌ Error: ${e.message}</td></tr`; }
+            } catch(e) { console.error(e); tbody.innerHTML = `<td><td colspan="8" style="color:red;">❌ Error: ${e.message} jonathan</tr`; }
         }
         
         function renderizarTabla() {
             const tbody = document.getElementById('tablaClientes');
             if (!tbody) return;
-            if (clientesFiltrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">📋 No hay clientes</td</tr'; return; }
+            if (clientesFiltrados.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">📋 No hay clientes</td</tr'; 
+                document.getElementById('totalClientesSpan').textContent = `0 clientes (${clientesData.length} total)`;
+                return; 
+            }
             
             tbody.innerHTML = clientesFiltrados.map(cliente => {
                 const etiquetas = cargarEtiquetasCliente(cliente.email);
@@ -387,9 +436,19 @@
                     </td>
                 </tr>`;
             }).join('');
+            
+            // Mostrar contador de resultados
+            const totalSpan = document.getElementById('totalClientesSpan');
+            if (totalSpan) {
+                totalSpan.textContent = `${clientesFiltrados.length} clientes (${clientesData.length} total)`;
+            }
         }
         
-        function filtrarClientes() { aplicarFiltros(); }
+        function filtrarClientes() { 
+            // Limpiar filtro de etiqueta al usar búsqueda manual
+            filtroEtiquetaActual = null;
+            aplicarFiltros(); 
+        }
         
         async function verReservasCliente(email) {
             try {
@@ -451,7 +510,17 @@
         window.agregarEtiquetaPersonalizada = agregarEtiquetaPersonalizada;
         window.filtrarPorEtiqueta = filtrarPorEtiqueta;
         
-        document.getElementById('busquedaCliente').addEventListener('keypress', e => { if (e.key === 'Enter') filtrarClientes(); });
+        // Inicializar búsqueda instantánea
+        initBusquedaInstantanea();
+        
+        // Mantener el evento Enter como respaldo
+        document.getElementById('busquedaCliente').addEventListener('keypress', e => { 
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                filtrarClientes(); 
+            }
+        });
+        
         initMenu();
         cargarClientes();
     </script>
