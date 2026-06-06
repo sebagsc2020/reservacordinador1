@@ -6,72 +6,20 @@
     <title>Historial de Cambios - CRM Aventura Total</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-        }
-        .header h1 { margin-bottom: 5px; }
-        .filtros {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .filtros input, .filtros select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        table {
-            width: 100%;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        th {
-            background: #667eea;
-            color: white;
-            padding: 12px;
-            text-align: left;
-        }
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #eee;
-        }
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
+        .filtros { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .filtros input, .filtros select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; }
+        table { width: 100%; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        th { background: #667eea; color: white; padding: 12px; text-align: left; }
+        td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
         .badge-pendiente { background: #ffc107; color: #856404; }
         .badge-confirmado { background: #27ae60; color: white; }
         .badge-pagado { background: #3498db; color: white; }
-        .btn-volver {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+        .btn { background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        .btn:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -80,100 +28,43 @@
             <h1>📝 Historial de Cambios de Estado</h1>
             <p>Auditoría de todas las modificaciones en reservas</p>
         </div>
-        
         <div class="filtros">
             <input type="text" id="filtroReserva" placeholder="🔍 Buscar por ID o Cliente" style="flex:2;">
             <input type="date" id="filtroFecha" style="flex:1;">
-            <button class="btn-volver" onclick="cargarHistorial()">🔄 Actualizar</button>
-            <button class="btn-volver" onclick="exportarHistorialCSV()">📄 Exportar CSV</button>
-            <button class="btn-volver" onclick="window.location.href='dashboard.html'">← Volver al Dashboard</button>
+            <button class="btn" onclick="cargarHistorial()">🔄 Actualizar</button>
+            <button class="btn" onclick="exportarCSV()">📄 Exportar CSV</button>
+            <button class="btn" onclick="window.location.href='dashboard.html'">← Volver</button>
         </div>
-        
-        <div id="historialContainer">
-            <table id="tablaHistorial">
-                <thead>
-                    <tr>
-                        <th>Fecha y Hora</th>
-                        <th>Reserva ID</th>
-                        <th>Cliente</th>
-                        <th>Estado Anterior</th>
-                        <th>Estado Nuevo</th>
-                        <th>Modificado por</th>
-                    </tr>
-                </thead>
-                <tbody id="historialBody">
-                    <tr><td colspan="6" style="text-align:center;">Cargando historial...</td</tr>
-                </tbody>
-            </table>
-        </div>
+        <div id="historialContainer"><table><thead><tr><th>Fecha/Hora</th><th>Reserva ID</th><th>Cliente</th><th>Estado Anterior</th><th>Estado Nuevo</th><th>Modificado por</th></tr></thead><tbody id="historialBody"><tr><td colspan="6" style="text-align:center;">Cargando...</td></tr></tbody></div>
     </div>
-    
     <script>
-        // Cargar historial desde localStorage
+        function getBadge(estado) {
+            const clases = { pendiente:'badge-pendiente', confirmado:'badge-confirmado', pagado:'badge-pagado' };
+            const textos = { pendiente:'Pendiente', confirmado:'Confirmado', pagado:'Pagado' };
+            return `<span class="badge ${clases[estado]}">${textos[estado]||estado}</span>`;
+        }
         function cargarHistorial() {
             const historial = JSON.parse(localStorage.getItem('historialEstados') || '[]');
-            const filtroReserva = document.getElementById('filtroReserva').value.toLowerCase();
+            const filtroId = document.getElementById('filtroReserva').value.toLowerCase();
             const filtroFecha = document.getElementById('filtroFecha').value;
-            
-            let filtrados = historial.reverse(); // Más reciente primero
-            
-            if (filtroReserva) {
-                filtrados = filtrados.filter(h => 
-                    h.reservaId.toLowerCase().includes(filtroReserva) || 
-                    h.cliente.toLowerCase().includes(filtroReserva)
-                );
-            }
-            
-            if (filtroFecha) {
-                filtrados = filtrados.filter(h => h.fecha.split(' ')[0] === filtroFecha);
-            }
-            
+            let filtrados = [...historial].reverse();
+            if (filtroId) filtrados = filtrados.filter(h => h.reservaId.toLowerCase().includes(filtroId) || h.cliente.toLowerCase().includes(filtroId));
+            if (filtroFecha) filtrados = filtrados.filter(h => h.fecha.split(' ')[0] === filtroFecha);
             const tbody = document.getElementById('historialBody');
-            if (filtrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay registros</td</tr>';
-                return;
-            }
-            
-            function getBadge(estado) {
-                const clases = {
-                    'pendiente': 'badge-pendiente',
-                    'confirmado': 'badge-confirmado',
-                    'pagado': 'badge-pagado'
-                };
-                const textos = {
-                    'pendiente': 'Pendiente',
-                    'confirmado': 'Confirmado',
-                    'pagado': 'Pagado'
-                };
-                return `<span class="badge ${clases[estado]}">${textos[estado] || estado}</span>`;
-            }
-            
-            tbody.innerHTML = filtrados.map(h => `
-                <tr>
-                    <td>${h.fecha}</td>
-                    <td><strong>${h.reservaId}</strong></td>
-                    <td>${h.cliente}</td>
-                    <td>${getBadge(h.estadoAnterior)}</td>
-                    <td>${getBadge(h.estadoNuevo)}</td>
-                    <td>👤 ${h.modificadoPor}</td>
-                </tr>
-            `).join('');
+            if (!filtrados.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay registros</td></tr>'; return; }
+            tbody.innerHTML = filtrados.map(h => `<tr><td>${h.fecha}</td><td><strong>${h.reservaId}</strong></td><td>${h.cliente}</td><td>${getBadge(h.estadoAnterior)}</td><td>${getBadge(h.estadoNuevo)}</td><td>👤 ${h.modificadoPor}</td></tr>`).join('');
         }
-        
-        function exportarHistorialCSV() {
+        function exportarCSV() {
             const historial = JSON.parse(localStorage.getItem('historialEstados') || '[]');
             let csv = "Fecha,Reserva ID,Cliente,Estado Anterior,Estado Nuevo,Modificado por\n";
-            historial.forEach(h => {
-                csv += `"${h.fecha}","${h.reservaId}","${h.cliente}","${h.estadoAnterior}","${h.estadoNuevo}","${h.modificadoPor}"\n`;
-            });
+            historial.forEach(h => { csv += `"${h.fecha}","${h.reservaId}","${h.cliente}","${h.estadoAnterior}","${h.estadoNuevo}","${h.modificadoPor}"\n`; });
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `historial_estados_${new Date().toISOString().slice(0,19)}.csv`;
+            link.download = `historial_${new Date().toISOString().slice(0,19)}.csv`;
             link.click();
             URL.revokeObjectURL(link.href);
         }
-        
         cargarHistorial();
     </script>
 </body>
