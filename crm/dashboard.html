@@ -262,7 +262,7 @@
             <div class="table-wrapper">
                 <table>
                     <thead><tr><th>Cliente</th><th>Email</th><th>Reservas</th><th>Total Pasajeros</th><th>Acciones</th></tr></thead>
-                    <tbody id="topClientesBody"><tr><td colspan="5">Cargando...</td></tr></tbody>
+                    <tbody id="topClientesBody"><tr><td colspan="5">Cargando... jonathan</tbody>
                 </table>
             </div>
         </div>
@@ -273,7 +273,7 @@
             <div class="table-wrapper">
                 <table>
                     <thead><tr><th>ID</th><th>Cliente</th><th>Excursión</th><th>Fecha</th><th>Personas</th><th>Estado</th></tr></thead>
-                    <tbody id="tablaUltimasReservas"><tr><td colspan="6">Cargando...</td></tr></tbody>
+                    <tbody id="tablaUltimasReservas"><tr><td colspan="6">Cargando... jonathan</tbody>
                 </table>
             </div>
         </div>
@@ -321,13 +321,36 @@
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201';
+        
+        // 📌 OPTIMIZACIÓN: URL con límite de 100 filas (más rápido)
+        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201&tq=order%20by%20A%20desc%20limit%20100';
+        
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
         let reservasData = [];
         let estadosGlobales = {};
         let fechaInicio = null, fechaFin = null;
         let ultimoConteoPasajeros = 0;
+        
+        // ==================================================
+        // CACHÉ LOCAL
+        // ==================================================
+        const CACHE_DURACION = 60000;
+        
+        function guardarEnCache(datos) {
+            localStorage.setItem('dashboardCache', JSON.stringify({
+                timestamp: Date.now(),
+                reservas: datos
+            }));
+        }
+        
+        function obtenerDeCache() {
+            const cache = localStorage.getItem('dashboardCache');
+            if (!cache) return null;
+            const data = JSON.parse(cache);
+            if (Date.now() - data.timestamp < CACHE_DURACION) return data.reservas;
+            return null;
+        }
         
         async function cargarEstadosDesdeNube() {
             try {
@@ -340,16 +363,117 @@
             } catch(e) { return JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}'); }
         }
         
-        function mostrarNotificacion(titulo, mensaje, tipo = 'success') {
+        function mostrarNotificacion(titulo, mensaje, tipo) {
             const notif = document.createElement('div');
             notif.className = `toast-notification ${tipo}`;
-            notif.innerHTML = `<div style="display:flex; align-items:center; gap:10px;"><span style="font-size:24px;">${tipo === 'success' ? '🎉' : '⚠️'}</span><div><div style="font-weight:700;">${titulo}</div><div style="font-size:11px;">${mensaje}</div></div></div>`;
+            notif.innerHTML = `<div style="display:flex; align-items:center; gap:10px;"><span style="font-size:24px;">🎉</span><div><div style="font-weight:700;">${titulo}</div><div style="font-size:11px;">${mensaje}</div></div></div>`;
             notif.onclick = () => notif.remove();
             document.body.appendChild(notif);
             setTimeout(() => { if (notif.parentNode) notif.remove(); }, 6000);
         }
         
+        function renderizarDashboard(reservas) {
+            if (!reservas || reservas.length === 0) {
+                document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6">No hay reservas jonathan</tr';
+                return;
+            }
+            
+            const totalPasajeros = reservas.reduce((s, r) => s + r.personas, 0);
+            const confirmadas = reservas.filter(r => r.estado === 'confirmado').length;
+            const pagadas = reservas.filter(r => r.estado === 'pagado').length;
+            const tasaConfirmacion = Math.round((confirmadas / reservas.length) * 100);
+            const tasaPago = Math.round((pagadas / reservas.length) * 100);
+            const grupoPromedio = (totalPasajeros / reservas.length).toFixed(1);
+            
+            const reservasPorEmail = {};
+            reservas.forEach(r => { if (r.email) reservasPorEmail[r.email] = (reservasPorEmail[r.email] || 0) + 1; });
+            const recurrentes = Object.values(reservasPorEmail).filter(c => c > 1).length;
+            const porcentajeRecurrentes = Object.keys(reservasPorEmail).length > 0 ? Math.round((recurrentes / Object.keys(reservasPorEmail).length) * 100) : 0;
+            
+            const diasUnicos = new Set(reservas.filter(r => r.fecha).map(r => r.fecha));
+            const pasajerosPorDia = diasUnicos.size > 0 ? Math.round(totalPasajeros / diasUnicos.size) : 0;
+            
+            document.getElementById('totalPasajeros').innerHTML = totalPasajeros.toLocaleString();
+            const tcElem = document.getElementById('tasaConfirmacion');
+            tcElem.innerHTML = `${tasaConfirmacion}%`;
+            tcElem.style.color = tasaConfirmacion >= 70 ? '#27ae60' : (tasaConfirmacion >= 40 ? '#f39c12' : '#e74c3c');
+            const tpElem = document.getElementById('tasaPago');
+            tpElem.innerHTML = `${tasaPago}%`;
+            tpElem.style.color = tasaPago >= 60 ? '#27ae60' : (tasaPago >= 30 ? '#f39c12' : '#e74c3c');
+            document.getElementById('grupoPromedio').innerHTML = grupoPromedio;
+            document.getElementById('clientesRecurrentes').innerHTML = `${porcentajeRecurrentes}%`;
+            document.getElementById('pasajerosPorDia').innerHTML = pasajerosPorDia.toLocaleString();
+            
+            // Top clientes
+            const clientesMap = new Map();
+            reservas.forEach(r => {
+                if (!r.email) return;
+                if (!clientesMap.has(r.email)) clientesMap.set(r.email, { nombre: r.nombre, email: r.email, reservas: 0, totalPasajeros: 0 });
+                const c = clientesMap.get(r.email);
+                c.reservas++;
+                c.totalPasajeros += r.personas;
+            });
+            const topClientes = Array.from(clientesMap.values()).sort((a,b) => b.totalPasajeros - a.totalPasajeros).slice(0, 10);
+            document.getElementById('topClientesBody').innerHTML = topClientes.map(c => `<tr><td><strong>${escapeHtml(c.nombre)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.reservas}</td><td><strong>${c.totalPasajeros}</strong></td><td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td></tr>`).join('');
+            
+            // Últimas reservas
+            const ultimas = reservas.slice(0, 5);
+            document.getElementById('tablaUltimasReservas').innerHTML = ultimas.map(r => `<tr><td><strong>${escapeHtml(r.id)}</strong></td><td>${escapeHtml(r.nombre)}</td><td>${escapeHtml(r.excursion)}</td><td>${escapeHtml(r.fecha)}</td><td>${r.personas}</td><td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td>`).join('');
+            
+            // Gráficos
+            const meses = (() => { const h=new Date(), m=[]; for(let i=5;i>=0;i--){ const f=new Date(h.getFullYear(),h.getMonth()-i,1); m.push({ nombre:`${f.toLocaleString('es',{month:'short'}).toUpperCase()} ${f.getFullYear()}`, año:f.getFullYear(), mes:f.getMonth() }); } return m; })();
+            const pasajerosPorMes = meses.map(m => reservas.reduce((s,r) => { if(r.fecha){ const [d,mes,a]=r.fecha.split('/'); if(parseInt(a)===m.año && parseInt(mes)-1===m.mes) s+=r.personas; } return s; },0));
+            if (window.pasajerosPorMesChart) window.pasajerosPorMesChart.destroy();
+            window.pasajerosPorMesChart = new Chart(document.getElementById('pasajerosPorMesChart'), { type:'line', data:{ labels:meses.map(m=>m.nombre), datasets:[{ label:'Pasajeros', data:pasajerosPorMes, borderColor:'#e74c3c', backgroundColor:'rgba(231,76,60,0.1)', borderWidth:2, fill:true, tension:0.3, pointBackgroundColor:'#e74c3c', pointBorderColor:'#fff', pointRadius:4 }] }, options:{ responsive:true, maintainAspectRatio:true } });
+            
+            const pend = reservas.filter(r => r.estado === 'pendiente').length;
+            const conf = reservas.filter(r => r.estado === 'confirmado').length;
+            const pag = reservas.filter(r => r.estado === 'pagado').length;
+            if (window.estadosChart) window.estadosChart.destroy();
+            window.estadosChart = new Chart(document.getElementById('estadosChart'), { type:'doughnut', data:{ labels:['Pendientes','Confirmadas','Pagadas'], datasets:[{ data:[pend,conf,pag], backgroundColor:['#ffc107','#27ae60','#3498db'], borderWidth:0 }] }, options:{ responsive:true } });
+        }
+        
+        function filtrarReservasPorFecha() {
+            if (!fechaInicio && !fechaFin) return reservasData;
+            return reservasData.filter(r => {
+                if (!r.fecha) return true;
+                const [d,m,a] = r.fecha.split('/');
+                const fechaR = new Date(a, m-1, d);
+                if (fechaInicio && fechaR < fechaInicio) return false;
+                if (fechaFin && fechaR > fechaFin) return false;
+                return true;
+            });
+        }
+        
+        function filtrarPorFecha() {
+            const inicio = document.getElementById('fechaInicio').value;
+            const fin = document.getElementById('fechaFin').value;
+            fechaInicio = inicio ? new Date(inicio) : null;
+            fechaFin = fin ? new Date(fin) : null;
+            renderizarDashboard(filtrarReservasPorFecha());
+        }
+        
+        function resetFechas() {
+            document.getElementById('fechaInicio').value = '';
+            document.getElementById('fechaFin').value = '';
+            fechaInicio = null; fechaFin = null;
+            renderizarDashboard(reservasData);
+        }
+        
         async function cargarDatos() {
+            // Intentar caché primero
+            const cache = obtenerDeCache();
+            if (cache && cache.length > 0) {
+                console.log('📦 Dashboard - Usando caché local');
+                reservasData = cache;
+                renderizarDashboard(reservasData);
+                setTimeout(() => cargarDatosDesdeRed(), 100);
+                return;
+            }
+            await cargarDatosDesdeRed();
+        }
+        
+        async function cargarDatosDesdeRed() {
             try {
                 await cargarEstadosDesdeNube();
                 const res = await fetch(JSON_URL + '&t=' + Date.now());
@@ -386,124 +510,29 @@
                     }
                     
                     const primeraExcursion = excursionesLista.length > 0 ? excursionesLista[0].substring(0, 40) : 'Sin excursión';
-                    
                     let fecha = '';
                     const ts = c[0]?.v;
                     if (ts) { const d = new Date(ts); if (!isNaN(d.getTime())) fecha = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; }
-                    
                     const personas = c[10]?.v ? String(c[10].v) : '1';
                     let estado = estadosGlobales[id];
                     if (!estado || !['pendiente','confirmado','pagado'].includes(estado)) estado = 'confirmado';
                     
-                    nuevasReservas.push({
-                        id, fecha, nombre: nombreCompleto, email, excursion: primeraExcursion,
-                        excursionesLista, personas: parseInt(personas) || 1, estado
-                    });
+                    nuevasReservas.push({ id, fecha, nombre: nombreCompleto, email, excursion: primeraExcursion, excursionesLista, personas: parseInt(personas) || 1, estado });
                 }
                 
                 const totalPasajerosNuevo = nuevasReservas.reduce((s, r) => s + r.personas, 0);
                 if (ultimoConteoPasajeros > 0 && totalPasajerosNuevo > ultimoConteoPasajeros) {
-                    const ultimaReserva = nuevasReservas[0];
-                    mostrarNotificacion(`🎉 Nueva reserva de ${ultimaReserva.nombre}!`, `Excursión: ${ultimaReserva.excursion} | ${ultimaReserva.personas} pax`, 'success');
+                    const ultima = nuevasReservas[0];
+                    mostrarNotificacion(`🎉 Nueva reserva de ${ultima.nombre}!`, `Excursión: ${ultima.excursion} | ${ultima.personas} pax`, 'success');
                     const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
                     audio.volume = 0.3; audio.play().catch(e => console.log);
                 }
                 ultimoConteoPasajeros = totalPasajerosNuevo;
                 reservasData = nuevasReservas;
                 reservasData.sort((a,b) => (parseInt(b.id.replace(/\D/g,''))||0) - (parseInt(a.id.replace(/\D/g,''))||0));
-                actualizarDashboard();
+                guardarEnCache(reservasData);
+                renderizarDashboard(reservasData);
             } catch(e) { console.error(e); }
-        }
-        
-        function filtrarReservasPorFecha() {
-            if (!fechaInicio && !fechaFin) return reservasData;
-            return reservasData.filter(r => {
-                if (!r.fecha) return true;
-                const [d,m,a] = r.fecha.split('/');
-                const fechaR = new Date(a, m-1, d);
-                if (fechaInicio && fechaR < fechaInicio) return false;
-                if (fechaFin && fechaR > fechaFin) return false;
-                return true;
-            });
-        }
-        
-        function filtrarPorFecha() {
-            const inicio = document.getElementById('fechaInicio').value;
-            const fin = document.getElementById('fechaFin').value;
-            fechaInicio = inicio ? new Date(inicio) : null;
-            fechaFin = fin ? new Date(fin) : null;
-            actualizarDashboard();
-        }
-        
-        function resetFechas() {
-            document.getElementById('fechaInicio').value = '';
-            document.getElementById('fechaFin').value = '';
-            fechaInicio = null; fechaFin = null;
-            actualizarDashboard();
-        }
-        
-        function actualizarDashboard() {
-            const reservasFiltradas = filtrarReservasPorFecha();
-            if (reservasFiltradas.length === 0) {
-                document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6">No hay reservas</td></tr>';
-                if (window.pasajerosPorMesChart) window.pasajerosPorMesChart.destroy();
-                if (window.estadosChart) window.estadosChart.destroy();
-                return;
-            }
-            
-            const totalPasajeros = reservasFiltradas.reduce((s, r) => s + r.personas, 0);
-            const confirmadas = reservasFiltradas.filter(r => r.estado === 'confirmado').length;
-            const pagadas = reservasFiltradas.filter(r => r.estado === 'pagado').length;
-            const tasaConfirmacion = Math.round((confirmadas / reservasFiltradas.length) * 100);
-            const tasaPago = Math.round((pagadas / reservasFiltradas.length) * 100);
-            const grupoPromedio = (totalPasajeros / reservasFiltradas.length).toFixed(1);
-            
-            const reservasPorEmail = {};
-            reservasFiltradas.forEach(r => { if (r.email) reservasPorEmail[r.email] = (reservasPorEmail[r.email] || 0) + 1; });
-            const recurrentes = Object.values(reservasPorEmail).filter(c => c > 1).length;
-            const porcentajeRecurrentes = Object.keys(reservasPorEmail).length > 0 ? Math.round((recurrentes / Object.keys(reservasPorEmail).length) * 100) : 0;
-            
-            const diasUnicos = new Set(reservasFiltradas.filter(r => r.fecha).map(r => r.fecha));
-            const pasajerosPorDia = diasUnicos.size > 0 ? Math.round(totalPasajeros / diasUnicos.size) : 0;
-            
-            document.getElementById('totalPasajeros').innerHTML = totalPasajeros.toLocaleString();
-            const tcElem = document.getElementById('tasaConfirmacion');
-            tcElem.innerHTML = `${tasaConfirmacion}%`;
-            tcElem.style.color = tasaConfirmacion >= 70 ? '#27ae60' : (tasaConfirmacion >= 40 ? '#f39c12' : '#e74c3c');
-            const tpElem = document.getElementById('tasaPago');
-            tpElem.innerHTML = `${tasaPago}%`;
-            tpElem.style.color = tasaPago >= 60 ? '#27ae60' : (tasaPago >= 30 ? '#f39c12' : '#e74c3c');
-            document.getElementById('grupoPromedio').innerHTML = grupoPromedio;
-            document.getElementById('clientesRecurrentes').innerHTML = `${porcentajeRecurrentes}%`;
-            document.getElementById('pasajerosPorDia').innerHTML = pasajerosPorDia.toLocaleString();
-            
-            // Top clientes
-            const clientesMap = new Map();
-            reservasFiltradas.forEach(r => {
-                if (!r.email) return;
-                if (!clientesMap.has(r.email)) clientesMap.set(r.email, { nombre: r.nombre, email: r.email, reservas: 0, totalPasajeros: 0 });
-                const c = clientesMap.get(r.email);
-                c.reservas++;
-                c.totalPasajeros += r.personas;
-            });
-            const topClientes = Array.from(clientesMap.values()).sort((a,b) => b.totalPasajeros - a.totalPasajeros).slice(0, 10);
-            document.getElementById('topClientesBody').innerHTML = topClientes.map(c => `<tr><td><strong>${escapeHtml(c.nombre)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.reservas}</td><td><strong>${c.totalPasajeros}</strong></td><td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td></tr>`).join('');
-            
-            // Últimas reservas
-            const ultimas = reservasFiltradas.slice(0, 5);
-            document.getElementById('tablaUltimasReservas').innerHTML = ultimas.map(r => `<tr><td><strong>${escapeHtml(r.id)}</strong></td><td>${escapeHtml(r.nombre)}</td><td>${escapeHtml(r.excursion)}</td><td>${escapeHtml(r.fecha)}</td><td>${r.personas}</td><td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td></tr>`).join('');
-            
-            // Gráficos
-            const meses = (() => { const h=new Date(), m=[]; for(let i=5;i>=0;i--){ const f=new Date(h.getFullYear(),h.getMonth()-i,1); m.push({ nombre:`${f.toLocaleString('es',{month:'short'}).toUpperCase()} ${f.getFullYear()}`, año:f.getFullYear(), mes:f.getMonth() }); } return m; })();
-            const pasajerosPorMes = meses.map(m => reservasFiltradas.reduce((s,r) => { if(r.fecha){ const [d,mes,a]=r.fecha.split('/'); if(parseInt(a)===m.año && parseInt(mes)-1===m.mes) s+=r.personas; } return s; },0));
-            if (window.pasajerosPorMesChart) window.pasajerosPorMesChart.destroy();
-            window.pasajerosPorMesChart = new Chart(document.getElementById('pasajerosPorMesChart'), { type:'line', data:{ labels:meses.map(m=>m.nombre), datasets:[{ label:'Pasajeros', data:pasajerosPorMes, borderColor:'#e74c3c', backgroundColor:'rgba(231,76,60,0.1)', borderWidth:2, fill:true, tension:0.3, pointBackgroundColor:'#e74c3c', pointBorderColor:'#fff', pointRadius:4 }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'top' } } } });
-            
-            const pend = reservasFiltradas.filter(r => r.estado === 'pendiente').length;
-            const conf = reservasFiltradas.filter(r => r.estado === 'confirmado').length;
-            const pag = reservasFiltradas.filter(r => r.estado === 'pagado').length;
-            if (window.estadosChart) window.estadosChart.destroy();
-            window.estadosChart = new Chart(document.getElementById('estadosChart'), { type:'doughnut', data:{ labels:['Pendientes','Confirmadas','Pagadas'], datasets:[{ data:[pend,conf,pag], backgroundColor:['#ffc107','#27ae60','#3498db'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom' } } } });
         }
         
         function verCliente(email) { window.location.href = `clientes.html?email=${encodeURIComponent(email)}`; }
