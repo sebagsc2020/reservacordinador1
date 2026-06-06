@@ -39,7 +39,64 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f2f5; 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        /* ===== MODO OSCURO ===== */
+        body.dark-mode {
+            background: #0f0f1a;
+        }
+        
+        body.dark-mode .stat-card,
+        body.dark-mode .chart-container,
+        body.dark-mode .recent-section,
+        body.dark-mode .date-range,
+        body.dark-mode .top-clients-section {
+            background: #1e1e2e;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .stat-info .number,
+        body.dark-mode .card-value,
+        body.dark-mode .recent-section h3,
+        body.dark-mode .top-clients-section h3,
+        body.dark-mode .chart-container h3 {
+            color: #ffffff;
+        }
+        
+        body.dark-mode .stat-info h3 {
+            color: #aaa;
+        }
+        
+        body.dark-mode table th {
+            background: #2a2a3e;
+            color: #ccc;
+        }
+        
+        body.dark-mode table td {
+            border-bottom-color: #2a2a3e;
+            color: #ddd;
+        }
+        
+        body.dark-mode .user-info {
+            background: #1e1e2e;
+            color: white;
+        }
+        
+        body.dark-mode .date-range input {
+            background: #2a2a3e;
+            border-color: #3a3a4e;
+            color: white;
+        }
+        
+        body.dark-mode .btn-theme {
+            color: white;
+        }
         
         /* Modo PWA (sin barra de navegación) */
         .pwa-mode {
@@ -179,6 +236,28 @@
             gap: 15px; 
         }
         .header h1 { font-size: 22px; color: #1a1a2e; }
+        body.dark-mode .header h1 { color: white; }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        .btn-theme:hover {
+            background: rgba(0,0,0,0.1);
+            transform: scale(1.1);
+        }
+        
         .user-info { 
             display: flex; 
             align-items: center; 
@@ -202,13 +281,14 @@
             font-size: 12px;
         }
         
-        /* ========== TARJETAS DE MÉTRICAS ========== */
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 25px; 
+        /* ========== MÉTRICAS PROFESIONALES ========== */
+        .metrics-advanced {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
+        
         .stat-card { 
             background: white; 
             border-radius: 16px; 
@@ -220,9 +300,45 @@
             transition: transform 0.2s;
         }
         .stat-card:active { transform: scale(0.98); }
+        .stat-card:hover { transform: translateY(-3px); }
         .stat-icon { font-size: 32px; }
-        .stat-info h3 { font-size: 11px; color: #666; margin-bottom: 5px; text-transform: uppercase; }
-        .stat-info .number { font-size: 28px; font-weight: 700; color: #1a1a2e; }
+        .stat-info h3 { font-size: 11px; color: #666; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-info .number { font-size: 28px; font-weight: 700; color: #1a1a2e; line-height: 1.2; }
+        .stat-info small { font-size: 9px; color: #999; display: block; margin-top: 3px; }
+        
+        /* ========== FILTRO DE FECHAS ========== */
+        .date-range {
+            background: white;
+            border-radius: 16px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .date-range span { font-size: 13px; font-weight: 600; color: #666; }
+        .date-range input {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+        .date-range input:focus { outline: none; border-color: #667eea; }
+        
+        .btn-filtrar, .btn-recargar {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .btn-filtrar:active, .btn-recargar:active { transform: scale(0.96); }
+        .btn-filtrar { background: #667eea; color: white; }
+        .btn-recargar { background: #27ae60; color: white; }
         
         /* ========== GRÁFICOS ========== */
         .charts-row { 
@@ -240,14 +356,15 @@
         .chart-container h3 { margin-bottom: 15px; color: #333; font-size: 14px; }
         canvas { max-height: 250px; width: 100% !important; }
         
-        /* ========== TABLA ÚLTIMAS RESERVAS ========== */
-        .recent-section { 
+        /* ========== TABLAS ========== */
+        .recent-section, .top-clients-section { 
             background: white; 
             border-radius: 16px; 
             padding: 20px; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            margin-bottom: 20px;
         }
-        .recent-section h3 { margin-bottom: 15px; color: #333; font-size: 15px; }
+        .recent-section h3, .top-clients-section h3 { margin-bottom: 15px; color: #333; font-size: 15px; }
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { text-align: left; padding: 10px 8px; background: #f8f9fa; font-size: 11px; color: #666; text-transform: uppercase; }
@@ -256,6 +373,33 @@
         .badge-pendiente { background: #fff3cd; color: #856404; }
         .badge-confirmado { background: #d4edda; color: #155724; }
         .badge-pagado { background: #d1ecf1; color: #0c5460; }
+        
+        .btn-ver-cliente {
+            padding: 4px 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .btn-ver-cliente:hover {
+            background: #5a6fd6;
+        }
+        
+        /* ========== BADGE SEGURIDAD ========== */
+        .security-badge {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 5px;
+            z-index: 1000;
+            font-family: monospace;
+        }
         
         /* Desktop */
         @media (min-width: 769px) {
@@ -289,14 +433,9 @@
                 padding: 60px 12px 20px;
             }
             
-            .stats-grid {
+            .metrics-advanced {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
-            }
-            
-            .charts-row {
-                grid-template-columns: 1fr;
-                gap: 15px;
             }
             
             .stat-card {
@@ -312,14 +451,32 @@
             }
             
             .stat-info h3 {
-                font-size: 10px;
+                font-size: 9px;
+            }
+            
+            .date-range {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .date-range input {
+                width: 100%;
+            }
+            
+            .btn-filtrar, .btn-recargar {
+                text-align: center;
+            }
+            
+            .charts-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
             
             .chart-container {
                 padding: 15px;
             }
             
-            .recent-section {
+            .recent-section, .top-clients-section {
                 padding: 15px;
                 overflow-x: auto;
             }
@@ -335,7 +492,7 @@
         }
         
         @media (max-width: 480px) {
-            .stats-grid {
+            .metrics-advanced {
                 grid-template-columns: repeat(2, 1fr);
             }
             
@@ -397,23 +554,79 @@
     <div class="main-content">
         <div class="header">
             <div><h1>📊 Dashboard</h1></div>
-            <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+            <div class="header-actions">
+                <button class="btn-theme" onclick="toggleTheme()" title="Modo oscuro/claro">🌙</button>
+                <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+            </div>
         </div>
 
-        <!-- Tarjetas de métricas -->
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-info"><h3>Total Reservas</h3><div class="number" id="totalReservas">0</div></div></div>
-            <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-info"><h3>Pendientes</h3><div class="number" id="totalPendientes">0</div></div></div>
-            <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-info"><h3>Confirmadas</h3><div class="number" id="totalConfirmadas">0</div></div></div>
-            <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-info"><h3>Pagadas</h3><div class="number" id="totalPagadas">0</div></div></div>
-            <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-info"><h3>Clientes</h3><div class="number" id="totalClientes">0</div></div></div>
+        <!-- ========== MÉTRICAS PROFESIONALES (sin precios) ========== -->
+        <div class="metrics-advanced">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <h3>Total Pasajeros</h3>
+                    <div class="number" id="totalPasajeros">0</div>
+                    <small>suma de todas las reservas</small>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-info">
+                    <h3>Tasa Confirmación</h3>
+                    <div class="number" id="tasaConfirmacion">0%</div>
+                    <small>confirmadas / total</small>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-info">
+                    <h3>Tasa Pago</h3>
+                    <div class="number" id="tasaPago">0%</div>
+                    <small>pagadas / total</small>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👨‍👩‍👧‍👦</div>
+                <div class="stat-info">
+                    <h3>Grupo Promedio</h3>
+                    <div class="number" id="grupoPromedio">0</div>
+                    <small>personas por reserva</small>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔄</div>
+                <div class="stat-info">
+                    <h3>Clientes Recurrentes</h3>
+                    <div class="number" id="clientesRecurrentes">0%</div>
+                    <small>con más de 1 reserva</small>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-info">
+                    <h3>Pasajeros/Día</h3>
+                    <div class="number" id="pasajerosPorDia">0</div>
+                    <small>promedio diario</small>
+                </div>
+            </div>
         </div>
 
-        <!-- Gráficos -->
+        <!-- ========== FILTRO DE FECHAS ========== -->
+        <div class="date-range">
+            <span>📅 Período:</span>
+            <input type="date" id="fechaInicio">
+            <input type="date" id="fechaFin">
+            <button class="btn-filtrar" onclick="filtrarPorFecha()">Aplicar filtro</button>
+            <button class="btn-recargar" onclick="resetFechas()">Resetear</button>
+            <button class="btn-recargar" onclick="cargarDatos()" style="background:#667eea;">🔄 Recargar datos</button>
+        </div>
+
+        <!-- ========== GRÁFICOS ========== -->
         <div class="charts-row">
             <div class="chart-container">
-                <h3>📈 Reservas por mes (últimos 6 meses)</h3>
-                <canvas id="reservasPorMesChart"></canvas>
+                <h3>📈 Pasajeros por mes (últimos 6 meses)</h3>
+                <canvas id="pasajerosPorMesChart"></canvas>
             </div>
             <div class="chart-container">
                 <h3>🥧 Distribución por estado</h3>
@@ -421,27 +634,46 @@
             </div>
         </div>
 
-        <!-- Últimas reservas -->
+        <!-- ========== TOP CLIENTES POR PASAJEROS ========== -->
+        <div class="top-clients-section">
+            <h3>🏆 Top Clientes por Pasajeros</h3>
+            <div class="table-wrapper">
+                <table id="topClientesTable">
+                    <thead>
+                        <tr><th>Cliente</th><th>Email</th><th>Reservas</th><th>Total Pasajeros</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="topClientesBody">
+                        <tr><td colspan="5">Cargando...</td</tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========== ÚLTIMAS RESERVAS ========== -->
         <div class="recent-section">
             <h3>📋 Últimas reservas</h3>
             <div class="table-wrapper">
-                <table>
+                <table id="ultimasReservasTable">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Cliente</th>
                             <th>Excursión</th>
                             <th>Fecha</th>
+                            <th>Personas</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
                     <tbody id="tablaUltimasReservas">
-                        <tr><td colspan="5">Cargando...</td</tr>
+                        <tr><td colspan="6">Cargando...</td</tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <!-- Badge seguridad -->
+    <div class="security-badge">🔒 SHA-256</div>
 
     <script>
         // ==================================================
@@ -463,6 +695,22 @@
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
             console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
             document.body.classList.add('pwa-mode');
+        }
+        
+        // ==================================================
+        // MODO OSCURO
+        // ==================================================
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            const btn = document.querySelector('.btn-theme');
+            btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.querySelector('.btn-theme').textContent = '☀️';
         }
         
         // ==================================================
@@ -492,7 +740,6 @@
             menuOverlay.addEventListener('click', closeMenu);
         }
         
-        // Cerrar menú al hacer clic en un enlace
         document.querySelectorAll('.nav-menu a').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 768) {
@@ -515,10 +762,7 @@
 
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
-        // USAR EL MISMO MÉTODO JSON QUE FUNCIONA EN RESERVAS
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
-        
-        // URL del Google Apps Script para obtener estados
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
         // ==================================================
@@ -526,16 +770,19 @@
         // ==================================================
         let reservasData = [];
         let clientesSet = new Set();
-        let reservasPorMesChart = null;
+        let pasajerosPorMesChart = null;
         let estadosChart = null;
         let estadosGlobales = {};
+        
+        // Filtros de fecha
+        let fechaInicio = null;
+        let fechaFin = null;
         
         // ==================================================
         // CARGAR ESTADOS DESDE LA NUBE
         // ==================================================
         async function cargarEstadosDesdeNube() {
             try {
-                // Primero intentar desde localStorage
                 const localEstados = localStorage.getItem('estadosReservasCloud');
                 if (localEstados) {
                     const parsed = JSON.parse(localEstados);
@@ -545,7 +792,6 @@
                     }
                 }
                 
-                // Luego sincronizar con la nube
                 const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
                 const data = await response.json();
                 if (data.success && data.estados) {
@@ -563,19 +809,17 @@
         }
         
         // ==================================================
-        // CARGAR DATOS DESDE GOOGLE SHEETS (MÉTODO JSON - IGUAL QUE RESERVAS)
+        // CARGAR DATOS DESDE GOOGLE SHEETS
         // ==================================================
         async function cargarDatos() {
             try {
                 console.log('📡 Cargando datos desde:', JSON_URL);
                 
-                // Primero cargar los estados desde la nube
                 await cargarEstadosDesdeNube();
                 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
                 const texto = await response.text();
                 
-                // Limpiar la respuesta de Google (mismo método que reservas.html)
                 let jsonStr = texto;
                 jsonStr = jsonStr.replace("/*O_o*/", "");
                 jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
@@ -603,13 +847,13 @@
                     const nombre = (c[2] && c[2].v) ? String(c[2].v) : '';
                     const apellido = (c[3] && c[3].v) ? String(c[3].v) : '';
                     const email = (c[4] && c[4].v) ? String(c[4].v) : '';
+                    const personasRaw = (c[10] && c[10].v) ? String(c[10].v) : '1';
                     
                     let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
                     if (nombresEditados[id]) {
                         nombreCompleto = nombresEditados[id];
                     }
                     
-                    // Parsear excursiones
                     let excursionesLista = [];
                     const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
                     if (excursionesRaw) {
@@ -626,8 +870,8 @@
                     }
                     
                     const primeraExcursion = excursionesLista.length > 0 ? excursionesLista[0].substring(0, 40) : 'Sin excursión';
+                    const personas = parseInt(personasRaw) || 1;
                     
-                    // Parsear fecha
                     let fecha = '';
                     const timestamp = (c[0] && c[0].v) ? c[0].v : null;
                     if (timestamp) {
@@ -637,7 +881,6 @@
                         }
                     }
                     
-                    // Usar el estado desde la nube
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
@@ -649,6 +892,8 @@
                         nombre: nombreCompleto,
                         email: email,
                         excursion: primeraExcursion,
+                        excursionesLista: excursionesLista,
+                        personas: personas,
                         estado: estado
                     };
                     reservasData.push(reserva);
@@ -658,9 +903,8 @@
                 
                 console.log(`📊 Cargadas ${reservasData.length} reservas`);
                 console.log(`👥 Clientes únicos: ${clientesSet.size}`);
-                console.log(`📊 Estados: Pendientes=${reservasData.filter(r => r.estado === 'pendiente').length}, Confirmadas=${reservasData.filter(r => r.estado === 'confirmado').length}, Pagadas=${reservasData.filter(r => r.estado === 'pagado').length}`);
+                console.log(`📊 Pasajeros totales: ${reservasData.reduce((sum, r) => sum + r.personas, 0)}`);
                 
-                // Ordenar por ID (más reciente primero)
                 reservasData.sort((a, b) => {
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
                     const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
@@ -671,44 +915,240 @@
                 
             } catch (error) {
                 console.error('❌ Error cargando datos:', error);
-                document.getElementById('tablaUltimasReservas').innerHTML = `<tr><td colspan="5">❌ Error: ${error.message}</td></tr>`;
+                document.getElementById('tablaUltimasReservas').innerHTML = `<tr><td colspan="6">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
         // ==================================================
-        // ACTUALIZAR DASHBOARD
+        // FILTRAR RESERVAS POR FECHA
+        // ==================================================
+        function filtrarReservasPorFecha() {
+            if (!fechaInicio && !fechaFin) return reservasData;
+            
+            return reservasData.filter(r => {
+                if (!r.fecha) return true;
+                const [dia, mes, año] = r.fecha.split('/');
+                const fechaReserva = new Date(año, mes-1, dia);
+                
+                if (fechaInicio && fechaReserva < fechaInicio) return false;
+                if (fechaFin && fechaReserva > fechaFin) return false;
+                return true;
+            });
+        }
+        
+        function filtrarPorFecha() {
+            const inicio = document.getElementById('fechaInicio').value;
+            const fin = document.getElementById('fechaFin').value;
+            fechaInicio = inicio ? new Date(inicio) : null;
+            fechaFin = fin ? new Date(fin) : null;
+            actualizarDashboard();
+        }
+        
+        function resetFechas() {
+            document.getElementById('fechaInicio').value = '';
+            document.getElementById('fechaFin').value = '';
+            fechaInicio = null;
+            fechaFin = null;
+            actualizarDashboard();
+        }
+        
+        // ==================================================
+        // CALCULAR MÉTRICAS AVANZADAS
+        // ==================================================
+        function calcularMetricasAvanzadas(reservas) {
+            if (reservas.length === 0) {
+                document.getElementById('totalPasajeros').innerHTML = '0';
+                document.getElementById('tasaConfirmacion').innerHTML = '0%';
+                document.getElementById('tasaPago').innerHTML = '0%';
+                document.getElementById('grupoPromedio').innerHTML = '0';
+                document.getElementById('clientesRecurrentes').innerHTML = '0%';
+                document.getElementById('pasajerosPorDia').innerHTML = '0';
+                return;
+            }
+            
+            // Total Pasajeros
+            const totalPasajeros = reservas.reduce((sum, r) => sum + (r.personas || 0), 0);
+            
+            // Tasas
+            const confirmadas = reservas.filter(r => r.estado === 'confirmado').length;
+            const pagadas = reservas.filter(r => r.estado === 'pagado').length;
+            const tasaConfirmacion = Math.round((confirmadas / reservas.length) * 100);
+            const tasaPago = Math.round((pagadas / reservas.length) * 100);
+            
+            // Grupo promedio
+            const grupoPromedio = (totalPasajeros / reservas.length).toFixed(1);
+            
+            // Clientes recurrentes
+            const reservasPorEmail = {};
+            reservas.forEach(r => {
+                if (r.email && r.email.trim()) {
+                    reservasPorEmail[r.email] = (reservasPorEmail[r.email] || 0) + 1;
+                }
+            });
+            const recurrentes = Object.values(reservasPorEmail).filter(c => c > 1).length;
+            const totalClientes = Object.keys(reservasPorEmail).length;
+            const porcentajeRecurrentes = totalClientes > 0 ? Math.round((recurrentes / totalClientes) * 100) : 0;
+            
+            // Pasajeros por día
+            const diasConReservas = new Set();
+            reservas.forEach(r => { if (r.fecha) diasConReservas.add(r.fecha); });
+            const pasajerosPorDia = diasConReservas.size > 0 ? Math.round(totalPasajeros / diasConReservas.size) : 0;
+            
+            // Actualizar UI con colores según rendimiento
+            document.getElementById('totalPasajeros').innerHTML = totalPasajeros.toLocaleString();
+            
+            const tasaConfirmacionElem = document.getElementById('tasaConfirmacion');
+            tasaConfirmacionElem.innerHTML = `${tasaConfirmacion}%`;
+            tasaConfirmacionElem.style.color = tasaConfirmacion >= 70 ? '#27ae60' : (tasaConfirmacion >= 40 ? '#f39c12' : '#e74c3c');
+            
+            const tasaPagoElem = document.getElementById('tasaPago');
+            tasaPagoElem.innerHTML = `${tasaPago}%`;
+            tasaPagoElem.style.color = tasaPago >= 60 ? '#27ae60' : (tasaPago >= 30 ? '#f39c12' : '#e74c3c');
+            
+            document.getElementById('grupoPromedio').innerHTML = grupoPromedio;
+            document.getElementById('clientesRecurrentes').innerHTML = `${porcentajeRecurrentes}%`;
+            document.getElementById('pasajerosPorDia').innerHTML = pasajerosPorDia.toLocaleString();
+        }
+        
+        // ==================================================
+        // OBTENER MESES
+        // ==================================================
+        function obtenerUltimos6Meses() {
+            const hoy = new Date();
+            const meses = [];
+            for (let i = 5; i >= 0; i--) {
+                const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+                const nombre = fecha.toLocaleString('es', { month: 'short' }).toUpperCase();
+                const año = fecha.getFullYear();
+                meses.push({ nombre: `${nombre} ${año}`, año, mes: fecha.getMonth(), fecha });
+            }
+            return meses;
+        }
+        
+        // ==================================================
+        // CONTAR PASAJEROS POR MES
+        // ==================================================
+        function contarPasajerosPorMes(meses, reservas) {
+            return meses.map(m => {
+                let total = 0;
+                for (const reserva of reservas) {
+                    if (!reserva.fecha) continue;
+                    const partes = reserva.fecha.split('/');
+                    if (partes.length === 3) {
+                        const mes = parseInt(partes[1]) - 1;
+                        const año = parseInt(partes[2]);
+                        if (año === m.año && mes === m.mes) {
+                            total += reserva.personas || 0;
+                        }
+                    }
+                }
+                return total;
+            });
+        }
+        
+        // ==================================================
+        // ACTUALIZAR TOP CLIENTES
+        // ==================================================
+        function actualizarTopClientes(reservas) {
+            const clientesMap = new Map();
+            
+            reservas.forEach(r => {
+                if (!r.email) return;
+                if (!clientesMap.has(r.email)) {
+                    clientesMap.set(r.email, {
+                        nombre: r.nombre,
+                        email: r.email,
+                        reservas: 0,
+                        totalPasajeros: 0
+                    });
+                }
+                const cliente = clientesMap.get(r.email);
+                cliente.reservas++;
+                cliente.totalPasajeros += r.personas || 0;
+            });
+            
+            const topClientes = Array.from(clientesMap.values())
+                .sort((a, b) => b.totalPasajeros - a.totalPasajeros)
+                .slice(0, 10);
+            
+            const tbody = document.getElementById('topClientesBody');
+            if (topClientes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No hay datos</td</tr>';
+            } else {
+                tbody.innerHTML = topClientes.map(c => `
+                    <tr>
+                        <td><strong>${escapeHtml(c.nombre)}</strong></td>
+                        <td>${escapeHtml(c.email)}</td>
+                        <td>${c.reservas}</td>
+                        <td><strong>${c.totalPasajeros}</strong></td>
+                        <td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        function verCliente(email) {
+            window.location.href = `clientes.html?email=${encodeURIComponent(email)}`;
+        }
+        
+        // ==================================================
+        // ACTUALIZAR DASHBOARD COMPLETO
         // ==================================================
         function actualizarDashboard() {
-            const total = reservasData.length;
-            const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
-            const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
-            const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
-            const clientes = clientesSet.size;
+            const reservasFiltradas = filtrarReservasPorFecha();
             
-            document.getElementById('totalReservas').innerText = total;
-            document.getElementById('totalPendientes').innerText = pendientes;
-            document.getElementById('totalConfirmadas').innerText = confirmadas;
-            document.getElementById('totalPagadas').innerText = pagadas;
-            document.getElementById('totalClientes').innerText = clientes;
+            if (reservasFiltradas.length === 0) {
+                document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6">No hay reservas en el período seleccionado</td</tr>';
+                if (pasajerosPorMesChart) pasajerosPorMesChart.destroy();
+                if (estadosChart) estadosChart.destroy();
+                calcularMetricasAvanzadas([]);
+                actualizarTopClientes([]);
+                return;
+            }
             
+            // Métricas
+            calcularMetricasAvanzadas(reservasFiltradas);
+            
+            // Top clientes
+            actualizarTopClientes(reservasFiltradas);
+            
+            // Tabla últimas reservas (incluyendo columna de personas)
+            const ultimas = reservasFiltradas.slice(0, 5);
+            const tbody = document.getElementById('tablaUltimasReservas');
+            if (ultimas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No hay reservas</td</tr>';
+            } else {
+                tbody.innerHTML = ultimas.map(r => `
+                    <tr>
+                        <td><strong>${escapeHtml(r.id)}</strong></td>
+                        <td>${escapeHtml(r.nombre)}</td>
+                        <td>${escapeHtml(r.excursion)}</td>
+                        <td>${escapeHtml(r.fecha)}</td>
+                        <td>${r.personas}</td>
+                        <td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td>
+                    </tr>
+                `).join('');
+            }
+            
+            // Gráfico de pasajeros por mes
             const meses = obtenerUltimos6Meses();
-            const reservasPorMesData = contarReservasPorMes(meses);
+            const pasajerosPorMesData = contarPasajerosPorMes(meses, reservasFiltradas);
             
-            if (reservasPorMesChart) reservasPorMesChart.destroy();
-            const ctxLineal = document.getElementById('reservasPorMesChart').getContext('2d');
-            reservasPorMesChart = new Chart(ctxLineal, {
+            if (pasajerosPorMesChart) pasajerosPorMesChart.destroy();
+            const ctxLineal = document.getElementById('pasajerosPorMesChart').getContext('2d');
+            pasajerosPorMesChart = new Chart(ctxLineal, {
                 type: 'line',
                 data: {
                     labels: meses.map(m => m.nombre),
                     datasets: [{
-                        label: 'Reservas',
-                        data: reservasPorMesData,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        label: 'Pasajeros',
+                        data: pasajerosPorMesData,
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
                         borderWidth: 2,
                         fill: true,
                         tension: 0.3,
-                        pointBackgroundColor: '#667eea',
+                        pointBackgroundColor: '#e74c3c',
                         pointBorderColor: '#fff',
                         pointRadius: 4
                     }]
@@ -719,6 +1159,11 @@
                     plugins: { legend: { position: 'top' } }
                 }
             });
+            
+            // Gráfico de estados
+            const pendientes = reservasFiltradas.filter(r => r.estado === 'pendiente').length;
+            const confirmadas = reservasFiltradas.filter(r => r.estado === 'confirmado').length;
+            const pagadas = reservasFiltradas.filter(r => r.estado === 'pagado').length;
             
             if (estadosChart) estadosChart.destroy();
             const ctxDona = document.getElementById('estadosChart').getContext('2d');
@@ -738,52 +1183,6 @@
                     plugins: { legend: { position: 'bottom' } }
                 }
             });
-            
-            const ultimas = reservasData.slice(0, 5);
-            const tbody = document.getElementById('tablaUltimasReservas');
-            if (ultimas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5">No hay reservas</td></tr>';
-            } else {
-                tbody.innerHTML = ultimas.map(r => `
-                    <tr>
-                        <td><strong>${escapeHtml(r.id)}</strong></td>
-                        <td>${escapeHtml(r.nombre)}</td>
-                        <td>${escapeHtml(r.excursion)}</td>
-                        <td>${escapeHtml(r.fecha)}</td>
-                        <td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td>
-                    </tr>
-                `).join('');
-            }
-        }
-        
-        function obtenerUltimos6Meses() {
-            const hoy = new Date();
-            const meses = [];
-            for (let i = 5; i >= 0; i--) {
-                const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
-                const nombre = fecha.toLocaleString('es', { month: 'short' }).toUpperCase();
-                const año = fecha.getFullYear();
-                meses.push({ nombre: `${nombre} ${año}`, año, mes: fecha.getMonth(), fecha });
-            }
-            return meses;
-        }
-        
-        function contarReservasPorMes(meses) {
-            return meses.map(m => {
-                let count = 0;
-                for (const reserva of reservasData) {
-                    if (!reserva.fecha) continue;
-                    const partes = reserva.fecha.split('/');
-                    if (partes.length === 3) {
-                        const mes = parseInt(partes[1]) - 1;
-                        const año = parseInt(partes[2]);
-                        if (año === m.año && mes === m.mes) {
-                            count++;
-                        }
-                    }
-                }
-                return count;
-            });
         }
         
         function escapeHtml(text) { 
@@ -793,9 +1192,16 @@
             return div.innerHTML; 
         }
         
+        // Exponer funciones globalmente
+        window.filtrarPorFecha = filtrarPorFecha;
+        window.resetFechas = resetFechas;
+        window.cargarDatos = cargarDatos;
+        window.logout = logout;
+        window.toggleTheme = toggleTheme;
+        window.verCliente = verCliente;
+        
         // Iniciar carga de datos
         cargarDatos();
-        // Recargar cada 60 segundos
         setInterval(cargarDatos, 60000);
     </script>
 </body>
