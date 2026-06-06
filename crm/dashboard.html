@@ -36,12 +36,23 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; transition: background 0.3s; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f2f5; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            transition: background 0.3s;
+        }
         
         body.dark-mode { background: #0f0f1a; }
-        body.dark-mode .stat-card, body.dark-mode .chart-container, body.dark-mode .recent-section,
-        body.dark-mode .date-range, body.dark-mode .top-clients-section { background: #1e1e2e; color: #e0e0e0; }
-        body.dark-mode .stat-info .number, body.dark-mode .recent-section h3, body.dark-mode .top-clients-section h3 { color: white; }
+        body.dark-mode .stat-card, 
+        body.dark-mode .chart-container, 
+        body.dark-mode .recent-section,
+        body.dark-mode .date-range, 
+        body.dark-mode .top-clients-section { background: #1e1e2e; color: #e0e0e0; }
+        body.dark-mode .stat-info .number, 
+        body.dark-mode .recent-section h3, 
+        body.dark-mode .top-clients-section h3 { color: white; }
         body.dark-mode table th { background: #2a2a3e; color: #ccc; }
         body.dark-mode table td { border-bottom-color: #2a2a3e; color: #ddd; }
         body.dark-mode .user-info { background: #1e1e2e; color: white; }
@@ -68,46 +79,38 @@
             background-size: 200% 100%;
         }
         
-        .skeleton-card {
-            height: 85px;
+        .skeleton-card { height: 85px; width: 100%; border-radius: 16px; }
+        .skeleton-chart { height: 250px; width: 100%; border-radius: 16px; }
+        .skeleton-table { height: 250px; width: 100%; border-radius: 16px; }
+        .skeleton-top-client { height: 200px; width: 100%; border-radius: 16px; }
+        
+        /* ===== MÉTRICAS EN GRID (UNA AL LADO DE LA OTRA) ===== */
+        .metrics-advanced {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
             width: 100%;
+        }
+        
+        .stat-card {
+            background: white;
             border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s;
+            min-width: 0;
         }
         
-        .skeleton-chart {
-            height: 250px;
-            width: 100%;
-            border-radius: 16px;
-        }
-        
-        .skeleton-table {
-            height: 250px;
-            width: 100%;
-            border-radius: 16px;
-        }
-        
-        .skeleton-top-client {
-            height: 200px;
-            width: 100%;
-            border-radius: 16px;
-        }
-        
-        /* Ocultar skeletons cuando se carga el contenido real */
-        .skeleton-container {
-            display: block;
-        }
-        
-        .real-content {
-            display: none;
-        }
-        
-        .real-content.visible {
-            display: block;
-        }
-        
-        .skeleton-container.hidden {
-            display: none;
-        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-icon { font-size: 32px; flex-shrink: 0; }
+        .stat-info { flex: 1; min-width: 0; }
+        .stat-info h3 { font-size: 11px; color: #666; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-info .number { font-size: 28px; font-weight: 700; color: #1a1a2e; line-height: 1.2; }
+        .stat-info small { font-size: 9px; color: #999; display: block; margin-top: 3px; }
         
         .menu-btn {
             position: fixed; top: 15px; left: 15px; width: 50px; height: 50px;
@@ -164,22 +167,6 @@
         
         .user-info { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 15px; border-radius: 40px; font-size: 13px; }
         .user-avatar { width: 30px; height: 30px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; }
-        
-        .metrics-advanced {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .stat-card {
-            background: white; border-radius: 16px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex; align-items: center; gap: 12px; transition: transform 0.2s;
-        }
-        .stat-card:hover { transform: translateY(-3px); }
-        .stat-icon { font-size: 32px; }
-        .stat-info h3 { font-size: 11px; color: #666; margin-bottom: 5px; text-transform: uppercase; }
-        .stat-info .number { font-size: 28px; font-weight: 700; color: #1a1a2e; line-height: 1.2; }
-        .stat-info small { font-size: 9px; color: #999; display: block; margin-top: 3px; }
         
         .date-range {
             background: white; border-radius: 16px; padding: 12px 20px; margin-bottom: 20px;
@@ -301,7 +288,7 @@
         </div>
 
         <!-- CONTENIDO REAL - MÉTRICAS -->
-        <div id="realMetrics" class="metrics-advanced real-content">
+        <div id="realMetrics" class="metrics-advanced real-content" style="display: none;">
             <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-info"><h3>Total Pasajeros</h3><div class="number" id="totalPasajeros">0</div><small>suma de todas las reservas</small></div></div>
             <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-info"><h3>Tasa Confirmación</h3><div class="number" id="tasaConfirmacion">0%</div><small>confirmadas / total</small></div></div>
             <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-info"><h3>Tasa Pago</h3><div class="number" id="tasaPago">0%</div><small>pagadas / total</small></div></div>
@@ -329,7 +316,7 @@
         </div>
 
         <!-- CONTENIDO REAL - GRÁFICOS -->
-        <div id="realCharts" class="charts-row real-content">
+        <div id="realCharts" class="charts-row real-content" style="display: none;">
             <div class="chart-container"><h3>📈 Pasajeros por mes (últimos 6 meses)</h3><canvas id="pasajerosPorMesChart"></canvas></div>
             <div class="chart-container"><h3>🥧 Distribución por estado</h3><canvas id="estadosChart"></canvas></div>
         </div>
@@ -341,12 +328,12 @@
         </div>
 
         <!-- CONTENIDO REAL - TOP CLIENTES -->
-        <div id="realTopClientes" class="top-clients-section real-content">
+        <div id="realTopClientes" class="top-clients-section real-content" style="display: none;">
             <h3>🏆 Top Clientes por Pasajeros</h3>
             <div class="table-wrapper">
                 <table>
                     <thead><tr><th>Cliente</th><th>Email</th><th>Reservas</th><th>Total Pasajeros</th><th>Acciones</th></tr></thead>
-                    <tbody id="topClientesBody"><tr><td colspan="5">Cargando... jonathan</tbody>
+                    <tbody id="topClientesBody"><tr><td colspan="5">Cargando...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -358,12 +345,12 @@
         </div>
 
         <!-- CONTENIDO REAL - ÚLTIMAS RESERVAS -->
-        <div id="realUltimasReservas" class="recent-section real-content">
+        <div id="realUltimasReservas" class="recent-section real-content" style="display: none;">
             <h3>📋 Últimas reservas</h3>
             <div class="table-wrapper">
-                <table>
+                <tr>
                     <thead><tr><th>ID</th><th>Cliente</th><th>Excursión</th><th>Fecha</th><th>Personas</th><th>Estado</th></tr></thead>
-                    <tbody id="tablaUltimasReservas"><tr><td colspan="6">Cargando... jonathan</tbody>
+                    <tbody id="tablaUltimasReservas"><tr><td colspan="6">Cargando...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -378,9 +365,14 @@
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-            document.querySelector('.btn-theme').textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            const btn = document.querySelector('.btn-theme');
+            if (btn) btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
         }
-        if (localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); document.querySelector('.btn-theme').textContent = '☀️'; }
+        if (localStorage.getItem('darkMode') === 'true') { 
+            document.body.classList.add('dark-mode'); 
+            const btn = document.querySelector('.btn-theme');
+            if (btn) btn.textContent = '☀️';
+        }
         
         // ==================================================
         // SERVICE WORKER
@@ -411,17 +403,13 @@
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        
-        // URL con límite de 100 filas (optimizada)
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201&tq=order%20by%20A%20desc%20limit%20100';
-        
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
         let reservasData = [];
         let estadosGlobales = {};
         let fechaInicio = null, fechaFin = null;
         let ultimoConteoPasajeros = 0;
-        
         let pasajerosPorMesChart = null;
         let estadosChart = null;
         
@@ -435,8 +423,6 @@
             skeletons.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = mostrar ? 'grid' : 'none';
-                if (id === 'skeletonMetrics') el.style.display = mostrar ? 'grid' : 'none';
-                if (id === 'skeletonCharts') el.style.display = mostrar ? 'grid' : 'none';
             });
             
             reals.forEach(id => {
@@ -489,7 +475,7 @@
         }
         
         // ==================================================
-        // OBTENER ÚLTIMOS 6 MESES (OPTIMIZADO)
+        // OBTENER ÚLTIMOS 6 MESES
         // ==================================================
         function obtenerUltimos6Meses() {
             const hoy = new Date();
@@ -504,20 +490,17 @@
         }
         
         // ==================================================
-        // CONTAR PASAJEROS POR MES (OPTIMIZADO - UN SOLO BUCLE)
+        // CONTAR PASAJEROS POR MES (OPTIMIZADO)
         // ==================================================
         function contarPasajerosPorMesOptimizado(reservas, meses) {
             const resultado = new Array(meses.length).fill(0);
-            
             for (const reserva of reservas) {
                 if (!reserva.fecha) continue;
                 const partes = reserva.fecha.split('/');
                 if (partes.length !== 3) continue;
-                
                 const mesReserva = parseInt(partes[1]) - 1;
                 const añoReserva = parseInt(partes[2]);
                 if (isNaN(mesReserva) || isNaN(añoReserva)) continue;
-                
                 for (let i = 0; i < meses.length; i++) {
                     if (añoReserva === meses[i].año && mesReserva === meses[i].mes) {
                         resultado[i] += reserva.personas || 0;
@@ -626,7 +609,13 @@
             });
             const topClientes = Array.from(clientesMap.values()).sort((a,b) => b.totalPasajeros - a.totalPasajeros).slice(0, 10);
             document.getElementById('topClientesBody').innerHTML = topClientes.map(c => 
-                `<tr><td><strong>${escapeHtml(c.nombre)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.reservas}</td><td><strong>${c.totalPasajeros}</strong></td><td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td>`
+                `<tr>
+                    <td><strong>${escapeHtml(c.nombre)}</strong></td>
+                    <td>${escapeHtml(c.email)}</td>
+                    <td>${c.reservas}</td>
+                    <td><strong>${c.totalPasajeros}</strong></td>
+                    <td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td>
+                 `
             ).join('');
             
             // Últimas reservas
@@ -676,17 +665,14 @@
         // CARGAR DATOS (CON ESQUELETO)
         // ==================================================
         async function cargarDatos() {
-            // Mostrar esqueletos
             mostrarEsqueletos(true);
             
-            // Intentar caché primero
             const cache = obtenerDeCache();
             if (cache && cache.length > 0) {
                 console.log('📦 Dashboard - Usando caché local');
                 reservasData = cache;
                 renderizarDashboard(reservasData);
                 mostrarEsqueletos(false);
-                // Actualizar en segundo plano
                 setTimeout(() => cargarDatosDesdeRed(), 500);
                 return;
             }
@@ -769,7 +755,6 @@
         window.toggleTheme = toggleTheme;
         window.verCliente = verCliente;
         
-        // Iniciar
         cargarDatos();
         setInterval(cargarDatos, 60000);
     </script>
