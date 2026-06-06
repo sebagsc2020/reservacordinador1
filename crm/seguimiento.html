@@ -743,7 +743,10 @@
 
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
-        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
+        
+        // 📌 OPTIMIZACIÓN: URL con límite de 100 filas (más rápido)
+        // Ordena por fecha descendente y limita a 100 registros
+        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME) + '&tq=order%20by%20A%20desc%20limit%20100';
         
         // URL del Google Apps Script (misma que reservas.html y dashboard.html)
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
@@ -761,11 +764,33 @@
         function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
 
         // ==================================================
-        // CARGAR ESTADOS DESDE LA NUBE (mismo que reservas.html)
+        // CACHÉ LOCAL (para evitar recargas innecesarias)
+        // ==================================================
+        const CACHE_DURACION = 60000; // 60 segundos
+        
+        function guardarEnCache(datos) {
+            localStorage.setItem('seguimientoCache', JSON.stringify({
+                timestamp: Date.now(),
+                reservas: datos
+            }));
+        }
+        
+        function obtenerDeCache() {
+            const cache = localStorage.getItem('seguimientoCache');
+            if (!cache) return null;
+            
+            const data = JSON.parse(cache);
+            if (Date.now() - data.timestamp < CACHE_DURACION) {
+                return data.reservas;
+            }
+            return null;
+        }
+
+        // ==================================================
+        // CARGAR ESTADOS DESDE LA NUBE
         // ==================================================
         async function cargarEstadosDesdeNube() {
             try {
-                // Primero intentar desde localStorage
                 const localEstados = localStorage.getItem('estadosReservasCloud');
                 if (localEstados) {
                     const parsed = JSON.parse(localEstados);
@@ -775,7 +800,6 @@
                     }
                 }
                 
-                // Luego sincronizar con la nube
                 const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
                 const data = await response.json();
                 if (data.success && data.estados) {
@@ -793,8 +817,32 @@
         }
 
         // ==================================================
-        // CARGAR DATOS PRINCIPAL
+        // CARGAR DATOS PRINCIPAL (con caché)
         // ==================================================
+        
+        // Función que renderiza directamente (útil para caché)
+        function renderizarDatos(reservas) {
+            if (!reservas || reservas.length === 0) return;
+            
+            const total = reservas.length;
+            const confirmadas = reservas.filter(r => r.estado === 'confirmado').length;
+            const pendientes = reservas.filter(r => r.estado === 'pendiente').length;
+            const pagadas = reservas.filter(r => r.estado === 'pagado').length;
+            
+            document.getElementById('metricaTotal').textContent = total;
+            document.getElementById('metricaConfirmadas').textContent = confirmadas;
+            document.getElementById('metricaPendientes').textContent = pendientes;
+            document.getElementById('metricaPagadas').textContent = pagadas;
+            
+            document.getElementById('countPendiente').textContent = pendientes;
+            document.getElementById('countConfirmado').textContent = confirmadas;
+            document.getElementById('countPagado').textContent = pagadas;
+            
+            document.getElementById('kanbanPendiente').innerHTML = renderizarTarjetas(reservas.filter(r => r.estado === 'pendiente'));
+            document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(reservas.filter(r => r.estado === 'confirmado'));
+            document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(reservas.filter(r => r.estado === 'pagado'));
+        }
+        
         async function cargarDatos() {
             const kanbanPendiente = document.getElementById('kanbanPendiente');
             const kanbanConfirmado = document.getElementById('kanbanConfirmado');
@@ -802,11 +850,30 @@
             
             if (!kanbanPendiente) return;
 
+            // 1. Intentar usar caché primero (carga instantánea)
+            const datosCache = obtenerDeCache();
+            if (datosCache && datosCache.length > 0) {
+                console.log('📦 Usando caché local - carga instantánea');
+                reservasData = datosCache;
+                renderizarDatos(reservasData);
+                // Seguir cargando en segundo plano para actualizar
+                setTimeout(() => cargarDatosDesdeRed(), 100);
+                return;
+            }
+
+            // 2. Si no hay caché, cargar desde red
+            await cargarDatosDesdeRed();
+        }
+        
+        async function cargarDatosDesdeRed() {
+            const kanbanPendiente = document.getElementById('kanbanPendiente');
+            const kanbanConfirmado = document.getElementById('kanbanConfirmado');
+            const kanbanPagado = document.getElementById('kanbanPagado');
+            
             try {
                 mostrarPreloader();
-                console.log('🚀 Iniciando carga de datos...');
+                console.log('🚀 Iniciando carga de datos desde Google Sheets (últimas 100 reservas)...');
 
-                // Cargar estados desde la nube
                 await cargarEstadosDesdeNube();
                 console.log('✅ Estados cargados:', Object.keys(estadosGlobales).length);
 
@@ -867,7 +934,6 @@
                     const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
                     const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
 
-                    // Obtener estado desde estadosGlobales (cargado desde la nube)
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
@@ -887,29 +953,14 @@
                     });
                 }
 
-                console.log(`📊 Cargadas ${reservasData.length} reservas`);
+                console.log(`📊 Cargadas ${reservasData.length} reservas (últimas 100)`);
                 console.log(`📋 Estados: Pendientes=${reservasData.filter(r => r.estado === 'pendiente').length}, Confirmadas=${reservasData.filter(r => r.estado === 'confirmado').length}, Pagadas=${reservasData.filter(r => r.estado === 'pagado').length}`);
 
-                // Actualizar métricas
-                const total = reservasData.length;
-                const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
-                const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
-                const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
+                // Guardar en caché
+                guardarEnCache(reservasData);
                 
-                document.getElementById('metricaTotal').textContent = total;
-                document.getElementById('metricaConfirmadas').textContent = confirmadas;
-                document.getElementById('metricaPendientes').textContent = pendientes;
-                document.getElementById('metricaPagadas').textContent = pagadas;
-                
-                document.getElementById('countPendiente').textContent = pendientes;
-                document.getElementById('countConfirmado').textContent = confirmadas;
-                document.getElementById('countPagado').textContent = pagadas;
-                
-                // Actualizar columnas Kanban
-                document.getElementById('kanbanPendiente').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pendiente'));
-                document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'confirmado'));
-                document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pagado'));
-                
+                // Renderizar
+                renderizarDatos(reservasData);
                 console.log('✅ Kanban actualizado correctamente');
                 
             } catch (error) {
@@ -1042,7 +1093,7 @@ ${MERCADO_PAGO_LINK}
         }
 
         // ==================================================
-        // INICIALIZAR - SIN ACTUALIZACIÓN AUTOMÁTICA
+        // INICIALIZAR
         // ==================================================
         
         // Exponer funciones globalmente
@@ -1053,10 +1104,8 @@ ${MERCADO_PAGO_LINK}
         window.enviarLinkPagoWhatsApp = enviarLinkPagoWhatsApp;
         window.toggleTheme = toggleTheme;
 
-        // Iniciar carga de datos (solo una vez al cargar la página)
+        // Iniciar carga de datos (con caché)
         cargarDatos();
-        
-        // NO hay setInterval - solo carga al iniciar y con el botón "Recargar"
     </script>
     
     <!-- ================================================== -->
