@@ -55,7 +55,7 @@
         body.dark-mode .btn-theme { color: white; }
         body.dark-mode .menu-btn { color: white; }
         
-        /* Sidebar - responsive */
+        /* Sidebar - SIN scrollbar visible */
         .sidebar {
             width: 280px;
             background: #1a1a2e;
@@ -70,6 +70,14 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateX(-100%);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            /* Ocultar scrollbar pero mantener funcionalidad */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        
+        /* Ocultar scrollbar en Chrome, Safari, Opera */
+        .sidebar::-webkit-scrollbar {
+            display: none;
         }
         
         .sidebar.open { transform: translateX(0); }
@@ -448,11 +456,6 @@
                 width: 100%;
             }
         }
-        
-        /* Scrollbar */
-        .sidebar::-webkit-scrollbar { width: 4px; }
-        .sidebar::-webkit-scrollbar-track { background: #1a1a2e; }
-        .sidebar::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
         
         /* SVG styles */
         .chart-line-path { fill: none; stroke: #667eea; stroke-width: 2.5; }
