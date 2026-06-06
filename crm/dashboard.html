@@ -151,7 +151,6 @@
         .badge-confirmado { background: #d4edda; color: #155724; }
         .badge-pagado { background: #d1ecf1; color: #0c5460; }
         
-        /* NOTIFICACIONES */
         .toast-notification {
             position: fixed; top: 20px; right: 20px;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -262,7 +261,7 @@
             <div class="table-wrapper">
                 <table>
                     <thead><tr><th>Cliente</th><th>Email</th><th>Reservas</th><th>Total Pasajeros</th><th>Acciones</th></tr></thead>
-                    <tbody id="topClientesBody"><tr><td colspan="5">Cargando... jonathan</tbody>
+                    <tbody id="topClientesBody"><tr><td colspan="5">Cargando...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -273,7 +272,7 @@
             <div class="table-wrapper">
                 <table>
                     <thead><tr><th>ID</th><th>Cliente</th><th>Excursión</th><th>Fecha</th><th>Personas</th><th>Estado</th></tr></thead>
-                    <tbody id="tablaUltimasReservas"><tr><td colspan="6">Cargando... jonathan</tbody>
+                    <tbody id="tablaUltimasReservas"><tr><td colspan="6">Cargando...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -322,7 +321,7 @@
         
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         
-        // 📌 OPTIMIZACIÓN: URL con límite de 100 filas (más rápido)
+        // URL con límite de 100 filas (optimizada)
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201&tq=order%20by%20A%20desc%20limit%20100';
         
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
@@ -331,6 +330,10 @@
         let estadosGlobales = {};
         let fechaInicio = null, fechaFin = null;
         let ultimoConteoPasajeros = 0;
+        
+        // Variables para los gráficos
+        let pasajerosPorMesChart = null;
+        let estadosChart = null;
         
         // ==================================================
         // CACHÉ LOCAL
@@ -372,27 +375,126 @@
             setTimeout(() => { if (notif.parentNode) notif.remove(); }, 6000);
         }
         
+        // ==================================================
+        // OBTENER ÚLTIMOS 6 MESES
+        // ==================================================
+        function obtenerUltimos6Meses() {
+            const hoy = new Date();
+            const meses = [];
+            for (let i = 5; i >= 0; i--) {
+                const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+                const nombre = fecha.toLocaleString('es', { month: 'short' }).toUpperCase();
+                const año = fecha.getFullYear();
+                meses.push({ nombre: `${nombre} ${año}`, año, mes: fecha.getMonth() });
+            }
+            return meses;
+        }
+        
+        // ==================================================
+        // ACTUALIZAR GRÁFICOS
+        // ==================================================
+        function actualizarGraficos(reservas) {
+            const meses = obtenerUltimos6Meses();
+            
+            // Calcular pasajeros por mes
+            const pasajerosPorMesData = meses.map(m => {
+                let total = 0;
+                for (const reserva of reservas) {
+                    if (!reserva.fecha) continue;
+                    const partes = reserva.fecha.split('/');
+                    if (partes.length === 3) {
+                        const mes = parseInt(partes[1]) - 1;
+                        const año = parseInt(partes[2]);
+                        if (año === m.año && mes === m.mes) {
+                            total += reserva.personas || 0;
+                        }
+                    }
+                }
+                return total;
+            });
+            
+            // Gráfico de pasajeros por mes
+            if (pasajerosPorMesChart) pasajerosPorMesChart.destroy();
+            const ctxLineal = document.getElementById('pasajerosPorMesChart').getContext('2d');
+            pasajerosPorMesChart = new Chart(ctxLineal, {
+                type: 'line',
+                data: {
+                    labels: meses.map(m => m.nombre),
+                    datasets: [{
+                        label: 'Pasajeros',
+                        data: pasajerosPorMesData,
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#e74c3c',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+            
+            // Calcular distribución por estado
+            const pendientes = reservas.filter(r => r.estado === 'pendiente').length;
+            const confirmadas = reservas.filter(r => r.estado === 'confirmado').length;
+            const pagadas = reservas.filter(r => r.estado === 'pagado').length;
+            
+            // Gráfico de distribución
+            if (estadosChart) estadosChart.destroy();
+            const ctxDona = document.getElementById('estadosChart').getContext('2d');
+            estadosChart = new Chart(ctxDona, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pendientes', 'Confirmadas', 'Pagadas'],
+                    datasets: [{
+                        data: [pendientes, confirmadas, pagadas],
+                        backgroundColor: ['#ffc107', '#27ae60', '#3498db'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+        
+        // ==================================================
+        // RENDERIZAR DASHBOARD
+        // ==================================================
         function renderizarDashboard(reservas) {
             if (!reservas || reservas.length === 0) {
-                document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6">No hay reservas jonathan</tr';
+                document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6">No hay reservas</td></tr>';
+                document.getElementById('topClientesBody').innerHTML = '<tr><td colspan="5">No hay datos</td></tr>';
+                actualizarGraficos([]);
                 return;
             }
             
-            const totalPasajeros = reservas.reduce((s, r) => s + r.personas, 0);
+            const totalPasajeros = reservas.reduce((s, r) => s + (r.personas || 0), 0);
             const confirmadas = reservas.filter(r => r.estado === 'confirmado').length;
             const pagadas = reservas.filter(r => r.estado === 'pagado').length;
-            const tasaConfirmacion = Math.round((confirmadas / reservas.length) * 100);
-            const tasaPago = Math.round((pagadas / reservas.length) * 100);
-            const grupoPromedio = (totalPasajeros / reservas.length).toFixed(1);
+            const tasaConfirmacion = reservas.length > 0 ? Math.round((confirmadas / reservas.length) * 100) : 0;
+            const tasaPago = reservas.length > 0 ? Math.round((pagadas / reservas.length) * 100) : 0;
+            const grupoPromedio = reservas.length > 0 ? (totalPasajeros / reservas.length).toFixed(1) : 0;
             
+            // Clientes recurrentes
             const reservasPorEmail = {};
             reservas.forEach(r => { if (r.email) reservasPorEmail[r.email] = (reservasPorEmail[r.email] || 0) + 1; });
             const recurrentes = Object.values(reservasPorEmail).filter(c => c > 1).length;
             const porcentajeRecurrentes = Object.keys(reservasPorEmail).length > 0 ? Math.round((recurrentes / Object.keys(reservasPorEmail).length) * 100) : 0;
             
+            // Pasajeros por día
             const diasUnicos = new Set(reservas.filter(r => r.fecha).map(r => r.fecha));
             const pasajerosPorDia = diasUnicos.size > 0 ? Math.round(totalPasajeros / diasUnicos.size) : 0;
             
+            // Actualizar métricas
             document.getElementById('totalPasajeros').innerHTML = totalPasajeros.toLocaleString();
             const tcElem = document.getElementById('tasaConfirmacion');
             tcElem.innerHTML = `${tasaConfirmacion}%`;
@@ -408,36 +510,33 @@
             const clientesMap = new Map();
             reservas.forEach(r => {
                 if (!r.email) return;
-                if (!clientesMap.has(r.email)) clientesMap.set(r.email, { nombre: r.nombre, email: r.email, reservas: 0, totalPasajeros: 0 });
+                if (!clientesMap.has(r.email)) {
+                    clientesMap.set(r.email, { nombre: r.nombre, email: r.email, reservas: 0, totalPasajeros: 0 });
+                }
                 const c = clientesMap.get(r.email);
                 c.reservas++;
-                c.totalPasajeros += r.personas;
+                c.totalPasajeros += r.personas || 0;
             });
             const topClientes = Array.from(clientesMap.values()).sort((a,b) => b.totalPasajeros - a.totalPasajeros).slice(0, 10);
-            document.getElementById('topClientesBody').innerHTML = topClientes.map(c => `<tr><td><strong>${escapeHtml(c.nombre)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.reservas}</td><td><strong>${c.totalPasajeros}</strong></td><td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td></tr>`).join('');
+            document.getElementById('topClientesBody').innerHTML = topClientes.map(c => 
+                `<tr><td><strong>${escapeHtml(c.nombre)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.reservas}</td><td><strong>${c.totalPasajeros}</strong></td><td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td></tr>`
+            ).join('');
             
             // Últimas reservas
             const ultimas = reservas.slice(0, 5);
-            document.getElementById('tablaUltimasReservas').innerHTML = ultimas.map(r => `<tr><td><strong>${escapeHtml(r.id)}</strong></td><td>${escapeHtml(r.nombre)}</td><td>${escapeHtml(r.excursion)}</td><td>${escapeHtml(r.fecha)}</td><td>${r.personas}</td><td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td>`).join('');
+            document.getElementById('tablaUltimasReservas').innerHTML = ultimas.map(r => 
+                `<tr><td><strong>${escapeHtml(r.id)}</strong></td><td>${escapeHtml(r.nombre)}</td><td>${escapeHtml(r.excursion)}</td><td>${escapeHtml(r.fecha)}</td><td>${r.personas || 0}</td><td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td></tr>`
+            ).join('');
             
-            // Gráficos
-            const meses = (() => { const h=new Date(), m=[]; for(let i=5;i>=0;i--){ const f=new Date(h.getFullYear(),h.getMonth()-i,1); m.push({ nombre:`${f.toLocaleString('es',{month:'short'}).toUpperCase()} ${f.getFullYear()}`, año:f.getFullYear(), mes:f.getMonth() }); } return m; })();
-            const pasajerosPorMes = meses.map(m => reservas.reduce((s,r) => { if(r.fecha){ const [d,mes,a]=r.fecha.split('/'); if(parseInt(a)===m.año && parseInt(mes)-1===m.mes) s+=r.personas; } return s; },0));
-            if (window.pasajerosPorMesChart) window.pasajerosPorMesChart.destroy();
-            window.pasajerosPorMesChart = new Chart(document.getElementById('pasajerosPorMesChart'), { type:'line', data:{ labels:meses.map(m=>m.nombre), datasets:[{ label:'Pasajeros', data:pasajerosPorMes, borderColor:'#e74c3c', backgroundColor:'rgba(231,76,60,0.1)', borderWidth:2, fill:true, tension:0.3, pointBackgroundColor:'#e74c3c', pointBorderColor:'#fff', pointRadius:4 }] }, options:{ responsive:true, maintainAspectRatio:true } });
-            
-            const pend = reservas.filter(r => r.estado === 'pendiente').length;
-            const conf = reservas.filter(r => r.estado === 'confirmado').length;
-            const pag = reservas.filter(r => r.estado === 'pagado').length;
-            if (window.estadosChart) window.estadosChart.destroy();
-            window.estadosChart = new Chart(document.getElementById('estadosChart'), { type:'doughnut', data:{ labels:['Pendientes','Confirmadas','Pagadas'], datasets:[{ data:[pend,conf,pag], backgroundColor:['#ffc107','#27ae60','#3498db'], borderWidth:0 }] }, options:{ responsive:true } });
+            // Actualizar gráficos
+            actualizarGraficos(reservas);
         }
         
         function filtrarReservasPorFecha() {
             if (!fechaInicio && !fechaFin) return reservasData;
             return reservasData.filter(r => {
                 if (!r.fecha) return true;
-                const [d,m,a] = r.fecha.split('/');
+                const [d, m, a] = r.fecha.split('/');
                 const fechaR = new Date(a, m-1, d);
                 if (fechaInicio && fechaR < fechaInicio) return false;
                 if (fechaFin && fechaR > fechaFin) return false;
@@ -460,6 +559,9 @@
             renderizarDashboard(reservasData);
         }
         
+        // ==================================================
+        // CARGAR DATOS PRINCIPAL
+        // ==================================================
         async function cargarDatos() {
             // Intentar caché primero
             const cache = obtenerDeCache();
@@ -467,7 +569,8 @@
                 console.log('📦 Dashboard - Usando caché local');
                 reservasData = cache;
                 renderizarDashboard(reservasData);
-                setTimeout(() => cargarDatosDesdeRed(), 100);
+                // Actualizar en segundo plano
+                setTimeout(() => cargarDatosDesdeRed(), 500);
                 return;
             }
             await cargarDatosDesdeRed();
@@ -475,6 +578,7 @@
         
         async function cargarDatosDesdeRed() {
             try {
+                console.log('🌐 Cargando datos desde Google Sheets...');
                 await cargarEstadosDesdeNube();
                 const res = await fetch(JSON_URL + '&t=' + Date.now());
                 let text = await res.text();
@@ -517,7 +621,10 @@
                     let estado = estadosGlobales[id];
                     if (!estado || !['pendiente','confirmado','pagado'].includes(estado)) estado = 'confirmado';
                     
-                    nuevasReservas.push({ id, fecha, nombre: nombreCompleto, email, excursion: primeraExcursion, excursionesLista, personas: parseInt(personas) || 1, estado });
+                    nuevasReservas.push({ 
+                        id, fecha, nombre: nombreCompleto, email, excursion: primeraExcursion, 
+                        excursionesLista, personas: parseInt(personas) || 1, estado 
+                    });
                 }
                 
                 const totalPasajerosNuevo = nuevasReservas.reduce((s, r) => s + r.personas, 0);
@@ -532,7 +639,8 @@
                 reservasData.sort((a,b) => (parseInt(b.id.replace(/\D/g,''))||0) - (parseInt(a.id.replace(/\D/g,''))||0));
                 guardarEnCache(reservasData);
                 renderizarDashboard(reservasData);
-            } catch(e) { console.error(e); }
+                console.log('✅ Dashboard actualizado con', reservasData.length, 'reservas');
+            } catch(e) { console.error('Error cargando datos:', e); }
         }
         
         function verCliente(email) { window.location.href = `clientes.html?email=${encodeURIComponent(email)}`; }
@@ -545,6 +653,7 @@
         window.toggleTheme = toggleTheme;
         window.verCliente = verCliente;
         
+        // Iniciar
         cargarDatos();
         setInterval(cargarDatos, 60000);
     </script>
