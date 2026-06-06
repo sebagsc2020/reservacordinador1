@@ -50,6 +50,65 @@
         
         .pwa-mode { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
         
+        /* ===== ESQUELETO DE CARGA ===== */
+        .skeleton {
+            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 12px;
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        body.dark-mode .skeleton {
+            background: linear-gradient(90deg, #2a2a3e 25%, #3a3a4e 50%, #2a2a3e 75%);
+            background-size: 200% 100%;
+        }
+        
+        .skeleton-card {
+            height: 85px;
+            width: 100%;
+            border-radius: 16px;
+        }
+        
+        .skeleton-chart {
+            height: 250px;
+            width: 100%;
+            border-radius: 16px;
+        }
+        
+        .skeleton-table {
+            height: 250px;
+            width: 100%;
+            border-radius: 16px;
+        }
+        
+        .skeleton-top-client {
+            height: 200px;
+            width: 100%;
+            border-radius: 16px;
+        }
+        
+        /* Ocultar skeletons cuando se carga el contenido real */
+        .skeleton-container {
+            display: block;
+        }
+        
+        .real-content {
+            display: none;
+        }
+        
+        .real-content.visible {
+            display: block;
+        }
+        
+        .skeleton-container.hidden {
+            display: none;
+        }
+        
         .menu-btn {
             position: fixed; top: 15px; left: 15px; width: 50px; height: 50px;
             background: #667eea; border-radius: 50%; display: none; align-items: center;
@@ -173,6 +232,8 @@
             padding: 4px 8px; border-radius: 5px; z-index: 1000; font-family: monospace;
         }
         
+        .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
+        
         @media (min-width: 769px) {
             .menu-btn { display: none !important; }
             .sidebar { transform: translateX(0) !important; width: 200px; }
@@ -229,8 +290,18 @@
             </div>
         </div>
 
-        <!-- Métricas -->
-        <div class="metrics-advanced">
+        <!-- ESQUELETO DE CARGA - MÉTRICAS -->
+        <div id="skeletonMetrics" class="metrics-advanced skeleton-container">
+            <div class="skeleton-card skeleton"></div>
+            <div class="skeleton-card skeleton"></div>
+            <div class="skeleton-card skeleton"></div>
+            <div class="skeleton-card skeleton"></div>
+            <div class="skeleton-card skeleton"></div>
+            <div class="skeleton-card skeleton"></div>
+        </div>
+
+        <!-- CONTENIDO REAL - MÉTRICAS -->
+        <div id="realMetrics" class="metrics-advanced real-content">
             <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-info"><h3>Total Pasajeros</h3><div class="number" id="totalPasajeros">0</div><small>suma de todas las reservas</small></div></div>
             <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-info"><h3>Tasa Confirmación</h3><div class="number" id="tasaConfirmacion">0%</div><small>confirmadas / total</small></div></div>
             <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-info"><h3>Tasa Pago</h3><div class="number" id="tasaPago">0%</div><small>pagadas / total</small></div></div>
@@ -249,14 +320,28 @@
             <button class="btn-recargar" onclick="cargarDatos()" style="background:#667eea;">🔄 Recargar datos</button>
         </div>
 
-        <!-- Gráficos -->
-        <div class="charts-row">
+        <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
+
+        <!-- ESQUELETO DE CARGA - GRÁFICOS -->
+        <div id="skeletonCharts" class="charts-row skeleton-container">
+            <div class="chart-container"><h3>📈 Pasajeros por mes</h3><div class="skeleton-chart skeleton"></div></div>
+            <div class="chart-container"><h3>🥧 Distribución por estado</h3><div class="skeleton-chart skeleton"></div></div>
+        </div>
+
+        <!-- CONTENIDO REAL - GRÁFICOS -->
+        <div id="realCharts" class="charts-row real-content">
             <div class="chart-container"><h3>📈 Pasajeros por mes (últimos 6 meses)</h3><canvas id="pasajerosPorMesChart"></canvas></div>
             <div class="chart-container"><h3>🥧 Distribución por estado</h3><canvas id="estadosChart"></canvas></div>
         </div>
 
-        <!-- Top Clientes -->
-        <div class="top-clients-section">
+        <!-- ESQUELETO DE CARGA - TOP CLIENTES -->
+        <div id="skeletonTopClientes" class="top-clients-section skeleton-container">
+            <h3>🏆 Top Clientes por Pasajeros</h3>
+            <div class="skeleton-top-client skeleton"></div>
+        </div>
+
+        <!-- CONTENIDO REAL - TOP CLIENTES -->
+        <div id="realTopClientes" class="top-clients-section real-content">
             <h3>🏆 Top Clientes por Pasajeros</h3>
             <div class="table-wrapper">
                 <table>
@@ -266,8 +351,14 @@
             </div>
         </div>
 
-        <!-- Últimas reservas -->
-        <div class="recent-section">
+        <!-- ESQUELETO DE CARGA - ÚLTIMAS RESERVAS -->
+        <div id="skeletonUltimasReservas" class="recent-section skeleton-container">
+            <h3>📋 Últimas reservas</h3>
+            <div class="skeleton-table skeleton"></div>
+        </div>
+
+        <!-- CONTENIDO REAL - ÚLTIMAS RESERVAS -->
+        <div id="realUltimasReservas" class="recent-section real-content">
             <h3>📋 Últimas reservas</h3>
             <div class="table-wrapper">
                 <table>
@@ -335,8 +426,48 @@
         let estadosChart = null;
         
         // ==================================================
-        // FUNCIONES
+        // MOSTRAR/OCULTAR ESQUELETOS
         // ==================================================
+        function mostrarEsqueletos(mostrar) {
+            const skeletons = ['skeletonMetrics', 'skeletonCharts', 'skeletonTopClientes', 'skeletonUltimasReservas'];
+            const reals = ['realMetrics', 'realCharts', 'realTopClientes', 'realUltimasReservas'];
+            
+            skeletons.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = mostrar ? 'grid' : 'none';
+                if (id === 'skeletonMetrics') el.style.display = mostrar ? 'grid' : 'none';
+                if (id === 'skeletonCharts') el.style.display = mostrar ? 'grid' : 'none';
+            });
+            
+            reals.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = mostrar ? 'none' : 'block';
+            });
+            
+            const totalSpan = document.getElementById('totalReservasSpan');
+            if (totalSpan) totalSpan.style.display = mostrar ? 'none' : 'block';
+        }
+        
+        // ==================================================
+        // CACHÉ LOCAL
+        // ==================================================
+        const CACHE_DURACION = 60000;
+        
+        function guardarEnCache(datos) {
+            localStorage.setItem('dashboardCache', JSON.stringify({
+                timestamp: Date.now(),
+                reservas: datos
+            }));
+        }
+        
+        function obtenerDeCache() {
+            const cache = localStorage.getItem('dashboardCache');
+            if (!cache) return null;
+            const data = JSON.parse(cache);
+            if (Date.now() - data.timestamp < CACHE_DURACION) return data.reservas;
+            return null;
+        }
+        
         async function cargarEstadosDesdeNube() {
             try {
                 const local = localStorage.getItem('estadosReservasCloud');
@@ -357,6 +488,9 @@
             setTimeout(() => { if (notif.parentNode) notif.remove(); }, 6000);
         }
         
+        // ==================================================
+        // OBTENER ÚLTIMOS 6 MESES (OPTIMIZADO)
+        // ==================================================
         function obtenerUltimos6Meses() {
             const hoy = new Date();
             const meses = [];
@@ -369,24 +503,37 @@
             return meses;
         }
         
-        function actualizarGraficos(reservas) {
-            const meses = obtenerUltimos6Meses();
+        // ==================================================
+        // CONTAR PASAJEROS POR MES (OPTIMIZADO - UN SOLO BUCLE)
+        // ==================================================
+        function contarPasajerosPorMesOptimizado(reservas, meses) {
+            const resultado = new Array(meses.length).fill(0);
             
-            const pasajerosPorMesData = meses.map(m => {
-                let total = 0;
-                for (const reserva of reservas) {
-                    if (!reserva.fecha) continue;
-                    const partes = reserva.fecha.split('/');
-                    if (partes.length === 3) {
-                        const mes = parseInt(partes[1]) - 1;
-                        const año = parseInt(partes[2]);
-                        if (año === m.año && mes === m.mes) {
-                            total += reserva.personas || 0;
-                        }
+            for (const reserva of reservas) {
+                if (!reserva.fecha) continue;
+                const partes = reserva.fecha.split('/');
+                if (partes.length !== 3) continue;
+                
+                const mesReserva = parseInt(partes[1]) - 1;
+                const añoReserva = parseInt(partes[2]);
+                if (isNaN(mesReserva) || isNaN(añoReserva)) continue;
+                
+                for (let i = 0; i < meses.length; i++) {
+                    if (añoReserva === meses[i].año && mesReserva === meses[i].mes) {
+                        resultado[i] += reserva.personas || 0;
+                        break;
                     }
                 }
-                return total;
-            });
+            }
+            return resultado;
+        }
+        
+        // ==================================================
+        // ACTUALIZAR GRÁFICOS
+        // ==================================================
+        function actualizarGraficos(reservas) {
+            const meses = obtenerUltimos6Meses();
+            const pasajerosPorMesData = contarPasajerosPorMesOptimizado(reservas, meses);
             
             if (pasajerosPorMesChart) pasajerosPorMesChart.destroy();
             const ctxLineal = document.getElementById('pasajerosPorMesChart').getContext('2d');
@@ -430,6 +577,9 @@
             });
         }
         
+        // ==================================================
+        // RENDERIZAR DASHBOARD
+        // ==================================================
         function renderizarDashboard(reservas) {
             if (!reservas || reservas.length === 0) {
                 document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6">No hay reservas jonathan</tr';
@@ -463,7 +613,9 @@
             document.getElementById('grupoPromedio').innerHTML = grupoPromedio;
             document.getElementById('clientesRecurrentes').innerHTML = `${porcentajeRecurrentes}%`;
             document.getElementById('pasajerosPorDia').innerHTML = pasajerosPorDia.toLocaleString();
+            document.getElementById('totalReservasSpan').innerHTML = `${reservas.length} reservas`;
             
+            // Top clientes
             const clientesMap = new Map();
             reservas.forEach(r => {
                 if (!r.email) return;
@@ -473,10 +625,22 @@
                 c.totalPasajeros += r.personas || 0;
             });
             const topClientes = Array.from(clientesMap.values()).sort((a,b) => b.totalPasajeros - a.totalPasajeros).slice(0, 10);
-            document.getElementById('topClientesBody').innerHTML = topClientes.map(c => `<tr><td><strong>${escapeHtml(c.nombre)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.reservas}</td><td><strong>${c.totalPasajeros}</strong></td><td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td></tr>`).join('');
+            document.getElementById('topClientesBody').innerHTML = topClientes.map(c => 
+                `<tr><td><strong>${escapeHtml(c.nombre)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.reservas}</td><td><strong>${c.totalPasajeros}</strong></td><td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td>`
+            ).join('');
             
+            // Últimas reservas
             const ultimas = reservas.slice(0, 5);
-            document.getElementById('tablaUltimasReservas').innerHTML = ultimas.map(r => `<tr><td><strong>${escapeHtml(r.id)}</strong></td><td>${escapeHtml(r.nombre)}</td><td>${escapeHtml(r.excursion)}</td><td>${escapeHtml(r.fecha)}</td><td>${r.personas || 0}</td><td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td></tr>`).join('');
+            document.getElementById('tablaUltimasReservas').innerHTML = ultimas.map(r => 
+                `<tr>
+                    <td><strong>${escapeHtml(r.id)}</strong></td>
+                    <td>${escapeHtml(r.nombre)}</td>
+                    <td>${escapeHtml(r.excursion)}</td>
+                    <td>${escapeHtml(r.fecha)}</td>
+                    <td>${r.personas || 0}</td>
+                    <td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td>
+                 `
+            ).join('');
             
             actualizarGraficos(reservas);
         }
@@ -509,9 +673,29 @@
         }
         
         // ==================================================
-        // CARGAR DATOS (SIN CACHÉ - SIEMPRE DATOS FRESCOS)
+        // CARGAR DATOS (CON ESQUELETO)
         // ==================================================
         async function cargarDatos() {
+            // Mostrar esqueletos
+            mostrarEsqueletos(true);
+            
+            // Intentar caché primero
+            const cache = obtenerDeCache();
+            if (cache && cache.length > 0) {
+                console.log('📦 Dashboard - Usando caché local');
+                reservasData = cache;
+                renderizarDashboard(reservasData);
+                mostrarEsqueletos(false);
+                // Actualizar en segundo plano
+                setTimeout(() => cargarDatosDesdeRed(), 500);
+                return;
+            }
+            
+            await cargarDatosDesdeRed();
+            mostrarEsqueletos(false);
+        }
+        
+        async function cargarDatosDesdeRed() {
             try {
                 console.log('🌐 Cargando datos desde Google Sheets...');
                 await cargarEstadosDesdeNube();
@@ -569,6 +753,7 @@
                 ultimoConteoPasajeros = totalPasajerosNuevo;
                 reservasData = nuevasReservas;
                 reservasData.sort((a,b) => (parseInt(b.id.replace(/\D/g,''))||0) - (parseInt(a.id.replace(/\D/g,''))||0));
+                guardarEnCache(reservasData);
                 renderizarDashboard(reservasData);
                 console.log('✅ Dashboard actualizado con', reservasData.length, 'reservas');
             } catch(e) { console.error('Error cargando datos:', e); }
