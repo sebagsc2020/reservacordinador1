@@ -685,13 +685,20 @@
             }
         }
         
-        // Cargar preferencia de modo oscuro
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
             const btn = document.querySelector('.btn-theme');
-            if (btn) {
-                btn.textContent = '☀️';
-            }
+            if (btn) btn.textContent = '☀️';
+        }
+        
+        // ==================================================
+        // SERVICE WORKER
+        // ==================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log(err)); });
+        }
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            document.body.classList.add('pwa-mode');
         }
         
         // ==================================================
@@ -713,19 +720,12 @@
             document.body.style.overflow = '';
         }
         
-        if (menuBtn) {
-            menuBtn.addEventListener('click', toggleMenu);
-        }
-        
-        if (menuOverlay) {
-            menuOverlay.addEventListener('click', closeMenu);
-        }
+        if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
+        if (menuOverlay) menuOverlay.addEventListener('click', closeMenu);
         
         document.querySelectorAll('.nav-menu a').forEach(link => {
             link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    closeMenu();
-                }
+                if (window.innerWidth <= 768) closeMenu();
             });
         });
         
@@ -742,49 +742,20 @@
         }
 
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const SHEET_NAME = 'Hoja 1';
         
-        // 📌 OPTIMIZACIÓN: URL con límite de 100 filas (más rápido)
-        // Ordena por fecha descendente y limita a 100 registros
-        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME) + '&tq=order%20by%20A%20desc%20limit%20100';
+        // URL optimizada con límite de 100 filas
+        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201&tq=order%20by%20A%20desc%20limit%20100';
         
-        // URL del Google Apps Script (misma que reservas.html y dashboard.html)
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         
-        // Link de Mercado Pago
         const MERCADO_PAGO_LINK = 'https://link.mercadopago.com.ar/scphotobr';
         
         let reservasData = [];
         let estadosGlobales = {};
 
-        // Preloader Popup
         const preloaderPopup = document.getElementById('preloaderPopup');
-        
         function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
         function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
-
-        // ==================================================
-        // CACHÉ LOCAL (para evitar recargas innecesarias)
-        // ==================================================
-        const CACHE_DURACION = 60000; // 60 segundos
-        
-        function guardarEnCache(datos) {
-            localStorage.setItem('seguimientoCache', JSON.stringify({
-                timestamp: Date.now(),
-                reservas: datos
-            }));
-        }
-        
-        function obtenerDeCache() {
-            const cache = localStorage.getItem('seguimientoCache');
-            if (!cache) return null;
-            
-            const data = JSON.parse(cache);
-            if (Date.now() - data.timestamp < CACHE_DURACION) {
-                return data.reservas;
-            }
-            return null;
-        }
 
         // ==================================================
         // CARGAR ESTADOS DESDE LA NUBE
@@ -794,10 +765,7 @@
                 const localEstados = localStorage.getItem('estadosReservasCloud');
                 if (localEstados) {
                     const parsed = JSON.parse(localEstados);
-                    if (Object.keys(parsed).length > 0) {
-                        estadosGlobales = parsed;
-                        console.log('📥 Estados cargados desde localStorage:', Object.keys(estadosGlobales).length);
-                    }
+                    if (Object.keys(parsed).length > 0) estadosGlobales = parsed;
                 }
                 
                 const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
@@ -805,11 +773,9 @@
                 if (data.success && data.estados) {
                     estadosGlobales = data.estados;
                     localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
-                    console.log('📥 Estados sincronizados desde nube:', Object.keys(estadosGlobales).length);
                 }
                 return estadosGlobales;
             } catch (error) {
-                console.error('Error al cargar desde nube:', error);
                 const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
                 estadosGlobales = estadosLocal;
                 return estadosLocal;
@@ -817,65 +783,14 @@
         }
 
         // ==================================================
-        // CARGAR DATOS PRINCIPAL (con caché)
+        // CARGAR DATOS PRINCIPAL (SIN CACHÉ - SIEMPRE DATOS FRESCOS)
         // ==================================================
-        
-        // Función que renderiza directamente (útil para caché)
-        function renderizarDatos(reservas) {
-            if (!reservas || reservas.length === 0) return;
-            
-            const total = reservas.length;
-            const confirmadas = reservas.filter(r => r.estado === 'confirmado').length;
-            const pendientes = reservas.filter(r => r.estado === 'pendiente').length;
-            const pagadas = reservas.filter(r => r.estado === 'pagado').length;
-            
-            document.getElementById('metricaTotal').textContent = total;
-            document.getElementById('metricaConfirmadas').textContent = confirmadas;
-            document.getElementById('metricaPendientes').textContent = pendientes;
-            document.getElementById('metricaPagadas').textContent = pagadas;
-            
-            document.getElementById('countPendiente').textContent = pendientes;
-            document.getElementById('countConfirmado').textContent = confirmadas;
-            document.getElementById('countPagado').textContent = pagadas;
-            
-            document.getElementById('kanbanPendiente').innerHTML = renderizarTarjetas(reservas.filter(r => r.estado === 'pendiente'));
-            document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(reservas.filter(r => r.estado === 'confirmado'));
-            document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(reservas.filter(r => r.estado === 'pagado'));
-        }
-        
         async function cargarDatos() {
-            const kanbanPendiente = document.getElementById('kanbanPendiente');
-            const kanbanConfirmado = document.getElementById('kanbanConfirmado');
-            const kanbanPagado = document.getElementById('kanbanPagado');
-            
-            if (!kanbanPendiente) return;
-
-            // 1. Intentar usar caché primero (carga instantánea)
-            const datosCache = obtenerDeCache();
-            if (datosCache && datosCache.length > 0) {
-                console.log('📦 Usando caché local - carga instantánea');
-                reservasData = datosCache;
-                renderizarDatos(reservasData);
-                // Seguir cargando en segundo plano para actualizar
-                setTimeout(() => cargarDatosDesdeRed(), 100);
-                return;
-            }
-
-            // 2. Si no hay caché, cargar desde red
-            await cargarDatosDesdeRed();
-        }
-        
-        async function cargarDatosDesdeRed() {
-            const kanbanPendiente = document.getElementById('kanbanPendiente');
-            const kanbanConfirmado = document.getElementById('kanbanConfirmado');
-            const kanbanPagado = document.getElementById('kanbanPagado');
-            
             try {
                 mostrarPreloader();
-                console.log('🚀 Iniciando carga de datos desde Google Sheets (últimas 100 reservas)...');
+                console.log('🚀 Cargando datos desde Google Sheets (últimas 100 reservas)...');
 
                 await cargarEstadosDesdeNube();
-                console.log('✅ Estados cargados:', Object.keys(estadosGlobales).length);
 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
                 const texto = await response.text();
@@ -909,16 +824,10 @@
                     let excursionesLista = [];
                     const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
                     if (excursionesRaw) {
-                        if (excursionesRaw.includes('\n')) {
-                            excursionesLista = excursionesRaw.split('\n');
-                        } else if (excursionesRaw.includes(' | ')) {
-                            excursionesLista = excursionesRaw.split(' | ');
-                        } else {
-                            excursionesLista = [excursionesRaw];
-                        }
-                        excursionesLista = excursionesLista.map(function(e) { 
-                            return e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
-                        }).filter(function(e) { return e; });
+                        if (excursionesRaw.includes('\n')) excursionesLista = excursionesRaw.split('\n');
+                        else if (excursionesRaw.includes(' | ')) excursionesLista = excursionesRaw.split(' | ');
+                        else excursionesLista = [excursionesRaw];
+                        excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e);
                     }
 
                     let fecha = '';
@@ -953,24 +862,37 @@
                     });
                 }
 
-                console.log(`📊 Cargadas ${reservasData.length} reservas (últimas 100)`);
-                console.log(`📋 Estados: Pendientes=${reservasData.filter(r => r.estado === 'pendiente').length}, Confirmadas=${reservasData.filter(r => r.estado === 'confirmado').length}, Pagadas=${reservasData.filter(r => r.estado === 'pagado').length}`);
+                console.log(`📊 Cargadas ${reservasData.length} reservas`);
+                actualizarDashboard();
 
-                // Guardar en caché
-                guardarEnCache(reservasData);
-                
-                // Renderizar
-                renderizarDatos(reservasData);
-                console.log('✅ Kanban actualizado correctamente');
-                
             } catch (error) {
                 console.error('❌ Error:', error);
-                if (kanbanPendiente) kanbanPendiente.innerHTML = '<div class="loading-text">Error al cargar datos</div>';
-                if (kanbanConfirmado) kanbanConfirmado.innerHTML = '<div class="loading-text">Error al cargar datos</div>';
-                if (kanbanPagado) kanbanPagado.innerHTML = '<div class="loading-text">Error al cargar datos</div>';
+                document.getElementById('kanbanPendiente').innerHTML = '<div class="loading-text">Error al cargar datos</div>';
+                document.getElementById('kanbanConfirmado').innerHTML = '<div class="loading-text">Error al cargar datos</div>';
+                document.getElementById('kanbanPagado').innerHTML = '<div class="loading-text">Error al cargar datos</div>';
             } finally {
                 ocultarPreloader();
             }
+        }
+
+        function actualizarDashboard() {
+            const total = reservasData.length;
+            const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
+            const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
+            const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
+            
+            document.getElementById('metricaTotal').textContent = total;
+            document.getElementById('metricaConfirmadas').textContent = confirmadas;
+            document.getElementById('metricaPendientes').textContent = pendientes;
+            document.getElementById('metricaPagadas').textContent = pagadas;
+            
+            document.getElementById('countPendiente').textContent = pendientes;
+            document.getElementById('countConfirmado').textContent = confirmadas;
+            document.getElementById('countPagado').textContent = pagadas;
+            
+            document.getElementById('kanbanPendiente').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pendiente'));
+            document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'confirmado'));
+            document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pagado'));
         }
 
         function renderizarTarjetas(reservas) {
@@ -998,12 +920,9 @@
             }).join('');
         }
 
-        // Función para enviar link de pago por WhatsApp
         function enviarLinkPagoWhatsApp(reserva) {
             let telefono = reserva.telefono.replace(/\D/g, '');
-            if (telefono.length === 10) {
-                telefono = '54' + telefono;
-            }
+            if (telefono.length === 10) telefono = '54' + telefono;
             
             const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️
 
@@ -1020,9 +939,7 @@ ${MERCADO_PAGO_LINK}
 
 🏔️ ¡Gracias por confiar en Aventura Total!`;
             
-            const mensajeCodificado = encodeURIComponent(mensaje);
-            const urlWhatsApp = `https://wa.me/${telefono}?text=${mensajeCodificado}`;
-            window.open(urlWhatsApp, '_blank');
+            window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
         function verDetalle(id) {
@@ -1092,11 +1009,6 @@ ${MERCADO_PAGO_LINK}
             return div.innerHTML; 
         }
 
-        // ==================================================
-        // INICIALIZAR
-        // ==================================================
-        
-        // Exponer funciones globalmente
         window.verDetalle = verDetalle;
         window.cerrarModal = cerrarModal;
         window.cargarDatos = cargarDatos;
@@ -1104,31 +1016,7 @@ ${MERCADO_PAGO_LINK}
         window.enviarLinkPagoWhatsApp = enviarLinkPagoWhatsApp;
         window.toggleTheme = toggleTheme;
 
-        // Iniciar carga de datos (con caché)
         cargarDatos();
-    </script>
-    
-    <!-- ================================================== -->
-    <!-- REGISTRAR SERVICE WORKER PARA PWA -->
-    <!-- ================================================== -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('✅ Service Worker registrado con éxito:', registration.scope);
-                    })
-                    .catch(function(error) {
-                        console.log('❌ Error al registrar Service Worker:', error);
-                    });
-            });
-        }
-
-        // Detectar si la app está instalada y se abre desde la pantalla de inicio
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
-            document.body.classList.add('pwa-mode');
-        }
     </script>
 </body>
 </html>
