@@ -35,12 +35,97 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
         
         /* Modo PWA (sin barra de navegación) */
         .pwa-mode {
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* ========== MODO OSCURO ========== */
+        body.dark-mode {
+            background: #0f0f1a;
+        }
+        
+        body.dark-mode .buscador-container,
+        body.dark-mode .whatsapp-composer,
+        body.dark-mode .template-card,
+        body.dark-mode .user-info,
+        body.dark-mode .resultados-busqueda,
+        body.dark-mode .cliente-detalle {
+            background: #1e1e2e;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .buscador-input,
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group textarea {
+            background: #2a2a3e;
+            border-color: #3a3a4e;
+            color: white;
+        }
+        
+        body.dark-mode .buscador-input::placeholder,
+        body.dark-mode .form-group input::placeholder,
+        body.dark-mode .form-group textarea::placeholder {
+            color: #888;
+        }
+        
+        body.dark-mode .template-card h4 {
+            color: white;
+        }
+        
+        body.dark-mode .template-card p {
+            color: #aaa;
+        }
+        
+        body.dark-mode .template-card:hover {
+            background: #2a2a3e;
+        }
+        
+        body.dark-mode .resultado-item {
+            border-bottom-color: #2a2a3e;
+        }
+        
+        body.dark-mode .resultado-item:hover {
+            background: #2a2a3e;
+        }
+        
+        body.dark-mode .resultado-nombre {
+            color: white;
+        }
+        
+        body.dark-mode .resultado-email {
+            color: #aaa;
+        }
+        
+        body.dark-mode .header h1 {
+            color: white;
+        }
+        
+        body.dark-mode .template-section h3 {
+            color: white;
+        }
+        
+        body.dark-mode .whatsapp-composer h3 {
+            color: white;
+        }
+        
+        body.dark-mode .form-group label {
+            color: #aaa;
+        }
+        
+        body.dark-mode .cliente-detalle strong {
+            color: white;
+        }
+        
+        body.dark-mode .btn-theme {
+            color: white;
+        }
+        
+        body.dark-mode .btn-theme:hover {
+            background: rgba(255,255,255,0.1);
         }
 
         /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
@@ -169,7 +254,33 @@
             flex-wrap: wrap; 
             gap: 10px; 
         }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
+        .header h1 { font-size: 26px; color: #1a1a2e; transition: color 0.3s; }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-theme:hover {
+            background: rgba(0,0,0,0.1);
+            transform: scale(1.1);
+        }
+        
         .user-info { 
             display: flex; 
             align-items: center; 
@@ -179,6 +290,7 @@
             border-radius: 50px; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
             font-size: 14px; 
+            transition: background 0.3s;
         }
         .user-avatar { 
             width: 35px; 
@@ -200,6 +312,7 @@
             box-shadow: 0 2px 15px rgba(0,0,0,0.05); 
             margin-bottom: 20px; 
             position: relative; 
+            transition: background 0.3s;
         }
         .buscador-input { 
             width: 100%; 
@@ -207,6 +320,7 @@
             border: 2px solid #e0e0e0; 
             border-radius: 10px; 
             font-size: 14px; 
+            transition: background 0.3s, border-color 0.3s, color 0.3s;
         }
         .buscador-input:focus { 
             outline: none; 
@@ -224,6 +338,7 @@
             overflow-y: auto; 
             z-index: 50; 
             display: none; 
+            transition: background 0.3s;
         }
         .resultados-busqueda.show { display: block; }
         .resultado-item { 
@@ -235,6 +350,7 @@
             align-items: center; 
             flex-wrap: wrap; 
             gap: 5px; 
+            transition: background 0.3s, border-color 0.3s;
         }
         .resultado-item:hover { background: #e8f5e9; } 
         .resultado-nombre { font-weight: 600; font-size: 13px; } 
@@ -249,15 +365,17 @@
             padding: 20px; 
             box-shadow: 0 2px 15px rgba(0,0,0,0.05); 
             margin-bottom: 20px; 
+            transition: background 0.3s;
         }
         .form-group { margin-bottom: 15px; } 
-        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 5px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 5px; transition: color 0.3s; }
         .form-group input, .form-group textarea { 
             width: 100%; 
             padding: 10px 12px; 
             border: 2px solid #e0e0e0; 
             border-radius: 8px; 
             font-size: 13px; 
+            transition: background 0.3s, border-color 0.3s, color 0.3s;
         }
         .form-group textarea { 
             min-height: 180px; 
@@ -309,8 +427,13 @@
             display: none; 
             font-weight: 600; 
             text-align: center; 
+            transition: background 0.3s, color 0.3s;
         }
         .mensaje-exito.show { display: block; }
+        body.dark-mode .mensaje-exito {
+            background: #1a3320;
+            color: #27ae60;
+        }
         
         .cliente-detalle { 
             background: #f0f7ff; 
@@ -319,12 +442,13 @@
             margin: 10px 0; 
             font-size: 12px; 
             border-left: 3px solid #25D366; 
+            transition: background 0.3s;
         }
-        .cliente-detalle strong { color: #1a1a2e; }
+        .cliente-detalle strong { color: #1a1a2e; transition: color 0.3s; }
 
         /* ===== PLANTILLAS ===== */
         .template-section { margin-bottom: 20px; } 
-        .template-section h3 { margin-bottom: 12px; color: #1a1a2e; font-size: 16px; }
+        .template-section h3 { margin-bottom: 12px; color: #1a1a2e; font-size: 16px; transition: color 0.3s; }
         .template-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
@@ -337,12 +461,12 @@
             box-shadow: 0 1px 5px rgba(0,0,0,0.05); 
             cursor: pointer; 
             border-left: 3px solid #25D366; 
-            transition: all 0.2s; 
+            transition: all 0.2s, background 0.3s; 
         }
         .template-card:active { transform: scale(0.96); }
         .template-card:hover { transform: translateY(-2px); background: #e8f5e9; } 
-        .template-card h4 { font-size: 13px; } 
-        .template-card p { font-size: 10px; color: #666; }
+        .template-card h4 { font-size: 13px; transition: color 0.3s; } 
+        .template-card p { font-size: 10px; color: #666; transition: color 0.3s; }
         .template-card .template-icon { font-size: 24px; margin-bottom: 5px; }
 
         /* ===== SCROLL SIDEBAR ===== */
@@ -420,6 +544,12 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+            
+            .btn-theme {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -430,6 +560,11 @@
             .header {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
             }
         }
     </style>
@@ -467,9 +602,12 @@
     <div class="main-content">
         <div class="header">
             <div><h1>💬 WhatsApp</h1></div>
-            <div class="user-info">
-                <div class="user-avatar">A</div>
-                <span>Admin</span>
+            <div class="header-actions">
+                <button class="btn-theme" onclick="toggleTheme()" title="Modo oscuro/claro">🌙</button>
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span>Admin</span>
+                </div>
             </div>
         </div>
 
@@ -541,11 +679,33 @@
 
     <script>
         // ==================================================
+        // MODO OSCURO
+        // ==================================================
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            const btn = document.querySelector('.btn-theme');
+            if (btn) {
+                btn.textContent = isDark ? '☀️' : '🌙';
+            }
+        }
+        
+        // Cargar preferencia de modo oscuro
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            const btn = document.querySelector('.btn-theme');
+            if (btn) {
+                btn.textContent = '☀️';
+            }
+        }
+        
+        // ==================================================
         // REGISTRAR SERVICE WORKER PARA PWA
         // ==================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('sw.js')
                     .then(function(registration) {
                         console.log('✅ Service Worker registrado con éxito:', registration.scope);
                     })
@@ -844,6 +1004,7 @@
         window.enviarWhatsApp = enviarWhatsApp;
         window.abrirWhatsAppWeb = abrirWhatsAppWeb;
         window.logout = logout;
+        window.toggleTheme = toggleTheme;
 
         document.getElementById('btnEnviarWhatsApp').addEventListener('click', enviarWhatsApp);
         document.getElementById('btnWhatsAppWeb').addEventListener('click', abrirWhatsAppWeb);
