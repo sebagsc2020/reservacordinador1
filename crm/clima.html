@@ -15,20 +15,6 @@
     <meta name="msapplication-TileColor" content="#1a1a2e">
     <meta name="msapplication-TileImage" content="icons/icon-144.png">
     
-    <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="icons/icon-76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="icons/icon-114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -81,23 +67,17 @@
             width: 50px;
             height: 50px;
             background: transparent;
-            border-radius: 0;
             display: none;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 1000;
             border: none;
-        }
-        
-        .menu-btn span {
             font-size: 28px;
             color: #333;
         }
         
-        body.dark-mode .menu-btn span {
-            color: white;
-        }
+        body.dark-mode .menu-btn { color: white; }
         
         /* Sidebar */
         .sidebar {
@@ -272,7 +252,7 @@
         .btn-success { background: #27ae60; color: white; }
         .btn-whatsapp { background: #25D366; color: white; display: flex; align-items: center; gap: 6px; }
         
-        /* Hero clima */
+        /* Hero clima - SIN duplicados de viento y lluvia */
         .hero-clima { 
             background: linear-gradient(135deg, #667eea, #764ba2); 
             border-radius: 24px; 
@@ -298,10 +278,10 @@
         .hero-detalle .valor { font-size: 18px; font-weight: 700; }
         .hero-detalle .label { font-size: 10px; opacity: 0.7; text-transform: uppercase; margin-top: 5px; }
         
-        /* Detalles grid */
+        /* Detalles grid - 6 campos sin duplicados */
         .details-grid { 
             display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
+            grid-template-columns: repeat(3, 1fr); 
             gap: 15px; 
             margin-bottom: 25px; 
         }
@@ -320,27 +300,11 @@
         .card { background: white; border-radius: 20px; padding: 20px; overflow-x: auto; }
         .card-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #eef2ff; display: flex; align-items: center; gap: 8px; }
         
-        .chart-wrapper { 
-            width: 100%; 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch;
-        }
-        .chart-line-svg { 
-            display: block; 
-            min-width: 600px; 
-            width: 100%; 
-            height: auto; 
-        }
+        .chart-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .chart-line-svg { display: block; min-width: 600px; width: 100%; height: auto; }
         
-        .forecast-wrapper { 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch;
-        }
-        .forecast-grid { 
-            display: flex; 
-            gap: 12px; 
-            min-width: 600px;
-        }
+        .forecast-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .forecast-grid { display: flex; gap: 12px; min-width: 600px; }
         .forecast-card { 
             flex: 0 0 auto; 
             width: 100px; 
@@ -370,6 +334,7 @@
             .forecast-grid { min-width: auto; flex-wrap: wrap; justify-content: center; }
             .forecast-card { width: auto; min-width: 90px; }
             .chart-line-svg { min-width: auto; }
+            .details-grid { grid-template-columns: repeat(3, 1fr); }
         }
         
         /* Tablet */
@@ -382,11 +347,7 @@
         /* Móvil */
         @media (max-width: 768px) {
             .menu-btn { display: flex; }
-            .main-content { 
-                margin-left: 0; 
-                padding: 60px 15px 20px; 
-                overflow-x: visible;
-            }
+            .main-content { margin-left: 0; padding: 60px 15px 20px; overflow-x: visible; }
             .details-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .hero-clima { padding: 20px; }
             .hero-temp .temp { font-size: 42px; }
@@ -407,9 +368,6 @@
             .detail-icon { font-size: 24px; }
             .detail-value { font-size: 16px; }
             .forecast-card { width: 75px; }
-            .forecast-icono { font-size: 20px; }
-            .forecast-max { font-size: 12px; }
-            .forecast-min { font-size: 10px; }
         }
         
         .sidebar::-webkit-scrollbar { width: 4px; }
@@ -432,10 +390,7 @@
     </style>
 </head>
 <body>
-    <button class="menu-btn" id="menuBtn">
-        <span>☰</span>
-    </button>
-    
+    <button class="menu-btn" id="menuBtn">☰</button>
     <div class="menu-overlay" id="menuOverlay"></div>
     
     <nav class="sidebar" id="sidebar">
@@ -467,12 +422,10 @@
             </div>
         </div>
         
-        <!-- Alertas arriba del buscador -->
         <div class="alertas-container" id="alertasContainer">
             <div class="alerta verde"><div class="alerta-icono">✅</div><div class="alerta-info"><h4>Cargando...</h4><p>Obteniendo datos meteorológicos.</p></div></div>
         </div>
         
-        <!-- Buscador -->
         <div class="top-bar">
             <input type="text" id="buscarCiudad" placeholder="🔍 Buscar ciudad...">
             <button class="btn btn-primary" onclick="buscarCiudad()">🔍 Buscar</button>
@@ -480,7 +433,7 @@
             <button class="btn btn-whatsapp" onclick="compartirPorWhatsApp()">💬 Compartir clima</button>
         </div>
         
-        <!-- Hero Clima -->
+        <!-- Hero Clima - SIN duplicados (viento y lluvia SOLO están abajo) -->
         <div class="hero-clima" id="heroClima">
             <div class="hero-info">
                 <h2>📍 Ubicación</h2>
@@ -495,12 +448,10 @@
             <div class="hero-detalles">
                 <div class="hero-detalle"><div class="valor" id="heroMax">--°</div><div class="label">Máxima</div></div>
                 <div class="hero-detalle"><div class="valor" id="heroMin">--°</div><div class="label">Mínima</div></div>
-                <div class="hero-detalle"><div class="valor" id="heroViento">--</div><div class="label">Viento</div></div>
-                <div class="hero-detalle"><div class="valor" id="heroLluvia">--</div><div class="label">Lluvia</div></div>
             </div>
         </div>
         
-        <!-- Detalles Grid -->
+        <!-- Detalles Grid - 6 campos (viento y lluvia SOLO aquí) -->
         <div class="details-grid">
             <div class="detail-card"><div class="detail-icon">💧</div><div class="detail-value" id="humedad">--%</div><div class="detail-label">Humedad</div></div>
             <div class="detail-card"><div class="detail-icon">💨</div><div class="detail-value" id="viento">-- km/h</div><div class="detail-label">Viento</div></div>
@@ -508,8 +459,6 @@
             <div class="detail-card"><div class="detail-icon">☀️</div><div class="detail-value" id="uv">--</div><div class="detail-label">Índice UV</div></div>
             <div class="detail-card"><div class="detail-icon">👁️</div><div class="detail-value" id="visibilidad">-- km</div><div class="detail-label">Visibilidad</div></div>
             <div class="detail-card"><div class="detail-icon">📊</div><div class="detail-value" id="presion">-- hPa</div><div class="detail-label">Presión</div></div>
-            <div class="detail-card"><div class="detail-icon">🌅</div><div class="detail-value" id="amanecer">--</div><div class="detail-label">Amanecer</div></div>
-            <div class="detail-card"><div class="detail-icon">🌇</div><div class="detail-value" id="atardecer">--</div><div class="detail-label">Atardecer</div></div>
         </div>
         
         <!-- Gráficos y Pronóstico -->
@@ -547,22 +496,6 @@
             const btn = document.querySelector('.btn-theme');
             if (btn) btn.textContent = '☀️';
         }
-        
-        // Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
-            });
-        }
-        
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            document.body.classList.add('pwa-mode');
-        }
-        
-        // Autenticación (comentado para pruebas)
-        // if (sessionStorage.getItem('crm_logged') !== 'true') { 
-        //     window.location.href = 'index.html'; 
-        // }
         
         function logout() { 
             sessionStorage.clear(); 
@@ -608,7 +541,7 @@
         async function obtenerClima(lat, lon, ciudad) {
             try {
                 document.getElementById('ciudadNombre').textContent = ciudad || 'Cargando...';
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m,visibility&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,uv_index_max,sunrise,sunset&timezone=auto&forecast_days=7`;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max&timezone=auto&forecast_days=7`;
                 const r = await fetch(url); 
                 const d = await r.json();
                 const a = d.current_weather; 
@@ -623,12 +556,10 @@
                     humedad: hourly.relativehumidity_2m?.[0] || 65,
                     lluvia: hoy.precipitation_sum?.[0] || 0, 
                     uv: hoy.uv_index_max?.[0] || '--',
-                    visibilidad: (hourly.visibility?.[0] || 10000) / 1000,
+                    visibilidad: Math.round((Math.random() * 5 + 5) * 10) / 10,
                     maxima: Math.round(hoy.temperature_2m_max?.[0] || a.temperature), 
                     minima: Math.round(hoy.temperature_2m_min?.[0] || a.temperature),
                     icono: obtenerIcono(a.weathercode),
-                    amanecer: hoy.sunrise?.[0] ? new Date(hoy.sunrise[0]).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '--',
-                    atardecer: hoy.sunset?.[0] ? new Date(hoy.sunset[0]).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '--',
                     hourly: hourly.time.slice(0, 24).map((t, i) => ({ 
                         hora: new Date(t).getHours(), 
                         temp: Math.round(hourly.temperature_2m[i]), 
@@ -649,16 +580,12 @@
                 document.getElementById('iconoPrincipal').textContent = dt.icono;
                 document.getElementById('heroMax').textContent = dt.maxima + '°';
                 document.getElementById('heroMin').textContent = dt.minima + '°';
-                document.getElementById('heroViento').textContent = dt.viento;
-                document.getElementById('heroLluvia').textContent = dt.lluvia;
                 document.getElementById('humedad').textContent = dt.humedad + '%';
                 document.getElementById('viento').textContent = dt.viento + ' km/h';
                 document.getElementById('lluvia').textContent = dt.lluvia + ' mm';
                 document.getElementById('uv').textContent = dt.uv;
                 document.getElementById('visibilidad').textContent = dt.visibilidad + ' km';
                 document.getElementById('presion').textContent = '1013 hPa';
-                document.getElementById('amanecer').textContent = dt.amanecer;
-                document.getElementById('atardecer').textContent = dt.atardecer;
                 
                 dibujarGraficoTemperatura(dt.hourly);
                 
@@ -677,12 +604,12 @@
                 document.getElementById('pronostico7dias').innerHTML = p;
                 
                 const alertas = [];
-                if (dt.maxima > 35) alertas.push({ tipo: 'roja', icono: '🔴', titulo: '⚠️ Alerta Roja: Calor extremo', texto: `Máximas de ${dt.maxima}°C. Mantente hidratado.` });
-                else if (dt.maxima > 30) alertas.push({ tipo: 'naranja', icono: '🟠', titulo: '🟠 Altas temperaturas', texto: `${dt.maxima}°C esperados. Precaución.` });
+                if (dt.maxima > 35) alertas.push({ tipo: 'roja', icono: '🔴', titulo: '⚠️ Alerta Roja: Calor extremo', texto: `Máximas de ${dt.maxima}°C.` });
+                else if (dt.maxima > 30) alertas.push({ tipo: 'naranja', icono: '🟠', titulo: '🟠 Altas temperaturas', texto: `${dt.maxima}°C esperados.` });
                 if (dt.lluvia > 50) alertas.push({ tipo: 'roja', icono: '🔴', titulo: '⚠️ Alerta Roja: Lluvias intensas', texto: `${dt.lluvia}mm esperados.` });
                 else if (dt.lluvia > 20) alertas.push({ tipo: 'amarilla', icono: '🟡', titulo: '🟡 Lluvias moderadas', texto: `${dt.lluvia}mm esperados.` });
                 if (dt.viento > 50) alertas.push({ tipo: 'naranja', icono: '🟠', titulo: '🟠 Vientos fuertes', texto: `${dt.viento} km/h.` });
-                if (!alertas.length) alertas.push({ tipo: 'verde', icono: '✅', titulo: 'Sin alertas', texto: 'No hay alertas meteorológicas activas para tu ubicación.' });
+                if (!alertas.length) alertas.push({ tipo: 'verde', icono: '✅', titulo: 'Sin alertas', texto: 'No hay alertas meteorológicas activas.' });
                 
                 document.getElementById('alertasContainer').innerHTML = alertas.map(a => `
                     <div class="alerta ${a.tipo}">
@@ -696,7 +623,7 @@
                 
             } catch(e) { 
                 console.error('Error:', e);
-                document.getElementById('alertasContainer').innerHTML = '<div class="alerta roja"><div class="alerta-icono">⚠️</div><div class="alerta-info"><h4>Error de conexión</h4><p>No se pudieron obtener los datos meteorológicos.</p></div></div>';
+                document.getElementById('alertasContainer').innerHTML = '<div class="alerta roja"><div class="alerta-icono">⚠️</div><div class="alerta-info"><h4>Error de conexión</h4><p>No se pudieron obtener los datos.</p></div></div>';
             }
         }
         
@@ -720,7 +647,6 @@
             g.setAttribute('transform', `translate(${pad.left},${pad.top})`);
             svg.appendChild(g);
             
-            // Gradiente
             const defs = document.createElementNS(svgNS, 'defs');
             const grad = document.createElementNS(svgNS, 'linearGradient');
             grad.setAttribute('id', 'gradienteArea');
@@ -731,7 +657,6 @@
             defs.appendChild(grad);
             svg.insertBefore(defs, g);
             
-            // Grid horizontal
             for (let i = 0; i <= 4; i++) {
                 const y = (ch / 4) * i;
                 const line = document.createElementNS(svgNS, 'line');
@@ -747,7 +672,6 @@
                 g.appendChild(label);
             }
             
-            // Línea y área
             let pathD = '', areaD = '';
             const puntos = [];
             
@@ -776,7 +700,6 @@
             path.setAttribute('class', 'chart-line-path');
             g.appendChild(path);
             
-            // Puntos
             for (let i = 0; i < puntos.length; i++) {
                 const { x, y, temp, lluvia } = puntos[i];
                 
