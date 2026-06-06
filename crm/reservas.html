@@ -35,7 +35,7 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
         
         /* Modo PWA (sin barra de navegación) */
         .pwa-mode {
@@ -43,6 +43,95 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
 
+        /* ========== MODO OSCURO ========== */
+        body.dark-mode {
+            background: #0f0f1a;
+        }
+        
+        body.dark-mode .filters-bar,
+        body.dark-mode .reserva-card,
+        body.dark-mode .preloader-popup-contenido {
+            background: #1e1e2e;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .card-header {
+            background: linear-gradient(135deg, #4a5aaa 0%, #5a3a82 100%);
+        }
+        
+        body.dark-mode .card-body .card-value,
+        body.dark-mode .excursiones-lista-card li,
+        body.dark-mode .total-reservas {
+            color: #ddd;
+        }
+        
+        body.dark-mode .card-label {
+            color: #aaa;
+        }
+        
+        body.dark-mode .excursiones-lista-card li {
+            border-bottom-color: #2a2a3e;
+        }
+        
+        body.dark-mode .card-actions {
+            background: #161622;
+            border-top-color: #2a2a3e;
+        }
+        
+        body.dark-mode .user-info {
+            background: #1e1e2e;
+            color: white;
+        }
+        
+        body.dark-mode .header h1 {
+            color: white;
+        }
+        
+        body.dark-mode .filter-input {
+            background: #2a2a3e;
+            border-color: #3a3a4e;
+            color: white;
+        }
+        
+        body.dark-mode .filter-input::placeholder {
+            color: #888;
+        }
+        
+        body.dark-mode .btn-filtrar,
+        body.dark-mode .btn-recargar,
+        body.dark-mode .btn-pdf {
+            background: #2a2a3e;
+            color: white;
+        }
+        
+        body.dark-mode .btn-filtrar {
+            background: #667eea;
+        }
+        
+        body.dark-mode .btn-recargar {
+            background: #27ae60;
+        }
+        
+        body.dark-mode .btn-pdf {
+            background: #2c7da0;
+        }
+        
+        body.dark-mode .btn-theme {
+            color: white;
+        }
+        
+        body.dark-mode .btn-theme:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        body.dark-mode .preloader-popup-titulo {
+            color: white;
+        }
+        
+        body.dark-mode .preloader-popup-subtitulo {
+            color: #aaa;
+        }
+        
         /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
         .menu-btn {
             position: fixed;
@@ -169,13 +258,38 @@
             flex-wrap: wrap; 
             gap: 10px; 
         }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
+        .header h1 { font-size: 26px; color: #1a1a2e; transition: color 0.3s; }
         
         .user-area {
             display: flex;
             align-items: center;
             gap: 15px;
             flex-wrap: wrap;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-theme:hover {
+            background: rgba(0,0,0,0.1);
+            transform: scale(1.1);
         }
         
         .user-info { 
@@ -187,6 +301,7 @@
             border-radius: 50px; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
             font-size: 14px; 
+            transition: background 0.3s;
         }
         .user-avatar { 
             width: 35px; 
@@ -233,6 +348,7 @@
             gap: 10px; 
             align-items: center; 
             flex-wrap: wrap; 
+            transition: background 0.3s;
         }
         .filter-input { 
             padding: 12px 15px; 
@@ -241,6 +357,7 @@
             font-size: 13px; 
             flex: 2; 
             min-width: 200px; 
+            transition: background 0.3s, border-color 0.3s, color 0.3s;
         }
         .filter-input:focus {
             outline: none;
@@ -270,7 +387,7 @@
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
         }
         .reserva-card:active {
             transform: scale(0.99);
@@ -289,6 +406,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
+            transition: background 0.3s;
         }
         .card-id {
             font-weight: 700;
@@ -329,11 +447,11 @@
 
         .card-body { padding: 15px; }
         .card-info { margin-bottom: 12px; }
-        .card-label { font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .card-value { font-size: 13px; font-weight: 500; color: #333; word-break: break-word; }
+        .card-label { font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 0.5px; margin-bottom: 4px; transition: color 0.3s; }
+        .card-value { font-size: 13px; font-weight: 500; color: #333; word-break: break-word; transition: color 0.3s; }
 
         .excursiones-lista-card { margin: 0; padding-left: 16px; list-style: none; }
-        .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: #555; border-bottom: 1px dashed #eee; }
+        .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: #555; border-bottom: 1px dashed #eee; transition: color 0.3s, border-color 0.3s; }
         .excursiones-lista-card li:last-child { border-bottom: none; }
 
         .card-actions {
@@ -343,6 +461,7 @@
             background: #f8f9fa;
             border-top: 1px solid #f0f0f0;
             flex-wrap: wrap;
+            transition: background 0.3s, border-color 0.3s;
         }
         .btn-card {
             flex: 1;
@@ -365,7 +484,7 @@
         .btn-whatsapp-card { background: #25D366; color: white; }
         .btn-excluir-card { background: #e74c3c; color: white; }
 
-        .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
+        .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; transition: color 0.3s; }
 
         /* ===== PRELOADER POPUP ===== */
         .preloader-popup {
@@ -393,6 +512,7 @@
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             animation: popupFadeIn 0.3s ease;
+            transition: background 0.3s;
         }
         @keyframes popupFadeIn {
             from { transform: scale(0.9); opacity: 0; }
@@ -417,10 +537,12 @@
             font-weight: 700;
             color: #1a1a2e;
             margin-bottom: 8px;
+            transition: color 0.3s;
         }
         .preloader-popup-subtitulo {
             font-size: 14px;
             color: #666;
+            transition: color 0.3s;
         }
         .puntos::after {
             content: '';
@@ -555,6 +677,12 @@
             .preloader-popup-titulo {
                 font-size: 18px;
             }
+            
+            .btn-theme {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -608,9 +736,12 @@
         <div class="header">
             <div><h1>📋 Reservas</h1></div>
             <div class="user-area">
-                <div class="user-info">
-                    <div class="user-avatar">A</div>
-                    <span>Admin</span>
+                <div class="header-actions">
+                    <button class="btn-theme" onclick="toggleTheme()" title="Modo oscuro/claro">🌙</button>
+                    <div class="user-info">
+                        <div class="user-avatar">A</div>
+                        <span>Admin</span>
+                    </div>
                 </div>
                 <button class="btn-reserva-manual" onclick="abrirReservaManual()">
                     ➕ Reserva manual
@@ -643,11 +774,33 @@
 
     <script>
         // ==================================================
+        // MODO OSCURO
+        // ==================================================
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            const btn = document.querySelector('.btn-theme');
+            if (btn) {
+                btn.textContent = isDark ? '☀️' : '🌙';
+            }
+        }
+        
+        // Cargar preferencia de modo oscuro
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            const btn = document.querySelector('.btn-theme');
+            if (btn) {
+                btn.textContent = '☀️';
+            }
+        }
+        
+        // ==================================================
         // REGISTRAR SERVICE WORKER PARA PWA
         // ==================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('sw.js')
                     .then(function(registration) {
                         console.log('✅ Service Worker registrado con éxito:', registration.scope);
                     })
@@ -1226,6 +1379,7 @@
         window.generarPDFExterno = generarPDFExterno;
         window.abrirReservaManual = abrirReservaManual;
         window.editarNombreReserva = editarNombreReserva;
+        window.toggleTheme = toggleTheme;
         
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
