@@ -103,16 +103,15 @@
         .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .filter-input { padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; transition: all 0.3s; }
         .filter-input:focus { outline: none; border-color: #667eea; }
-        .btn-filtrar, .btn-recargar, .btn-pdf, .btn-etiqueta { padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; }
-        .btn-filtrar { background: #667eea; color: white; }
-        .btn-recargar { background: #27ae60; color: white; }
+        .btn-filtrar, .btn-recargar, .btn-pdf { padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; }
+        .btn-filtrar { background: #27ae60; color: white; }
+        .btn-recargar { background: #667eea; color: white; }
         .btn-pdf { background: #dc2626; color: white; }
-        .btn-etiqueta { background: #6c5ce7; color: white; }
         
         .table-container { background: white; border-radius: 15px; padding: 20px; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
         th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 12px; text-transform: uppercase; font-weight: 600; border-bottom: 2px solid #e0e0e0; }
         td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #333; }
         tr:hover td { background: #f8f9ff; }
@@ -121,31 +120,11 @@
         .badge-activo { background: #d4edda; color: #155724; }
         .badge-reservas { background: #eef2ff; color: #667eea; }
         
-        .etiqueta-item {
-            display: inline-block; background: #667eea; color: white;
-            padding: 2px 8px; border-radius: 20px; font-size: 9px; margin: 2px;
-        }
-        .etiqueta-item.sin { background: #ccc; color: #666; }
-        
-        .btn-ver, .btn-etiquetas-cliente {
+        .btn-ver {
             padding: 6px 14px; background: #667eea; color: white;
             border: none; border-radius: 8px; cursor: pointer; font-size: 12px;
-            font-weight: 500; margin: 2px;
+            font-weight: 500;
         }
-        .btn-etiquetas-cliente { background: #6c5ce7; }
-        
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); display: flex; justify-content: center;
-            align-items: center; z-index: 2000;
-        }
-        .modal-contenido {
-            background: white; border-radius: 20px; max-width: 500px;
-            width: 90%; max-height: 85vh; overflow-y: auto; padding: 25px;
-        }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eef2ff; padding-bottom: 12px; }
-        .modal-header h3 { color: #667eea; }
-        .cerrar-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
         
         /* Indicador de búsqueda activa */
         .busqueda-activa {
@@ -172,9 +151,9 @@
             .stats-number { font-size: 32px; }
             .filters-bar { flex-direction: column; }
             .filter-input { width: 100%; }
-            .btn-filtrar, .btn-recargar, .btn-pdf, .btn-etiqueta { width: 100%; text-align: center; }
+            .btn-filtrar, .btn-recargar, .btn-pdf { width: 100%; text-align: center; }
             th, td { padding: 8px 6px; font-size: 11px; }
-            .btn-ver, .btn-etiquetas-cliente { padding: 4px 10px; font-size: 10px; }
+            .btn-ver { padding: 4px 10px; font-size: 10px; }
         }
         
         .sidebar::-webkit-scrollbar { width: 4px; }
@@ -216,10 +195,9 @@
 
         <div class="filters-bar">
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono... (mínimo 2 caracteres)" id="busquedaCliente">
-            <button class="btn-filtrar" onclick="filtrarClientes()" style="background:#27ae60;">🔍 Buscar</button>
+            <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Buscar</button>
             <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
             <button class="btn-pdf" onclick="descargarPDF()">📄 Descargar PDF</button>
-            <button class="btn-etiqueta" onclick="filtrarPorEtiqueta()">🏷️ Filtrar por etiqueta</button>
         </div>
 
         <div class="table-container">
@@ -230,9 +208,17 @@
             <div class="table-wrapper">
                 <table>
                     <thead>
-                        <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Reservas</th><th>Estado</th><th>Etiquetas</th><th>Acciones</th></tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Reservas</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
                     </thead>
-                    <tbody id="tablaClientes"><tr><td colspan="8" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr</tbody>
+                    <tbody id="tablaClientes"><tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr</tbody>
                 </table>
             </div>
         </div>
@@ -266,83 +252,6 @@
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201';
         
         let clientesData = [], clientesFiltrados = [];
-        let filtroEtiquetaActual = null;
-        
-        const ETIQUETAS_DISPONIBLES = ['VIP', 'Nuevo', 'Recomendó', 'Pendiente Pago', 'Frecuente', 'Aniversario'];
-        
-        function cargarEtiquetasCliente(email) { return JSON.parse(localStorage.getItem(`etiquetas_${email}`) || '[]'); }
-        function guardarEtiquetasCliente(email, etiquetas) { localStorage.setItem(`etiquetas_${email}`, JSON.stringify(etiquetas)); }
-        
-        function mostrarModalEtiquetas(email, nombre) {
-            const etiquetasActuales = cargarEtiquetasCliente(email);
-            const modalHtml = `
-                <div id="modalEtiquetas" class="modal">
-                    <div class="modal-contenido">
-                        <div class="modal-header"><h3>🏷️ Etiquetas para ${escapeHtml(nombre)}</h3><button class="cerrar-modal" onclick="cerrarModal('modalEtiquetas')">✕</button></div>
-                        <div class="modal-body" style="padding:20px;">
-                            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
-                                ${ETIQUETAS_DISPONIBLES.map(e => `
-                                    <label style="display:flex; align-items:center; gap:5px; background:#f0f0f0; padding:5px 12px; border-radius:20px; cursor:pointer;">
-                                        <input type="checkbox" value="${e}" ${etiquetasActuales.includes(e) ? 'checked' : ''} onchange="toggleEtiqueta('${email}', '${e}', this.checked)">
-                                        ${e}
-                                    </label>
-                                `).join('')}
-                            </div>
-                            <div><input type="text" id="nuevaEtiqueta" placeholder="✏️ Nueva etiqueta personalizada" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px;"></div>
-                            <button onclick="agregarEtiquetaPersonalizada('${email}')" style="margin-top:8px; width:100%; padding:8px; background:#6c5ce7; color:white; border:none; border-radius:8px;">➕ Agregar</button>
-                        </div>
-                        <div style="padding:15px; border-top:1px solid #eee;"><button onclick="cerrarModal('modalEtiquetas')" style="width:100%; padding:10px; background:#666; color:white; border:none; border-radius:8px;">Cerrar</button></div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-        }
-        
-        function toggleEtiqueta(email, etiqueta, activar) {
-            let etiquetas = cargarEtiquetasCliente(email);
-            if (activar && !etiquetas.includes(etiqueta)) etiquetas.push(etiqueta);
-            else if (!activar && etiquetas.includes(etiqueta)) etiquetas = etiquetas.filter(e => e !== etiqueta);
-            guardarEtiquetasCliente(email, etiquetas);
-            renderizarTabla();
-        }
-        
-        function agregarEtiquetaPersonalizada(email) {
-            const input = document.getElementById('nuevaEtiqueta');
-            const nueva = input.value.trim();
-            if (!nueva) return;
-            let etiquetas = cargarEtiquetasCliente(email);
-            if (!etiquetas.includes(nueva)) {
-                etiquetas.push(nueva);
-                guardarEtiquetasCliente(email, etiquetas);
-                renderizarTabla();
-                const modal = document.getElementById('modalEtiquetas');
-                if (modal) modal.remove();
-                mostrarModalEtiquetas(email, clientesData.find(c => c.email === email)?.nombre || 'Cliente');
-            }
-            input.value = '';
-        }
-        
-        function cerrarModal(id) { const m = document.getElementById(id); if (m) m.remove(); }
-        
-        function filtrarPorEtiqueta() {
-            const etiqueta = prompt('🏷️ Filtrar clientes por etiqueta:\n' + ETIQUETAS_DISPONIBLES.join(', ') + '\n\nTambién puedes escribir una etiqueta personalizada');
-            if (!etiqueta) { filtroEtiquetaActual = null; }
-            else { filtroEtiquetaActual = etiqueta.trim(); }
-            aplicarFiltros();
-        }
-        
-        function aplicarFiltros() {
-            const texto = document.getElementById('busquedaCliente').value.toLowerCase().trim();
-            let filtrados = [...clientesData];
-            if (texto && texto.length >= 2) {
-                filtrados = filtrados.filter(c => c.nombre.toLowerCase().includes(texto) || c.email.toLowerCase().includes(texto) || (c.telefono && c.telefono.includes(texto)));
-            }
-            if (filtroEtiquetaActual) {
-                filtrados = filtrados.filter(c => cargarEtiquetasCliente(c.email).includes(filtroEtiquetaActual));
-            }
-            clientesFiltrados = filtrados;
-            renderizarTabla();
-        }
         
         // ==================================================
         // BÚSQUEDA INSTANTÁNEA (mientras escribe)
@@ -381,7 +290,7 @@
         async function cargarClientes() {
             const tbody = document.getElementById('tablaClientes');
             try {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">⏳ Cargando...</td</tr';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">⏳ Cargando...</td</tr';
                 const res = await fetch(JSON_URL + '&t=' + Date.now());
                 let text = await res.text();
                 let jsonStr = text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2);
@@ -404,38 +313,33 @@
                 }
                 clientesData = Array.from(clientesMap.entries()).map(([email, cl], idx) => ({ id: idx+1, email, nombre: cl.nombre, telefono: cl.telefono || 'No registrado', totalReservas: cl.reservasCount }));
                 clientesData.sort((a,b) => a.nombre.localeCompare(b.nombre));
-                aplicarFiltros();
+                clientesFiltrados = [...clientesData];
+                renderizarTabla();
                 document.getElementById('totalClientes').textContent = clientesData.length;
                 document.getElementById('totalClientesSpan').textContent = `${clientesData.length} clientes`;
-            } catch(e) { console.error(e); tbody.innerHTML = `<td><td colspan="8" style="color:red;">❌ Error: ${e.message} jonathan</tr`; }
+            } catch(e) { console.error(e); tbody.innerHTML = `<tr><td colspan="7" style="color:red;">❌ Error: ${e.message} jonathan</tr`; }
         }
         
         function renderizarTabla() {
             const tbody = document.getElementById('tablaClientes');
             if (!tbody) return;
             if (clientesFiltrados.length === 0) { 
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">📋 No hay clientes</td</tr'; 
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">📋 No hay clientes</td</tr'; 
                 document.getElementById('totalClientesSpan').textContent = `0 clientes (${clientesData.length} total)`;
                 return; 
             }
             
-            tbody.innerHTML = clientesFiltrados.map(cliente => {
-                const etiquetas = cargarEtiquetasCliente(cliente.email);
-                const etiquetasHtml = etiquetas.length ? etiquetas.map(e => `<span class="etiqueta-item">${escapeHtml(e)}</span>`).join('') : '<span class="etiqueta-item sin">Sin etiquetas</span>';
-                return `<tr>
+            tbody.innerHTML = clientesFiltrados.map(cliente => `
+                <tr>
                     <td>${cliente.id}</td>
                     <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
                     <td style="font-size:12px">${escapeHtml(cliente.email)}</td>
                     <td>${escapeHtml(cliente.telefono)}</td>
                     <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td>
                     <td><span class="badge badge-activo">Activo</span></td>
-                    <td><div id="etiquetas_${cliente.email.replace(/[^a-z0-9]/gi, '_')}">${etiquetasHtml}</div></td>
-                    <td>
-                        <button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button>
-                        <button class="btn-etiquetas-cliente" onclick="mostrarModalEtiquetas('${escapeHtml(cliente.email)}', '${escapeHtml(cliente.nombre)}')">🏷️ Etiquetas</button>
-                    </td>
-                </tr>`;
-            }).join('');
+                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td>
+                </tr>
+            `).join('');
             
             // Mostrar contador de resultados
             const totalSpan = document.getElementById('totalClientesSpan');
@@ -445,9 +349,22 @@
         }
         
         function filtrarClientes() { 
-            // Limpiar filtro de etiqueta al usar búsqueda manual
-            filtroEtiquetaActual = null;
             aplicarFiltros(); 
+        }
+        
+        function aplicarFiltros() {
+            const texto = document.getElementById('busquedaCliente').value.toLowerCase().trim();
+            
+            if (texto.length === 0) {
+                clientesFiltrados = [...clientesData];
+            } else if (texto.length >= 2) {
+                clientesFiltrados = clientesData.filter(c => 
+                    c.nombre.toLowerCase().includes(texto) || 
+                    c.email.toLowerCase().includes(texto) ||
+                    (c.telefono && c.telefono.includes(texto))
+                );
+            }
+            renderizarTabla();
         }
         
         async function verReservasCliente(email) {
@@ -486,12 +403,14 @@
             } catch(e) { alert('Error al cargar reservas: ' + e.message); }
         }
         
+        function cerrarModal(id) { const m = document.getElementById(id); if (m) m.remove(); }
+        
         function descargarPDF() {
             if (clientesFiltrados.length === 0) { alert('⚠️ No hay clientes para exportar.'); return; }
             const fecha = new Date();
             const fechaStr = `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
             let filas = '';
-            for (const c of clientesFiltrados) { filas += `<tr><td>${escapeHtml(c.nombre)}</td><td>${escapeHtml(c.email)}</td><td>${escapeHtml(c.telefono)}</td><td>${c.totalReservas}</td></tr>`; }
+            for (const c of clientesFiltrados) { filas += `<tr><td>${escapeHtml(c.nombre)}</td><td>${escapeHtml(c.email)}</td><td>${escapeHtml(c.telefono)}</td><td>${c.totalReservas}</td>`; }
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Clientes - Aventura Total</title><style>body{font-family:Segoe UI;padding:20px}.header{text-align:center;border-bottom:2px solid #667eea;padding-bottom:15px}th{background:#667eea;color:white;padding:8px}td{padding:8px;border-bottom:1px solid #ddd}</style></head><body><div class="header"><div>🏔️</div><h1>Aventura Total - Clientes</h1></div><p>📅 Generado: ${fechaStr}</p><table width="100%"><thead><tr><th>NOMBRE</th><th>EMAIL</th><th>TELÉFONO</th><th>RESERVAS</th></tr></thead><tbody>${filas}</tbody></table><p>Total clientes: ${clientesFiltrados.length}</p></body></html>`;
             html2pdf().set({ margin:0.5, filename:`clientes_${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'in',format:'a4',orientation:'portrait'} }).from(html).save();
         }
@@ -505,10 +424,6 @@
         window.logout = logout;
         window.descargarPDF = descargarPDF;
         window.toggleTheme = toggleTheme;
-        window.mostrarModalEtiquetas = mostrarModalEtiquetas;
-        window.toggleEtiqueta = toggleEtiqueta;
-        window.agregarEtiquetaPersonalizada = agregarEtiquetaPersonalizada;
-        window.filtrarPorEtiqueta = filtrarPorEtiqueta;
         
         // Inicializar búsqueda instantánea
         initBusquedaInstantanea();
