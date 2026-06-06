@@ -82,7 +82,7 @@
         body.dark-mode .btn-theme { color: white; }
         body.dark-mode .btn-theme:hover { background: rgba(255,255,255,0.1); }
         
-        /* ===== MENÚ HAMBURGUESA - SIN CAJA, MÁS ANCHO ===== */
+        /* ===== MENÚ HAMBURGUESA - SIN CAJA ===== */
         .menu-btn {
             position: fixed;
             top: 15px;
@@ -183,12 +183,15 @@
         }
         .btn-logout-sidebar:hover { background: rgba(231,76,60,0.4); }
         
+        /* ===== CONTENIDO PRINCIPAL - CON ANCHO MÁXIMO ===== */
         .main-content {
             margin-left: 0;
             flex: 1;
             padding: 20px;
             transition: margin-left 0.3s ease;
             width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
             background: linear-gradient(180deg, #f0f2f5 0%, #e8ecf1 100%);
             min-height: 100vh;
             transition: background 0.3s;
@@ -218,7 +221,7 @@
         .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 8px 15px; border-radius: 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 13px; transition: background 0.3s; }
         .user-avatar { width: 32px; height: 32px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
-        /* ===== ALERTAS (ARRIBA DEL BUSCADOR) ===== */
+        /* ===== ALERTAS ===== */
         .alertas-container { margin-bottom: 20px; }
         .alerta { 
             padding: 14px 18px; 
@@ -254,7 +257,7 @@
         }
         .top-bar input { 
             flex: 1; 
-            min-width: 180px; 
+            min-width: 200px; 
             padding: 12px 16px; 
             border: 2px solid #e8ecf1; 
             border-radius: 12px; 
@@ -279,6 +282,7 @@
         .btn-whatsapp { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; display: flex; align-items: center; gap: 6px; }
         .btn-primary:hover, .btn-success:hover, .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         
+        /* ===== HERO CLIMA ===== */
         .hero-clima { 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
             border-radius: 24px; 
@@ -292,26 +296,40 @@
             gap: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        .hero-info { flex: 1; min-width: 150px; }
+        .hero-info { flex: 1; min-width: 180px; }
         .hero-info h2 { font-size: 16px; opacity: 0.9; margin-bottom: 8px; }
-        .hero-info .ciudad { font-size: clamp(20px, 6vw, 34px); font-weight: 800; }
+        .hero-info .ciudad { font-size: clamp(20px, 6vw, 34px); font-weight: 800; word-break: break-word; }
         .hero-info .fecha { font-size: 12px; opacity: 0.8; margin-top: 8px; }
-        .hero-temp { text-align: center; min-width: 120px; }
+        .hero-temp { text-align: center; min-width: 130px; }
         .hero-temp .icono { font-size: 60px; }
         .hero-temp .temp { font-size: clamp(45px, 12vw, 85px); font-weight: 800; line-height: 1; }
         .hero-temp .desc { font-size: 15px; opacity: 0.9; margin-top: 5px; }
-        .hero-detalles { display: flex; gap: 25px; flex-wrap: wrap; justify-content: flex-end; flex: 1; min-width: 200px; }
-        .hero-detalle { text-align: center; min-width: 70px; }
+        .hero-detalles { display: flex; gap: 25px; flex-wrap: wrap; justify-content: flex-end; flex: 1; min-width: 250px; }
+        .hero-detalle { text-align: center; min-width: 80px; }
         .hero-detalle .valor { font-size: 20px; font-weight: 700; }
         .hero-detalle .label { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 5px; }
         
-        .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .detail-card { background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s; }
+        /* ===== DETALLES GRID ===== */
+        .details-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 25px; 
+        }
+        .detail-card { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 15px; 
+            text-align: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
         .detail-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .detail-icon { font-size: 28px; margin-bottom: 8px; }
         .detail-value { font-size: 20px; font-weight: 800; color: #1a1a2e; transition: color 0.3s; }
         .detail-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 5px; transition: color 0.3s; }
         
+        /* ===== GRID PRINCIPAL ===== */
         .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-bottom: 25px; }
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); transition: all 0.3s; overflow-x: auto; }
         .card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
@@ -348,11 +366,42 @@
         .legend-dot.temp { background: #667eea; }
         .legend-dot.rain { background: #3498db; }
         
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 1200px) {
+            .main-content {
+                max-width: 1300px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+            .hero-clima {
+                padding: 40px;
+            }
+            .hero-detalles {
+                gap: 40px;
+            }
+            .hero-detalle {
+                min-width: 90px;
+            }
+            .details-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1199px) {
+            .menu-btn { display: none !important; }
+            .sidebar { transform: translateX(0) !important; width: 250px; }
+            .menu-overlay { display: none !important; }
+            .main-content { margin-left: 250px; padding: 25px; }
+            .details-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
         @media (min-width: 769px) {
             .menu-btn { display: none !important; }
             .sidebar { transform: translateX(0) !important; width: 250px; }
             .menu-overlay { display: none !important; }
-            .main-content { margin-left: 250px; padding: 30px; }
             .forecast-grid { min-width: auto; flex-wrap: wrap; justify-content: center; }
             .forecast-card { width: auto; flex: 1 1 auto; min-width: 85px; max-width: 120px; }
             .chart-wrapper { overflow-x: visible; }
@@ -367,7 +416,7 @@
         
         @media (max-width: 768px) {
             .menu-btn { display: flex; }
-            .main-content { padding: 60px 15px 20px; }
+            .main-content { padding: 60px 15px 20px; margin-left: 0; }
             .hero-clima { flex-direction: column; text-align: center; }
             .hero-detalles { justify-content: center; }
             .details-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -441,7 +490,7 @@
             </div>
         </div>
         
-        <!-- ===== ALERTAS METEOROLÓGICAS (ARRIBA DEL BUSCADOR) ===== -->
+        <!-- ALERTAS ARRIBA DEL BUSCADOR -->
         <div class="alertas-container" id="alertasContainer">
             <div class="alerta verde"><div class="alerta-icono">✅</div><div class="alerta-info"><h4>Cargando...</h4><p>Obteniendo datos meteorológicos.</p></div></div>
         </div>
