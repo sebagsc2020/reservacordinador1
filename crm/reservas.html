@@ -238,13 +238,23 @@
         function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201';
+        
+        // 📌 OPTIMIZACIÓN: URL con límite de 100 filas
+        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201&tq=order%20by%20A%20desc%20limit%20100';
+        
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
         
         let reservasData = [], reservasFiltradas = [], estadosGlobales = {};
         const preloaderPopup = document.getElementById('preloaderPopup');
         function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
         function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
+        
+        // ==================================================
+        // CACHÉ LOCAL
+        // ==================================================
+        const CACHE_DURACION = 60000;
+        function guardarEnCache(datos) { localStorage.setItem('reservasCache', JSON.stringify({ timestamp: Date.now(), reservas: datos })); }
+        function obtenerDeCache() { const cache = localStorage.getItem('reservasCache'); if (!cache) return null; const data = JSON.parse(cache); if (Date.now() - data.timestamp < CACHE_DURACION) return data.reservas; return null; }
         
         async function guardarEstadoEnNube(id, nuevoEstado) {
             try {
@@ -269,6 +279,23 @@
         async function cargarReservas() {
             const container = document.getElementById('cardsContainer');
             if (!container) return;
+            
+            // Intentar caché primero
+            const cache = obtenerDeCache();
+            if (cache && cache.length > 0) {
+                console.log('📦 Reservas - Usando caché local');
+                reservasData = cache;
+                reservasFiltradas = [...reservasData];
+                renderizarCards();
+                document.getElementById('totalReservasSpan').textContent = reservasData.length + ' reservas';
+                setTimeout(() => cargarReservasDesdeRed(), 100);
+                return;
+            }
+            await cargarReservasDesdeRed();
+        }
+        
+        async function cargarReservasDesdeRed() {
+            const container = document.getElementById('cardsContainer');
             try {
                 mostrarPreloader();
                 await cargarEstadosDesdeNube();
@@ -321,6 +348,7 @@
                 }
                 reservasData.sort((a,b) => (parseInt(b.id.replace(/\D/g,''))||0) - (parseInt(a.id.replace(/\D/g,''))||0));
                 reservasFiltradas = [...reservasData];
+                guardarEnCache(reservasData);
                 renderizarCards();
                 document.getElementById('totalReservasSpan').textContent = reservasData.length + ' reservas';
             } catch(e) { console.error(e); container.innerHTML = '<div style="text-align:center; color:red; padding:50px;">❌ Error: ' + e.message + '</div>'; }
@@ -332,16 +360,8 @@
             if (!reserva) return;
             const estadoAnterior = reserva.estado;
             
-            // Guardar en historial
             const historial = JSON.parse(localStorage.getItem('historialEstados') || '[]');
-            historial.push({
-                fecha: new Date().toLocaleString(),
-                reservaId: id,
-                cliente: reserva.nombre,
-                estadoAnterior: estadoAnterior,
-                estadoNuevo: nuevoEstado,
-                modificadoPor: sessionStorage.getItem('crm_user') || 'Admin'
-            });
+            historial.push({ fecha: new Date().toLocaleString(), reservaId: id, cliente: reserva.nombre, estadoAnterior, estadoNuevo: nuevoEstado, modificadoPor: sessionStorage.getItem('crm_user') || 'Admin' });
             localStorage.setItem('historialEstados', JSON.stringify(historial.slice(-500)));
             
             reserva.estado = nuevoEstado;
@@ -364,16 +384,14 @@
             let telefono = reserva.telefono.replace(/\D/g, '');
             if (telefono.length === 10) telefono = '54' + telefono;
             let excursionesTexto = '';
-            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
-                excursionesTexto = reserva.excursionesLista.map((exc,idx) => `${idx+1}. ${exc}`).join('\n');
-            } else { excursionesTexto = 'Sin excursiones específicas'; }
+            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) excursionesTexto = reserva.excursionesLista.map((exc,idx) => `${idx+1}. ${exc}`).join('\n');
+            else excursionesTexto = 'Sin excursiones específicas';
             let estadoTexto = { pendiente:'Pendiente', confirmado:'Confirmado', pagado:'Pagado' }[reserva.estado] || 'Confirmado';
             const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️\n\n✅ *CONFIRMACIÓN DE RESERVA*\n\n🆔 *N° de reserva:* ${reserva.id}\n📅 *Fecha:* ${reserva.fecha}\n\n👤 *DATOS DEL PASAJERO:*\n   Nombre: ${reserva.nombre}\n   📞 Teléfono: ${reserva.telefono}\n   📧 Email: ${reserva.email}\n\n📍 *DESTINO:*\n   ${reserva.ciudad}\n\n✨ *EXCURSIONES SELECCIONADAS:*\n${excursionesTexto}\n\n👥 *Cantidad de personas:* ${reserva.personas}\n💳 *Forma de pago:* ${reserva.formaPago}\n🚐 *Punto de encuentro:* ${reserva.lugar}\n📌 *Estado:* ${estadoTexto}\n\n📌 *PRÓXIMOS PASOS:*\n• En las próximas 24hs recibirás detalles de pago\n• Punto de encuentro exacto será confirmado\n\n🏔️ ¡Gracias por confiar en Aventura Total!`;
             window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
         
         function verHistorialCompleto() { window.open('historial.html', '_blank'); }
-        
         function verHistorialReserva(reservaId) { window.open(`historial.html?reserva=${reservaId}`, '_blank'); }
         
         function renderizarCards() {
