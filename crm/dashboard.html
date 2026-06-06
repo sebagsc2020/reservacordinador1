@@ -261,7 +261,7 @@
             <div class="table-wrapper">
                 <table>
                     <thead><tr><th>Cliente</th><th>Email</th><th>Reservas</th><th>Total Pasajeros</th><th>Acciones</th></tr></thead>
-                    <tbody id="topClientesBody"><tr><td colspan="5">Cargando...</td></tr></tbody>
+                    <tbody id="topClientesBody"><tr><td colspan="5">Cargando... jonathan</tbody>
                 </table>
             </div>
         </div>
@@ -272,7 +272,7 @@
             <div class="table-wrapper">
                 <table>
                     <thead><tr><th>ID</th><th>Cliente</th><th>Excursión</th><th>Fecha</th><th>Personas</th><th>Estado</th></tr></thead>
-                    <tbody id="tablaUltimasReservas"><tr><td colspan="6">Cargando...</td></tr></tbody>
+                    <tbody id="tablaUltimasReservas"><tr><td colspan="6">Cargando... jonathan</tbody>
                 </table>
             </div>
         </div>
@@ -331,30 +331,12 @@
         let fechaInicio = null, fechaFin = null;
         let ultimoConteoPasajeros = 0;
         
-        // Variables para los gráficos
         let pasajerosPorMesChart = null;
         let estadosChart = null;
         
         // ==================================================
-        // CACHÉ LOCAL
+        // FUNCIONES
         // ==================================================
-        const CACHE_DURACION = 60000;
-        
-        function guardarEnCache(datos) {
-            localStorage.setItem('dashboardCache', JSON.stringify({
-                timestamp: Date.now(),
-                reservas: datos
-            }));
-        }
-        
-        function obtenerDeCache() {
-            const cache = localStorage.getItem('dashboardCache');
-            if (!cache) return null;
-            const data = JSON.parse(cache);
-            if (Date.now() - data.timestamp < CACHE_DURACION) return data.reservas;
-            return null;
-        }
-        
         async function cargarEstadosDesdeNube() {
             try {
                 const local = localStorage.getItem('estadosReservasCloud');
@@ -375,9 +357,6 @@
             setTimeout(() => { if (notif.parentNode) notif.remove(); }, 6000);
         }
         
-        // ==================================================
-        // OBTENER ÚLTIMOS 6 MESES
-        // ==================================================
         function obtenerUltimos6Meses() {
             const hoy = new Date();
             const meses = [];
@@ -390,13 +369,9 @@
             return meses;
         }
         
-        // ==================================================
-        // ACTUALIZAR GRÁFICOS
-        // ==================================================
         function actualizarGraficos(reservas) {
             const meses = obtenerUltimos6Meses();
             
-            // Calcular pasajeros por mes
             const pasajerosPorMesData = meses.map(m => {
                 let total = 0;
                 for (const reserva of reservas) {
@@ -413,7 +388,6 @@
                 return total;
             });
             
-            // Gráfico de pasajeros por mes
             if (pasajerosPorMesChart) pasajerosPorMesChart.destroy();
             const ctxLineal = document.getElementById('pasajerosPorMesChart').getContext('2d');
             pasajerosPorMesChart = new Chart(ctxLineal, {
@@ -433,19 +407,13 @@
                         pointRadius: 4
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { position: 'top' } }
-                }
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
             });
             
-            // Calcular distribución por estado
             const pendientes = reservas.filter(r => r.estado === 'pendiente').length;
             const confirmadas = reservas.filter(r => r.estado === 'confirmado').length;
             const pagadas = reservas.filter(r => r.estado === 'pagado').length;
             
-            // Gráfico de distribución
             if (estadosChart) estadosChart.destroy();
             const ctxDona = document.getElementById('estadosChart').getContext('2d');
             estadosChart = new Chart(ctxDona, {
@@ -458,21 +426,14 @@
                         borderWidth: 0
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { position: 'bottom' } }
-                }
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
             });
         }
         
-        // ==================================================
-        // RENDERIZAR DASHBOARD
-        // ==================================================
         function renderizarDashboard(reservas) {
             if (!reservas || reservas.length === 0) {
-                document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6">No hay reservas</td></tr>';
-                document.getElementById('topClientesBody').innerHTML = '<tr><td colspan="5">No hay datos</td></tr>';
+                document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="6">No hay reservas jonathan</tr';
+                document.getElementById('topClientesBody').innerHTML = '<tr><td colspan="5">No hay datos jonathan</tr';
                 actualizarGraficos([]);
                 return;
             }
@@ -480,21 +441,18 @@
             const totalPasajeros = reservas.reduce((s, r) => s + (r.personas || 0), 0);
             const confirmadas = reservas.filter(r => r.estado === 'confirmado').length;
             const pagadas = reservas.filter(r => r.estado === 'pagado').length;
-            const tasaConfirmacion = reservas.length > 0 ? Math.round((confirmadas / reservas.length) * 100) : 0;
-            const tasaPago = reservas.length > 0 ? Math.round((pagadas / reservas.length) * 100) : 0;
-            const grupoPromedio = reservas.length > 0 ? (totalPasajeros / reservas.length).toFixed(1) : 0;
+            const tasaConfirmacion = Math.round((confirmadas / reservas.length) * 100);
+            const tasaPago = Math.round((pagadas / reservas.length) * 100);
+            const grupoPromedio = (totalPasajeros / reservas.length).toFixed(1);
             
-            // Clientes recurrentes
             const reservasPorEmail = {};
             reservas.forEach(r => { if (r.email) reservasPorEmail[r.email] = (reservasPorEmail[r.email] || 0) + 1; });
             const recurrentes = Object.values(reservasPorEmail).filter(c => c > 1).length;
             const porcentajeRecurrentes = Object.keys(reservasPorEmail).length > 0 ? Math.round((recurrentes / Object.keys(reservasPorEmail).length) * 100) : 0;
             
-            // Pasajeros por día
             const diasUnicos = new Set(reservas.filter(r => r.fecha).map(r => r.fecha));
             const pasajerosPorDia = diasUnicos.size > 0 ? Math.round(totalPasajeros / diasUnicos.size) : 0;
             
-            // Actualizar métricas
             document.getElementById('totalPasajeros').innerHTML = totalPasajeros.toLocaleString();
             const tcElem = document.getElementById('tasaConfirmacion');
             tcElem.innerHTML = `${tasaConfirmacion}%`;
@@ -506,29 +464,20 @@
             document.getElementById('clientesRecurrentes').innerHTML = `${porcentajeRecurrentes}%`;
             document.getElementById('pasajerosPorDia').innerHTML = pasajerosPorDia.toLocaleString();
             
-            // Top clientes
             const clientesMap = new Map();
             reservas.forEach(r => {
                 if (!r.email) return;
-                if (!clientesMap.has(r.email)) {
-                    clientesMap.set(r.email, { nombre: r.nombre, email: r.email, reservas: 0, totalPasajeros: 0 });
-                }
+                if (!clientesMap.has(r.email)) clientesMap.set(r.email, { nombre: r.nombre, email: r.email, reservas: 0, totalPasajeros: 0 });
                 const c = clientesMap.get(r.email);
                 c.reservas++;
                 c.totalPasajeros += r.personas || 0;
             });
             const topClientes = Array.from(clientesMap.values()).sort((a,b) => b.totalPasajeros - a.totalPasajeros).slice(0, 10);
-            document.getElementById('topClientesBody').innerHTML = topClientes.map(c => 
-                `<tr><td><strong>${escapeHtml(c.nombre)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.reservas}</td><td><strong>${c.totalPasajeros}</strong></td><td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td></tr>`
-            ).join('');
+            document.getElementById('topClientesBody').innerHTML = topClientes.map(c => `<tr><td><strong>${escapeHtml(c.nombre)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.reservas}</td><td><strong>${c.totalPasajeros}</strong></td><td><button class="btn-ver-cliente" onclick="verCliente('${escapeHtml(c.email)}')">Ver</button></td></tr>`).join('');
             
-            // Últimas reservas
             const ultimas = reservas.slice(0, 5);
-            document.getElementById('tablaUltimasReservas').innerHTML = ultimas.map(r => 
-                `<tr><td><strong>${escapeHtml(r.id)}</strong></td><td>${escapeHtml(r.nombre)}</td><td>${escapeHtml(r.excursion)}</td><td>${escapeHtml(r.fecha)}</td><td>${r.personas || 0}</td><td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td></tr>`
-            ).join('');
+            document.getElementById('tablaUltimasReservas').innerHTML = ultimas.map(r => `<tr><td><strong>${escapeHtml(r.id)}</strong></td><td>${escapeHtml(r.nombre)}</td><td>${escapeHtml(r.excursion)}</td><td>${escapeHtml(r.fecha)}</td><td>${r.personas || 0}</td><td><span class="badge badge-${r.estado}">${r.estado === 'pendiente' ? 'Pendiente' : (r.estado === 'pagado' ? 'Pagado' : 'Confirmado')}</span></td></tr>`).join('');
             
-            // Actualizar gráficos
             actualizarGraficos(reservas);
         }
         
@@ -560,23 +509,9 @@
         }
         
         // ==================================================
-        // CARGAR DATOS PRINCIPAL
+        // CARGAR DATOS (SIN CACHÉ - SIEMPRE DATOS FRESCOS)
         // ==================================================
         async function cargarDatos() {
-            // Intentar caché primero
-            const cache = obtenerDeCache();
-            if (cache && cache.length > 0) {
-                console.log('📦 Dashboard - Usando caché local');
-                reservasData = cache;
-                renderizarDashboard(reservasData);
-                // Actualizar en segundo plano
-                setTimeout(() => cargarDatosDesdeRed(), 500);
-                return;
-            }
-            await cargarDatosDesdeRed();
-        }
-        
-        async function cargarDatosDesdeRed() {
             try {
                 console.log('🌐 Cargando datos desde Google Sheets...');
                 await cargarEstadosDesdeNube();
@@ -621,10 +556,7 @@
                     let estado = estadosGlobales[id];
                     if (!estado || !['pendiente','confirmado','pagado'].includes(estado)) estado = 'confirmado';
                     
-                    nuevasReservas.push({ 
-                        id, fecha, nombre: nombreCompleto, email, excursion: primeraExcursion, 
-                        excursionesLista, personas: parseInt(personas) || 1, estado 
-                    });
+                    nuevasReservas.push({ id, fecha, nombre: nombreCompleto, email, excursion: primeraExcursion, excursionesLista, personas: parseInt(personas) || 1, estado });
                 }
                 
                 const totalPasajerosNuevo = nuevasReservas.reduce((s, r) => s + r.personas, 0);
@@ -637,7 +569,6 @@
                 ultimoConteoPasajeros = totalPasajerosNuevo;
                 reservasData = nuevasReservas;
                 reservasData.sort((a,b) => (parseInt(b.id.replace(/\D/g,''))||0) - (parseInt(a.id.replace(/\D/g,''))||0));
-                guardarEnCache(reservasData);
                 renderizarDashboard(reservasData);
                 console.log('✅ Dashboard actualizado con', reservasData.length, 'reservas');
             } catch(e) { console.error('Error cargando datos:', e); }
