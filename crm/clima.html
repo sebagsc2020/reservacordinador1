@@ -36,7 +36,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background: #f0f2f5; 
             min-height: 100vh; 
-            overflow-x: hidden; 
+            overflow-x: visible;
             transition: background 0.3s, color 0.3s;
         }
         
@@ -320,11 +320,27 @@
         .card { background: white; border-radius: 20px; padding: 20px; overflow-x: auto; }
         .card-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #eef2ff; display: flex; align-items: center; gap: 8px; }
         
-        .chart-wrapper { width: 100%; overflow-x: auto; }
-        .chart-line-svg { display: block; min-width: 600px; width: 100%; height: auto; }
+        .chart-wrapper { 
+            width: 100%; 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch;
+        }
+        .chart-line-svg { 
+            display: block; 
+            min-width: 600px; 
+            width: 100%; 
+            height: auto; 
+        }
         
-        .forecast-wrapper { overflow-x: auto; }
-        .forecast-grid { display: flex; gap: 12px; min-width: 600px; }
+        .forecast-wrapper { 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch;
+        }
+        .forecast-grid { 
+            display: flex; 
+            gap: 12px; 
+            min-width: 600px;
+        }
         .forecast-card { 
             flex: 0 0 auto; 
             width: 100px; 
@@ -353,6 +369,7 @@
             .main-content { margin-left: 250px; }
             .forecast-grid { min-width: auto; flex-wrap: wrap; justify-content: center; }
             .forecast-card { width: auto; min-width: 90px; }
+            .chart-line-svg { min-width: auto; }
         }
         
         /* Tablet */
@@ -365,7 +382,11 @@
         /* Móvil */
         @media (max-width: 768px) {
             .menu-btn { display: flex; }
-            .main-content { margin-left: 0; padding: 60px 15px 20px; }
+            .main-content { 
+                margin-left: 0; 
+                padding: 60px 15px 20px; 
+                overflow-x: visible;
+            }
             .details-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .hero-clima { padding: 20px; }
             .hero-temp .temp { font-size: 42px; }
@@ -375,6 +396,7 @@
             .top-bar .btn { width: 100%; text-align: center; }
             .detail-value { font-size: 18px; }
             .forecast-card { width: 85px; }
+            .chart-line-svg { min-width: 500px; }
         }
         
         @media (max-width: 550px) {
@@ -384,6 +406,10 @@
             .detail-card { padding: 12px; }
             .detail-icon { font-size: 24px; }
             .detail-value { font-size: 16px; }
+            .forecast-card { width: 75px; }
+            .forecast-icono { font-size: 20px; }
+            .forecast-max { font-size: 12px; }
+            .forecast-min { font-size: 10px; }
         }
         
         .sidebar::-webkit-scrollbar { width: 4px; }
@@ -533,10 +559,10 @@
             document.body.classList.add('pwa-mode');
         }
         
-        // Autenticación
-        if (sessionStorage.getItem('crm_logged') !== 'true') { 
-            // window.location.href = 'index.html'; 
-        }
+        // Autenticación (comentado para pruebas)
+        // if (sessionStorage.getItem('crm_logged') !== 'true') { 
+        //     window.location.href = 'index.html'; 
+        // }
         
         function logout() { 
             sessionStorage.clear(); 
