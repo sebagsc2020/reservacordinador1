@@ -5,13 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Clientes - CRM Aventura Total</title>
     
+    <!-- ================================================== -->
+    <!-- PWA CONFIGURACIÓN                                      -->
+    <!-- ================================================== -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AVT CRM">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1a1a2e">
+    <meta name="application-name" content="Aventura Total CRM">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+    <meta name="msapplication-TileImage" content="icons/icon-144.png">
     
+    <!-- Iconos para diferentes plataformas -->
     <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
@@ -26,43 +33,81 @@
     <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; transition: background 0.3s; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
         
-        body.dark-mode { background: #0f0f1a; }
-        body.dark-mode .stats-card, body.dark-mode .table-container, body.dark-mode .filters-bar { background: #1e1e2e; color: #e0e0e0; }
-        body.dark-mode .stats-number { color: #667eea; }
-        body.dark-mode .table-header h3, body.dark-mode .header h1 { color: white; }
-        body.dark-mode table th { background: #2a2a3e; color: #ccc; }
-        body.dark-mode table td { border-bottom-color: #2a2a3e; color: #ddd; }
-        body.dark-mode .user-info, body.dark-mode .filter-input { background: #1e1e2e; color: white; border-color: #3a3a4e; }
-        body.dark-mode .btn-theme { color: white; }
+        /* Modo PWA (sin barra de navegación) */
+        .pwa-mode {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
         
-        .pwa-mode { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
-        
+        /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
         .menu-btn {
-            position: fixed; top: 15px; left: 15px; width: 50px; height: 50px;
-            background: #667eea; border-radius: 50%; display: none; align-items: center;
-            justify-content: center; cursor: pointer; z-index: 1000; border: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 50px;
+            height: 50px;
+            background: #667eea;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: none;
         }
-        .menu-btn span { font-size: 24px; color: white; }
         
-        .sidebar {
-            width: 250px; background: #1a1a2e; color: white; padding: 25px 0;
-            position: fixed; height: 100vh; overflow-y: auto; z-index: 1001;
-            transition: transform 0.3s ease; transform: translateX(-100%);
+        .menu-btn:hover {
+            background: #5a6fd6;
+            transform: scale(1.05);
         }
-        .sidebar.open { transform: translateX(0); }
+        
+        .menu-btn span {
+            font-size: 24px;
+            color: white;
+        }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar { 
+            width: 250px; 
+            background: #1a1a2e; 
+            color: white; 
+            padding: 25px 0; 
+            position: fixed; 
+            height: 100vh; 
+            overflow-y: auto; 
+            z-index: 1001;
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
         
         .menu-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1000; display: none; opacity: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
             transition: opacity 0.3s ease;
         }
-        .menu-overlay.active { display: block; opacity: 1; }
+        
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
         
         .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .sidebar-logo .logo-icon { font-size: 40px; }
@@ -72,101 +117,379 @@
         .nav-menu { list-style: none; padding: 0 15px; }
         .nav-menu li { margin-bottom: 5px; }
         .nav-menu a {
-            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
-            color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 10px;
-            font-size: 14px; transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            font-size: 14px;
         }
         .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
         .nav-menu a.active { background: #667eea; }
         .nav-icon { font-size: 18px; width: 24px; text-align: center; }
         
-        .sidebar-footer { position: absolute; bottom: 20px; left: 15px; right: 15px; }
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 15px;
+            right: 15px;
+        }
         .btn-logout-sidebar {
-            width: 100%; padding: 12px; background: rgba(231,76,60,0.2);
-            color: #e74c3c; border: 1px solid rgba(231,76,60,0.3);
-            border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px;
+            width: 100%;
+            padding: 12px;
+            background: rgba(231,76,60,0.2);
+            color: #e74c3c;
+            border: 1px solid rgba(231,76,60,0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+        .btn-logout-sidebar:hover {
+            background: rgba(231,76,60,0.4);
         }
         
-        .main-content { margin-left: 0; flex: 1; padding: 20px; transition: margin-left 0.3s ease; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
-        .header h1 { font-size: 26px; color: #1a1a2e; transition: color 0.3s; }
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        .main-content {
+            margin-left: 0;
+            flex: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
         
-        .header-actions { display: flex; align-items: center; gap: 15px; }
-        .btn-theme { background: none; border: none; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 50%; width: 45px; height: 45px; }
-        .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 8px 20px; border-radius: 50px; font-size: 14px; }
-        .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header h1 { font-size: 26px; color: #1a1a2e; }
         
-        .stats-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center; }
-        .stats-number { font-size: 40px; font-weight: 800; color: #667eea; }
-        .stats-label { font-size: 13px; color: #666; margin-top: 5px; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            font-size: 14px;
+        }
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
         
-        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-input { padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; transition: all 0.3s; }
-        .filter-input:focus { outline: none; border-color: #667eea; }
-        .btn-filtrar, .btn-recargar, .btn-pdf { padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; }
-        .btn-filtrar { background: #27ae60; color: white; }
-        .btn-recargar { background: #667eea; color: white; }
+        /* ===== TARJETAS ===== */
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .stats-number {
+            font-size: 40px;
+            font-weight: 800;
+            color: #667eea;
+        }
+        .stats-label {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* ===== FILTROS ===== */
+        .filters-bar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-input {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 13px;
+            flex: 2;
+            min-width: 200px;
+            transition: border-color 0.2s;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-filtrar, .btn-recargar, .btn-pdf {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .btn-filtrar:active, .btn-recargar:active, .btn-pdf:active {
+            transform: scale(0.96);
+        }
+        .btn-filtrar { background: #667eea; color: white; }
+        .btn-recargar { background: #27ae60; color: white; }
         .btn-pdf { background: #dc2626; color: white; }
         
-        .table-container { background: white; border-radius: 15px; padding: 20px; }
-        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 12px; text-transform: uppercase; font-weight: 600; border-bottom: 2px solid #e0e0e0; }
-        td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #333; }
-        tr:hover td { background: #f8f9ff; }
+        /* ===== TABLA ===== */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .table-header h3 { color: #333; font-size: 16px; }
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        th {
+            text-align: left;
+            padding: 12px;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            color: #333;
+        }
+        tr:hover td {
+            background: #f8f9ff;
+        }
         
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
-        .badge-activo { background: #d4edda; color: #155724; }
-        .badge-reservas { background: #eef2ff; color: #667eea; }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .badge-activo {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge-reservas {
+            background: #eef2ff;
+            color: #667eea;
+        }
         
         .btn-ver {
-            padding: 6px 14px; background: #667eea; color: white;
-            border: none; border-radius: 8px; cursor: pointer; font-size: 12px;
+            padding: 6px 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
             font-weight: 500;
         }
-        
-        /* Indicador de búsqueda activa */
-        .busqueda-activa {
-            background: #e8f5e9 !important;
-            border-color: #27ae60 !important;
+        .btn-ver:active {
+            transform: scale(0.96);
         }
-        body.dark-mode .busqueda-activa {
-            background: #2a3a2e !important;
-            border-color: #27ae60 !important;
+        .btn-ver:hover {
+            background: #5a67d8;
         }
         
+        /* Estilos para el modal de reservas */
+        .reserva-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .reserva-id {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .reserva-fecha {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+        .reserva-excursiones {
+            margin-top: 8px;
+        }
+        .reserva-excursiones-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .reserva-excursiones-lista {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .reserva-excursiones-lista li {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        /* ===== SCROLL SIDEBAR ===== */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+        
+        /* ===== DESKTOP ===== */
         @media (min-width: 769px) {
-            .menu-btn { display: none !important; }
-            .sidebar { transform: translateX(0) !important; width: 250px; }
-            .main-content { margin-left: 250px; padding: 30px; }
+            .menu-btn {
+                display: none !important;
+            }
+            
+            .sidebar {
+                transform: translateX(0) !important;
+                width: 250px;
+            }
+            
+            .menu-overlay {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 250px;
+                padding: 30px;
+            }
         }
         
+        /* ===== MÓVIL ===== */
         @media (max-width: 768px) {
-            .menu-btn { display: flex; }
-            .main-content { padding: 60px 12px 20px; }
-            .header h1 { font-size: 20px; }
-            .user-info { padding: 5px 12px; font-size: 12px; }
-            .user-avatar { width: 28px; height: 28px; font-size: 12px; }
-            .stats-number { font-size: 32px; }
-            .filters-bar { flex-direction: column; }
-            .filter-input { width: 100%; }
-            .btn-filtrar, .btn-recargar, .btn-pdf { width: 100%; text-align: center; }
-            th, td { padding: 8px 6px; font-size: 11px; }
-            .btn-ver { padding: 4px 10px; font-size: 10px; }
+            .menu-btn {
+                display: flex;
+            }
+            
+            .main-content {
+                padding: 60px 12px 20px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .user-info {
+                padding: 5px 12px;
+                font-size: 12px;
+            }
+            
+            .user-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            
+            .stats-number {
+                font-size: 32px;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+            }
+            
+            .filter-input {
+                width: 100%;
+            }
+            
+            .btn-filtrar, .btn-recargar, .btn-pdf {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+                font-size: 11px;
+            }
+            
+            .btn-ver {
+                padding: 4px 10px;
+                font-size: 10px;
+            }
         }
         
-        .sidebar::-webkit-scrollbar { width: 4px; }
-        .sidebar::-webkit-scrollbar-track { background: #1a1a2e; }
-        .sidebar::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        @media (max-width: 480px) {
+            .stats-number {
+                font-size: 28px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
-    <button class="menu-btn" id="menuBtn"><span>☰</span></button>
+    <!-- Botón menú hamburguesa (solo móvil) -->
+    <button class="menu-btn" id="menuBtn">
+        <span>☰</span>
+    </button>
+    
+    <!-- Overlay para cerrar menú -->
     <div class="menu-overlay" id="menuOverlay"></div>
     
+    <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2><p style="font-size:11px;opacity:0.6;">Panel CRM</p></div>
+        <div class="sidebar-logo">
+            <div class="logo-icon">🏔️</div>
+            <h2>Aventura <span>Total</span></h2>
+            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
+        </div>
         <ul class="nav-menu">
             <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
             <li><a href="clientes.html" class="active"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
@@ -176,15 +499,17 @@
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
             <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
         </ul>
-        <div class="sidebar-footer"><button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button></div>
+        <div class="sidebar-footer">
+            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
+        </div>
     </nav>
 
     <div class="main-content">
         <div class="header">
             <div><h1>👥 Clientes</h1></div>
-            <div class="header-actions">
-                <button class="btn-theme" onclick="toggleTheme()">🌙</button>
-                <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <span>Admin</span>
             </div>
         </div>
 
@@ -194,8 +519,8 @@
         </div>
 
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono... (mínimo 2 caracteres)" id="busquedaCliente">
-            <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Buscar</button>
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono..." id="busquedaCliente">
+            <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Filtrar</button>
             <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
             <button class="btn-pdf" onclick="descargarPDF()">📄 Descargar PDF</button>
         </div>
@@ -206,7 +531,7 @@
                 <span id="totalClientesSpan" style="font-size:12px;color:#666;">0 clientes</span>
             </div>
             <div class="table-wrapper">
-                <table>
+                <table id="clientesTable">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -218,118 +543,196 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaClientes"><tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr</tbody>
+                    <tbody id="tablaClientes">
+                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <!-- Incluir librería html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <script>
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-            document.querySelector('.btn-theme').textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-        }
-        if (localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); document.querySelector('.btn-theme').textContent = '☀️'; }
-        
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(e => console.log(e)); }); }
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) { document.body.classList.add('pwa-mode'); }
-        
-        function initMenu() {
-            const btn = document.getElementById('menuBtn'), sidebar = document.getElementById('sidebar'), overlay = document.getElementById('menuOverlay');
-            if (!btn) return;
-            function toggle() { sidebar.classList.toggle('open'); overlay.classList.toggle('active'); document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : ''; }
-            function close() { sidebar.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
-            btn.addEventListener('click', toggle);
-            overlay.addEventListener('click', close);
-            document.querySelectorAll('.nav-menu a').forEach(l => l.addEventListener('click', () => { if (window.innerWidth <= 768) close(); }));
-        }
-        
-        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
-        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
-        
-        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201';
-        
-        let clientesData = [], clientesFiltrados = [];
-        
         // ==================================================
-        // BÚSQUEDA INSTANTÁNEA (mientras escribe)
+        // REGISTRAR SERVICE WORKER PARA PWA
         // ==================================================
-        function initBusquedaInstantanea() {
-            const input = document.getElementById('busquedaCliente');
-            if (!input) return;
-            
-            input.addEventListener('input', function(e) {
-                const texto = e.target.value.toLowerCase().trim();
-                
-                // Marcar visualmente que hay búsqueda activa
-                if (texto.length >= 2) {
-                    input.classList.add('busqueda-activa');
-                } else {
-                    input.classList.remove('busqueda-activa');
-                }
-                
-                if (texto.length === 0) {
-                    // Sin texto: mostrar todos los clientes
-                    clientesFiltrados = [...clientesData];
-                    renderizarTabla();
-                } else if (texto.length >= 2) {
-                    // Buscar después de 2 caracteres
-                    clientesFiltrados = clientesData.filter(c => 
-                        c.nombre.toLowerCase().includes(texto) || 
-                        c.email.toLowerCase().includes(texto) ||
-                        (c.telefono && c.telefono.includes(texto))
-                    );
-                    renderizarTabla();
-                }
-                // Si tiene 1 carácter, no hace nada (espera más)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registrado con éxito:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Error al registrar Service Worker:', error);
+                    });
             });
         }
         
+        // Detectar si la app está instalada y se abre desde la pantalla de inicio
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
+            document.body.classList.add('pwa-mode');
+        }
+        
+        // ==================================================
+        // MENÚ FLOTANTE
+        // ==================================================
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const menuOverlay = document.getElementById('menuOverlay');
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('open');
+            menuOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+        
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (menuBtn) {
+            menuBtn.addEventListener('click', toggleMenu);
+        }
+        
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', closeMenu);
+        }
+        
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeMenu();
+                }
+            });
+        });
+        
+        // ==================================================
+        // CONFIGURACIÓN
+        // ==================================================
+        const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
+        const SHEET_NAME = 'Hoja 1';
+        const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
+        
+        if (sessionStorage.getItem('crm_logged') !== 'true') { 
+            window.location.href = 'index.html'; 
+        }
+        
+        function logout() { 
+            sessionStorage.clear(); 
+            window.location.href = 'index.html'; 
+        }
+        
+        let clientesData = [];
+        let clientesFiltrados = [];
+        
         async function cargarClientes() {
             const tbody = document.getElementById('tablaClientes');
+            const totalSpan = document.getElementById('totalClientesSpan');
+            const totalNum = document.getElementById('totalClientes');
+            
+            if (!tbody) return;
             try {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">⏳ Cargando...</td</tr';
-                const res = await fetch(JSON_URL + '&t=' + Date.now());
-                let text = await res.text();
-                let jsonStr = text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2);
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr';
+                
+                const response = await fetch(JSON_URL + '&t=' + Date.now());
+                const texto = await response.text();
+                
+                // Limpiar la respuesta JSONP de Google
+                let jsonStr = texto;
+                jsonStr = jsonStr.replace("/*O_o*/", "");
+                jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
+                jsonStr = jsonStr.slice(0, -2);
+                
                 const data = JSON.parse(jsonStr);
                 const rows = data.table.rows;
+                
                 if (!rows || rows.length === 0) throw new Error('No hay datos');
                 
+                // Mapeo de columnas según la estructura de tu Google Sheets
+                // Columna 0: Timestamp (fecha)
+                // Columna 1: ID
+                // Columna 2: Nombre
+                // Columna 3: Apellido
+                // Columna 4: Email
+                // Columna 5: Teléfono
+                // Columna 6: País
+                // Columna 7: Ciudad
+                // Columna 8: Excursiones
+                // Columna 9: Días
+                // Columna 10: Personas
+                // Columna 11: Forma de pago
+                
                 const clientesMap = new Map();
+                
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
                     if (!c || c.length < 5) continue;
-                    const email = c[4]?.v ? String(c[4].v) : '';
+                    
+                    const email = (c[4] && c[4].v) ? String(c[4].v) : '';
                     if (!email) continue;
-                    const nombre = c[2]?.v ? String(c[2].v) : '';
-                    const apellido = c[3]?.v ? String(c[3].v) : '';
-                    const telefono = c[5]?.v ? String(c[5].v) : '';
+                    
+                    const nombre = (c[2] && c[2].v) ? String(c[2].v) : '';
+                    const apellido = (c[3] && c[3].v) ? String(c[3].v) : '';
+                    const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
                     const nombreCompleto = (nombre + ' ' + apellido).trim() || 'Sin nombre';
-                    if (!clientesMap.has(email)) clientesMap.set(email, { email, nombre: nombreCompleto, telefono, reservasCount: 1 });
-                    else clientesMap.get(email).reservasCount++;
+                    
+                    if (!clientesMap.has(email)) {
+                        clientesMap.set(email, {
+                            email: email,
+                            nombre: nombreCompleto,
+                            telefono: telefono,
+                            reservasCount: 1
+                        });
+                    } else {
+                        const existing = clientesMap.get(email);
+                        existing.reservasCount++;
+                        clientesMap.set(email, existing);
+                    }
                 }
-                clientesData = Array.from(clientesMap.entries()).map(([email, cl], idx) => ({ id: idx+1, email, nombre: cl.nombre, telefono: cl.telefono || 'No registrado', totalReservas: cl.reservasCount }));
-                clientesData.sort((a,b) => a.nombre.localeCompare(b.nombre));
+                
+                clientesData = Array.from(clientesMap.entries()).map(([email, cliente], index) => ({
+                    id: index + 1,
+                    email: email,
+                    nombre: cliente.nombre,
+                    telefono: cliente.telefono || 'No registrado',
+                    totalReservas: cliente.reservasCount
+                }));
+                
+                clientesData.sort((a, b) => a.nombre.localeCompare(b.nombre));
                 clientesFiltrados = [...clientesData];
                 renderizarTabla();
-                document.getElementById('totalClientes').textContent = clientesData.length;
-                document.getElementById('totalClientesSpan').textContent = `${clientesData.length} clientes`;
-            } catch(e) { console.error(e); tbody.innerHTML = `<tr><td colspan="7" style="color:red;">❌ Error: ${e.message} jonathan</tr`; }
+                
+                if (totalNum) totalNum.textContent = clientesData.length;
+                if (totalSpan) totalSpan.textContent = `${clientesData.length} clientes`;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message}</td></tr>`;
+            }
         }
         
         function renderizarTabla() {
             const tbody = document.getElementById('tablaClientes');
             if (!tbody) return;
-            if (clientesFiltrados.length === 0) { 
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">📋 No hay clientes</td</tr'; 
-                document.getElementById('totalClientesSpan').textContent = `0 clientes (${clientesData.length} total)`;
-                return; 
+            
+            if (clientesFiltrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td</tr';
+                return;
             }
             
-            tbody.innerHTML = clientesFiltrados.map(cliente => `
+            function escapeHtml(text) { 
+                if (!text) return ''; 
+                const div = document.createElement('div'); 
+                div.textContent = text; 
+                return div.innerHTML; 
+            }
+            
+            tbody.innerHTML = clientesFiltrados.map((cliente) => `
                 <tr>
                     <td>${cliente.id}</td>
                     <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
@@ -340,24 +743,16 @@
                     <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td>
                 </tr>
             `).join('');
-            
-            // Mostrar contador de resultados
-            const totalSpan = document.getElementById('totalClientesSpan');
-            if (totalSpan) {
-                totalSpan.textContent = `${clientesFiltrados.length} clientes (${clientesData.length} total)`;
-            }
         }
         
-        function filtrarClientes() { 
-            aplicarFiltros(); 
-        }
-        
-        function aplicarFiltros() {
-            const texto = document.getElementById('busquedaCliente').value.toLowerCase().trim();
+        function filtrarClientes() {
+            const busqueda = document.getElementById('busquedaCliente');
+            if (!busqueda) return;
+            const texto = busqueda.value.toLowerCase().trim();
             
-            if (texto.length === 0) {
+            if (!texto) {
                 clientesFiltrados = [...clientesData];
-            } else if (texto.length >= 2) {
+            } else {
                 clientesFiltrados = clientesData.filter(c => 
                     c.nombre.toLowerCase().includes(texto) || 
                     c.email.toLowerCase().includes(texto) ||
@@ -369,74 +764,286 @@
         
         async function verReservasCliente(email) {
             try {
-                const res = await fetch(JSON_URL + '&t=' + Date.now());
-                let text = await res.text();
-                let jsonStr = text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2);
+                const response = await fetch(JSON_URL + '&t=' + Date.now());
+                const texto = await response.text();
+                
+                let jsonStr = texto;
+                jsonStr = jsonStr.replace("/*O_o*/", "");
+                jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
+                jsonStr = jsonStr.slice(0, -2);
+                
                 const data = JSON.parse(jsonStr);
                 const rows = data.table.rows;
+                
                 const reservas = [];
+                
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
                     if (!c || c.length < 5) continue;
-                    const emailFila = c[4]?.v ? String(c[4].v) : '';
+                    
+                    const emailFila = (c[4] && c[4].v) ? String(c[4].v) : '';
                     if (emailFila.toLowerCase() !== email.toLowerCase()) continue;
-                    const id = c[1]?.v ? String(c[1].v) : `R-${i+1}`;
-                    const ts = c[0]?.v;
+                    
+                    const id = (c[1] && c[1].v) ? String(c[1].v) : `R-${i+1}`;
+                    const timestamp = (c[0] && c[0].v) ? c[0].v : null;
+                    
                     let fecha = '';
-                    if (ts) { const d = new Date(ts); if (!isNaN(d.getTime())) fecha = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; }
-                    const excRaw = c[8]?.v ? String(c[8].v) : '';
-                    let excList = [];
-                    if (excRaw) {
-                        if (excRaw.includes('\n')) excList = excRaw.split('\n');
-                        else if (excRaw.includes(' | ')) excList = excRaw.split(' | ');
-                        else excList = [excRaw];
-                        excList = excList.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e);
+                    if (timestamp) {
+                        const fechaObj = new Date(timestamp);
+                        if (!isNaN(fechaObj.getTime())) {
+                            fecha = `${fechaObj.getDate().toString().padStart(2,'0')}/${(fechaObj.getMonth()+1).toString().padStart(2,'0')}/${fechaObj.getFullYear()}`;
+                        }
                     }
-                    reservas.push({ id, fecha: fecha || 'Sin fecha', excursiones: excList });
+                    
+                    const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
+                    let excursionesLista = [];
+                    if (excursionesRaw) {
+                        if (excursionesRaw.includes('\n')) {
+                            excursionesLista = excursionesRaw.split('\n');
+                        } else if (excursionesRaw.includes(' | ')) {
+                            excursionesLista = excursionesRaw.split(' | ');
+                        } else {
+                            excursionesLista = [excursionesRaw];
+                        }
+                        excursionesLista = excursionesLista.map(function(e) { 
+                            return e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
+                        }).filter(function(e) { return e; });
+                    }
+                    
+                    reservas.push({ 
+                        id: id, 
+                        fecha: fecha || 'Sin fecha', 
+                        excursiones: excursionesLista 
+                    });
                 }
-                let reservasHtml = '';
-                if (reservas.length === 0) reservasHtml = '<p style="text-align:center;">📭 No hay reservas para este cliente</p>';
-                else reservasHtml = reservas.map(r => `<div style="background:#f8f9fa; border-radius:12px; padding:15px; margin-bottom:15px; border-left:4px solid #667eea;"><div style="font-weight:700; color:#667eea;">🆔 Reserva: ${escapeHtml(r.id)}</div><div style="font-size:11px; color:#999;">📅 ${escapeHtml(r.fecha)}</div><div><div style="font-size:11px; font-weight:600;">✨ Excursiones:</div><ul style="margin:0; padding-left:20px;">${r.excursiones.map(ex => `<li>${escapeHtml(ex)}</li>`).join('')}</ul></div></div>`).join('');
                 
-                const modal = `<div id="modalReservas" class="modal"><div class="modal-contenido"><div class="modal-header"><h3>📋 Reservas del cliente</h3><button class="cerrar-modal" onclick="cerrarModal('modalReservas')">✕</button></div><p><strong>📧 Email:</strong> ${escapeHtml(email)}</p><p><strong>📊 Total reservas:</strong> ${reservas.length}</p><hr><div style="max-height:50vh; overflow-y:auto;">${reservasHtml}</div><button onclick="cerrarModal('modalReservas')" style="width:100%; padding:12px; background:#667eea; color:white; border:none; border-radius:12px; margin-top:20px;">Cerrar</button></div></div>`;
-                document.body.insertAdjacentHTML('beforeend', modal);
-            } catch(e) { alert('Error al cargar reservas: ' + e.message); }
+                function escapeHtml(text) { 
+                    if (!text) return ''; 
+                    const div = document.createElement('div'); 
+                    div.textContent = text; 
+                    return div.innerHTML; 
+                }
+                
+                let reservasHtml = '';
+                if (reservas.length === 0) {
+                    reservasHtml = '<p style="text-align:center;padding:20px;">📭 No hay reservas para este cliente</p>';
+                } else {
+                    reservas.forEach(r => {
+                        let excursionesListHtml = '';
+                        if (r.excursiones && r.excursiones.length > 0) {
+                            excursionesListHtml = '<ul style="margin:0; padding-left:20px;">';
+                            r.excursiones.forEach(exc => {
+                                excursionesListHtml += `<li style="margin-bottom:4px;">${escapeHtml(exc)}</li>`;
+                            });
+                            excursionesListHtml += '</ul>';
+                        } else {
+                            excursionesListHtml = '<p style="color:#999; font-size:12px;">Sin excursiones específicas</p>';
+                        }
+                        
+                        reservasHtml += `
+                            <div style="background:#f8f9fa; border-radius:12px; padding:15px; margin-bottom:15px; border-left:4px solid #667eea;">
+                                <div style="font-weight:700; color:#667eea; font-size:14px; margin-bottom:8px;">🆔 Reserva: ${escapeHtml(r.id)}</div>
+                                <div style="font-size:11px; color:#999; margin-bottom:10px;">📅 ${escapeHtml(r.fecha)}</div>
+                                <div>
+                                    <div style="font-size:11px; font-weight:600; color:#666; margin-bottom:5px;">✨ Excursiones seleccionadas:</div>
+                                    ${excursionesListHtml}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                const modalHtml = `
+                    <div id="modalReservas" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:2000;">
+                        <div style="background:white; border-radius:20px; max-width:550px; width:90%; max-height:85vh; overflow-y:auto; padding:25px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #eef2ff; padding-bottom:12px;">
+                                <h3 style="color:#667eea;">📋 Reservas del cliente</h3>
+                                <button onclick="cerrarModalReservas()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">✕</button>
+                            </div>
+                            <p><strong>📧 Email:</strong> ${escapeHtml(email)}</p>
+                            <p><strong>📊 Total reservas:</strong> ${reservas.length}</p>
+                            <hr style="margin:15px 0;">
+                            <div style="max-height: 50vh; overflow-y: auto;">
+                                ${reservasHtml}
+                            </div>
+                            <button onclick="cerrarModalReservas()" style="width:100%; padding:12px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border:none; border-radius:12px; margin-top:20px; cursor:pointer; font-weight:600;">Cerrar</button>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+            } catch (error) {
+                console.error(error);
+                alert('Error al cargar reservas: ' + error.message);
+            }
         }
         
-        function cerrarModal(id) { const m = document.getElementById(id); if (m) m.remove(); }
+        function cerrarModalReservas() {
+            const modal = document.getElementById('modalReservas');
+            if (modal) modal.remove();
+        }
         
         function descargarPDF() {
-            if (clientesFiltrados.length === 0) { alert('⚠️ No hay clientes para exportar.'); return; }
-            const fecha = new Date();
-            const fechaStr = `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
-            let filas = '';
-            for (const c of clientesFiltrados) { filas += `<tr><td>${escapeHtml(c.nombre)}</td><td>${escapeHtml(c.email)}</td><td>${escapeHtml(c.telefono)}</td><td>${c.totalReservas}</td>`; }
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Clientes - Aventura Total</title><style>body{font-family:Segoe UI;padding:20px}.header{text-align:center;border-bottom:2px solid #667eea;padding-bottom:15px}th{background:#667eea;color:white;padding:8px}td{padding:8px;border-bottom:1px solid #ddd}</style></head><body><div class="header"><div>🏔️</div><h1>Aventura Total - Clientes</h1></div><p>📅 Generado: ${fechaStr}</p><table width="100%"><thead><tr><th>NOMBRE</th><th>EMAIL</th><th>TELÉFONO</th><th>RESERVAS</th></tr></thead><tbody>${filas}</tbody></table><p>Total clientes: ${clientesFiltrados.length}</p></body></html>`;
-            html2pdf().set({ margin:0.5, filename:`clientes_${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'in',format:'a4',orientation:'portrait'} }).from(html).save();
+            if (clientesFiltrados.length === 0) {
+                alert('⚠️ No hay clientes para exportar.');
+                return;
+            }
+            
+            const fechaActual = new Date();
+            const fechaFormateada = `${fechaActual.getDate().toString().padStart(2,'0')}/${(fechaActual.getMonth()+1).toString().padStart(2,'0')}/${fechaActual.getFullYear()} ${fechaActual.getHours().toString().padStart(2,'0')}:${fechaActual.getMinutes().toString().padStart(2,'0')}`;
+            
+            function escapeHtml(text) { 
+                if (!text) return ''; 
+                const div = document.createElement('div'); 
+                div.textContent = text; 
+                return div.innerHTML; 
+            }
+            
+            let filasTabla = '';
+            for (const cliente of clientesFiltrados) {
+                filasTabla += `
+                    <tr>
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.nombre)}</td>
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.email)}</td>
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px;">${escapeHtml(cliente.telefono)}</td>
+                        <td style="padding:8px; border-bottom:1px solid #e0e0e0; font-size:10px; text-align:center;">${cliente.totalReservas}</td>
+                    </tr>
+                `;
+            }
+            
+            const contenidoPDF = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Lista de Clientes - Aventura Total</title>
+                    <style>
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            padding: 20px;
+                            margin: 0;
+                            background: white;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 25px;
+                            border-bottom: 2px solid #667eea;
+                            padding-bottom: 15px;
+                        }
+                        .logo {
+                            font-size: 40px;
+                            margin-bottom: 8px;
+                        }
+                        h1 {
+                            color: #1a1a2e;
+                            font-size: 20px;
+                            margin-bottom: 5px;
+                        }
+                        .subtitulo {
+                            color: #666;
+                            font-size: 11px;
+                        }
+                        .fecha {
+                            text-align: right;
+                            font-size: 9px;
+                            color: #999;
+                            margin-bottom: 15px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 15px;
+                        }
+                        th {
+                            background: #667eea;
+                            color: white;
+                            padding: 10px 8px;
+                            text-align: left;
+                            font-size: 11px;
+                            font-weight: 600;
+                        }
+                        td {
+                            padding: 8px;
+                            border-bottom: 1px solid #e0e0e0;
+                            font-size: 10px;
+                            color: #333;
+                        }
+                        .total-container {
+                            margin-top: 20px;
+                            text-align: right;
+                            font-size: 11px;
+                            font-weight: bold;
+                            color: #667eea;
+                            border-top: 1px solid #e0e0e0;
+                            padding-top: 12px;
+                        }
+                        .footer {
+                            margin-top: 25px;
+                            text-align: center;
+                            font-size: 9px;
+                            color: #999;
+                            border-top: 1px solid #e0e0e0;
+                            padding-top: 15px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="logo">🏔️</div>
+                        <h1>Aventura Total - Lista de Clientes</h1>
+                        <div class="subtitulo">Reporte generado desde el sistema CRM</div>
+                    </div>
+                    <div class="fecha">📅 Generado: ${fechaFormateada}</div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NOMBRE</th>
+                                <th>EMAIL</th>
+                                <th>TELÉFONO</th>
+                                <th>RESERVAS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filasTabla}
+                        </tbody>
+                    </table>
+                    
+                    <div class="total-container">
+                        Total de clientes: ${clientesFiltrados.length}
+                    </div>
+                    
+                    <div class="footer">
+                        Aventura Total - CRM | Generado automáticamente
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: `clientes_aventura_total_${fechaActual.getFullYear()}-${(fechaActual.getMonth()+1).toString().padStart(2,'0')}-${fechaActual.getDate().toString().padStart(2,'0')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(contenidoPDF).save();
         }
         
-        function escapeHtml(t) { if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-        
+        // Exponer funciones globalmente
         window.filtrarClientes = filtrarClientes;
         window.cargarClientes = cargarClientes;
         window.verReservasCliente = verReservasCliente;
-        window.cerrarModal = cerrarModal;
+        window.cerrarModalReservas = cerrarModalReservas;
         window.logout = logout;
         window.descargarPDF = descargarPDF;
-        window.toggleTheme = toggleTheme;
         
-        // Inicializar búsqueda instantánea
-        initBusquedaInstantanea();
+        // Event listener para búsqueda con Enter
+        const busquedaInput = document.getElementById('busquedaCliente');
+        if (busquedaInput) busquedaInput.addEventListener('keypress', e => { if (e.key === 'Enter') filtrarClientes(); });
         
-        // Mantener el evento Enter como respaldo
-        document.getElementById('busquedaCliente').addEventListener('keypress', e => { 
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                filtrarClientes(); 
-            }
-        });
-        
-        initMenu();
+        // Cargar datos al iniciar
         cargarClientes();
     </script>
 </body>
