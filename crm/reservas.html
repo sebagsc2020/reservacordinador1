@@ -40,6 +40,16 @@
         body.dark-mode .header h1 { color: white; }
         body.dark-mode .btn-theme { color: white; }
         
+        /* Indicador de búsqueda activa */
+        .busqueda-activa {
+            background: #e8f5e9 !important;
+            border-color: #27ae60 !important;
+        }
+        body.dark-mode .busqueda-activa {
+            background: #2a3a2e !important;
+            border-color: #27ae60 !important;
+        }
+        
         .pwa-mode { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
         
         .menu-btn {
@@ -99,10 +109,11 @@
         .btn-reserva-manual { background: #e74c3c; color: white; border: none; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
         
         .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; transition: background 0.3s; }
-        .filter-input { padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
+        .filter-input { padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; transition: all 0.3s; }
+        .filter-input:focus { outline: none; border-color: #667eea; }
         .btn-filtrar, .btn-recargar, .btn-pdf, .btn-historial { padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
-        .btn-filtrar { background: #667eea; color: white; }
-        .btn-recargar { background: #27ae60; color: white; }
+        .btn-filtrar { background: #27ae60; color: white; }
+        .btn-recargar { background: #667eea; color: white; }
         .btn-pdf { background: #2c7da0; color: white; }
         .btn-historial { background: #6c5ce7; color: white; }
         
@@ -196,8 +207,8 @@
         </div>
 
         <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
-            <button class="btn-filtrar" id="btnFiltrar">🔍 Filtrar</button>
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión... (mínimo 2 caracteres)" id="busquedaReserva">
+            <button class="btn-filtrar" id="btnFiltrar">🔍 Buscar</button>
             <button class="btn-recargar" id="btnRecargar">🔄 Recargar</button>
             <button class="btn-pdf" id="btnPDFExterno">📄 Generar PDF</button>
             <button class="btn-historial" onclick="verHistorialCompleto()">📝 Ver Historial</button>
@@ -355,6 +366,41 @@
             finally { ocultarPreloader(); }
         }
         
+        // ==================================================
+        // BÚSQUEDA INSTANTÁNEA (mientras escribe)
+        // ==================================================
+        function initBusquedaInstantanea() {
+            const input = document.getElementById('busquedaReserva');
+            if (!input) return;
+            
+            input.addEventListener('input', function(e) {
+                const texto = e.target.value.toLowerCase().trim();
+                
+                // Marcar visualmente que hay búsqueda activa
+                if (texto.length >= 2) {
+                    input.classList.add('busqueda-activa');
+                } else {
+                    input.classList.remove('busqueda-activa');
+                }
+                
+                if (texto.length === 0) {
+                    // Sin texto: mostrar todas las reservas
+                    reservasFiltradas = [...reservasData];
+                    renderizarCards();
+                    document.getElementById('totalReservasSpan').textContent = reservasFiltradas.length + ' de ' + reservasData.length + ' reservas';
+                } else if (texto.length >= 2) {
+                    // Buscar después de 2 caracteres
+                    reservasFiltradas = reservasData.filter(r => 
+                        r.nombre.toLowerCase().includes(texto) || 
+                        r.excursionesLista.some(exc => exc.toLowerCase().includes(texto))
+                    );
+                    renderizarCards();
+                    document.getElementById('totalReservasSpan').textContent = reservasFiltradas.length + ' de ' + reservasData.length + ' reservas';
+                }
+                // Si tiene 1 carácter, no hace nada (espera más)
+            });
+        }
+        
         async function cambiarEstado(id, nuevoEstado) {
             const reserva = reservasData.find(r => r.id === id);
             if (!reserva) return;
@@ -387,7 +433,7 @@
             if (reserva.excursionesLista && reserva.excursionesLista.length > 0) excursionesTexto = reserva.excursionesLista.map((exc,idx) => `${idx+1}. ${exc}`).join('\n');
             else excursionesTexto = 'Sin excursiones específicas';
             let estadoTexto = { pendiente:'Pendiente', confirmado:'Confirmado', pagado:'Pagado' }[reserva.estado] || 'Confirmado';
-            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️\n\n✅ *CONFIRMACIÓN DE RESERVA*\n\n🆔 *N° de reserva:* ${reserva.id}\n📅 *Fecha:* ${reserva.fecha}\n\n👤 *DATOS DEL PASAJERO:*\n   Nombre: ${reserva.nombre}\n   📞 Teléfono: ${reserva.telefono}\n   📧 Email: ${reserva.email}\n\n📍 *DESTINO:*\n   ${reserva.ciudad}\n\n✨ *EXCURSIONES SELECCIONADAS:*\n${excursionesTexto}\n\n👥 *Cantidad de personas:* ${reserva.personas}\n💳 *Forma de pago:* ${reserva.formaPago}\n🚐 *Punto de encuentro:* ${reserva.lugar}\n📌 *Estado:* ${estadoTexto}\n\n📌 *PRÓXIMOS PASOS:*\n• En las próximas 24hs recibirás detalles de pago\n• Punto de encuentro exacto será confirmado\n\n🏔️ ¡Gracias por confiar en Aventura Total!`;
+            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️\n\n✅ *CONFIRMACIÓN DE RESERVA*\n\n🆔 *N° de reserva:* ${reserva.id}\n📅 *Fecha:* ${reserva.fecha}\n\n👤 *DATOS DEL PASAJERO:*\n   Nombre: ${reserva.nombre}\n   📞 Teléfono: ${reserva.telefono}\n   📧 Email: ${reserva.email}\n\n📍 *DESTINO:*\n   ${reserva.ciudad}\n\n✨ *EXCURSIONES SELECCIONADAS:*\n${excursionesTexto}\n\n👥 *Cantidad de personas:* ${reserva.personas}\n💳 *Forma de pago:* ${reserva.formaPago}\n🚐 *Punto de encuentro:* ${reserva.lugar}\n📌 *Estado:* ${estadoTexto}\n\n📌 *PRÓXIMOS PASOS:*\n• En las próximas 24hs recibirás detalles de pago\n• Punto de encuentro exacto será confirmado\n\n🏔️ ¡Gracias por confiar in Aventura Total!`;
             window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
         
@@ -397,7 +443,7 @@
         function renderizarCards() {
             const container = document.getElementById('cardsContainer');
             if (!container) return;
-            if (reservasFiltradas.length === 0) { container.innerHTML = '<div style="text-align:center; padding:50px;">📋 No hay reservas</div>'; document.getElementById('totalReservasSpan').textContent = '0 reservas'; return; }
+            if (reservasFiltradas.length === 0) { container.innerHTML = '<div style="text-align:center; padding:50px;">📋 No hay reservas</div>'; return; }
             
             function escapeHtml(t) { if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
             
@@ -445,7 +491,6 @@
                 </div>`;
             }
             container.innerHTML = html;
-            document.getElementById('totalReservasSpan').textContent = reservasFiltradas.length + ' de ' + reservasData.length + ' reservas';
             
             document.querySelectorAll('.btn-confirmar-card').forEach(b => b.addEventListener('click', () => cambiarEstado(b.dataset.id, 'confirmado')));
             document.querySelectorAll('.btn-pendiente-card').forEach(b => b.addEventListener('click', () => cambiarEstado(b.dataset.id, 'pendiente')));
@@ -456,8 +501,24 @@
         
         function filtrarReservas() {
             const texto = document.getElementById('busquedaReserva').value.toLowerCase().trim();
-            reservasFiltradas = texto ? reservasData.filter(r => r.nombre.toLowerCase().includes(texto) || r.excursionesLista.some(e => e.toLowerCase().includes(texto))) : [...reservasData];
+            // Limpiar clase visual si el botón se usa manualmente
+            const input = document.getElementById('busquedaReserva');
+            if (texto.length >= 2) {
+                input.classList.add('busqueda-activa');
+            } else {
+                input.classList.remove('busqueda-activa');
+            }
+            
+            if (texto.length === 0) {
+                reservasFiltradas = [...reservasData];
+            } else if (texto.length >= 2) {
+                reservasFiltradas = reservasData.filter(r => 
+                    r.nombre.toLowerCase().includes(texto) || 
+                    r.excursionesLista.some(e => e.toLowerCase().includes(texto))
+                );
+            }
             renderizarCards();
+            document.getElementById('totalReservasSpan').textContent = reservasFiltradas.length + ' de ' + reservasData.length + ' reservas';
         }
         
         function excluirReserva(id) {
@@ -504,7 +565,15 @@
             document.getElementById('btnFiltrar').addEventListener('click', filtrarReservas);
             document.getElementById('btnRecargar').addEventListener('click', cargarReservas);
             document.getElementById('btnPDFExterno').addEventListener('click', generarPDFExterno);
-            document.getElementById('busquedaReserva').addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
+            
+            // Inicializar búsqueda instantánea
+            initBusquedaInstantanea();
+            
+            // Mantener Enter como respaldo
+            document.getElementById('busquedaReserva').addEventListener('keypress', e => { 
+                if (e.key === 'Enter') filtrarReservas(); 
+            });
+            
             cargarReservas();
             setInterval(() => { if (document.visibilityState === 'visible') cargarReservas(); }, 120000);
         }
