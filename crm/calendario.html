@@ -35,12 +35,95 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
         
         /* Modo PWA (sin barra de navegación) */
         .pwa-mode {
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* ========== MODO OSCURO ========== */
+        body.dark-mode {
+            background: #0f0f1a;
+        }
+        
+        body.dark-mode .evento-card,
+        body.dark-mode .modal-contenido,
+        body.dark-mode .user-info,
+        body.dark-mode .preloader-popup-contenido,
+        body.dark-mode .dia-card,
+        body.dark-mode .nota-item {
+            background: #1e1e2e;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .evento-header {
+            background: linear-gradient(135deg, #4a5aaa 0%, #5a3a82 100%);
+        }
+        
+        body.dark-mode .evento-titulo {
+            color: white;
+        }
+        
+        body.dark-mode .evento-acciones {
+            background: #161622;
+            border-top-color: #2a2a3e;
+        }
+        
+        body.dark-mode .header h1 {
+            color: white;
+        }
+        
+        body.dark-mode .modal-header h3 {
+            color: #667eea;
+        }
+        
+        body.dark-mode .form-group label {
+            color: #aaa;
+        }
+        
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select,
+        body.dark-mode .form-group textarea {
+            background: #2a2a3e;
+            border-color: #3a3a4e;
+            color: white;
+        }
+        
+        body.dark-mode .form-group input::placeholder,
+        body.dark-mode .form-group textarea::placeholder {
+            color: #888;
+        }
+        
+        body.dark-mode .dia-titulo {
+            color: #667eea;
+        }
+        
+        body.dark-mode .nota-texto {
+            color: #ddd;
+        }
+        
+        body.dark-mode .nota-fecha {
+            color: #888;
+        }
+        
+        body.dark-mode .btn-agregar-nota {
+            background: #2a2a3e;
+            color: #aaa;
+        }
+        
+        body.dark-mode .btn-agregar-nota:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        body.dark-mode .btn-theme {
+            color: white;
+        }
+        
+        body.dark-mode .btn-theme:hover {
+            background: rgba(255,255,255,0.1);
         }
         
         .menu-btn {
@@ -165,7 +248,32 @@
             flex-wrap: wrap; 
             gap: 15px; 
         }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
+        .header h1 { font-size: 26px; color: #1a1a2e; transition: color 0.3s; }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-theme:hover {
+            background: rgba(0,0,0,0.1);
+            transform: scale(1.1);
+        }
         
         .user-info { 
             display: flex; 
@@ -176,6 +284,7 @@
             border-radius: 50px; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
             font-size: 14px; 
+            transition: background 0.3s;
         }
         .user-avatar { 
             width: 35px; 
@@ -217,7 +326,7 @@
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            transition: transform 0.2s;
+            transition: transform 0.2s, background 0.3s;
         }
         .evento-card:hover {
             transform: translateY(-4px);
@@ -227,6 +336,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 15px;
+            transition: background 0.3s;
         }
         .evento-titulo {
             font-size: 18px;
@@ -247,6 +357,7 @@
             padding: 12px 15px;
             background: #f8f9fa;
             border-top: 1px solid #e0e0e0;
+            transition: background 0.3s, border-color 0.3s;
         }
         .btn-ver-evento {
             flex: 1;
@@ -302,6 +413,7 @@
             max-height: 85vh;
             overflow-y: auto;
             padding: 25px;
+            transition: background 0.3s;
         }
         .modal-header {
             display: flex;
@@ -332,6 +444,7 @@
             font-weight: 600;
             font-size: 13px;
             color: #666;
+            transition: color 0.3s;
         }
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
@@ -340,6 +453,7 @@
             border-radius: 10px;
             font-size: 14px;
             font-family: inherit;
+            transition: background 0.3s, border-color 0.3s, color 0.3s;
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
@@ -354,6 +468,7 @@
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 15px;
+            transition: background 0.3s;
         }
         .dia-titulo {
             font-weight: 700;
@@ -367,15 +482,18 @@
             padding: 10px;
             margin-bottom: 10px;
             border-left: 3px solid #667eea;
+            transition: background 0.3s;
         }
         .nota-texto {
             font-size: 13px;
             color: #333;
             margin-bottom: 8px;
+            transition: color 0.3s;
         }
         .nota-fecha {
             font-size: 10px;
             color: #999;
+            transition: color 0.3s;
         }
         .btn-agregar-nota {
             width: 100%;
@@ -387,6 +505,7 @@
             cursor: pointer;
             font-size: 12px;
             margin-top: 8px;
+            transition: all 0.2s;
         }
         .btn-agregar-nota:hover {
             background: #667eea;
@@ -413,6 +532,7 @@
             border-radius: 24px;
             padding: 35px 45px;
             text-align: center;
+            transition: background 0.3s;
         }
         .preloader-popup-icono {
             width: 70px;
@@ -437,6 +557,7 @@
             .menu-btn { display: flex; }
             .main-content { padding: 60px 12px 20px; }
             .eventos-grid { grid-template-columns: 1fr; }
+            .btn-theme { width: 40px; height: 40px; font-size: 20px; }
         }
     </style>
 </head>
@@ -467,9 +588,12 @@
     <div class="main-content">
         <div class="header">
             <div><h1>📅 Calendario de Eventos</h1></div>
-            <div class="user-info">
-                <div class="user-avatar">A</div>
-                <span>Admin</span>
+            <div class="header-actions">
+                <button class="btn-theme" onclick="toggleTheme()" title="Modo oscuro/claro">🌙</button>
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span>Admin</span>
+                </div>
             </div>
         </div>
 
@@ -489,11 +613,33 @@
 
     <script>
         // ==================================================
+        // MODO OSCURO
+        // ==================================================
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            const btn = document.querySelector('.btn-theme');
+            if (btn) {
+                btn.textContent = isDark ? '☀️' : '🌙';
+            }
+        }
+        
+        // Cargar preferencia de modo oscuro
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            const btn = document.querySelector('.btn-theme');
+            if (btn) {
+                btn.textContent = '☀️';
+            }
+        }
+        
+        // ==================================================
         // REGISTRAR SERVICE WORKER PARA PWA
         // ==================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('sw.js')
                     .then(function(registration) {
                         console.log('✅ Service Worker registrado con éxito:', registration.scope);
                     })
@@ -754,7 +900,6 @@
                 const notasPorFecha = {};
                 notasEvento.forEach(nota => {
                     let fechaNota = nota.fecha;
-                    // Si la nota tiene fecha en formato ISO, convertirla
                     if (fechaNota && fechaNota.includes('T')) {
                         fechaNota = convertirFechaISOtoDDMMYYYY(fechaNota);
                     }
@@ -1121,6 +1266,7 @@
         window.compartirEvento = compartirEvento;
         window.eliminarEvento = eliminarEvento;
         window.logout = logout;
+        window.toggleTheme = toggleTheme;
         
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
