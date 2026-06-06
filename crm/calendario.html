@@ -676,6 +676,28 @@
         function ocultarPreloader() { if (preloaderPopup) preloaderPopup.classList.add('oculto'); }
         
         // ==================================================
+        // CACHÉ LOCAL
+        // ==================================================
+        const CACHE_DURACION = 60000; // 60 segundos
+        
+        function guardarEventosEnCache(datos) {
+            localStorage.setItem('eventosCache', JSON.stringify({
+                timestamp: Date.now(),
+                eventos: datos
+            }));
+        }
+        
+        function obtenerEventosDeCache() {
+            const cache = localStorage.getItem('eventosCache');
+            if (!cache) return null;
+            const data = JSON.parse(cache);
+            if (Date.now() - data.timestamp < CACHE_DURACION) {
+                return data.eventos;
+            }
+            return null;
+        }
+        
+        // ==================================================
         // FUNCIONES DE FECHAS (MANEJA FORMATO ISO)
         // ==================================================
         function convertirFechaISOtoDDMMYYYY(fechaIso) {
@@ -721,41 +743,14 @@
         }
         
         // ==================================================
-        // CARGAR EVENTOS
+        // CARGAR EVENTOS (con caché)
         // ==================================================
-        async function cargarEventos() {
-            mostrarPreloader();
-            try {
-                const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
-                console.log('📡 Cargando eventos...');
-                
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                console.log('📦 Eventos recibidos:', data);
-                
-                if (data.success && data.eventos) {
-                    eventos = data.eventos;
-                    renderizarEventos();
-                } else {
-                    document.getElementById('eventosContainer').innerHTML = `<div style="text-align:center; padding:50px;">❌ Error: ${data.message}</div>`;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('eventosContainer').innerHTML = '<div style="text-align:center; padding:50px;">❌ Error al conectar con el servidor</div>';
-            } finally {
-                ocultarPreloader();
-            }
-        }
         
-        // ==================================================
-        // RENDERIZAR EVENTOS
-        // ==================================================
-        function renderizarEventos() {
+        function renderizarEventos(eventosData) {
             const container = document.getElementById('eventosContainer');
             if (!container) return;
             
-            if (eventos.length === 0) {
+            if (!eventosData || eventosData.length === 0) {
                 container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">📭 No hay eventos creados. Haz clic en "Crear nuevo evento"</div>';
                 return;
             }
@@ -767,7 +762,7 @@
                 return div.innerHTML;
             }
             
-            container.innerHTML = eventos.map(evento => `
+            container.innerHTML = eventosData.map(evento => `
                 <div class="evento-card">
                     <div class="evento-header">
                         <div class="evento-titulo">${escapeHtml(evento.nombre)}</div>
@@ -781,6 +776,54 @@
                     </div>
                 </div>
             `).join('');
+        }
+        
+        async function cargarEventos() {
+            const container = document.getElementById('eventosContainer');
+            
+            // 1. Intentar usar caché primero (carga instantánea)
+            const eventosCache = obtenerEventosDeCache();
+            if (eventosCache && eventosCache.length > 0) {
+                console.log('📦 Calendario - Usando caché local');
+                eventos = eventosCache;
+                renderizarEventos(eventos);
+                // Seguir cargando en segundo plano para actualizar
+                setTimeout(() => cargarEventosDesdeRed(), 500);
+                return;
+            }
+            
+            // 2. Si no hay caché, cargar desde red
+            await cargarEventosDesdeRed();
+        }
+        
+        async function cargarEventosDesdeRed() {
+            const container = document.getElementById('eventosContainer');
+            try {
+                mostrarPreloader();
+                console.log('📡 Cargando eventos desde Google Apps Script...');
+                
+                // 📌 OPTIMIZACIÓN: Límite de 100 eventos
+                const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}&limite=100`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                console.log('📦 Eventos recibidos:', data);
+                
+                if (data.success && data.eventos) {
+                    eventos = data.eventos;
+                    // Guardar en caché
+                    guardarEventosEnCache(eventos);
+                    renderizarEventos(eventos);
+                } else {
+                    container.innerHTML = `<div style="text-align:center; padding:50px;">❌ Error: ${data.message}</div>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = '<div style="text-align:center; padding:50px;">❌ Error al conectar con el servidor</div>';
+            } finally {
+                ocultarPreloader();
+            }
         }
         
         // ==================================================
@@ -852,7 +895,7 @@
                 if (data.success) {
                     alert('✅ Evento creado correctamente');
                     cerrarModal('modalCrearEvento');
-                    await cargarEventos();
+                    await cargarEventosDesdeRed();
                 } else {
                     alert('❌ Error al crear evento: ' + data.message);
                 }
@@ -887,13 +930,16 @@
                 const fechaInicioDate = new Date(evento.fechaInicio);
                 const fechaFinDate = new Date(evento.fechaFin);
                 
-                // Generar array de fechas
+                // Generar array de fechas (máximo 30 días para evitar sobrecarga)
                 const fechas = [];
-                for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
+                const maxDias = 30;
+                let diasContados = 0;
+                for (let d = new Date(fechaInicioDate); d <= fechaFinDate && diasContados < maxDias; d.setDate(d.getDate() + 1)) {
                     const dia = d.getDate().toString().padStart(2, '0');
                     const mes = (d.getMonth() + 1).toString().padStart(2, '0');
                     const anio = d.getFullYear();
                     fechas.push(`${dia}/${mes}/${anio}`);
+                    diasContados++;
                 }
                 
                 // Organizar notas por fecha
@@ -1147,7 +1193,7 @@
                 
                 if (data.success) {
                     alert('✅ Evento eliminado correctamente');
-                    await cargarEventos();
+                    await cargarEventosDesdeRed();
                 } else {
                     alert('❌ Error al eliminar evento: ' + data.message);
                 }
@@ -1182,7 +1228,9 @@
                 const fechaFinDate = new Date(evento.fechaFin);
                 
                 const fechasConNotas = [];
-                for (let d = new Date(fechaInicioDate); d <= fechaFinDate; d.setDate(d.getDate() + 1)) {
+                let diasContados = 0;
+                const maxDias = 14; // Límite para evitar mensajes demasiado largos
+                for (let d = new Date(fechaInicioDate); d <= fechaFinDate && diasContados < maxDias; d.setDate(d.getDate() + 1)) {
                     const dia = d.getDate().toString().padStart(2, '0');
                     const mes = (d.getMonth() + 1).toString().padStart(2, '0');
                     const anio = d.getFullYear();
@@ -1196,6 +1244,7 @@
                         return fechaNota === fechaStr;
                     });
                     fechasConNotas.push({ fecha: fechaStr, notas: notasDelDia });
+                    diasContados++;
                 }
                 
                 let mensaje = `🏔️ *AVENTURA TOTAL* 🏔️\n\n`;
