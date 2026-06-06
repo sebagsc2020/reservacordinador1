@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Reservas - CRM Aventura Total</title>
+    <title>Clientes - CRM Aventura Total</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AVT CRM">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1a1a2e">
+    meta name="theme-color" content="#1a1a2e">
     
     <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
@@ -26,18 +26,19 @@
     <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; transition: background 0.3s; }
         
         body.dark-mode { background: #0f0f1a; }
-        body.dark-mode .filters-bar, body.dark-mode .reserva-card, body.dark-mode .preloader-popup-contenido { background: #1e1e2e; color: #e0e0e0; }
-        body.dark-mode .card-header { background: linear-gradient(135deg, #4a5aaa 0%, #5a3a82 100%); }
-        body.dark-mode .card-body .card-value, body.dark-mode .excursiones-lista-card li, body.dark-mode .total-reservas { color: #ddd; }
-        body.dark-mode .card-label { color: #aaa; }
-        body.dark-mode .card-actions { background: #161622; border-top-color: #2a2a3e; }
+        body.dark-mode .stats-card, body.dark-mode .table-container, body.dark-mode .filters-bar { background: #1e1e2e; color: #e0e0e0; }
+        body.dark-mode .stats-number { color: #667eea; }
+        body.dark-mode .table-header h3, body.dark-mode .header h1 { color: white; }
+        body.dark-mode table th { background: #2a2a3e; color: #ccc; }
+        body.dark-mode table td { border-bottom-color: #2a2a3e; color: #ddd; }
         body.dark-mode .user-info, body.dark-mode .filter-input { background: #1e1e2e; color: white; border-color: #3a3a4e; }
-        body.dark-mode .header h1 { color: white; }
         body.dark-mode .btn-theme { color: white; }
         
         .pwa-mode { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
@@ -87,78 +88,83 @@
         }
         
         .main-content { margin-left: 0; flex: 1; padding: 20px; transition: margin-left 0.3s ease; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
         .header h1 { font-size: 26px; color: #1a1a2e; transition: color 0.3s; }
         
-        .user-area { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .header-actions { display: flex; align-items: center; gap: 15px; }
         .btn-theme { background: none; border: none; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 50%; width: 45px; height: 45px; }
         .user-info { display: flex; align-items: center; gap: 10px; background: white; padding: 8px 20px; border-radius: 50px; font-size: 14px; }
         .user-avatar { width: 35px; height: 35px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
         
-        .btn-reserva-manual { background: #e74c3c; color: white; border: none; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .stats-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center; }
+        .stats-number { font-size: 40px; font-weight: 800; color: #667eea; }
+        .stats-label { font-size: 13px; color: #666; margin-top: 5px; }
         
-        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; transition: background 0.3s; }
+        .filters-bar { background: white; padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .filter-input { padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 13px; flex: 2; min-width: 200px; }
-        .btn-filtrar, .btn-recargar, .btn-pdf, .btn-historial { padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .btn-filtrar, .btn-recargar, .btn-pdf, .btn-etiqueta { padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; }
         .btn-filtrar { background: #667eea; color: white; }
         .btn-recargar { background: #27ae60; color: white; }
-        .btn-pdf { background: #2c7da0; color: white; }
-        .btn-historial { background: #6c5ce7; color: white; }
+        .btn-pdf { background: #dc2626; color: white; }
+        .btn-etiqueta { background: #6c5ce7; color: white; }
         
-        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .table-container { background: white; border-radius: 15px; padding: 20px; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 12px; text-transform: uppercase; font-weight: 600; border-bottom: 2px solid #e0e0e0; }
+        td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #333; }
+        tr:hover td { background: #f8f9ff; }
         
-        .reserva-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.2s, background 0.3s; }
-        .reserva-card:hover { transform: translateY(-4px); }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .badge-activo { background: #d4edda; color: #155724; }
+        .badge-reservas { background: #eef2ff; color: #667eea; }
         
-        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-        .card-id { font-weight: 700; font-size: 13px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; }
-        .btn-editar-nombre { background: rgba(255,255,255,0.2); border: none; border-radius: 20px; padding: 4px 8px; cursor: pointer; font-size: 10px; color: white; }
-        .card-estado-header { font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 20px; color: white; }
-        .card-fecha { font-size: 10px; opacity: 0.85; }
+        .etiqueta-item {
+            display: inline-block; background: #667eea; color: white;
+            padding: 2px 8px; border-radius: 20px; font-size: 9px; margin: 2px;
+        }
+        .etiqueta-item.sin { background: #ccc; color: #666; }
         
-        .card-body { padding: 15px; }
-        .card-info { margin-bottom: 12px; }
-        .card-label { font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .card-value { font-size: 13px; font-weight: 500; color: #333; word-break: break-word; }
+        .btn-ver, .btn-etiquetas-cliente {
+            padding: 6px 14px; background: #667eea; color: white;
+            border: none; border-radius: 8px; cursor: pointer; font-size: 12px;
+            font-weight: 500; margin: 2px;
+        }
+        .btn-etiquetas-cliente { background: #6c5ce7; }
         
-        .excursiones-lista-card { margin: 0; padding-left: 16px; list-style: none; }
-        .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: #555; border-bottom: 1px dashed #eee; }
-        
-        .card-actions { display: flex; gap: 8px; padding: 12px 15px; background: #f8f9fa; border-top: 1px solid #f0f0f0; flex-wrap: wrap; }
-        .btn-card { flex: 1; padding: 8px; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; text-align: center; }
-        .btn-card:active { transform: scale(0.96); }
-        .btn-confirmar-card { background: #27ae60; color: white; }
-        .btn-pendiente-card { background: #ffc107; color: #856404; }
-        .btn-pagar-card { background: #3498db; color: white; }
-        .btn-whatsapp-card { background: #25D366; color: white; }
-        .btn-excluir-card { background: #e74c3c; color: white; }
-        .btn-historial-card { background: #6c5ce7; color: white; }
-        
-        .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
-        
-        .preloader-popup {
+        .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
-            display: flex; justify-content: center; align-items: center; z-index: 10000;
-            transition: opacity 0.3s ease;
+            background: rgba(0,0,0,0.6); display: flex; justify-content: center;
+            align-items: center; z-index: 2000;
         }
-        .preloader-popup.oculto { opacity: 0; visibility: hidden; }
-        .preloader-popup-contenido { background: white; border-radius: 24px; padding: 35px 45px; text-align: center; }
-        .preloader-popup-icono { width: 70px; height: 70px; border: 4px solid #e2e8f0; border-top: 4px solid #667eea; border-right: 4px solid #764ba2; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        .toast-notification {
-            position: fixed; bottom: 20px; right: 20px; background: #27ae60; color: white;
-            padding: 12px 20px; border-radius: 10px; z-index: 10000; animation: fadeInOut 3s ease;
-            font-weight: 600; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        .modal-contenido {
+            background: white; border-radius: 20px; max-width: 500px;
+            width: 90%; max-height: 85vh; overflow-y: auto; padding: 25px;
         }
-        @keyframes fadeInOut { 0% { opacity: 0; transform: translateX(100%); } 10% { opacity: 1; transform: translateX(0); } 90% { opacity: 1; } 100% { opacity: 0; transform: translateX(100%); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eef2ff; padding-bottom: 12px; }
+        .modal-header h3 { color: #667eea; }
+        .cerrar-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
         
-        @media (min-width: 1201px) { .cards-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (min-width: 769px) and (max-width: 1200px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 769px) { .menu-btn { display: none !important; } .sidebar { transform: translateX(0) !important; width: 250px; } .main-content { margin-left: 250px; padding: 30px; } }
-        @media (max-width: 768px) { .menu-btn { display: flex; } .main-content { padding: 60px 12px 20px; } .cards-grid { grid-template-columns: 1fr; } .filters-bar { flex-direction: column; } .filter-input { width: 100%; } .btn-filtrar, .btn-recargar, .btn-pdf, .btn-historial { width: 100%; text-align: center; } .card-actions { flex-direction: column; } .btn-card { width: 100%; } }
+        @media (min-width: 769px) {
+            .menu-btn { display: none !important; }
+            .sidebar { transform: translateX(0) !important; width: 250px; }
+            .main-content { margin-left: 250px; padding: 30px; }
+        }
+        
+        @media (max-width: 768px) {
+            .menu-btn { display: flex; }
+            .main-content { padding: 60px 12px 20px; }
+            .header h1 { font-size: 20px; }
+            .user-info { padding: 5px 12px; font-size: 12px; }
+            .user-avatar { width: 28px; height: 28px; font-size: 12px; }
+            .stats-number { font-size: 32px; }
+            .filters-bar { flex-direction: column; }
+            .filter-input { width: 100%; }
+            .btn-filtrar, .btn-recargar, .btn-pdf, .btn-etiqueta { width: 100%; text-align: center; }
+            th, td { padding: 8px 6px; font-size: 11px; }
+            .btn-ver, .btn-etiquetas-cliente { padding: 4px 10px; font-size: 10px; }
+        }
         
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: #1a1a2e; }
@@ -173,8 +179,8 @@
         <div class="sidebar-logo"><div class="logo-icon">🏔️</div><h2>Aventura <span>Total</span></h2><p style="font-size:11px;opacity:0.6;">Panel CRM</p></div>
         <ul class="nav-menu">
             <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
-            <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="clientes.html" class="active"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
             <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
             <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
             <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
@@ -185,30 +191,40 @@
 
     <div class="main-content">
         <div class="header">
-            <div><h1>📋 Reservas</h1></div>
-            <div class="user-area">
-                <div class="header-actions">
-                    <button class="btn-theme" onclick="toggleTheme()">🌙</button>
-                    <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
-                </div>
-                <button class="btn-reserva-manual" onclick="abrirReservaManual()">➕ Reserva manual</button>
+            <div><h1>👥 Clientes</h1></div>
+            <div class="header-actions">
+                <button class="btn-theme" onclick="toggleTheme()">🌙</button>
+                <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
             </div>
         </div>
 
-        <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
-            <button class="btn-filtrar" id="btnFiltrar">🔍 Filtrar</button>
-            <button class="btn-recargar" id="btnRecargar">🔄 Recargar</button>
-            <button class="btn-pdf" id="btnPDFExterno">📄 Generar PDF</button>
-            <button class="btn-historial" onclick="verHistorialCompleto()">📝 Ver Historial</button>
+        <div class="stats-card">
+            <div class="stats-number" id="totalClientes">0</div>
+            <div class="stats-label">Clientes Registrados</div>
         </div>
 
-        <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
-        <div id="cardsContainer" class="cards-grid"><div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div></div>
-    </div>
+        <div class="filters-bar">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono..." id="busquedaCliente">
+            <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Filtrar</button>
+            <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
+            <button class="btn-pdf" onclick="descargarPDF()">📄 Descargar PDF</button>
+            <button class="btn-etiqueta" onclick="filtrarPorEtiqueta()">🏷️ Filtrar por etiqueta</button>
+        </div>
 
-    <div id="preloaderPopup" class="preloader-popup oculto">
-        <div class="preloader-popup-contenido"><div class="preloader-popup-icono"></div><div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div><div class="preloader-popup-subtitulo">Guardando datos...</div></div>
+        <div class="table-container">
+            <div class="table-header">
+                <h3>📋 Lista de Clientes</h3>
+                <span id="totalClientesSpan" style="font-size:12px;color:#666;">0 clientes</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Reservas</th><th>Estado</th><th>Etiquetas</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="tablaClientes"><tr><td colspan="8" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr</tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -222,14 +238,12 @@
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(e => console.log(e)); }); }
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) { document.body.classList.add('pwa-mode'); }
         
-        function abrirReservaManual() { window.open('https://sebagsc2020.github.io/reservacordinador1/reservar.html', '_blank'); }
-        
         function initMenu() {
-            const menuBtn = document.getElementById('menuBtn'), sidebar = document.getElementById('sidebar'), overlay = document.getElementById('menuOverlay');
-            if (!menuBtn) return;
+            const btn = document.getElementById('menuBtn'), sidebar = document.getElementById('sidebar'), overlay = document.getElementById('menuOverlay');
+            if (!btn) return;
             function toggle() { sidebar.classList.toggle('open'); overlay.classList.toggle('active'); document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : ''; }
             function close() { sidebar.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
-            menuBtn.addEventListener('click', toggle);
+            btn.addEventListener('click', toggle);
             overlay.addEventListener('click', close);
             document.querySelectorAll('.nav-menu a').forEach(l => l.addEventListener('click', () => { if (window.innerWidth <= 768) close(); }));
         }
@@ -239,39 +253,90 @@
         
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201';
-        const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
         
-        let reservasData = [], reservasFiltradas = [], estadosGlobales = {};
-        const preloaderPopup = document.getElementById('preloaderPopup');
-        function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
-        function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
+        let clientesData = [], clientesFiltrados = [];
+        let filtroEtiquetaActual = null;
         
-        async function guardarEstadoEnNube(id, nuevoEstado) {
-            try {
-                const fd = new URLSearchParams();
-                fd.append('action', 'guardar'); fd.append('id', id); fd.append('estado', nuevoEstado);
-                await fetch(ESTADOS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: fd.toString() });
-                return true;
-            } catch(e) { return false; }
+        const ETIQUETAS_DISPONIBLES = ['VIP', 'Nuevo', 'Recomendó', 'Pendiente Pago', 'Frecuente', 'Aniversario'];
+        
+        function cargarEtiquetasCliente(email) { return JSON.parse(localStorage.getItem(`etiquetas_${email}`) || '[]'); }
+        function guardarEtiquetasCliente(email, etiquetas) { localStorage.setItem(`etiquetas_${email}`, JSON.stringify(etiquetas)); }
+        
+        function mostrarModalEtiquetas(email, nombre) {
+            const etiquetasActuales = cargarEtiquetasCliente(email);
+            const modalHtml = `
+                <div id="modalEtiquetas" class="modal">
+                    <div class="modal-contenido">
+                        <div class="modal-header"><h3>🏷️ Etiquetas para ${escapeHtml(nombre)}</h3><button class="cerrar-modal" onclick="cerrarModal('modalEtiquetas')">✕</button></div>
+                        <div class="modal-body" style="padding:20px;">
+                            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+                                ${ETIQUETAS_DISPONIBLES.map(e => `
+                                    <label style="display:flex; align-items:center; gap:5px; background:#f0f0f0; padding:5px 12px; border-radius:20px; cursor:pointer;">
+                                        <input type="checkbox" value="${e}" ${etiquetasActuales.includes(e) ? 'checked' : ''} onchange="toggleEtiqueta('${email}', '${e}', this.checked)">
+                                        ${e}
+                                    </label>
+                                `).join('')}
+                            </div>
+                            <div><input type="text" id="nuevaEtiqueta" placeholder="✏️ Nueva etiqueta personalizada" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px;"></div>
+                            <button onclick="agregarEtiquetaPersonalizada('${email}')" style="margin-top:8px; width:100%; padding:8px; background:#6c5ce7; color:white; border:none; border-radius:8px;">➕ Agregar</button>
+                        </div>
+                        <div style="padding:15px; border-top:1px solid #eee;"><button onclick="cerrarModal('modalEtiquetas')" style="width:100%; padding:10px; background:#666; color:white; border:none; border-radius:8px;">Cerrar</button></div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
         }
         
-        async function cargarEstadosDesdeNube() {
-            try {
-                const local = localStorage.getItem('estadosReservasCloud');
-                if (local) { const p = JSON.parse(local); if (Object.keys(p).length > 0) estadosGlobales = p; }
-                const res = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
-                const data = await res.json();
-                if (data.success && data.estados) { estadosGlobales = data.estados; localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales)); }
-                return estadosGlobales;
-            } catch(e) { return JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}'); }
+        function toggleEtiqueta(email, etiqueta, activar) {
+            let etiquetas = cargarEtiquetasCliente(email);
+            if (activar && !etiquetas.includes(etiqueta)) etiquetas.push(etiqueta);
+            else if (!activar && etiquetas.includes(etiqueta)) etiquetas = etiquetas.filter(e => e !== etiqueta);
+            guardarEtiquetasCliente(email, etiquetas);
+            renderizarTabla();
         }
         
-        async function cargarReservas() {
-            const container = document.getElementById('cardsContainer');
-            if (!container) return;
+        function agregarEtiquetaPersonalizada(email) {
+            const input = document.getElementById('nuevaEtiqueta');
+            const nueva = input.value.trim();
+            if (!nueva) return;
+            let etiquetas = cargarEtiquetasCliente(email);
+            if (!etiquetas.includes(nueva)) {
+                etiquetas.push(nueva);
+                guardarEtiquetasCliente(email, etiquetas);
+                renderizarTabla();
+                const modal = document.getElementById('modalEtiquetas');
+                if (modal) modal.remove();
+                mostrarModalEtiquetas(email, clientesData.find(c => c.email === email)?.nombre || 'Cliente');
+            }
+            input.value = '';
+        }
+        
+        function cerrarModal(id) { const m = document.getElementById(id); if (m) m.remove(); }
+        
+        function filtrarPorEtiqueta() {
+            const etiqueta = prompt('🏷️ Filtrar clientes por etiqueta:\n' + ETIQUETAS_DISPONIBLES.join(', ') + '\n\nTambién puedes escribir una etiqueta personalizada');
+            if (!etiqueta) { filtroEtiquetaActual = null; }
+            else { filtroEtiquetaActual = etiqueta.trim(); }
+            aplicarFiltros();
+        }
+        
+        function aplicarFiltros() {
+            const texto = document.getElementById('busquedaCliente').value.toLowerCase().trim();
+            let filtrados = [...clientesData];
+            if (texto) {
+                filtrados = filtrados.filter(c => c.nombre.toLowerCase().includes(texto) || c.email.toLowerCase().includes(texto) || (c.telefono && c.telefono.includes(texto)));
+            }
+            if (filtroEtiquetaActual) {
+                filtrados = filtrados.filter(c => cargarEtiquetasCliente(c.email).includes(filtroEtiquetaActual));
+            }
+            clientesFiltrados = filtrados;
+            renderizarTabla();
+        }
+        
+        async function cargarClientes() {
+            const tbody = document.getElementById('tablaClientes');
             try {
-                mostrarPreloader();
-                await cargarEstadosDesdeNube();
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">⏳ Cargando...</td</tr';
                 const res = await fetch(JSON_URL + '&t=' + Date.now());
                 let text = await res.text();
                 let jsonStr = text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2);
@@ -279,230 +344,116 @@
                 const rows = data.table.rows;
                 if (!rows || rows.length === 0) throw new Error('No hay datos');
                 
-                reservasData = [];
-                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
-                const nombresEditados = JSON.parse(localStorage.getItem('nombresEditados') || '{}');
-                
+                const clientesMap = new Map();
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
                     if (!c || c.length < 5) continue;
-                    const id = c[1]?.v ? String(c[1].v) : '';
-                    if (!id || excluidos.includes(id)) continue;
-                    
+                    const email = c[4]?.v ? String(c[4].v) : '';
+                    if (!email) continue;
                     const nombre = c[2]?.v ? String(c[2].v) : '';
                     const apellido = c[3]?.v ? String(c[3].v) : '';
-                    const email = c[4]?.v ? String(c[4].v) : '';
                     const telefono = c[5]?.v ? String(c[5].v) : '';
-                    const ciudad = c[7]?.v ? String(c[7].v) : '';
-                    
-                    let excursionesLista = [];
-                    const excRaw = c[8]?.v ? String(c[8].v) : '';
-                    if (excRaw) {
-                        if (excRaw.includes('\n')) excursionesLista = excRaw.split('\n');
-                        else if (excRaw.includes(' | ')) excursionesLista = excRaw.split(' | ');
-                        else excursionesLista = [excRaw];
-                        excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e);
-                    }
-                    
-                    let fecha = '';
-                    const ts = c[0]?.v;
-                    if (ts) { const d = new Date(ts); if (!isNaN(d.getTime())) fecha = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; }
-                    
-                    const personas = c[10]?.v ? String(c[10].v) : '1';
-                    const formaPago = c[11]?.v ? String(c[11].v) : 'No especificado';
-                    const lugar = c[12]?.v ? String(c[12].v) : 'No especificado';
-                    let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
-                    if (nombresEditados[id]) nombreCompleto = nombresEditados[id];
-                    
-                    let estado = estadosGlobales[id];
-                    if (!estado || !['pendiente','confirmado','pagado'].includes(estado)) estado = 'confirmado';
-                    
-                    reservasData.push({ id, fecha, nombre: nombreCompleto, email, telefono, ciudad, excursionesLista, personas: parseInt(personas)||1, formaPago, lugar, estado });
+                    const nombreCompleto = (nombre + ' ' + apellido).trim() || 'Sin nombre';
+                    if (!clientesMap.has(email)) clientesMap.set(email, { email, nombre: nombreCompleto, telefono, reservasCount: 1 });
+                    else clientesMap.get(email).reservasCount++;
                 }
-                reservasData.sort((a,b) => (parseInt(b.id.replace(/\D/g,''))||0) - (parseInt(a.id.replace(/\D/g,''))||0));
-                reservasFiltradas = [...reservasData];
-                renderizarCards();
-                document.getElementById('totalReservasSpan').textContent = reservasData.length + ' reservas';
-            } catch(e) { console.error(e); container.innerHTML = '<div style="text-align:center; color:red; padding:50px;">❌ Error: ' + e.message + '</div>'; }
-            finally { ocultarPreloader(); }
+                clientesData = Array.from(clientesMap.entries()).map(([email, cl], idx) => ({ id: idx+1, email, nombre: cl.nombre, telefono: cl.telefono || 'No registrado', totalReservas: cl.reservasCount }));
+                clientesData.sort((a,b) => a.nombre.localeCompare(b.nombre));
+                aplicarFiltros();
+                document.getElementById('totalClientes').textContent = clientesData.length;
+                document.getElementById('totalClientesSpan').textContent = `${clientesData.length} clientes`;
+            } catch(e) { console.error(e); tbody.innerHTML = `<tr><td colspan="8" style="color:red;">❌ Error: ${e.message}</td></tr`; }
         }
         
-        async function cambiarEstado(id, nuevoEstado) {
-            const reserva = reservasData.find(r => r.id === id);
-            if (!reserva) return;
-            const estadoAnterior = reserva.estado;
+        function renderizarTabla() {
+            const tbody = document.getElementById('tablaClientes');
+            if (!tbody) return;
+            if (clientesFiltrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">📋 No hay clientes</td</tr'; return; }
             
-            // Guardar en historial
-            const historial = JSON.parse(localStorage.getItem('historialEstados') || '[]');
-            historial.push({
-                fecha: new Date().toLocaleString(),
-                reservaId: id,
-                cliente: reserva.nombre,
-                estadoAnterior: estadoAnterior,
-                estadoNuevo: nuevoEstado,
-                modificadoPor: sessionStorage.getItem('crm_user') || 'Admin'
-            });
-            localStorage.setItem('historialEstados', JSON.stringify(historial.slice(-500)));
-            
-            reserva.estado = nuevoEstado;
-            estadosGlobales[id] = nuevoEstado;
-            const idx = reservasFiltradas.findIndex(r => r.id === id);
-            if (idx !== -1) reservasFiltradas[idx].estado = nuevoEstado;
-            localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
-            await guardarEstadoEnNube(id, nuevoEstado);
-            renderizarCards();
-            
-            const estadoText = nuevoEstado === 'confirmado' ? 'Confirmada' : (nuevoEstado === 'pendiente' ? 'Pendiente' : 'Pagada');
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.textContent = `✅ Estado cambiado a: ${estadoText}`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            tbody.innerHTML = clientesFiltrados.map(cliente => {
+                const etiquetas = cargarEtiquetasCliente(cliente.email);
+                const etiquetasHtml = etiquetas.length ? etiquetas.map(e => `<span class="etiqueta-item">${escapeHtml(e)}</span>`).join('') : '<span class="etiqueta-item sin">Sin etiquetas</span>';
+                return `<tr>
+                    <td>${cliente.id}</td>
+                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
+                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td>
+                    <td>${escapeHtml(cliente.telefono)}</td>
+                    <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td>
+                    <td><span class="badge badge-activo">Activo</span></td>
+                    <td><div id="etiquetas_${cliente.email.replace(/[^a-z0-9]/gi, '_')}">${etiquetasHtml}</div></td>
+                    <td>
+                        <button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button>
+                        <button class="btn-etiquetas-cliente" onclick="mostrarModalEtiquetas('${escapeHtml(cliente.email)}', '${escapeHtml(cliente.nombre)}')">🏷️ Etiquetas</button>
+                    </td>
+                </tr>`;
+            }).join('');
         }
         
-        function enviarWhatsApp(reserva) {
-            let telefono = reserva.telefono.replace(/\D/g, '');
-            if (telefono.length === 10) telefono = '54' + telefono;
-            let excursionesTexto = '';
-            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
-                excursionesTexto = reserva.excursionesLista.map((exc,idx) => `${idx+1}. ${exc}`).join('\n');
-            } else { excursionesTexto = 'Sin excursiones específicas'; }
-            let estadoTexto = { pendiente:'Pendiente', confirmado:'Confirmado', pagado:'Pagado' }[reserva.estado] || 'Confirmado';
-            const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️\n\n✅ *CONFIRMACIÓN DE RESERVA*\n\n🆔 *N° de reserva:* ${reserva.id}\n📅 *Fecha:* ${reserva.fecha}\n\n👤 *DATOS DEL PASAJERO:*\n   Nombre: ${reserva.nombre}\n   📞 Teléfono: ${reserva.telefono}\n   📧 Email: ${reserva.email}\n\n📍 *DESTINO:*\n   ${reserva.ciudad}\n\n✨ *EXCURSIONES SELECCIONADAS:*\n${excursionesTexto}\n\n👥 *Cantidad de personas:* ${reserva.personas}\n💳 *Forma de pago:* ${reserva.formaPago}\n🚐 *Punto de encuentro:* ${reserva.lugar}\n📌 *Estado:* ${estadoTexto}\n\n📌 *PRÓXIMOS PASOS:*\n• En las próximas 24hs recibirás detalles de pago\n• Punto de encuentro exacto será confirmado\n\n🏔️ ¡Gracias por confiar en Aventura Total!`;
-            window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
-        }
+        function filtrarClientes() { aplicarFiltros(); }
         
-        function verHistorialCompleto() { window.open('historial.html', '_blank'); }
-        
-        function verHistorialReserva(reservaId) { window.open(`historial.html?reserva=${reservaId}`, '_blank'); }
-        
-        function renderizarCards() {
-            const container = document.getElementById('cardsContainer');
-            if (!container) return;
-            if (reservasFiltradas.length === 0) { container.innerHTML = '<div style="text-align:center; padding:50px;">📋 No hay reservas</div>'; document.getElementById('totalReservasSpan').textContent = '0 reservas'; return; }
-            
-            function escapeHtml(t) { if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-            
-            let html = '';
-            for (const r of reservasFiltradas) {
-                let estadoText = '', estadoColor = '';
-                switch(r.estado) {
-                    case 'pendiente': estadoText='Pendiente'; estadoColor='#ffc107'; break;
-                    case 'confirmado': estadoText='Confirmado'; estadoColor='#27ae60'; break;
-                    case 'pagado': estadoText='Pagado'; estadoColor='#3498db'; break;
-                    default: estadoText='Confirmado'; estadoColor='#27ae60';
-                }
-                let excHtml = '<ul class="excursiones-lista-card">';
-                if (!r.excursionesLista || r.excursionesLista.length === 0) excHtml += '<li>Sin excursiones</li>';
-                else for (let i=0; i<r.excursionesLista.length; i++) excHtml += `<li>${i+1}. ${escapeHtml(r.excursionesLista[i])}</li>`;
-                excHtml += '</ul>';
-                
-                html += `<div class="reserva-card">
-                    <div class="card-header">
-                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <span class="card-id">ID: ${escapeHtml(r.id)}</span>
-                            <button class="btn-editar-nombre" onclick="editarNombreReserva('${r.id}', '${escapeHtml(r.nombre).replace(/'/g, "\\'")}')">✏️</button>
-                            <span class="card-estado-header" style="background:${estadoColor};">${estadoText}</span>
-                        </div>
-                        <span class="card-fecha">${escapeHtml(r.fecha)}</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-info"><div class="card-label">👤 CLIENTE</div><div class="card-value">${escapeHtml(r.nombre)}</div></div>
-                        <div class="card-info"><div class="card-label">📧 EMAIL</div><div class="card-value">${escapeHtml(r.email)}</div></div>
-                        <div class="card-info"><div class="card-label">📞 TELÉFONO</div><div class="card-value">${escapeHtml(r.telefono)}</div></div>
-                        <div class="card-info"><div class="card-label">📍 CIUDAD</div><div class="card-value">${escapeHtml(r.ciudad)}</div></div>
-                        <div class="card-info"><div class="card-label">✨ EXCURSIONES</div>${excHtml}</div>
-                        <div class="card-info"><div class="card-label">👥 PERSONAS</div><div class="card-value">${escapeHtml(r.personas)}</div></div>
-                        <div class="card-info"><div class="card-label">💳 FORMA DE PAGO</div><div class="card-value">${escapeHtml(r.formaPago)}</div></div>
-                        <div class="card-info"><div class="card-label">🚐 LUGAR</div><div class="card-value">${escapeHtml(r.lugar)}</div></div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn-card btn-confirmar-card" data-id="${escapeHtml(r.id)}" data-estado="confirmado">✅ Confirmada</button>
-                        <button class="btn-card btn-pendiente-card" data-id="${escapeHtml(r.id)}" data-estado="pendiente">⏳ Pendiente</button>
-                        <button class="btn-card btn-pagar-card" data-id="${escapeHtml(r.id)}" data-estado="pagado">💰 Paga</button>
-                        <button class="btn-card btn-whatsapp-card" data-id="${escapeHtml(r.id)}">💬 WhatsApp</button>
-                        <button class="btn-card btn-excluir-card" data-id="${escapeHtml(r.id)}">🗑️ Excluir</button>
-                        <button class="btn-card btn-historial-card" onclick="verHistorialReserva('${escapeHtml(r.id)}')">📝 Historial</button>
-                    </div>
-                </div>`;
-            }
-            container.innerHTML = html;
-            document.getElementById('totalReservasSpan').textContent = reservasFiltradas.length + ' de ' + reservasData.length + ' reservas';
-            
-            document.querySelectorAll('.btn-confirmar-card').forEach(b => b.addEventListener('click', () => cambiarEstado(b.dataset.id, 'confirmado')));
-            document.querySelectorAll('.btn-pendiente-card').forEach(b => b.addEventListener('click', () => cambiarEstado(b.dataset.id, 'pendiente')));
-            document.querySelectorAll('.btn-pagar-card').forEach(b => b.addEventListener('click', () => cambiarEstado(b.dataset.id, 'pagado')));
-            document.querySelectorAll('.btn-whatsapp-card').forEach(b => { const r = reservasData.find(rr => rr.id === b.dataset.id); b.addEventListener('click', () => enviarWhatsApp(r)); });
-            document.querySelectorAll('.btn-excluir-card').forEach(b => b.addEventListener('click', () => excluirReserva(b.dataset.id)));
-        }
-        
-        function filtrarReservas() {
-            const texto = document.getElementById('busquedaReserva').value.toLowerCase().trim();
-            reservasFiltradas = texto ? reservasData.filter(r => r.nombre.toLowerCase().includes(texto) || r.excursionesLista.some(e => e.toLowerCase().includes(texto))) : [...reservasData];
-            renderizarCards();
-        }
-        
-        function excluirReserva(id) {
-            if (confirm(`⚠️ ¿Estás seguro de excluir la reserva ${id}?`)) {
-                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
-                if (!excluidos.includes(id)) { excluidos.push(id); localStorage.setItem('reservasExcluidas', JSON.stringify(excluidos)); }
-                cargarReservas();
-                alert(`✅ Reserva ${id} excluida.`);
-            }
-        }
-        
-        async function editarNombreReserva(id, nombreActual) {
-            const nuevo = prompt('✏️ Editar nombre del cliente:', nombreActual);
-            if (!nuevo || nuevo.trim() === '' || nuevo === nombreActual) return;
-            mostrarPreloader();
+        async function verReservasCliente(email) {
             try {
-                const reserva = reservasData.find(r => r.id === id);
-                if (reserva) reserva.nombre = nuevo.trim();
-                const idx = reservasFiltradas.findIndex(r => r.id === id);
-                if (idx !== -1) reservasFiltradas[idx].nombre = nuevo.trim();
-                const editados = JSON.parse(localStorage.getItem('nombresEditados') || '{}');
-                editados[id] = nuevo.trim();
-                localStorage.setItem('nombresEditados', JSON.stringify(editados));
-                const fd = new URLSearchParams();
-                fd.append('action', 'actualizarNombre'); fd.append('id', id); fd.append('nombre', nuevo.trim());
-                await fetch(ESTADOS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: fd.toString() });
-                renderizarCards();
-                alert('✅ Nombre actualizado correctamente');
-            } catch(e) { alert('❌ Error al actualizar'); }
-            finally { ocultarPreloader(); }
+                const res = await fetch(JSON_URL + '&t=' + Date.now());
+                let text = await res.text();
+                let jsonStr = text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2);
+                const data = JSON.parse(jsonStr);
+                const rows = data.table.rows;
+                const reservas = [];
+                for (let i = 0; i < rows.length; i++) {
+                    const c = rows[i].c;
+                    if (!c || c.length < 5) continue;
+                    const emailFila = c[4]?.v ? String(c[4].v) : '';
+                    if (emailFila.toLowerCase() !== email.toLowerCase()) continue;
+                    const id = c[1]?.v ? String(c[1].v) : `R-${i+1}`;
+                    const ts = c[0]?.v;
+                    let fecha = '';
+                    if (ts) { const d = new Date(ts); if (!isNaN(d.getTime())) fecha = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; }
+                    const excRaw = c[8]?.v ? String(c[8].v) : '';
+                    let excList = [];
+                    if (excRaw) {
+                        if (excRaw.includes('\n')) excList = excRaw.split('\n');
+                        else if (excRaw.includes(' | ')) excList = excRaw.split(' | ');
+                        else excList = [excRaw];
+                        excList = excList.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e);
+                    }
+                    reservas.push({ id, fecha: fecha || 'Sin fecha', excursiones: excList });
+                }
+                let reservasHtml = '';
+                if (reservas.length === 0) reservasHtml = '<p style="text-align:center;">📭 No hay reservas para este cliente</p>';
+                else reservasHtml = reservas.map(r => `<div style="background:#f8f9fa; border-radius:12px; padding:15px; margin-bottom:15px; border-left:4px solid #667eea;"><div style="font-weight:700; color:#667eea;">🆔 Reserva: ${escapeHtml(r.id)}</div><div style="font-size:11px; color:#999;">📅 ${escapeHtml(r.fecha)}</div><div><div style="font-size:11px; font-weight:600;">✨ Excursiones:</div><ul style="margin:0; padding-left:20px;">${r.excursiones.map(ex => `<li>${escapeHtml(ex)}</li>`).join('')}</ul></div></div>`).join('');
+                
+                const modal = `<div id="modalReservas" class="modal"><div class="modal-contenido"><div class="modal-header"><h3>📋 Reservas del cliente</h3><button class="cerrar-modal" onclick="cerrarModal('modalReservas')">✕</button></div><p><strong>📧 Email:</strong> ${escapeHtml(email)}</p><p><strong>📊 Total reservas:</strong> ${reservas.length}</p><hr><div style="max-height:50vh; overflow-y:auto;">${reservasHtml}</div><button onclick="cerrarModal('modalReservas')" style="width:100%; padding:12px; background:#667eea; color:white; border:none; border-radius:12px; margin-top:20px;">Cerrar</button></div></div>`;
+                document.body.insertAdjacentHTML('beforeend', modal);
+            } catch(e) { alert('Error al cargar reservas: ' + e.message); }
         }
         
-        function generarPDFExterno() {
-            const filtro = document.getElementById('busquedaReserva').value.trim();
-            if (reservasFiltradas.length === 0) { alert('⚠️ No hay reservas para exportar.'); return; }
-            localStorage.setItem('filtroExcursionPDF', filtro);
-            localStorage.setItem('reservasFiltradasPDF', JSON.stringify(reservasFiltradas));
-            const win = window.open('generar-pdf.html', '_blank');
-            if (!win) alert('⚠️ Permita ventanas emergentes para generar el PDF.');
+        function descargarPDF() {
+            if (clientesFiltrados.length === 0) { alert('⚠️ No hay clientes para exportar.'); return; }
+            const fecha = new Date();
+            const fechaStr = `${fecha.getDate().toString().padStart(2,'0')}/${(fecha.getMonth()+1).toString().padStart(2,'0')}/${fecha.getFullYear()}`;
+            let filas = '';
+            for (const c of clientesFiltrados) { filas += `<tr><td>${escapeHtml(c.nombre)}</td><td>${escapeHtml(c.email)}</td><td>${escapeHtml(c.telefono)}</td><td>${c.totalReservas}</td></tr>`; }
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Clientes - Aventura Total</title><style>body{font-family:Segoe UI;padding:20px}.header{text-align:center;border-bottom:2px solid #667eea;padding-bottom:15px}th{background:#667eea;color:white;padding:8px}td{padding:8px;border-bottom:1px solid #ddd}</style></head><body><div class="header"><div>🏔️</div><h1>Aventura Total - Clientes</h1></div><p>📅 Generado: ${fechaStr}</p><table width="100%"><thead><tr><th>NOMBRE</th><th>EMAIL</th><th>TELÉFONO</th><th>RESERVAS</th></tr></thead><tbody>${filas}</tbody></table><p>Total clientes: ${clientesFiltrados.length}</p></body></html>`;
+            html2pdf().set({ margin:0.5, filename:`clientes_${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'in',format:'a4',orientation:'portrait'} }).from(html).save();
         }
         
-        function init() {
-            initMenu();
-            document.getElementById('btnFiltrar').addEventListener('click', filtrarReservas);
-            document.getElementById('btnRecargar').addEventListener('click', cargarReservas);
-            document.getElementById('btnPDFExterno').addEventListener('click', generarPDFExterno);
-            document.getElementById('busquedaReserva').addEventListener('keypress', e => { if (e.key === 'Enter') filtrarReservas(); });
-            cargarReservas();
-            setInterval(() => { if (document.visibilityState === 'visible') cargarReservas(); }, 120000);
-        }
+        function escapeHtml(t) { if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
         
+        window.filtrarClientes = filtrarClientes;
+        window.cargarClientes = cargarClientes;
+        window.verReservasCliente = verReservasCliente;
+        window.cerrarModal = cerrarModal;
         window.logout = logout;
-        window.cargarReservas = cargarReservas;
-        window.filtrarReservas = filtrarReservas;
-        window.generarPDFExterno = generarPDFExterno;
-        window.abrirReservaManual = abrirReservaManual;
-        window.editarNombreReserva = editarNombreReserva;
+        window.descargarPDF = descargarPDF;
         window.toggleTheme = toggleTheme;
-        window.verHistorialReserva = verHistorialReserva;
-        window.verHistorialCompleto = verHistorialCompleto;
+        window.mostrarModalEtiquetas = mostrarModalEtiquetas;
+        window.toggleEtiqueta = toggleEtiqueta;
+        window.agregarEtiquetaPersonalizada = agregarEtiquetaPersonalizada;
+        window.filtrarPorEtiqueta = filtrarPorEtiqueta;
         
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-        else init();
+        document.getElementById('busquedaCliente').addEventListener('keypress', e => { if (e.key === 'Enter') filtrarClientes(); });
+        initMenu();
+        cargarClientes();
     </script>
 </body>
 </html>
