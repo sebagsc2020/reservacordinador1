@@ -395,7 +395,7 @@
             font-weight: 400;
         }
         
-        /* Barra de progreso */
+        /* Barra de progreso - AVANZA UNA SOLA VEZ */
         .preloader-progress-container {
             width: 260px;
             height: 5px;
@@ -410,7 +410,7 @@
             background: linear-gradient(90deg, #6366f1, #8b5cf6, #a78bfa);
             border-radius: 10px;
             width: 0%;
-            animation: progressLoading 2.2s ease-in-out infinite;
+            animation: progressLoading 2.5s ease-in-out forwards;
             position: relative;
         }
         
@@ -427,8 +427,9 @@
         
         @keyframes progressLoading {
             0% { width: 0%; }
-            40% { width: 60%; }
-            70% { width: 85%; }
+            30% { width: 35%; }
+            60% { width: 70%; }
+            85% { width: 92%; }
             100% { width: 100%; }
         }
         
