@@ -2,70 +2,587 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial de Cambios - CRM Aventura Total</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- PWA CONFIGURACIÓN -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AVT CRM">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="application-name" content="Aventura Total CRM">
+    
+    <!-- Fuentes: Inter vía Fontsource -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.15/index.css">
+    
+    <!-- Iconos: Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <title>Login - CRM Aventura Total</title>
+    
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            
+            --bg-body: #0f172a;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
-        .filtros { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .filtros input, .filtros select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; }
-        table { width: 100%; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        th { background: #667eea; color: white; padding: 12px; text-align: left; }
-        td { padding: 10px 12px; border-bottom: 1px solid #eee; }
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .badge-pendiente { background: #ffc107; color: #856404; }
-        .badge-confirmado { background: #27ae60; color: white; }
-        .badge-pagado { background: #3498db; color: white; }
-        .btn { background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
-        .btn:hover { opacity: 0.9; }
+        
+        html, body { height: 100%; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #312e81 70%, #4338ca 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Fondo decorativo */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .pwa-mode {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        .login-container { 
+            background: var(--bg-surface); 
+            border-radius: var(--radius); 
+            padding: 48px 40px; 
+            max-width: 420px; 
+            width: 100%; 
+            box-shadow: var(--shadow-lg); 
+            text-align: center; 
+            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(40px) scale(0.96); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+        
+        .login-logo { 
+            width: 72px; height: 72px; 
+            background: linear-gradient(135deg, var(--primary), #8b5cf6); 
+            border-radius: 20px; 
+            display: flex; align-items: center; justify-content: center; 
+            margin: 0 auto 20px; 
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+        }
+        .login-logo i { font-size: 36px; color: white; }
+        
+        h1 { 
+            color: var(--text-main); font-size: 26px; font-weight: 800; 
+            margin-bottom: 6px; letter-spacing: -0.5px; 
+        } 
+        h1 span { color: var(--primary); }
+        
+        .subtitulo { 
+            color: var(--text-muted); font-size: 14px; margin-bottom: 32px; 
+            font-weight: 400; 
+        }
+        
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { 
+            display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); 
+            margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; 
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+        input { 
+            width: 100%; 
+            padding: 14px 16px 14px 42px; 
+            border: 2px solid var(--border-color); 
+            border-radius: var(--radius-sm); 
+            font-size: 14px; 
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: #f8fafc;
+            transition: all 0.3s; 
+        }
+        input:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: white;
+        }
+        input:focus + i,
+        .input-wrapper:focus-within i {
+            color: var(--primary);
+        }
+        
+        .btn-login { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, var(--primary), #8b5cf6); 
+            color: white; 
+            border: none; 
+            border-radius: var(--radius-sm); 
+            font-size: 15px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-top: 8px; 
+            transition: all 0.3s ease; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-login:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4); 
+        }
+        .btn-login:active { transform: scale(0.98); }
+        .btn-login:disabled { 
+            background: #94a3b8; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none;
+        }
+        
+        .btn-volver {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-volver:hover {
+            background: var(--bg-body);
+            border-color: var(--text-muted);
+            color: var(--text-main);
+        }
+        .btn-volver:active { transform: scale(0.98); }
+        
+        .error-message { 
+            background: var(--danger-light); 
+            color: #991b1b; 
+            padding: 12px 16px; 
+            border-radius: var(--radius-sm); 
+            font-size: 13px; 
+            margin-top: 16px; 
+            display: none; 
+            font-weight: 600; 
+            border: 1px solid var(--danger);
+            align-items: center;
+            gap: 8px;
+        }
+        .error-message.show { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .footer-text { 
+            margin-top: 24px; font-size: 12px; color: var(--text-muted); 
+            font-weight: 500;
+        }
+        
+        .spinner { 
+            display: inline-block; width: 18px; height: 18px; 
+            border: 2px solid rgba(255,255,255,0.3); 
+            border-top-color: white; border-radius: 50%; 
+            animation: spin 0.6s linear infinite; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .security-badge { 
+            position: fixed; bottom: 16px; left: 16px; 
+            font-size: 11px; color: rgba(255,255,255,0.5); 
+            background: rgba(0,0,0,0.3); padding: 6px 12px; 
+            border-radius: 20px; z-index: 1000; 
+            font-family: 'Inter', sans-serif; font-weight: 500;
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; gap: 6px;
+        }
+        
+        @media (max-width: 480px) {
+            .login-container { padding: 32px 24px; }
+            .login-logo { width: 60px; height: 60px; border-radius: 16px; }
+            .login-logo i { font-size: 28px; }
+            h1 { font-size: 22px; }
+            input { padding: 12px 14px 12px 38px; font-size: 13px; }
+            .btn-login { padding: 12px; font-size: 14px; }
+            .btn-volver { padding: 10px; font-size: 13px; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📝 Historial de Cambios de Estado</h1>
-            <p>Auditoría de todas las modificaciones en reservas</p>
+    <div class="login-container">
+        <div class="login-logo"><i class="ph-bold ph-mountains"></i></div>
+        <h1>Aventura <span>Total</span></h1>
+        <p class="subtitulo">Panel de Administración CRM</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <div class="input-wrapper">
+                    <i class="ph ph-envelope"></i>
+                    <input type="email" id="email" placeholder="admin@aventuratotal.com" required autocomplete="off">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <div class="input-wrapper">
+                    <i class="ph ph-lock"></i>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-login" id="btnLogin">
+                <i class="ph ph-sign-in"></i> Ingresar al Panel
+            </button>
+        </form>
+        
+        <button class="btn-volver" onclick="cerrarPestana()">
+            <i class="ph ph-arrow-left"></i> Volver
+        </button>
+        
+        <div class="error-message" id="errorMessage">
+            <i class="ph ph-warning-circle"></i>
+            <span id="errorText"></span>
         </div>
-        <div class="filtros">
-            <input type="text" id="filtroReserva" placeholder="🔍 Buscar por ID o Cliente" style="flex:2;">
-            <input type="date" id="filtroFecha" style="flex:1;">
-            <button class="btn" onclick="cargarHistorial()">🔄 Actualizar</button>
-            <button class="btn" onclick="exportarCSV()">📄 Exportar CSV</button>
-            <button class="btn" onclick="window.location.href='dashboard.html'">← Volver</button>
-        </div>
-        <div id="historialContainer"><table><thead><tr><th>Fecha/Hora</th><th>Reserva ID</th><th>Cliente</th><th>Estado Anterior</th><th>Estado Nuevo</th><th>Modificado por</th></tr></thead><tbody id="historialBody"><tr><td colspan="6" style="text-align:center;">Cargando...</td></tr></tbody></div>
+        <p class="footer-text">© 2026 Aventura Total · Acceso Restringido</p>
     </div>
+    
+    <div class="security-badge"><i class="ph ph-shield-check"></i> Conexión segura</div>
+    
     <script>
-        function getBadge(estado) {
-            const clases = { pendiente:'badge-pendiente', confirmado:'badge-confirmado', pagado:'badge-pagado' };
-            const textos = { pendiente:'Pendiente', confirmado:'Confirmado', pagado:'Pagado' };
-            return `<span class="badge ${clases[estado]}">${textos[estado]||estado}</span>`;
+        // ==================================================
+        // REGISTRAR SERVICE WORKER PARA PWA
+        // ==================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registrado con éxito:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Error al registrar Service Worker:', error);
+                    });
+            });
         }
-        function cargarHistorial() {
-            const historial = JSON.parse(localStorage.getItem('historialEstados') || '[]');
-            const filtroId = document.getElementById('filtroReserva').value.toLowerCase();
-            const filtroFecha = document.getElementById('filtroFecha').value;
-            let filtrados = [...historial].reverse();
-            if (filtroId) filtrados = filtrados.filter(h => h.reservaId.toLowerCase().includes(filtroId) || h.cliente.toLowerCase().includes(filtroId));
-            if (filtroFecha) filtrados = filtrados.filter(h => h.fecha.split(' ')[0] === filtroFecha);
-            const tbody = document.getElementById('historialBody');
-            if (!filtrados.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay registros</td></tr>'; return; }
-            tbody.innerHTML = filtrados.map(h => `<tr><td>${h.fecha}</td><td><strong>${h.reservaId}</strong></td><td>${h.cliente}</td><td>${getBadge(h.estadoAnterior)}</td><td>${getBadge(h.estadoNuevo)}</td><td>👤 ${h.modificadoPor}</td></tr>`).join('');
+        
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            document.body.classList.add('pwa-mode');
         }
-        function exportarCSV() {
-            const historial = JSON.parse(localStorage.getItem('historialEstados') || '[]');
-            let csv = "Fecha,Reserva ID,Cliente,Estado Anterior,Estado Nuevo,Modificado por\n";
-            historial.forEach(h => { csv += `"${h.fecha}","${h.reservaId}","${h.cliente}","${h.estadoAnterior}","${h.estadoNuevo}","${h.modificadoPor}"\n`; });
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `historial_${new Date().toISOString().slice(0,19)}.csv`;
-            link.click();
-            URL.revokeObjectURL(link.href);
+        
+        // ==================================================
+        // FUNCIÓN PARA CERRAR LA PESTAÑA
+        // ==================================================
+        function cerrarPestana() {
+            // Método 1: Intentar cerrar la pestaña (funciona si fue abierta con window.open)
+            window.close();
+            
+            // Método 2: Si no se pudo cerrar (bloqueado por el navegador),
+            // reemplazar el contenido con una pantalla de despedida
+            setTimeout(() => {
+                if (!window.closed) {
+                    document.body.innerHTML = `
+                        <div style="
+                            display: flex; 
+                            justify-content: center; 
+                            align-items: center; 
+                            height: 100vh; 
+                            font-family: 'Inter', sans-serif; 
+                            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #312e81 70%, #4338ca 100%);
+                            color: white; 
+                            text-align: center;
+                            flex-direction: column;
+                            gap: 20px;
+                            padding: 20px;
+                        ">
+                            <div style="
+                                width: 80px; 
+                                height: 80px; 
+                                background: linear-gradient(135deg, #6366f1, #8b5cf6); 
+                                border-radius: 20px; 
+                                display: flex; 
+                                align-items: center; 
+                                justify-content: center;
+                                box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+                            ">
+                                <span style="font-size: 40px;">👋</span>
+                            </div>
+                            <h2 style="font-size: 24px; font-weight: 700;">¡Hasta pronto!</h2>
+                            <p style="color: #94a3b8; font-size: 16px; max-width: 300px; line-height: 1.5;">
+                                Has cerrado sesión correctamente.<br>Ya puedes cerrar esta pestaña.
+                            </p>
+                            <button onclick="window.close()" style="
+                                padding: 14px 32px;
+                                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                                color: white;
+                                border: none;
+                                border-radius: 10px;
+                                cursor: pointer;
+                                font-size: 15px;
+                                font-weight: 700;
+                                font-family: 'Inter', sans-serif;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+                            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(99, 102, 241, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(99, 102, 241, 0.3)';">
+                                Cerrar pestaña
+                            </button>
+                            <p style="color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 8px;">
+                                Aventura Total CRM · 2026
+                            </p>
+                        </div>
+                    `;
+                    document.title = 'Sesión finalizada - Aventura Total';
+                    
+                    // Limpiar datos de sesión
+                    sessionStorage.clear();
+                    localStorage.removeItem('crm_sesion_activa');
+                }
+            }, 300);
         }
-        cargarHistorial();
+        
+        // ==================================================
+        // HASH SHA-256
+        // ==================================================
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        
+        // ==================================================
+        // USUARIOS CON SUS HASHES Y ROLES
+        // ==================================================
+        const USUARIOS = {
+            'admin@aventuratotal.com': {
+                hash: '9f85e28811e6d2be994f9d5b89d29bb30a7a6c7be3989c0c9f134b64f2f7e77f',
+                rol: 'admin'
+            },
+            'user2@aventuratotal.com': {
+                hash: '198d9f61f702b601f362671605562e619a5c9cb7403f14595e74d964703533ad',
+                rol: 'operador'
+            },
+            'user3@aventuratotal.com': {
+                hash: 'adbf6432511abab8999b991d0cbe675490d5e201209aba867c89b7c7235389b1',
+                rol: 'ventas'
+            }
+        };
+        
+        // ==================================================
+        // VERIFICAR SESIÓN EXISTENTE
+        // ==================================================
+        function verificarSesionExistente() {
+            const sesionActiva = localStorage.getItem('crm_sesion_activa');
+            if (sesionActiva) {
+                const datos = JSON.parse(sesionActiva);
+                if (Date.now() - datos.timestamp < 28800000) {
+                    return true;
+                } else {
+                    localStorage.removeItem('crm_sesion_activa');
+                }
+            }
+            return false;
+        }
+        
+        // ==================================================
+        // REGISTRAR SESIÓN
+        // ==================================================
+        function registrarSesion(email, rol) {
+            const sessionId = 'SESSION-' + Date.now() + '-' + Math.random().toString(36).substr(2, 8);
+            localStorage.setItem('crm_sesion_activa', JSON.stringify({
+                id: sessionId,
+                timestamp: Date.now(),
+                email: email,
+                rol: rol
+            }));
+            sessionStorage.setItem('crm_logged', 'true');
+            sessionStorage.setItem('crm_user', email);
+            sessionStorage.setItem('crm_user_rol', rol);
+        }
+        
+        // ==================================================
+        // RATE LIMITING
+        // ==================================================
+        let intentosFallidos = 0;
+        let tiempoBloqueo = null;
+        
+        function verificarRateLimiting() {
+            if (tiempoBloqueo && Date.now() < tiempoBloqueo) {
+                const segundosRestantes = Math.ceil((tiempoBloqueo - Date.now()) / 1000);
+                throw new Error(`Demasiados intentos. Espere ${segundosRestantes} segundos.`);
+            }
+            return true;
+        }
+        
+        function registrarIntentoFallido() {
+            intentosFallidos++;
+            if (intentosFallidos >= 5) {
+                tiempoBloqueo = Date.now() + 300000;
+                intentosFallidos = 0;
+                document.getElementById('btnLogin').disabled = true;
+                setTimeout(() => {
+                    document.getElementById('btnLogin').disabled = false;
+                    tiempoBloqueo = null;
+                }, 300000);
+                throw new Error('Demasiados intentos fallidos. Espere 5 minutos.');
+            }
+        }
+        
+        function mostrarError(mensaje) {
+            const errorMsg = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = mensaje;
+            errorMsg.classList.add('show');
+            setTimeout(() => errorMsg.classList.remove('show'), 4000);
+        }
+        
+        // ==================================================
+        // MANEJAR LOGIN
+        // ==================================================
+        const loginForm = document.getElementById('loginForm');
+        const btnLogin = document.getElementById('btnLogin');
+        
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                mostrarError('Complete todos los campos');
+                return;
+            }
+            
+            try {
+                verificarRateLimiting();
+            } catch (error) {
+                mostrarError(error.message);
+                return;
+            }
+            
+            btnLogin.disabled = true;
+            btnLogin.innerHTML = 'Verificando <span class="spinner"></span>';
+            
+            try {
+                const hashIngresado = await hashPassword(password);
+                const usuario = USUARIOS[email];
+                
+                if (usuario && hashIngresado === usuario.hash) {
+                    registrarSesion(email, usuario.rol);
+                    intentosFallidos = 0;
+                    btnLogin.innerHTML = '<i class="ph ph-check-circle"></i> Ingresando...';
+                    btnLogin.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 500);
+                } else {
+                    registrarIntentoFallido();
+                    btnLogin.disabled = false;
+                    btnLogin.innerHTML = '<i class="ph ph-sign-in"></i> Ingresar al Panel';
+                    btnLogin.style.background = '';
+                    mostrarError('Email o contraseña incorrectos');
+                }
+            } catch (error) {
+                if (error.message.includes('Demasiados intentos')) {
+                    mostrarError(error.message);
+                } else {
+                    btnLogin.disabled = false;
+                    btnLogin.innerHTML = '<i class="ph ph-sign-in"></i> Ingresar al Panel';
+                    btnLogin.style.background = '';
+                    mostrarError('Error de conexión. Intente nuevamente.');
+                }
+            }
+        });
+        
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        // Prevenir F12 y DevTools
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+                (e.ctrlKey && e.key === 'U') || (e.ctrlKey && e.key === 'C')) {
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        // Exponer función globalmente
+        window.cerrarPestana = cerrarPestana;
+        
+        // Redirigir si ya hay sesión activa
+        if (verificarSesionExistente()) {
+            window.location.href = 'dashboard.html';
+        }
     </script>
 </body>
 </html>
