@@ -2,804 +2,499 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Clientes - CRM Aventura Total</title>
     
-    <!-- ================================================== -->
-    <!-- PWA CONFIGURACIÓN                                      -->
-    <!-- ================================================== -->
+    <!-- PWA CONFIGURACIÓN -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AVT CRM">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#6366f1">
     <meta name="application-name" content="Aventura Total CRM">
-    <meta name="msapplication-TileColor" content="#1a1a2e">
-    <meta name="msapplication-TileImage" content="icons/icon-144.png">
     
-    <!-- Iconos para diferentes plataformas -->
-    <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="icons/icon-76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="icons/icon-114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+    <!-- Fuentes: Inter vía Fontsource -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.15/index.css">
+    
+    <!-- Iconos: Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; transition: background 0.3s; }
-        
-        /* ========== MODO OSCURO ========== */
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #475569;
+            --sidebar-active-bg: #e0e7ff;
+            --sidebar-active-text: #4338ca;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
         body.dark-mode {
-            background: #0f0f1a;
+            --bg-body: #0f172a;
+            --bg-surface: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #cbd5e1;
+            --sidebar-active-bg: #334155;
+            --sidebar-active-text: #818cf8;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== LAYOUT ===== */
+        .app-container { display: flex; min-height: 100vh; }
+        
+        .sidebar {
+            width: 260px; 
+            background: var(--sidebar-bg); 
+            border-right: 1px solid var(--border-color);
+            position: fixed; height: 100vh; z-index: 1001;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
         }
         
-        body.dark-mode .stats-card,
-        body.dark-mode .table-container,
-        body.dark-mode .filters-bar,
-        body.dark-mode .user-info {
-            background: #1e1e2e;
-            color: #e0e0e0;
+        .sidebar-header { 
+            padding: 20px 24px; 
+            display: flex; align-items: center; gap: 12px; 
+            border-bottom: 1px solid var(--border-color); 
+            flex-shrink: 0;
         }
+        .brand-icon { 
+            width: 36px; height: 36px; 
+            background: linear-gradient(135deg, var(--primary), #8b5cf6); 
+            border-radius: var(--radius-sm); 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 20px; 
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
+        }
+        .brand-text { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; color: var(--text-main); }
+        .brand-text span { color: var(--primary); }
+
+        .nav-menu { list-style: none; padding: 16px 12px; flex: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            color: var(--sidebar-text); text-decoration: none; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 500; transition: all 0.2s ease;
+        }
+        .nav-link i { font-size: 20px; flex-shrink: 0; }
+        .nav-link:hover { background: var(--bg-body); color: var(--primary); }
+        .nav-link.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); font-weight: 600; }
         
-        body.dark-mode .stats-number {
-            color: #667eea;
+        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
+        .user-profile { 
+            display: flex; align-items: center; gap: 12px; padding: 12px; 
+            border-radius: var(--radius-sm); background: var(--bg-body); 
+            cursor: pointer; transition: background 0.2s;
         }
+        .user-profile:hover { background: var(--border-color); }
+        .avatar { 
+            width: 36px; height: 36px; background: var(--primary); color: white; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-weight: 600; font-size: 14px; flex-shrink: 0;
+        }
+        .user-details { overflow: hidden; }
+        .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-details p { font-size: 11px; color: var(--text-muted); }
+
+        .main-content { margin-left: 260px; flex: 1; padding: 32px; transition: margin-left 0.3s; width: 100%; }
         
-        body.dark-mode .stats-label {
-            color: #aaa;
+        /* Mobile Menu */
+        .menu-toggle { 
+            display: none; position: fixed; top: 16px; left: 16px; z-index: 1002; 
+            background: var(--bg-surface); border: 1px solid var(--border-color); 
+            width: 44px; height: 44px; border-radius: var(--radius-sm); cursor: pointer; 
+            color: var(--text-main); box-shadow: var(--shadow-md); 
+            align-items: center; justify-content: center;
         }
+        .overlay { 
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
+            z-index: 1000; opacity: 0; pointer-events: none; 
+            transition: opacity 0.3s; backdrop-filter: blur(4px); 
+        }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* ===== HEADER & FILTERS ===== */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+        .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
+        .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
         
-        body.dark-mode .table-header h3 {
-            color: white;
+        .actions-group { display: flex; gap: 12px; align-items: center; }
+        .btn { 
+            padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; 
+            cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; 
+            transition: all 0.2s ease; white-space: nowrap;
         }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
+        .btn-icon { 
+            width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); 
+            border: 1px solid var(--border-color); color: var(--text-muted); 
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
         
-        body.dark-mode table th {
-            background: #2a2a3e;
-            color: #ccc;
+        .filter-bar { 
+            background: var(--bg-surface); padding: 16px 20px; border-radius: var(--radius); 
+            box-shadow: var(--shadow-sm); display: flex; gap: 16px; align-items: center; 
+            flex-wrap: wrap; margin-bottom: 28px; border: 1px solid var(--border-color); 
         }
-        
-        body.dark-mode table td {
-            border-bottom-color: #2a2a3e;
-            color: #ddd;
+        .input-group { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px; }
+        .search-input { 
+            flex: 1; padding: 10px 12px 10px 36px; border: 1px solid var(--border-color); 
+            border-radius: var(--radius-sm); background: var(--bg-body); color: var(--text-main); 
+            font-family: inherit; font-size: 13px; transition: border-color 0.2s; 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 256 256'%3E%3Cpath d='M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: 12px center;
         }
-        
-        body.dark-mode tr:hover td {
-            background: #2a2a3e;
-        }
-        
-        body.dark-mode .filter-input {
-            background: #2a2a3e;
-            border-color: #3a3a4e;
-            color: white;
-        }
-        
-        body.dark-mode .filter-input::placeholder {
-            color: #888;
-        }
-        
-        body.dark-mode .btn-filtrar,
-        body.dark-mode .btn-recargar,
-        body.dark-mode .btn-pdf {
-            background: #2a2a3e;
-            color: white;
-        }
-        
-        body.dark-mode .btn-filtrar {
-            background: #667eea;
-        }
-        
-        body.dark-mode .btn-recargar {
-            background: #27ae60;
-        }
-        
-        body.dark-mode .btn-pdf {
-            background: #dc2626;
-        }
-        
-        body.dark-mode .header h1 {
-            color: white;
-        }
-        
-        body.dark-mode .badge-activo {
-            background: #1a3320;
-            color: #27ae60;
-        }
-        
-        body.dark-mode .badge-reservas {
-            background: #1e2a3a;
-            color: #667eea;
-        }
-        
-        body.dark-mode .btn-theme {
-            color: white;
-        }
-        
-        body.dark-mode .btn-theme:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        
-        body.dark-mode #modalReservas > div {
-            background: #1e1e2e !important;
-        }
-        
-        body.dark-mode #modalReservas h3 {
-            color: #667eea !important;
-        }
-        
-        body.dark-mode #modalReservas p,
-        body.dark-mode #modalReservas strong {
-            color: #ddd !important;
-        }
-        
-        body.dark-mode .reserva-item {
-            background: #2a2a3e;
-        }
-        
-        body.dark-mode .reserva-id {
-            color: #667eea;
-        }
-        
-        body.dark-mode .reserva-fecha {
-            color: #888;
-        }
-        
-        body.dark-mode .reserva-excursiones-title {
-            color: #aaa;
-        }
-        
-        body.dark-mode .reserva-excursiones-lista li {
-            color: #ddd;
-        }
-        
-        /* Modo PWA (sin barra de navegación) */
-        .pwa-mode {
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        
-        /* ===== MENÚ FLOTANTE HAMBURGUESA - SIN FONDO AZUL ===== */
-        .menu-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            width: 50px;
-            height: 50px;
-            background: transparent;
-            border-radius: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            border: none;
-        }
-        
-        .menu-btn span {
-            font-size: 24px;
-            color: #333;
-        }
-        
-        body.dark-mode .menu-btn span {
-            color: white;
-        }
-        
-        /* ===== SIDEBAR ===== */
-        .sidebar { 
-            width: 250px; 
-            background: #1a1a2e; 
-            color: white; 
-            padding: 25px 0; 
-            position: fixed; 
-            height: 100vh; 
-            overflow-y: auto; 
-            z-index: 1001;
-            transition: transform 0.3s ease;
-            transform: translateX(-100%);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        
-        .sidebar.open {
-            transform: translateX(0);
-        }
-        
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .menu-overlay.active {
-            display: block;
-            opacity: 1;
-        }
-        
-        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; }
-        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; }
-        .sidebar-logo h2 span { color: #667eea; }
-        
-        .nav-menu { list-style: none; padding: 0 15px; }
-        .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 15px;
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            border-radius: 10px;
-            transition: all 0.2s ease;
-            font-size: 14px;
-        }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
-        .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        
-        .sidebar-footer {
-            position: absolute;
-            bottom: 20px;
-            left: 15px;
-            right: 15px;
-        }
-        .btn-logout-sidebar {
-            width: 100%;
-            padding: 12px;
-            background: rgba(231,76,60,0.2);
-            color: #e74c3c;
-            border: 1px solid rgba(231,76,60,0.3);
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.2s ease;
-        }
-        .btn-logout-sidebar:hover {
-            background: rgba(231,76,60,0.4);
-        }
-        
-        /* ===== CONTENIDO PRINCIPAL ===== */
-        .main-content {
-            margin-left: 0;
-            flex: 1;
-            padding: 20px;
-            transition: margin-left 0.3s ease;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .header h1 { font-size: 26px; color: #1a1a2e; transition: color 0.3s; }
-        
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .btn-theme {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: all 0.2s;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-theme:hover {
-            background: rgba(0,0,0,0.1);
-            transform: scale(1.1);
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            padding: 8px 20px;
-            border-radius: 50px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-        .user-avatar {
-            width: 35px;
-            height: 35px;
-            background: #667eea;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-        }
-        
-        /* ===== TARJETAS ===== */
+        .search-input:focus { border-color: var(--primary); }
+
+        /* ===== STAT CARD ===== */
         .stats-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            text-align: center;
-            transition: background 0.3s;
+            background: var(--bg-surface); border-radius: var(--radius); padding: 24px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            text-align: center; margin-bottom: 28px;
+            display: flex; align-items: center; justify-content: center; gap: 16px;
         }
-        .stats-number {
-            font-size: 40px;
-            font-weight: 800;
-            color: #667eea;
+        .stats-icon { 
+            width: 56px; height: 56px; border-radius: var(--radius-sm); 
+            background: var(--primary-light); color: var(--primary);
+            display: flex; align-items: center; justify-content: center; font-size: 28px; 
+            flex-shrink: 0;
         }
-        .stats-label {
-            font-size: 13px;
-            color: #666;
-            margin-top: 5px;
-            transition: color 0.3s;
+        .stats-info { text-align: left; }
+        .stats-number { font-size: 36px; font-weight: 700; color: var(--text-main); line-height: 1.1; letter-spacing: -1px; }
+        .stats-label { font-size: 14px; color: var(--text-muted); font-weight: 500; margin-top: 4px; }
+
+        /* ===== TABLES ===== */
+        .table-section { 
+            background: var(--bg-surface); border-radius: var(--radius); 
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); 
+            overflow: hidden; margin-bottom: 28px; 
         }
+        .section-header { 
+            padding: 16px 20px; border-bottom: 1px solid var(--border-color); 
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+        .section-header h3 { font-size: 15px; font-weight: 600; color: var(--text-main); }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { 
+            text-align: left; padding: 14px 20px; font-size: 11px; font-weight: 600; 
+            text-transform: uppercase; color: var(--text-muted); background: var(--bg-body); 
+            letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); white-space: nowrap;
+        }
+        td { 
+            padding: 16px 20px; border-bottom: 1px solid var(--border-color); 
+            font-size: 14px; color: var(--text-main); vertical-align: middle; white-space: nowrap;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(99, 102, 241, 0.02); }
         
-        /* ===== FILTROS ===== */
-        .filters-bar {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 15px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            transition: background 0.3s;
+        .badge { 
+            padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; 
+            text-transform: capitalize; display: inline-flex; align-items: center; gap: 4px; 
         }
-        .filter-input {
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 13px;
-            flex: 2;
-            min-width: 200px;
-            transition: border-color 0.2s, background 0.3s, color 0.3s;
+        .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+        .badge-activo { background: var(--success-light); color: #047857; }
+        .badge-activo::before { background: #047857; }
+        .badge-reservas { background: var(--info-light); color: #1d4ed8; font-size: 12px; padding: 6px 12px; }
+        
+        .dark-mode .badge-activo { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .dark-mode .badge-activo::before { background: #34d399; }
+        .dark-mode .badge-reservas { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+
+        .client-avatar-sm { 
+            width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); 
+            color: var(--primary); display: inline-flex; align-items: center; justify-content: center; 
+            font-size: 14px; font-weight: 700; margin-right: 10px; vertical-align: middle; flex-shrink: 0;
         }
-        .filter-input:focus {
-            outline: none;
-            border-color: #667eea;
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); 
+            z-index: 2000; display: flex; align-items: center; justify-content: center; 
+            padding: 20px; backdrop-filter: blur(4px);
         }
-        .btn-filtrar, .btn-recargar, .btn-pdf {
-            padding: 10px 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            white-space: nowrap;
+        .modal-content {
+            background: var(--bg-surface); border-radius: var(--radius); 
+            max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; 
+            box-shadow: var(--shadow-lg); border: 1px solid var(--border-color);
+        }
+        .modal-header { 
+            padding: 20px 24px; border-bottom: 1px solid var(--border-color); 
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; background: var(--bg-surface); z-index: 10; 
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+        .modal-header h3 { font-size: 16px; font-weight: 600; color: var(--primary); }
+        .modal-close { 
+            background: none; border: none; font-size: 24px; cursor: pointer; 
+            color: var(--text-muted); padding: 4px; border-radius: 50%; 
             transition: all 0.2s;
         }
-        .btn-filtrar:active, .btn-recargar:active, .btn-pdf:active {
-            transform: scale(0.96);
-        }
-        .btn-filtrar { background: #667eea; color: white; }
-        .btn-recargar { background: #27ae60; color: white; }
-        .btn-pdf { background: #dc2626; color: white; }
-        
-        /* ===== TABLA ===== */
-        .table-container {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            transition: background 0.3s;
-        }
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .table-header h3 { color: #333; font-size: 16px; transition: color 0.3s; }
-        .table-wrapper {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 700px;
-        }
-        th {
-            text-align: left;
-            padding: 12px;
-            background: #f8f9fa;
-            color: #666;
-            font-size: 12px;
-            text-transform: uppercase;
-            font-weight: 600;
-            border-bottom: 2px solid #e0e0e0;
-            transition: background 0.3s, color 0.3s;
-        }
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 13px;
-            color: #333;
-            transition: border-color 0.3s, color 0.3s;
-        }
-        tr:hover td {
-            background: #f8f9ff;
+        .modal-close:hover { color: var(--danger); background: var(--danger-light); }
+        .modal-body { padding: 24px; }
+        .modal-footer { 
+            padding: 16px 24px; border-top: 1px solid var(--border-color); 
+            position: sticky; bottom: 0; background: var(--bg-surface); 
+            border-radius: 0 0 var(--radius) var(--radius);
         }
         
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            display: inline-block;
-        }
-        .badge-activo {
-            background: #d4edda;
-            color: #155724;
-            transition: background 0.3s, color 0.3s;
-        }
-        .badge-reservas {
-            background: #eef2ff;
-            color: #667eea;
-            transition: background 0.3s, color 0.3s;
-        }
-        
-        .btn-ver {
-            padding: 6px 14px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background 0.2s;
-            font-weight: 500;
-        }
-        .btn-ver:active {
-            transform: scale(0.96);
-        }
-        .btn-ver:hover {
-            background: #5a67d8;
-        }
-        
-        /* Estilos para el modal de reservas */
         .reserva-item {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid #667eea;
-            transition: background 0.3s;
+            background: var(--bg-body); border-radius: var(--radius-sm); 
+            padding: 16px; margin-bottom: 12px; 
+            border-left: 4px solid var(--primary);
         }
-        .reserva-id {
-            font-weight: 700;
-            color: #667eea;
-            font-size: 14px;
-            margin-bottom: 8px;
+        .reserva-id { 
+            font-weight: 700; color: var(--primary); font-size: 14px; margin-bottom: 8px; 
         }
-        .reserva-fecha {
-            font-size: 11px;
-            color: #999;
-            margin-bottom: 10px;
-            transition: color 0.3s;
+        .reserva-fecha { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+        .reserva-excursiones-title { 
+            font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; 
         }
-        .reserva-excursiones {
-            margin-top: 8px;
+        .reserva-excursiones-lista { margin: 0; padding-left: 20px; }
+        .reserva-excursiones-lista li { 
+            font-size: 13px; color: var(--text-muted); margin-bottom: 4px; 
         }
-        .reserva-excursiones-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 5px;
-            transition: color 0.3s;
+
+        /* Loader */
+        .loader-container { padding: 40px; text-align: center; }
+        .spinner { 
+            width: 32px; height: 32px; border: 3px solid var(--border-color); 
+            border-top-color: var(--primary); border-radius: 50%; 
+            animation: spin 0.8s linear infinite; margin: 0 auto; 
         }
-        .reserva-excursiones-lista {
-            margin: 0;
-            padding-left: 20px;
-        }
-        .reserva-excursiones-lista li {
-            font-size: 12px;
-            color: #333;
-            margin-bottom: 4px;
-            transition: color 0.3s;
-        }
-        
-        /* ===== SCROLL SIDEBAR ===== */
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar::-webkit-scrollbar-track {
-            background: #1a1a2e;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
-        }
-        
-        /* ===== DESKTOP ===== */
-        @media (min-width: 769px) {
-            .menu-btn {
-                display: none !important;
-            }
-            
-            .sidebar {
-                transform: translateX(0) !important;
-                width: 250px;
-            }
-            
-            .menu-overlay {
-                display: none !important;
-            }
-            
-            .main-content {
-                margin-left: 250px;
-                padding: 30px;
-            }
-        }
-        
-        /* ===== MÓVIL ===== */
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .menu-btn {
-                display: flex;
-            }
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 76px; }
+            .menu-toggle { display: flex; }
             
-            .main-content {
-                padding: 60px 12px 20px;
-            }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
             
-            .header h1 {
-                font-size: 20px;
-            }
+            .filter-bar { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
+            .input-group { width: 100%; }
+            .filter-bar .btn { width: 100%; justify-content: center; }
             
-            .user-info {
-                padding: 5px 12px;
-                font-size: 12px;
-            }
+            .stats-card { flex-direction: column; text-align: center; gap: 12px; padding: 16px; }
+            .stats-info { text-align: center; }
+            .stats-number { font-size: 28px; }
             
-            .user-avatar {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
+            .section-header { padding: 16px; }
+            .section-header .btn { font-size: 12px; padding: 6px 12px; }
             
-            .stats-number {
-                font-size: 32px;
-            }
-            
-            .filters-bar {
-                flex-direction: column;
-            }
-            
-            .filter-input {
-                width: 100%;
-            }
-            
-            .btn-filtrar, .btn-recargar, .btn-pdf {
-                width: 100%;
-                text-align: center;
-            }
-            
-            .table-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            th, td {
-                padding: 8px 6px;
-                font-size: 11px;
-            }
-            
-            .btn-ver {
-                padding: 4px 10px;
-                font-size: 10px;
-            }
-            
-            .btn-theme {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
+            .modal-content { max-height: 90vh; }
         }
-        
+
         @media (max-width: 480px) {
-            .stats-number {
-                font-size: 28px;
-            }
-            
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            .page-title h1 { font-size: 20px; }
+            .brand-text { font-size: 16px; }
+            .stats-icon { width: 44px; height: 44px; font-size: 22px; }
+            th, td { padding: 10px 12px; font-size: 12px; }
         }
     </style>
 </head>
 <body>
-    <!-- Botón menú hamburguesa (solo móvil) -->
-    <button class="menu-btn" id="menuBtn">
-        <span>☰</span>
-    </button>
-    
-    <!-- Overlay para cerrar menú -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-    
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🏔️</div>
-            <h2>Aventura <span>Total</span></h2>
-            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="clientes.html" class="active"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
-            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
-            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
-            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
-            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
-        </div>
-    </nav>
 
-    <div class="main-content">
-        <div class="header">
-            <div><h1>👥 Clientes</h1></div>
-            <div class="header-actions">
-                <button class="btn-theme" onclick="toggleTheme()" title="Modo oscuro/claro">🌙</button>
-                <div class="user-info">
-                    <div class="user-avatar">A</div>
-                    <span>Admin</span>
+    <!-- Mobile Toggle -->
+    <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú"><i class="ph ph-list" style="font-size: 24px;"></i></button>
+    <div class="overlay" id="menuOverlay"></div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-icon"><i class="ph-bold ph-mountains"></i></div>
+                <div class="brand-text">Aventura<span>Total</span></div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="ph ph-squares-four"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="clientes.html" class="nav-link active"><i class="ph ph-users"></i> Clientes</a></li>
+                <li class="nav-item"><a href="reservas.html" class="nav-link"><i class="ph ph-calendar-check"></i> Reservas</a></li>
+                <li class="nav-item"><a href="seguimiento.html" class="nav-link"><i class="ph ph-chart-line-up"></i> Seguimiento</a></li>
+                <li class="nav-item"><a href="emails.html" class="nav-link"><i class="ph ph-whatsapp-logo"></i> WhatsApp</a></li>
+                <li class="nav-item"><a href="calendario.html" class="nav-link"><i class="ph ph-calendar"></i> Calendario</a></li>
+                <li class="nav-item"><a href="clima.html" class="nav-link"><i class="ph ph-cloud-sun"></i> Clima</a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-profile" onclick="logout()">
+                    <div class="avatar">AD</div>
+                    <div class="user-details">
+                        <h4>Administrador</h4>
+                        <p>Cerrar Sesión</p>
+                    </div>
+                    <i class="ph ph-sign-out" style="margin-left: auto; color: var(--text-muted); font-size: 18px;"></i>
                 </div>
             </div>
-        </div>
+        </aside>
 
-        <div class="stats-card">
-            <div class="stats-number" id="totalClientes">0</div>
-            <div class="stats-label">Clientes Registrados</div>
-        </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="page-title">
+                    <h1>Clientes</h1>
+                    <p>Gestiona y visualiza todos tus clientes registrados.</p>
+                </div>
+                <div class="actions-group">
+                    <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
+                    <button class="btn btn-secondary" onclick="cargarClientes()"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
+                </div>
+            </header>
 
-        <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email o teléfono..." id="busquedaCliente">
-            <button class="btn-filtrar" onclick="filtrarClientes()">🔍 Filtrar</button>
-            <button class="btn-recargar" onclick="cargarClientes()">🔄 Recargar</button>
-            <button class="btn-pdf" onclick="descargarPDF()">📄 Descargar PDF</button>
-        </div>
-
-        <div class="table-container">
-            <div class="table-header">
-                <h3>📋 Lista de Clientes</h3>
-                <span id="totalClientesSpan" style="font-size:12px;color:#666;">0 clientes</span>
+            <!-- Stats -->
+            <div class="stats-card">
+                <div class="stats-icon"><i class="ph-fill ph-users-three"></i></div>
+                <div class="stats-info">
+                    <div class="stats-number" id="totalClientes">0</div>
+                    <div class="stats-label">Clientes Registrados</div>
+                </div>
             </div>
-            <div class="table-wrapper">
-                <table id="clientesTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Email</th>
-                            <th>Teléfono</th>
-                            <th>Reservas</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaClientes">
-                        <tr><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr>
-                    </tbody>
-                </table>
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <div class="input-group">
+                    <input type="text" class="search-input" placeholder="Buscar por nombre, email o teléfono..." id="busquedaCliente">
+                </div>
+                <button class="btn btn-primary" onclick="filtrarClientes()"><i class="ph ph-funnel"></i> Filtrar</button>
+                <button class="btn btn-secondary" onclick="cargarClientes()"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
+                <button class="btn btn-danger" onclick="descargarPDF()"><i class="ph ph-file-pdf"></i> Descargar PDF</button>
             </div>
-        </div>
+
+            <!-- Table -->
+            <div class="table-section">
+                <div class="section-header">
+                    <h3>Lista de Clientes</h3>
+                    <span id="totalClientesSpan" style="font-size: 13px; color: var(--text-muted);">0 clientes</span>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Reservas</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaClientes">
+                            <tr><td colspan="7"><div class="loader-container"><div class="spinner"></div></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
-
-    <!-- Incluir librería html2pdf -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
         // ==================================================
-        // MODO OSCURO
-        // ==================================================
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDark);
-            const btn = document.querySelector('.btn-theme');
-            if (btn) {
-                btn.textContent = isDark ? '☀️' : '🌙';
-            }
-        }
-        
-        // Cargar preferencia de modo oscuro
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            const btn = document.querySelector('.btn-theme');
-            if (btn) {
-                btn.textContent = '☀️';
-            }
-        }
-        
-        // ==================================================
-        // REGISTRAR SERVICE WORKER PARA PWA
-        // ==================================================
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('✅ Service Worker registrado con éxito:', registration.scope);
-                    })
-                    .catch(function(error) {
-                        console.log('❌ Error al registrar Service Worker:', error);
-                    });
-            });
-        }
-        
-        // Detectar si la app está instalada y se abre desde la pantalla de inicio
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
-            document.body.classList.add('pwa-mode');
-        }
-        
-        // ==================================================
-        // MENÚ FLOTANTE
+        // LOGICA UI & TEMA
         // ==================================================
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.getElementById('sidebar');
-        const menuOverlay = document.getElementById('menuOverlay');
+        const overlay = document.getElementById('menuOverlay');
+        const themeIcon = document.getElementById('themeIcon');
         
         function toggleMenu() {
             sidebar.classList.toggle('open');
-            menuOverlay.classList.toggle('active');
+            overlay.classList.toggle('active');
             document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
         }
         
         function closeMenu() {
             sidebar.classList.remove('open');
-            menuOverlay.classList.remove('active');
+            overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', closeMenu);
         
-        if (menuBtn) {
-            menuBtn.addEventListener('click', toggleMenu);
-        }
-        
-        if (menuOverlay) {
-            menuOverlay.addEventListener('click', closeMenu);
-        }
-        
-        document.querySelectorAll('.nav-menu a').forEach(link => {
+        document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    closeMenu();
-                }
+                if (window.innerWidth <= 768) closeMenu();
             });
         });
-        
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            themeIcon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
+        }
+
+        if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.body.classList.add('dark-mode');
+            themeIcon.className = 'ph ph-sun';
+        }
+
+        // ==================================================
+        // SERVICE WORKER
+        // ==================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log(err)); });
+        }
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            document.body.classList.add('pwa-mode');
+        }
+
         // ==================================================
         // CONFIGURACIÓN
         // ==================================================
@@ -826,12 +521,11 @@
             
             if (!tbody) return;
             try {
-                tbody.innerHTML = '<table><td colspan="7" style="text-align:center;padding:30px;">⏳ Cargando datos...</td</tr';
+                tbody.innerHTML = '<tr><td colspan="7"><div class="loader-container"><div class="spinner"></div></div></td></tr>';
                 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
                 const texto = await response.text();
                 
-                // Limpiar la respuesta JSONP de Google
                 let jsonStr = texto;
                 jsonStr = jsonStr.replace("/*O_o*/", "");
                 jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
@@ -841,20 +535,6 @@
                 const rows = data.table.rows;
                 
                 if (!rows || rows.length === 0) throw new Error('No hay datos');
-                
-                // Mapeo de columnas según la estructura de tu Google Sheets
-                // Columna 0: Timestamp (fecha)
-                // Columna 1: ID
-                // Columna 2: Nombre
-                // Columna 3: Apellido
-                // Columna 4: Email
-                // Columna 5: Teléfono
-                // Columna 6: País
-                // Columna 7: Ciudad
-                // Columna 8: Excursiones
-                // Columna 9: Días
-                // Columna 10: Personas
-                // Columna 11: Forma de pago
                 
                 const clientesMap = new Map();
                 
@@ -901,7 +581,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:30px;">❌ Error: ${error.message} jonathan</tr`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--danger); padding:30px;">❌ Error: ${error.message}</td></tr>`;
             }
         }
         
@@ -910,7 +590,7 @@
             if (!tbody) return;
             
             if (clientesFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;">📋 No hay clientes</td</tr';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color: var(--text-muted);">📋 No se encontraron clientes</td></tr>';
                 return;
             }
             
@@ -923,13 +603,18 @@
             
             tbody.innerHTML = clientesFiltrados.map((cliente) => `
                 <tr>
-                    <td>${cliente.id}</td>
-                    <td><strong>${escapeHtml(cliente.nombre)}</strong></td>
-                    <td style="font-size:12px">${escapeHtml(cliente.email)}</td>
+                    <td><span style="font-family:monospace; color:var(--text-muted); font-size:12px;">#${cliente.id}</span></td>
+                    <td>
+                        <div style="display:flex; align-items:center;">
+                            <div class="client-avatar-sm">${cliente.nombre.charAt(0).toUpperCase()}</div>
+                            <strong>${escapeHtml(cliente.nombre)}</strong>
+                        </div>
+                    </td>
+                    <td style="font-size:13px; color:var(--text-muted);">${escapeHtml(cliente.email)}</td>
                     <td>${escapeHtml(cliente.telefono)}</td>
                     <td><span class="badge badge-reservas">${cliente.totalReservas} reserva(s)</span></td>
                     <td><span class="badge badge-activo">Activo</span></td>
-                    <td><button class="btn-ver" onclick="verReservasCliente('${escapeHtml(cliente.email)}')">📋 Ver reservas</button></td>
+                    <td><button class="btn btn-secondary" style="padding:6px 14px; font-size:12px;" onclick="verReservasCliente('${escapeHtml(cliente.email)}')"><i class="ph ph-eye"></i> Ver</button></td>
                 </tr>
             `).join('');
         }
@@ -1015,24 +700,24 @@
                 
                 let reservasHtml = '';
                 if (reservas.length === 0) {
-                    reservasHtml = '<p style="text-align:center;padding:20px;">📭 No hay reservas para este cliente</p>';
+                    reservasHtml = '<p style="text-align:center; padding:20px; color: var(--text-muted);">📭 No hay reservas para este cliente</p>';
                 } else {
                     reservas.forEach(r => {
                         let excursionesListHtml = '';
                         if (r.excursiones && r.excursiones.length > 0) {
-                            excursionesListHtml = '<ul style="margin:0; padding-left:20px;">';
+                            excursionesListHtml = '<ul class="reserva-excursiones-lista">';
                             r.excursiones.forEach(exc => {
-                                excursionesListHtml += `<li style="margin-bottom:4px;">${escapeHtml(exc)}</li>`;
+                                excursionesListHtml += `<li>${escapeHtml(exc)}</li>`;
                             });
                             excursionesListHtml += '</ul>';
                         } else {
-                            excursionesListHtml = '<p style="color:#999; font-size:12px;">Sin excursiones específicas</p>';
+                            excursionesListHtml = '<p style="color:var(--text-muted); font-size:12px;">Sin excursiones específicas</p>';
                         }
                         
                         reservasHtml += `
                             <div class="reserva-item">
                                 <div class="reserva-id">🆔 Reserva: ${escapeHtml(r.id)}</div>
-                                <div class="reserva-fecha">📅 ${escapeHtml(r.fecha)}</div>
+                                <div class="reserva-fecha"><i class="ph ph-calendar"></i> ${escapeHtml(r.fecha)}</div>
                                 <div>
                                     <div class="reserva-excursiones-title">✨ Excursiones seleccionadas:</div>
                                     ${excursionesListHtml}
@@ -1043,19 +728,21 @@
                 }
                 
                 const modalHtml = `
-                    <div id="modalReservas" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:2000;">
-                        <div style="background:white; border-radius:20px; max-width:550px; width:90%; max-height:85vh; overflow-y:auto; padding:25px; transition:background 0.3s;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #eef2ff; padding-bottom:12px;">
-                                <h3 style="color:#667eea;">📋 Reservas del cliente</h3>
-                                <button onclick="cerrarModalReservas()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">✕</button>
+                    <div id="modalReservas" class="modal-overlay" onclick="if(event.target===this) cerrarModalReservas()">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3><i class="ph ph-calendar-check"></i> Reservas del cliente</h3>
+                                <button class="modal-close" onclick="cerrarModalReservas()">✕</button>
                             </div>
-                            <p><strong>📧 Email:</strong> ${escapeHtml(email)}</p>
-                            <p><strong>📊 Total reservas:</strong> ${reservas.length}</p>
-                            <hr style="margin:15px 0;">
-                            <div style="max-height: 50vh; overflow-y: auto;">
+                            <div class="modal-body">
+                                <p style="margin-bottom: 8px;"><strong>📧 Email:</strong> ${escapeHtml(email)}</p>
+                                <p style="margin-bottom: 16px;"><strong>📊 Total reservas:</strong> <span class="badge badge-reservas">${reservas.length}</span></p>
+                                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 16px 0;">
                                 ${reservasHtml}
                             </div>
-                            <button onclick="cerrarModalReservas()" style="width:100%; padding:12px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border:none; border-radius:12px; margin-top:20px; cursor:pointer; font-weight:600;">Cerrar</button>
+                            <div class="modal-footer">
+                                <button onclick="cerrarModalReservas()" class="btn btn-primary" style="width:100%; justify-content:center;">Cerrar</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1107,73 +794,17 @@
                     <meta charset="UTF-8">
                     <title>Lista de Clientes - Aventura Total</title>
                     <style>
-                        body {
-                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                            padding: 20px;
-                            margin: 0;
-                            background: white;
-                        }
-                        .header {
-                            text-align: center;
-                            margin-bottom: 25px;
-                            border-bottom: 2px solid #667eea;
-                            padding-bottom: 15px;
-                        }
-                        .logo {
-                            font-size: 40px;
-                            margin-bottom: 8px;
-                        }
-                        h1 {
-                            color: #1a1a2e;
-                            font-size: 20px;
-                            margin-bottom: 5px;
-                        }
-                        .subtitulo {
-                            color: #666;
-                            font-size: 11px;
-                        }
-                        .fecha {
-                            text-align: right;
-                            font-size: 9px;
-                            color: #999;
-                            margin-bottom: 15px;
-                        }
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-top: 15px;
-                        }
-                        th {
-                            background: #667eea;
-                            color: white;
-                            padding: 10px 8px;
-                            text-align: left;
-                            font-size: 11px;
-                            font-weight: 600;
-                        }
-                        td {
-                            padding: 8px;
-                            border-bottom: 1px solid #e0e0e0;
-                            font-size: 10px;
-                            color: #333;
-                        }
-                        .total-container {
-                            margin-top: 20px;
-                            text-align: right;
-                            font-size: 11px;
-                            font-weight: bold;
-                            color: #667eea;
-                            border-top: 1px solid #e0e0e0;
-                            padding-top: 12px;
-                        }
-                        .footer {
-                            margin-top: 25px;
-                            text-align: center;
-                            font-size: 9px;
-                            color: #999;
-                            border-top: 1px solid #e0e0e0;
-                            padding-top: 15px;
-                        }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; margin: 0; background: white; }
+                        .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #667eea; padding-bottom: 15px; }
+                        .logo { font-size: 40px; margin-bottom: 8px; }
+                        h1 { color: #1a1a2e; font-size: 20px; margin-bottom: 5px; }
+                        .subtitulo { color: #666; font-size: 11px; }
+                        .fecha { text-align: right; font-size: 9px; color: #999; margin-bottom: 15px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                        th { background: #667eea; color: white; padding: 10px 8px; text-align: left; font-size: 11px; font-weight: 600; }
+                        td { padding: 8px; border-bottom: 1px solid #e0e0e0; font-size: 10px; color: #333; }
+                        .total-container { margin-top: 20px; text-align: right; font-size: 11px; font-weight: bold; color: #667eea; border-top: 1px solid #e0e0e0; padding-top: 12px; }
+                        .footer { margin-top: 25px; text-align: center; font-size: 9px; color: #999; border-top: 1px solid #e0e0e0; padding-top: 15px; }
                     </style>
                 </head>
                 <body>
@@ -1186,25 +817,13 @@
                     
                     <table width="100%">
                         <thead>
-                            <tr>
-                                <th>NOMBRE</th>
-                                <th>EMAIL</th>
-                                <th>TELÉFONO</th>
-                                <th>RESERVAS</th>
-                            </tr>
+                            <tr><th>NOMBRE</th><th>EMAIL</th><th>TELÉFONO</th><th>RESERVAS</th></tr>
                         </thead>
-                        <tbody>
-                            ${filasTabla}
-                        </tbody>
+                        <tbody>${filasTabla}</tbody>
                     </table>
                     
-                    <div class="total-container">
-                        Total de clientes: ${clientesFiltrados.length}
-                    </div>
-                    
-                    <div class="footer">
-                        Aventura Total - CRM | Generado automáticamente
-                    </div>
+                    <div class="total-container">Total de clientes: ${clientesFiltrados.length}</div>
+                    <div class="footer">Aventura Total - CRM | Generado automáticamente</div>
                 </body>
                 </html>
             `;
