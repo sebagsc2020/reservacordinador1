@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Dashboard - CRM Aventura Total</title>
     
     <!-- PWA CONFIGURACIÓN -->
@@ -14,12 +14,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#6366f1">
     <meta name="application-name" content="Aventura Total CRM">
-    <meta name="msapplication-TileColor" content="#6366f1">
     
-    <!-- Fuentes: Inter vía Fontsource (Regla: No Google Fonts directos, usar fontsource CDN) -->
+    <!-- Fuentes: Inter vía Fontsource -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.15/index.css">
     
-    <!-- Iconos: Phosphor Icons (Profesionales y escalables) -->
+    <!-- Iconos: Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- Chart.js -->
@@ -27,7 +26,6 @@
     
     <style>
         :root {
-            /* Paleta Moderna: Indigo & Slate */
             --primary: #6366f1;
             --primary-hover: #4f46e5;
             --primary-light: #e0e7ff;
@@ -40,7 +38,6 @@
             --info: #3b82f6;
             --info-light: #dbeafe;
             
-            /* Light Mode */
             --bg-body: #f8fafc;
             --bg-surface: #ffffff;
             --text-main: #0f172a;
@@ -58,7 +55,6 @@
         }
 
         body.dark-mode {
-            /* Dark Mode (Slate) */
             --bg-body: #0f172a;
             --bg-surface: #1e293b;
             --text-main: #f1f5f9;
@@ -73,7 +69,7 @@
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
             font-family: 'Inter', sans-serif; 
@@ -98,9 +94,10 @@
         }
         
         .sidebar-header { 
-            padding: 24px; 
+            padding: 20px 24px; 
             display: flex; align-items: center; gap: 12px; 
             border-bottom: 1px solid var(--border-color); 
+            flex-shrink: 0;
         }
         .brand-icon { 
             width: 36px; height: 36px; 
@@ -109,22 +106,23 @@
             display: flex; align-items: center; justify-content: center; 
             color: white; font-size: 20px; 
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
         }
         .brand-text { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; color: var(--text-main); }
         .brand-text span { color: var(--primary); }
 
-        .nav-menu { list-style: none; padding: 20px 12px; flex: 1; overflow-y: auto; }
+        .nav-menu { list-style: none; padding: 16px 12px; flex: 1; overflow-y: auto; }
         .nav-item { margin-bottom: 4px; }
         .nav-link {
             display: flex; align-items: center; gap: 12px; padding: 12px 16px;
             color: var(--sidebar-text); text-decoration: none; border-radius: var(--radius-sm);
             font-size: 14px; font-weight: 500; transition: all 0.2s ease;
         }
-        .nav-link i { font-size: 20px; }
+        .nav-link i { font-size: 20px; flex-shrink: 0; }
         .nav-link:hover { background: var(--bg-body); color: var(--primary); }
         .nav-link.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); font-weight: 600; }
         
-        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); }
+        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
         .user-profile { 
             display: flex; align-items: center; gap: 12px; padding: 12px; 
             border-radius: var(--radius-sm); background: var(--bg-body); 
@@ -134,19 +132,21 @@
         .avatar { 
             width: 36px; height: 36px; background: var(--primary); color: white; 
             border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-weight: 600; font-size: 14px; 
+            font-weight: 600; font-size: 14px; flex-shrink: 0;
         }
-        .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); }
+        .user-details { overflow: hidden; }
+        .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-details p { font-size: 11px; color: var(--text-muted); }
 
-        .main-content { margin-left: 260px; flex: 1; padding: 32px; transition: margin-left 0.3s; }
+        .main-content { margin-left: 260px; flex: 1; padding: 32px; transition: margin-left 0.3s; width: 100%; }
         
         /* Mobile Menu */
         .menu-toggle { 
-            display: none; position: fixed; top: 20px; left: 20px; z-index: 1002; 
+            display: none; position: fixed; top: 16px; left: 16px; z-index: 1002; 
             background: var(--bg-surface); border: 1px solid var(--border-color); 
-            padding: 10px; border-radius: var(--radius-sm); cursor: pointer; 
+            width: 44px; height: 44px; border-radius: var(--radius-sm); cursor: pointer; 
             color: var(--text-main); box-shadow: var(--shadow-md); 
+            align-items: center; justify-content: center;
         }
         .overlay { 
             position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
@@ -156,15 +156,15 @@
         .overlay.active { opacity: 1; pointer-events: auto; }
 
         /* ===== HEADER & FILTERS ===== */
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 20px; }
-        .page-title h1 { font-size: 26px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+        .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
         .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
         
         .actions-group { display: flex; gap: 12px; align-items: center; }
         .btn { 
             padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; 
             cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; 
-            transition: all 0.2s ease; 
+            transition: all 0.2s ease; white-space: nowrap;
         }
         .btn:active { transform: scale(0.97); }
         .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
@@ -172,10 +172,10 @@
         .btn-secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
         .btn-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
         .btn-icon { 
-            padding: 10px; border-radius: 50%; background: var(--bg-surface); 
+            width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); 
             border: 1px solid var(--border-color); color: var(--text-muted); 
             display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s; flex-shrink: 0;
         }
         .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
         
@@ -184,30 +184,30 @@
             box-shadow: var(--shadow-sm); display: flex; gap: 16px; align-items: center; 
             flex-wrap: wrap; margin-bottom: 28px; border: 1px solid var(--border-color); 
         }
-        .input-group { display: flex; align-items: center; gap: 8px; }
-        .input-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 140px; }
+        .input-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
         input[type="date"] { 
-            padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); 
+            flex: 1; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); 
             background: var(--bg-body); color: var(--text-main); font-family: inherit; font-size: 13px; 
-            transition: border-color 0.2s;
+            transition: border-color 0.2s; min-width: 0;
         }
         input[type="date"]:focus { border-color: var(--primary); }
 
         /* ===== METRICS GRID ===== */
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 32px; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 28px; }
         
         .stat-card {
-            background: var(--bg-surface); border-radius: var(--radius); padding: 24px;
+            background: var(--bg-surface); border-radius: var(--radius); padding: 20px;
             box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
             display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .stat-card:active { transform: scale(0.98); }
         
         .stat-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .stat-icon-wrapper { 
             width: 44px; height: 44px; border-radius: var(--radius-sm); 
-            display: flex; align-items: center; justify-content: center; font-size: 22px; 
+            display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
         }
         .icon-blue { background: var(--info-light); color: var(--info); }
         .icon-green { background: var(--success-light); color: var(--success); }
@@ -215,19 +215,19 @@
         .icon-orange { background: var(--warning-light); color: var(--warning); }
         .dark-mode .icon-purple { background: rgba(168, 85, 247, 0.15); }
         
-        .stat-value { font-size: 30px; font-weight: 700; color: var(--text-main); line-height: 1.1; letter-spacing: -1px; }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--text-main); line-height: 1.1; letter-spacing: -1px; word-break: break-word; }
         .stat-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
         .stat-trend { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
         .trend-up { color: var(--success); }
         .trend-down { color: var(--danger); }
 
         /* ===== CHARTS SECTION ===== */
-        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 32px; }
+        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 28px; }
         .chart-card { 
-            background: var(--bg-surface); border-radius: var(--radius); padding: 24px; 
+            background: var(--bg-surface); border-radius: var(--radius); padding: 20px; 
             box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); 
         }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .card-title { font-size: 15px; font-weight: 600; color: var(--text-main); }
         .chart-wrapper { position: relative; height: 280px; width: 100%; }
 
@@ -235,22 +235,22 @@
         .table-section { 
             background: var(--bg-surface); border-radius: var(--radius); 
             box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); 
-            overflow: hidden; margin-bottom: 32px; 
+            overflow: hidden; margin-bottom: 28px; 
         }
         .section-header { 
-            padding: 20px 24px; border-bottom: 1px solid var(--border-color); 
+            padding: 16px 20px; border-bottom: 1px solid var(--border-color); 
             display: flex; justify-content: space-between; align-items: center; 
         }
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { 
-            text-align: left; padding: 14px 24px; font-size: 11px; font-weight: 600; 
+            text-align: left; padding: 14px 20px; font-size: 11px; font-weight: 600; 
             text-transform: uppercase; color: var(--text-muted); background: var(--bg-body); 
-            letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color);
+            letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); white-space: nowrap;
         }
         td { 
-            padding: 16px 24px; border-bottom: 1px solid var(--border-color); 
-            font-size: 14px; color: var(--text-main); vertical-align: middle; 
+            padding: 16px 20px; border-bottom: 1px solid var(--border-color); 
+            font-size: 14px; color: var(--text-main); vertical-align: middle; white-space: nowrap;
         }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(99, 102, 241, 0.02); }
@@ -277,7 +277,7 @@
         .client-avatar-sm { 
             width: 30px; height: 30px; border-radius: 50%; background: var(--primary-light); 
             color: var(--primary); display: inline-flex; align-items: center; justify-content: center; 
-            font-size: 11px; font-weight: 700; margin-right: 10px; vertical-align: middle; 
+            font-size: 11px; font-weight: 700; margin-right: 10px; vertical-align: middle; flex-shrink: 0;
         }
 
         /* Loader */
@@ -291,7 +291,7 @@
 
         /* Toast Notification */
         .toast {
-            position: fixed; bottom: 32px; right: 32px;
+            position: fixed; bottom: 24px; right: 24px; left: 24px; max-width: 400px; margin: 0 auto;
             background: var(--bg-surface); border-left: 4px solid var(--success);
             padding: 16px 20px; border-radius: var(--radius-sm);
             box-shadow: var(--shadow-lg); border: 1px solid var(--border-color);
@@ -301,24 +301,46 @@
             z-index: 2000;
         }
         .toast.show { transform: translateY(0); opacity: 1; }
-        .toast-icon { color: var(--success); font-size: 22px; }
+        .toast-icon { color: var(--success); font-size: 22px; flex-shrink: 0; }
         .toast-content h4 { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
-        .toast-content p { font-size: 12px; color: var(--text-muted); }
+        .toast-content p { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
 
-        /* Responsive */
+        /* ===== RESPONSIVE DESIGN ===== */
         @media (max-width: 1024px) {
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
             .charts-container { grid-template-columns: 1fr; }
+            .chart-wrapper { height: 250px; }
         }
+
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); width: 280px; }
-            .sidebar.open { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 24px; padding-top: 80px; }
+            .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 76px; }
             .menu-toggle { display: flex; }
-            .metrics-grid { grid-template-columns: 1fr; }
-            .filter-bar { flex-direction: column; align-items: stretch; gap: 12px; }
-            .page-header { flex-direction: column; align-items: flex-start; }
+            
+            .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .actions-group { width: 100%; justify-content: space-between; }
+            
+            .filter-bar { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
             .input-group { width: 100%; }
             input[type="date"] { width: 100%; }
+            .filter-bar .btn { width: 100%; justify-content: center; }
+            
+            .metrics-grid { grid-template-columns: 1fr; gap: 12px; }
+            .stat-card { padding: 16px; flex-direction: row; align-items: center; gap: 16px; }
+            .stat-header { flex-direction: row-reverse; align-items: center; width: 100%; }
+            .stat-info-mobile { flex: 1; }
+            .stat-value { font-size: 24px; }
+            
+            .section-header { padding: 16px; }
+            .section-header .btn { font-size: 12px; padding: 6px 12px; }
+        }
+
+        @media (max-width: 480px) {
+            .page-title h1 { font-size: 20px; }
+            .brand-text { font-size: 16px; }
+            .stat-icon-wrapper { width: 40px; height: 40px; font-size: 20px; }
+            .toast { left: 16px; right: 16px; bottom: 16px; }
         }
     </style>
 </head>
@@ -367,7 +389,7 @@
                 </div>
                 <div class="actions-group">
                     <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
-                    <button class="btn btn-primary" onclick="cargarDatos()"><i class="ph ph-arrows-clockwise"></i> Actualizar</button>
+                    <button class="btn btn-primary" onclick="cargarDatos()"><i class="ph ph-arrows-clockwise"></i> <span class="btn-text">Actualizar</span></button>
                 </div>
             </header>
 
@@ -381,7 +403,7 @@
                     <label>Hasta:</label>
                     <input type="date" id="fechaFin">
                 </div>
-                <button class="btn btn-secondary" onclick="filtrarPorFecha()" style="margin-left: auto;"><i class="ph ph-funnel"></i> Aplicar</button>
+                <button class="btn btn-secondary" onclick="filtrarPorFecha()"><i class="ph ph-funnel"></i> Aplicar</button>
                 <button class="btn btn-secondary" onclick="resetFechas()"><i class="ph ph-x"></i> Limpiar</button>
             </div>
 
@@ -389,46 +411,42 @@
             <div class="metrics-grid">
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div>
+                        <div class="stat-info-mobile">
                             <div class="stat-label">Total Pasajeros</div>
                             <div class="stat-value" id="totalPasajeros">0</div>
                         </div>
                         <div class="stat-icon-wrapper icon-blue"><i class="ph-fill ph-users-three"></i></div>
                     </div>
-                    <div class="stat-trend trend-up"><i class="ph-bold ph-trend-up"></i> <span>Actividad reciente</span></div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div>
+                        <div class="stat-info-mobile">
                             <div class="stat-label">Tasa Confirmación</div>
                             <div class="stat-value" id="tasaConfirmacion">0%</div>
                         </div>
                         <div class="stat-icon-wrapper icon-green"><i class="ph-fill ph-check-circle"></i></div>
                     </div>
-                    <div class="stat-trend" id="trendConfirmacion"><span>Objetivo: 80%</span></div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div>
+                        <div class="stat-info-mobile">
                             <div class="stat-label">Tasa de Pago</div>
                             <div class="stat-value" id="tasaPago">0%</div>
                         </div>
                         <div class="stat-icon-wrapper icon-purple"><i class="ph-fill ph-currency-dollar"></i></div>
                     </div>
-                    <div class="stat-trend" id="trendPago"><span>Ingresos estimados</span></div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div>
+                        <div class="stat-info-mobile">
                             <div class="stat-label">Top Excursión</div>
-                            <div class="stat-value" id="topExcursion" style="font-size: 18px; margin-top: 6px; line-height: 1.3;">--</div>
+                            <div class="stat-value" id="topExcursion" style="font-size: 18px; margin-top: 4px; line-height: 1.2;">--</div>
                         </div>
                         <div class="stat-icon-wrapper icon-orange"><i class="ph-fill ph-star"></i></div>
                     </div>
-                    <div class="stat-trend"><span>Más popular del período</span></div>
                 </div>
             </div>
 
@@ -436,8 +454,8 @@
             <div class="charts-container">
                 <div class="chart-card">
                     <div class="card-header">
-                        <h3 class="card-title">Evolución de Pasajeros (Últimos 6 meses)</h3>
-                        <button class="btn-icon" style="padding: 6px; width: 32px; height: 32px;"><i class="ph ph-dots-three-outline"></i></button>
+                        <h3 class="card-title">Evolución de Pasajeros</h3>
+                        <button class="btn-icon" style="width: 32px; height: 32px;"><i class="ph ph-dots-three-outline"></i></button>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="pasajerosChart"></canvas>
@@ -457,7 +475,7 @@
             <div class="table-section">
                 <div class="section-header">
                     <h3 class="card-title">Últimas Reservas</h3>
-                    <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">Ver todas</button>
+                    <button class="btn btn-secondary">Ver todas</button>
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -525,10 +543,24 @@
         function toggleMenu() {
             sidebar.classList.toggle('open');
             overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
         }
         
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
         menuBtn.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', closeMenu);
+        
+        // Cerrar menú al hacer clic en un enlace (móvil)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) closeMenu();
+            });
+        });
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -810,7 +842,7 @@
                     plugins: {
                         legend: { 
                             position: 'bottom', 
-                            labels: { usePointStyle: true, pointStyle: 'circle', color: textColor, padding: 20, font: { size: 12 } } 
+                            labels: { usePointStyle: true, pointStyle: 'circle', color: textColor, padding: 16, font: { size: 11 } } 
                         }
                     }
                 }
@@ -842,7 +874,6 @@
 
         function filtrarPorFecha() {
             showToast('Filtro aplicado', 'Mostrando resultados del período seleccionado.');
-            // Lógica de filtrado real se implementaría aquí modificando reservasDataArray temporalmente
         }
 
         function resetFechas() { 
