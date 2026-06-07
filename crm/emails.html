@@ -2,620 +2,379 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>WhatsApp - CRM Aventura Total</title>
     
-    <!-- ================================================== -->
-    <!-- PWA CONFIGURACIÓN                                      -->
-    <!-- ================================================== -->
+    <!-- PWA CONFIGURACIÓN -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AVT CRM">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#6366f1">
     <meta name="application-name" content="Aventura Total CRM">
-    <meta name="msapplication-TileColor" content="#1a1a2e">
-    <meta name="msapplication-TileImage" content="icons/icon-144.png">
     
-    <!-- Iconos para diferentes plataformas -->
-    <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="icons/icon-76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="icons/icon-114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+    <!-- Fuentes: Inter vía Fontsource -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.15/index.css">
+    
+    <!-- Iconos: Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
-        
-        /* Modo PWA (sin barra de navegación) */
-        .pwa-mode {
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --whatsapp: #25D366;
+            --whatsapp-hover: #1da851;
+            --whatsapp-dark: #128C7E;
+            --whatsapp-light: #e8f5e9;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #475569;
+            --sidebar-active-bg: #e0e7ff;
+            --sidebar-active-text: #4338ca;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
         }
-        
-        /* ========== MODO OSCURO ========== */
+
         body.dark-mode {
-            background: #0f0f1a;
-        }
-        
-        body.dark-mode .buscador-container,
-        body.dark-mode .whatsapp-composer,
-        body.dark-mode .template-card,
-        body.dark-mode .user-info,
-        body.dark-mode .resultados-busqueda,
-        body.dark-mode .cliente-detalle {
-            background: #1e1e2e;
-            color: #e0e0e0;
-        }
-        
-        body.dark-mode .buscador-input,
-        body.dark-mode .form-group input,
-        body.dark-mode .form-group textarea {
-            background: #2a2a3e;
-            border-color: #3a3a4e;
-            color: white;
-        }
-        
-        body.dark-mode .buscador-input::placeholder,
-        body.dark-mode .form-group input::placeholder,
-        body.dark-mode .form-group textarea::placeholder {
-            color: #888;
-        }
-        
-        body.dark-mode .template-card h4 {
-            color: white;
-        }
-        
-        body.dark-mode .template-card p {
-            color: #aaa;
-        }
-        
-        body.dark-mode .template-card:hover {
-            background: #2a2a3e;
-        }
-        
-        body.dark-mode .resultado-item {
-            border-bottom-color: #2a2a3e;
-        }
-        
-        body.dark-mode .resultado-item:hover {
-            background: #2a2a3e;
-        }
-        
-        body.dark-mode .resultado-nombre {
-            color: white;
-        }
-        
-        body.dark-mode .resultado-email {
-            color: #aaa;
-        }
-        
-        body.dark-mode .header h1 {
-            color: white;
-        }
-        
-        body.dark-mode .template-section h3 {
-            color: white;
-        }
-        
-        body.dark-mode .whatsapp-composer h3 {
-            color: white;
-        }
-        
-        body.dark-mode .form-group label {
-            color: #aaa;
-        }
-        
-        body.dark-mode .cliente-detalle strong {
-            color: white;
-        }
-        
-        body.dark-mode .btn-theme {
-            color: white;
-        }
-        
-        body.dark-mode .btn-theme:hover {
-            background: rgba(255,255,255,0.1);
+            --bg-body: #0f172a;
+            --bg-surface: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #cbd5e1;
+            --sidebar-active-bg: #334155;
+            --sidebar-active-text: #818cf8;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
         }
 
-        /* ===== MENÚ HAMBURGUESA - SIN FONDO AZUL ===== */
-        .menu-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            width: 50px;
-            height: 50px;
-            background: transparent;
-            border-radius: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            border: none;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
-        .menu-btn span {
-            font-size: 24px;
-            color: #333;
-        }
-        
-        body.dark-mode .menu-btn span {
-            color: white;
-        }
-        
-        /* ===== SIDEBAR ===== */
-        .sidebar { 
-            width: 250px; 
-            background: #1a1a2e; 
-            color: white; 
-            padding: 25px 0; 
-            position: fixed; 
-            height: 100vh; 
-            overflow-y: auto; 
-            z-index: 1001;
-            transition: transform 0.3s ease;
-            transform: translateX(-100%);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        
-        .sidebar.open {
-            transform: translateX(0);
-        }
-        
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .menu-overlay.active {
-            display: block;
-            opacity: 1;
-        }
-        
-        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; } 
-        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } 
-        .sidebar-logo h2 span { color: #667eea; }
-        
-        .nav-menu { list-style: none; padding: 0 15px; } 
-        .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            padding: 12px 15px; 
-            color: rgba(255,255,255,0.7); 
-            text-decoration: none; 
-            border-radius: 10px; 
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
-        .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        
-        .sidebar-footer { 
-            position: absolute; 
-            bottom: 20px; 
-            left: 15px; 
-            right: 15px; 
-        }
-        .btn-logout-sidebar { 
-            width: 100%; 
-            padding: 12px; 
-            background: rgba(231,76,60,0.2); 
-            color: #e74c3c; 
-            border: 1px solid rgba(231,76,60,0.3);
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 13px; 
-            transition: all 0.2s ease;
-        }
-        .btn-logout-sidebar:hover {
-            background: rgba(231,76,60,0.4);
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== CONTENIDO PRINCIPAL ===== */
-        .main-content { 
-            margin-left: 0;
-            flex: 1; 
-            padding: 20px; 
-            min-width: 0;
-            transition: margin-left 0.3s ease;
-        }
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 30px; 
-            flex-wrap: wrap; 
-            gap: 10px; 
-        }
-        .header h1 { font-size: 26px; color: #1a1a2e; transition: color 0.3s; }
+        /* ===== LAYOUT ===== */
+        .app-container { display: flex; min-height: 100vh; }
         
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .sidebar {
+            width: 260px; 
+            background: var(--sidebar-bg); 
+            border-right: 1px solid var(--border-color);
+            position: fixed; height: 100vh; z-index: 1001;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
         }
         
-        .btn-theme {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: all 0.2s;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .sidebar-header { 
+            padding: 20px 24px; 
+            display: flex; align-items: center; gap: 12px; 
+            border-bottom: 1px solid var(--border-color); 
+            flex-shrink: 0;
         }
-        .btn-theme:hover {
-            background: rgba(0,0,0,0.1);
-            transform: scale(1.1);
+        .brand-icon { 
+            width: 36px; height: 36px; 
+            background: linear-gradient(135deg, var(--primary), #8b5cf6); 
+            border-radius: var(--radius-sm); 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 20px; 
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
         }
-        
-        .user-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            background: white; 
-            padding: 8px 20px; 
-            border-radius: 50px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-            font-size: 14px; 
-            transition: background 0.3s;
-        }
-        .user-avatar { 
-            width: 35px; 
-            height: 35px; 
-            background: #667eea; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: 700; 
-        }
+        .brand-text { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; color: var(--text-main); }
+        .brand-text span { color: var(--primary); }
 
-        /* ===== BUSCADOR ===== */
-        .buscador-container { 
-            background: white; 
-            border-radius: 15px; 
-            padding: 20px; 
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); 
-            margin-bottom: 20px; 
-            position: relative; 
-            transition: background 0.3s;
+        .nav-menu { list-style: none; padding: 16px 12px; flex: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            color: var(--sidebar-text); text-decoration: none; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 500; transition: all 0.2s ease;
         }
-        .buscador-input { 
-            width: 100%; 
-            padding: 12px 15px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 10px; 
-            font-size: 14px; 
-            transition: background 0.3s, border-color 0.3s, color 0.3s;
-        }
-        .buscador-input:focus { 
-            outline: none; 
-            border-color: #25D366; 
-        }
-        .resultados-busqueda { 
-            position: absolute; 
-            top: 100%; 
-            left: 20px; 
-            right: 20px; 
-            background: white; 
-            border: 2px solid #25D366; 
-            border-radius: 0 0 10px 10px; 
-            max-height: 250px; 
-            overflow-y: auto; 
-            z-index: 50; 
-            display: none; 
-            transition: background 0.3s;
-        }
-        .resultados-busqueda.show { display: block; }
-        .resultado-item { 
-            padding: 10px 15px; 
-            cursor: pointer; 
-            border-bottom: 1px solid #f0f0f0; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            gap: 5px; 
-            transition: background 0.3s, border-color 0.3s;
-        }
-        .resultado-item:hover { background: #e8f5e9; } 
-        .resultado-nombre { font-weight: 600; font-size: 13px; } 
-        .resultado-telefono { color: #25D366; font-weight: 600; font-size: 12px; }
-        .resultado-email { font-size: 10px; color: #666; } 
-        .resultado-info { flex: 1; }
-
-        /* ===== COMPOSITOR WHATSAPP ===== */
-        .whatsapp-composer { 
-            background: white; 
-            border-radius: 15px; 
-            padding: 20px; 
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); 
-            margin-bottom: 20px; 
-            transition: background 0.3s;
-        }
-        .form-group { margin-bottom: 15px; } 
-        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 5px; transition: color 0.3s; }
-        .form-group input, .form-group textarea { 
-            width: 100%; 
-            padding: 10px 12px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 8px; 
-            font-size: 13px; 
-            transition: background 0.3s, border-color 0.3s, color 0.3s;
-        }
-        .form-group textarea { 
-            min-height: 180px; 
-            resize: vertical; 
-            font-family: monospace; 
-            font-size: 12px; 
-        }
-        .form-group input:focus, .form-group textarea:focus { 
-            outline: none; 
-            border-color: #25D366; 
-        }
-        .form-row { display: flex; gap: 12px; flex-wrap: wrap; } 
-        .form-row .form-group { flex: 1; min-width: 150px; }
-
-        .btn-enviar { 
-            padding: 10px 25px; 
-            background: #25D366; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 14px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.2s;
-        }
-        .btn-enviar:active { transform: scale(0.96); }
-        .btn-enviar:hover { background: #1da851; }
+        .nav-link i { font-size: 20px; flex-shrink: 0; }
+        .nav-link:hover { background: var(--bg-body); color: var(--primary); }
+        .nav-link.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); font-weight: 600; }
         
-        .btn-web { 
-            padding: 10px 25px; 
-            background: #128C7E; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 14px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.2s;
+        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
+        .user-profile { 
+            display: flex; align-items: center; gap: 12px; padding: 12px; 
+            border-radius: var(--radius-sm); background: var(--bg-body); 
+            cursor: pointer; transition: background 0.2s;
         }
-        .btn-web:active { transform: scale(0.96); }
-        .btn-web:hover { background: #0e6e63; }
-        
-        .mensaje-exito { 
-            background: #d4edda; 
-            color: #155724; 
-            padding: 10px; 
-            border-radius: 8px; 
-            margin-top: 12px; 
-            display: none; 
-            font-weight: 600; 
-            text-align: center; 
-            transition: background 0.3s, color 0.3s;
+        .user-profile:hover { background: var(--border-color); }
+        .avatar { 
+            width: 36px; height: 36px; background: var(--primary); color: white; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-weight: 600; font-size: 14px; flex-shrink: 0;
         }
-        .mensaje-exito.show { display: block; }
-        body.dark-mode .mensaje-exito {
-            background: #1a3320;
-            color: #27ae60;
-        }
-        
-        .cliente-detalle { 
-            background: #f0f7ff; 
-            padding: 12px; 
-            border-radius: 8px; 
-            margin: 10px 0; 
-            font-size: 12px; 
-            border-left: 3px solid #25D366; 
-            transition: background 0.3s;
-        }
-        .cliente-detalle strong { color: #1a1a2e; transition: color 0.3s; }
+        .user-details { overflow: hidden; }
+        .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-details p { font-size: 11px; color: var(--text-muted); }
 
-        /* ===== PLANTILLAS ===== */
-        .template-section { margin-bottom: 20px; } 
-        .template-section h3 { margin-bottom: 12px; color: #1a1a2e; font-size: 16px; transition: color 0.3s; }
-        .template-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 10px; 
+        .main-content { margin-left: 260px; flex: 1; padding: 32px; transition: margin-left 0.3s; width: 100%; }
+        
+        /* Mobile Menu */
+        .menu-toggle { 
+            display: none; position: fixed; top: 16px; left: 16px; z-index: 1002; 
+            background: var(--bg-surface); border: 1px solid var(--border-color); 
+            width: 44px; height: 44px; border-radius: var(--radius-sm); cursor: pointer; 
+            color: var(--text-main); box-shadow: var(--shadow-md); 
+            align-items: center; justify-content: center;
+        }
+        .overlay { 
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
+            z-index: 1000; opacity: 0; pointer-events: none; 
+            transition: opacity 0.3s; backdrop-filter: blur(4px); 
+        }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* ===== HEADER ===== */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+        .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
+        .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+        
+        .actions-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .btn { 
+            padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; 
+            cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; 
+            transition: all 0.2s ease; white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
+        .btn-whatsapp { background: var(--whatsapp); color: white; }
+        .btn-whatsapp:hover { background: var(--whatsapp-hover); }
+        .btn-whatsapp-dark { background: var(--whatsapp-dark); color: white; }
+        .btn-whatsapp-dark:hover { background: #0e6e63; }
+        .btn-icon { 
+            width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); 
+            border: 1px solid var(--border-color); color: var(--text-muted); 
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
+
+        /* ===== SEARCH ===== */
+        .search-section { 
+            background: var(--bg-surface); border-radius: var(--radius); 
+            padding: 20px; box-shadow: var(--shadow-sm); 
+            border: 1px solid var(--border-color); margin-bottom: 24px; 
+            position: relative;
+        }
+        .search-input-wrapper { position: relative; }
+        .search-input { 
+            width: 100%; padding: 12px 16px 12px 44px; 
+            border: 2px solid var(--border-color); border-radius: var(--radius-sm); 
+            font-size: 14px; font-family: inherit; background: var(--bg-body); 
+            color: var(--text-main); transition: all 0.3s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%2364748b' viewBox='0 0 256 256'%3E%3Cpath d='M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: 14px center;
+        }
+        .search-input:focus { border-color: var(--whatsapp); }
+        
+        .search-results { 
+            position: absolute; top: calc(100% - 4px); left: 20px; right: 20px; 
+            background: var(--bg-surface); border: 2px solid var(--whatsapp); 
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm); 
+            max-height: 280px; overflow-y: auto; z-index: 50; display: none; 
+            box-shadow: var(--shadow-lg);
+        }
+        .search-results.show { display: block; }
+        .search-result-item { 
+            padding: 12px 16px; cursor: pointer; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; justify-content: space-between; align-items: center; 
+            gap: 10px; transition: background 0.2s;
+        }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background: var(--whatsapp-light); }
+        .dark-mode .search-result-item:hover { background: rgba(37, 211, 102, 0.1); }
+        .search-result-name { font-weight: 600; font-size: 13px; color: var(--text-main); }
+        .search-result-email { font-size: 11px; color: var(--text-muted); }
+        .search-result-phone { color: var(--whatsapp); font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .search-result-info { flex: 1; min-width: 0; }
+
+        /* ===== TEMPLATES ===== */
+        .section-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .templates-grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 12px; margin-bottom: 28px; 
         }
         .template-card { 
-            background: #f8f9fa; 
-            padding: 12px; 
-            border-radius: 10px; 
-            box-shadow: 0 1px 5px rgba(0,0,0,0.05); 
-            cursor: pointer; 
-            border-left: 3px solid #25D366; 
-            transition: all 0.2s, background 0.3s; 
+            background: var(--bg-surface); padding: 16px; 
+            border-radius: var(--radius); cursor: pointer; 
+            border: 1px solid var(--border-color); 
+            border-left: 4px solid var(--whatsapp); 
+            box-shadow: var(--shadow-sm); transition: all 0.2s ease;
+            text-align: center;
         }
-        .template-card:active { transform: scale(0.96); }
-        .template-card:hover { transform: translateY(-2px); background: #e8f5e9; } 
-        .template-card h4 { font-size: 13px; transition: color 0.3s; } 
-        .template-card p { font-size: 10px; color: #666; transition: color 0.3s; }
-        .template-card .template-icon { font-size: 24px; margin-bottom: 5px; }
+        .template-card:active { transform: scale(0.97); }
+        .template-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--whatsapp); }
+        .template-icon { 
+            width: 44px; height: 44px; border-radius: var(--radius-sm); 
+            margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; 
+            font-size: 22px; background: var(--whatsapp-light); color: var(--whatsapp);
+        }
+        .dark-mode .template-icon { background: rgba(37, 211, 102, 0.15); }
+        .template-card h4 { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .template-card p { font-size: 11px; color: var(--text-muted); }
 
-        /* ===== SCROLL SIDEBAR ===== */
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
+        /* ===== COMPOSER ===== */
+        .composer-section { 
+            background: var(--bg-surface); border-radius: var(--radius); 
+            padding: 24px; box-shadow: var(--shadow-sm); 
+            border: 1px solid var(--border-color); 
         }
-        .sidebar::-webkit-scrollbar-track {
-            background: #1a1a2e;
+        .form-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+        .form-group { flex: 1; min-width: 180px; }
+        .form-group label { 
+            display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); 
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; 
         }
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
+        .form-group input, .form-group textarea { 
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); 
+            border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; 
+            background: var(--bg-body); color: var(--text-main); transition: border-color 0.2s; 
         }
-
-        /* ===== DESKTOP ===== */
-        @media (min-width: 769px) {
-            .menu-btn {
-                display: none !important;
-            }
-            
-            .sidebar {
-                transform: translateX(0) !important;
-                width: 250px;
-            }
-            
-            .menu-overlay {
-                display: none !important;
-            }
-            
-            .main-content {
-                margin-left: 250px;
-                padding: 30px;
-            }
-        }
-
-        /* ===== MÓVIL ===== */
-        @media (max-width: 768px) {
-            .menu-btn {
-                display: flex;
-            }
-            
-            .main-content {
-                padding: 60px 12px 20px;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            .user-info {
-                padding: 5px 12px;
-                font-size: 12px;
-            }
-            
-            .user-avatar {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
-            
-            .template-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .form-row {
-                flex-direction: column;
-            }
-            
-            .btn-enviar, .btn-web {
-                width: 100%;
-                text-align: center;
-            }
-            
-            .resultado-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .btn-theme {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--whatsapp); }
+        .form-group input[readonly] { opacity: 0.8; cursor: default; }
+        .form-group textarea { 
+            min-height: 200px; resize: vertical; font-size: 13px; 
+            line-height: 1.6; font-family: 'Inter', monospace;
         }
         
+        .client-detail { 
+            background: var(--whatsapp-light); padding: 14px 16px; 
+            border-radius: var(--radius-sm); margin-bottom: 16px; 
+            border-left: 4px solid var(--whatsapp); font-size: 13px; 
+            line-height: 1.6; display: none;
+        }
+        .dark-mode .client-detail { background: rgba(37, 211, 102, 0.08); }
+        .client-detail strong { color: var(--text-main); }
+        
+        .button-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+        
+        .success-message { 
+            background: var(--success-light); color: #047857; 
+            padding: 12px 16px; border-radius: var(--radius-sm); 
+            margin-top: 12px; display: none; font-weight: 600; 
+            text-align: center; font-size: 13px;
+            border: 1px solid var(--success);
+        }
+        .dark-mode .success-message { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .success-message.show { display: block; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 76px; }
+            .menu-toggle { display: flex; }
+            
+            .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .templates-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-row { flex-direction: column; gap: 12px; }
+            .button-row { flex-direction: column; }
+            .button-row .btn { width: 100%; justify-content: center; }
+            .search-result-item { flex-direction: column; align-items: flex-start; }
+        }
+
         @media (max-width: 480px) {
-            .template-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .header-actions {
-                width: 100%;
-                justify-content: flex-start;
-            }
+            .page-title h1 { font-size: 20px; }
+            .templates-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .template-card { padding: 12px; }
         }
     </style>
 </head>
 <body>
-    <!-- Botón menú hamburguesa (solo móvil) -->
-    <button class="menu-btn" id="menuBtn">
-        <span>☰</span>
-    </button>
-    
-    <!-- Overlay para cerrar menú -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-    
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🏔️</div>
-            <h2>Aventura <span>Total</span></h2>
-            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
-            <li><a href="reservas.html"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
-            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="emails.html" class="active"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
-            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
-            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
-        </div>
-    </nav>
 
-    <div class="main-content">
-        <div class="header">
-            <div><h1>💬 WhatsApp</h1></div>
-            <div class="header-actions">
-                <button class="btn-theme" onclick="toggleTheme()" title="Modo oscuro/claro">🌙</button>
-                <div class="user-info">
-                    <div class="user-avatar">A</div>
-                    <span>Admin</span>
+    <!-- Mobile Toggle -->
+    <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú"><i class="ph ph-list" style="font-size: 24px;"></i></button>
+    <div class="overlay" id="menuOverlay"></div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-icon"><i class="ph-bold ph-mountains"></i></div>
+                <div class="brand-text">Aventura<span>Total</span></div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="ph ph-squares-four"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="clientes.html" class="nav-link"><i class="ph ph-users"></i> Clientes</a></li>
+                <li class="nav-item"><a href="reservas.html" class="nav-link"><i class="ph ph-calendar-check"></i> Reservas</a></li>
+                <li class="nav-item"><a href="seguimiento.html" class="nav-link"><i class="ph ph-chart-line-up"></i> Seguimiento</a></li>
+                <li class="nav-item"><a href="emails.html" class="nav-link active"><i class="ph ph-whatsapp-logo"></i> WhatsApp</a></li>
+                <li class="nav-item"><a href="calendario.html" class="nav-link"><i class="ph ph-calendar"></i> Calendario</a></li>
+                <li class="nav-item"><a href="clima.html" class="nav-link"><i class="ph ph-cloud-sun"></i> Clima</a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-profile" onclick="logout()">
+                    <div class="avatar">AD</div>
+                    <div class="user-details">
+                        <h4>Administrador</h4>
+                        <p>Cerrar Sesión</p>
+                    </div>
+                    <i class="ph ph-sign-out" style="margin-left: auto; color: var(--text-muted); font-size: 18px;"></i>
                 </div>
             </div>
-        </div>
+        </aside>
 
-        <div class="buscador-container">
-            <input type="text" class="buscador-input" id="buscadorCliente" placeholder="🔍 Buscar cliente por nombre, email o teléfono..." autocomplete="off">
-            <div class="resultados-busqueda" id="resultadosBusqueda"></div>
-        </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="page-title">
+                    <h1>WhatsApp</h1>
+                    <p>Envía mensajes personalizados a tus clientes.</p>
+                </div>
+                <div class="actions-group">
+                    <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
+                </div>
+            </header>
 
-        <div class="template-section">
-            <h3>📝 Plantillas</h3>
-            <div class="template-grid">
+            <!-- Search -->
+            <div class="search-section">
+                <div class="search-input-wrapper">
+                    <input type="text" class="search-input" id="buscadorCliente" placeholder="Buscar cliente por nombre, email o teléfono..." autocomplete="off">
+                </div>
+                <div class="search-results" id="resultadosBusqueda"></div>
+            </div>
+
+            <!-- Templates -->
+            <div class="section-title"><i class="ph ph-note-pencil" style="color: var(--whatsapp);"></i> Plantillas de mensajes</div>
+            <div class="templates-grid">
                 <div class="template-card" onclick="cargarPlantilla('confirmacion')">
                     <div class="template-icon">✅</div>
                     <h4>Confirmación</h4>
@@ -629,131 +388,109 @@
                 <div class="template-card" onclick="cargarPlantilla('salida')">
                     <div class="template-icon">🚌</div>
                     <h4>Día Antes</h4>
-                    <p>24hs antes</p>
+                    <p>24hs antes de la excursión</p>
                 </div>
                 <div class="template-card" onclick="cargarPlantilla('agradecimiento')">
                     <div class="template-icon">🙏</div>
                     <h4>Post-Excursión</h4>
-                    <p>Agradecimiento</p>
+                    <p>Agradecimiento y reseña</p>
                 </div>
                 <div class="template-card" onclick="cargarPlantilla('promocion')">
                     <div class="template-icon">🎉</div>
                     <h4>Promoción</h4>
-                    <p>Ofertas</p>
+                    <p>Ofertas especiales</p>
                 </div>
                 <div class="template-card" onclick="cargarPlantilla('personalizado')">
                     <div class="template-icon">✏️</div>
                     <h4>Personalizado</h4>
-                    <p>Tu mensaje</p>
+                    <p>Tu propio mensaje</p>
                 </div>
             </div>
-        </div>
 
-        <div class="whatsapp-composer">
-            <h3>💬 Enviar Mensaje</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>📞 WhatsApp:</label>
-                    <input type="text" id="whatsappNumero" placeholder="Ej: 5493518692251">
+            <!-- Composer -->
+            <div class="composer-section">
+                <div class="section-title"><i class="ph ph-chat-centered-text" style="color: var(--whatsapp);"></i> Redactar mensaje</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📞 Número de WhatsApp</label>
+                        <input type="text" id="whatsappNumero" placeholder="Ej: 5493518692251">
+                    </div>
+                    <div class="form-group">
+                        <label>👤 Cliente seleccionado</label>
+                        <input type="text" id="whatsappCliente" readonly placeholder="Selecciona un cliente arriba">
+                    </div>
                 </div>
+                
+                <div class="client-detail" id="clienteDetalleDiv"></div>
+                
                 <div class="form-group">
-                    <label>👤 Cliente:</label>
-                    <input type="text" id="whatsappCliente" readonly placeholder="Seleccionar cliente">
+                    <label>💬 Mensaje</label>
+                    <textarea id="whatsappMensaje" placeholder="Escribe tu mensaje aquí...&#10;&#10;Variables disponibles:&#10;[NOMBRE] - Nombre del cliente&#10;[EXCURSIONES] - Lista de excursiones&#10;[FECHA] - Fecha de la reserva&#10;[PERSONAS] - Cantidad de personas&#10;[PAGO] - Forma de pago&#10;[LUGAR] - Punto de encuentro"></textarea>
                 </div>
+                
+                <div class="button-row">
+                    <button class="btn btn-whatsapp" id="btnEnviarWhatsApp"><i class="ph ph-paper-plane-right"></i> Enviar por WhatsApp</button>
+                    <button class="btn btn-whatsapp-dark" id="btnWhatsAppWeb"><i class="ph ph-globe"></i> WhatsApp Web</button>
+                </div>
+                
+                <div class="success-message" id="mensajeExito"><i class="ph ph-check-circle"></i> ✅ Mensaje listo para enviar</div>
             </div>
-            <div id="clienteDetalleDiv" style="display:none;"></div>
-            <div class="form-group">
-                <label>💬 Mensaje:</label>
-                <textarea id="whatsappMensaje" placeholder="Escribe tu mensaje...&#10;&#10;Puedes usar:&#10;[NOMBRE] - Nombre del cliente&#10;[EXCURSIONES] - Lista de excursiones&#10;[FECHA] - Fecha de la reserva&#10;[PERSONAS] - Cantidad de personas&#10;[PAGO] - Forma de pago&#10;[LUGAR] - Punto de encuentro"></textarea>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
-                <button class="btn-enviar" id="btnEnviarWhatsApp">💬 Enviar</button>
-                <button class="btn-web" id="btnWhatsAppWeb">🌐 WhatsApp Web</button>
-            </div>
-            <div class="mensaje-exito" id="mensajeExito">✅ Mensaje listo para enviar</div>
-        </div>
+        </main>
     </div>
 
     <script>
         // ==================================================
-        // MODO OSCURO
-        // ==================================================
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDark);
-            const btn = document.querySelector('.btn-theme');
-            if (btn) {
-                btn.textContent = isDark ? '☀️' : '🌙';
-            }
-        }
-        
-        // Cargar preferencia de modo oscuro
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            const btn = document.querySelector('.btn-theme');
-            if (btn) {
-                btn.textContent = '☀️';
-            }
-        }
-        
-        // ==================================================
-        // REGISTRAR SERVICE WORKER PARA PWA
-        // ==================================================
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('✅ Service Worker registrado con éxito:', registration.scope);
-                    })
-                    .catch(function(error) {
-                        console.log('❌ Error al registrar Service Worker:', error);
-                    });
-            });
-        }
-        
-        // Detectar si la app está instalada y se abre desde la pantalla de inicio
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
-            document.body.classList.add('pwa-mode');
-        }
-        
-        // ==================================================
-        // MENÚ FLOTANTE
+        // LOGICA UI & TEMA
         // ==================================================
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.getElementById('sidebar');
-        const menuOverlay = document.getElementById('menuOverlay');
+        const overlay = document.getElementById('menuOverlay');
+        const themeIcon = document.getElementById('themeIcon');
         
         function toggleMenu() {
             sidebar.classList.toggle('open');
-            menuOverlay.classList.toggle('active');
+            overlay.classList.toggle('active');
             document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
         }
         
         function closeMenu() {
             sidebar.classList.remove('open');
-            menuOverlay.classList.remove('active');
+            overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', closeMenu);
         
-        if (menuBtn) {
-            menuBtn.addEventListener('click', toggleMenu);
-        }
-        
-        if (menuOverlay) {
-            menuOverlay.addEventListener('click', closeMenu);
-        }
-        
-        // Cerrar menú al hacer clic en un enlace
-        document.querySelectorAll('.nav-menu a').forEach(link => {
+        document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    closeMenu();
-                }
+                if (window.innerWidth <= 768) closeMenu();
             });
         });
-        
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            themeIcon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
+        }
+
+        if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.body.classList.add('dark-mode');
+            themeIcon.className = 'ph ph-sun';
+        }
+
+        // ==================================================
+        // SERVICE WORKER
+        // ==================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log(err)); });
+        }
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            document.body.classList.add('pwa-mode');
+        }
+
         // ==================================================
         // CONFIGURACIÓN
         // ==================================================
@@ -844,8 +581,7 @@
             if (detalleDiv && reservaActual) {
                 const excursionesPreview = formatearExcursiones(reservaActual.excursiones).split('\n')[0] || 'No especificada';
                 detalleDiv.style.display = 'block';
-                detalleDiv.className = 'cliente-detalle';
-                detalleDiv.innerHTML = `<strong>📋 Última reserva:</strong><br>🕐 ${excursionesPreview}<br>📅 ${reservaActual.fecha || 'No especificada'} | 👥 ${reservaActual.personas || '1'} pax<br>💳 ${reservaActual.formaPago || 'No especificada'} | 📍 ${reservaActual.lugar || 'No especificado'}`;
+                detalleDiv.innerHTML = `<strong>📋 Última reserva:</strong><br>🕐 ${escapeHtml(excursionesPreview)}<br>📅 ${escapeHtml(reservaActual.fecha || 'No especificada')} | 👥 ${escapeHtml(reservaActual.personas || '1')} pax<br>💳 ${escapeHtml(reservaActual.formaPago || 'No especificada')} | 📍 ${escapeHtml(reservaActual.lugar || 'No especificado')}`;
             } else if (detalleDiv) {
                 detalleDiv.style.display = 'none';
             }
@@ -969,15 +705,15 @@
                 ).slice(0, 10);
                 
                 if (filtrados.length === 0) {
-                    resultadosDiv.innerHTML = '<div class="resultado-item" style="justify-content:center;">❌ No se encontraron clientes</div>';
+                    resultadosDiv.innerHTML = '<div class="search-result-item" style="justify-content:center; color:var(--text-muted);">❌ No se encontraron clientes</div>';
                 } else {
                     resultadosDiv.innerHTML = filtrados.map(cliente => `
-                        <div class="resultado-item" onclick="seleccionarCliente(${JSON.stringify(cliente).replace(/"/g, '&quot;')})">
-                            <div class="resultado-info">
-                                <div class="resultado-nombre">${escapeHtml(cliente.nombre)}</div>
-                                <div class="resultado-email">${escapeHtml(cliente.email)}</div>
+                        <div class="search-result-item" onclick="seleccionarCliente(${JSON.stringify(cliente).replace(/"/g, '&quot;')})">
+                            <div class="search-result-info">
+                                <div class="search-result-name">${escapeHtml(cliente.nombre)}</div>
+                                <div class="search-result-email">${escapeHtml(cliente.email)}</div>
                             </div>
-                            <div class="resultado-telefono">📞 ${escapeHtml(cliente.telefono || 'Sin teléfono')}</div>
+                            <div class="search-result-phone"><i class="ph ph-phone"></i> ${escapeHtml(cliente.telefono || 'Sin teléfono')}</div>
                         </div>
                     `).join('');
                 }
@@ -985,7 +721,7 @@
             });
             
             document.addEventListener('click', function(e) {
-                if (!e.target.closest('.buscador-container') && resultadosDiv) resultadosDiv.classList.remove('show');
+                if (!e.target.closest('.search-section') && resultadosDiv) resultadosDiv.classList.remove('show');
             });
         }
 
