@@ -2,287 +2,141 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     
-    <!-- PWA CONFIGURACIÓN -->
+    <!-- ================================================== -->
+    <!-- PWA CONFIGURACIÓN                                      -->
+    <!-- ================================================== -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AVT CRM">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#6366f1">
+    <meta name="theme-color" content="#1a1a2e">
     <meta name="application-name" content="Aventura Total CRM">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+    <meta name="msapplication-TileImage" content="icons/icon-144.png">
     
-    <!-- Fuentes: Inter vía Fontsource -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.15/index.css">
+    <!-- Iconos para diferentes plataformas -->
+    <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="icons/icon-76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="icons/icon-114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
     
-    <!-- Iconos: Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <title>Login - CRM Aventura Total</title>
-    
+    <title>CRM - Aventura Total</title>
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --primary-light: #e0e7ff;
-            --success: #10b981;
-            --success-light: #d1fae5;
-            --danger: #ef4444;
-            --danger-light: #fee2e2;
-            
-            --bg-body: #0f172a;
-            --bg-surface: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            --radius: 16px;
-            --radius-sm: 10px;
-        }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        html, body { height: 100%; margin: 0; padding: 0; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #312e81 70%, #4338ca 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            position: relative;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
         }
         
-        /* Fondo decorativo */
-        body::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -30%;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-        
-        body::after {
-            content: '';
-            position: absolute;
-            bottom: -40%;
-            left: -20%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
+        /* Modo PWA (sin barra de navegación) - se aplica cuando la app está instalada */
         .pwa-mode {
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
         
         .login-container { 
-            background: var(--bg-surface); 
-            border-radius: var(--radius); 
-            padding: 48px 40px; 
+            background: white; 
+            border-radius: 20px; 
+            padding: 50px 40px; 
             max-width: 420px; 
             width: 100%; 
-            box-shadow: var(--shadow-lg); 
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4); 
             text-align: center; 
-            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            z-index: 1;
+            animation: slideUp 0.6s ease; 
         }
         
         @keyframes slideUp { 
-            from { opacity: 0; transform: translateY(40px) scale(0.96); } 
-            to { opacity: 1; transform: translateY(0) scale(1); } 
+            from { opacity: 0; transform: translateY(40px); } 
+            to { opacity: 1; transform: translateY(0); } 
         }
         
-        .login-logo { 
-            width: 72px; height: 72px; 
-            background: linear-gradient(135deg, var(--primary), #8b5cf6); 
-            border-radius: 20px; 
-            display: flex; align-items: center; justify-content: center; 
-            margin: 0 auto 20px; 
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
-        }
-        .login-logo i { font-size: 36px; color: white; }
-        
-        h1 { 
-            color: var(--text-main); font-size: 26px; font-weight: 800; 
-            margin-bottom: 6px; letter-spacing: -0.5px; 
-        } 
-        h1 span { color: var(--primary); }
-        
-        .subtitulo { 
-            color: var(--text-muted); font-size: 14px; margin-bottom: 32px; 
-            font-weight: 400; 
-        }
-        
+        .login-logo { font-size: 60px; margin-bottom: 15px; }
+        h1 { color: #1a1a2e; font-size: 24px; margin-bottom: 5px; } 
+        h1 span { color: #667eea; }
+        .subtitulo { color: #666; font-size: 14px; margin-bottom: 30px; }
         .form-group { margin-bottom: 20px; text-align: left; }
-        label { 
-            display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); 
-            margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; 
-        }
-        .input-wrapper {
-            position: relative;
-        }
-        .input-wrapper i {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 18px;
-            color: var(--text-muted);
-            pointer-events: none;
-            transition: color 0.2s;
-        }
+        label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         input { 
             width: 100%; 
-            padding: 14px 16px 14px 42px; 
-            border: 2px solid var(--border-color); 
-            border-radius: var(--radius-sm); 
-            font-size: 14px; 
-            font-family: 'Inter', sans-serif;
-            color: var(--text-main);
-            background: #f8fafc;
+            padding: 14px 16px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            font-size: 15px; 
             transition: all 0.3s; 
         }
-        input:focus { 
-            outline: none; 
-            border-color: var(--primary); 
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-            background: white;
-        }
-        input:focus + i,
-        .input-wrapper:focus-within i {
-            color: var(--primary);
-        }
-        
+        input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
         .btn-login { 
             width: 100%; 
             padding: 14px; 
-            background: linear-gradient(135deg, var(--primary), #8b5cf6); 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
             color: white; 
             border: none; 
-            border-radius: var(--radius-sm); 
-            font-size: 15px; 
+            border-radius: 10px; 
+            font-size: 16px; 
             font-weight: 700; 
             cursor: pointer; 
-            margin-top: 8px; 
-            transition: all 0.3s ease; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-family: 'Inter', sans-serif;
+            margin-top: 10px; 
+            transition: all 0.3s; 
         }
-        .btn-login:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4); 
-        }
-        .btn-login:active { transform: scale(0.98); }
-        .btn-login:disabled { 
-            background: #94a3b8; 
-            cursor: not-allowed; 
-            transform: none; 
-            box-shadow: none;
-        }
-        
-        .error-message { 
-            background: var(--danger-light); 
-            color: #991b1b; 
-            padding: 12px 16px; 
-            border-radius: var(--radius-sm); 
-            font-size: 13px; 
-            margin-top: 16px; 
-            display: none; 
-            font-weight: 600; 
-            border: 1px solid var(--danger);
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-        .error-message.show { display: flex; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .footer-text { 
-            margin-top: 24px; font-size: 12px; color: var(--text-muted); 
-            font-weight: 500;
-        }
-        
-        .spinner { 
-            display: inline-block; width: 18px; height: 18px; 
-            border: 2px solid rgba(255,255,255,0.3); 
-            border-top-color: white; border-radius: 50%; 
-            animation: spin 0.6s linear infinite; 
-        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102,126,234,0.4); }
+        .btn-login:disabled { background: #95a5a6; cursor: not-allowed; transform: none; }
+        .error-message { background: #ffe0e0; color: #c0392b; padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 15px; display: none; font-weight: 600; }
+        .error-message.show { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .footer-text { margin-top: 20px; font-size: 12px; color: #999; }
+        .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; margin-left: 8px; vertical-align: middle; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .security-badge { 
-            position: fixed; bottom: 16px; left: 16px; 
-            font-size: 11px; color: rgba(255,255,255,0.5); 
-            background: rgba(0,0,0,0.3); padding: 6px 12px; 
-            border-radius: 20px; z-index: 1000; 
-            font-family: 'Inter', sans-serif; font-weight: 500;
-            backdrop-filter: blur(8px);
-            display: flex; align-items: center; gap: 6px;
-        }
+        .security-badge { position: fixed; bottom: 10px; left: 10px; font-size: 10px; color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 5px; z-index: 1000; }
         
         @media (max-width: 480px) {
-            .login-container { padding: 32px 24px; }
-            .login-logo { width: 60px; height: 60px; border-radius: 16px; }
-            .login-logo i { font-size: 28px; }
-            h1 { font-size: 22px; }
-            input { padding: 12px 14px 12px 38px; font-size: 13px; }
-            .btn-login { padding: 12px; font-size: 14px; }
+            .login-container { padding: 30px 20px; }
+            .login-logo { font-size: 50px; }
+            h1 { font-size: 20px; }
+            input { padding: 12px 14px; font-size: 14px; }
+            .btn-login { padding: 12px; }
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <div class="login-logo"><i class="ph-bold ph-mountains"></i></div>
+        <div class="login-logo">🏔️</div>
         <h1>Aventura <span>Total</span></h1>
         <p class="subtitulo">Panel de Administración CRM</p>
         
         <form id="loginForm">
-            <div class="form-group">
-                <label>Email</label>
-                <div class="input-wrapper">
-                    <i class="ph ph-envelope"></i>
-                    <input type="email" id="email" placeholder="admin@aventuratotal.com" required autocomplete="off">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Contraseña</label>
-                <div class="input-wrapper">
-                    <i class="ph ph-lock"></i>
-                    <input type="password" id="password" placeholder="••••••••" required>
-                </div>
-            </div>
-            <button type="submit" class="btn-login" id="btnLogin">
-                <i class="ph ph-sign-in"></i> Ingresar al Panel
-            </button>
+            <div class="form-group"><label>📧 Email</label><input type="email" id="email" placeholder="admin@aventuratotal.com" required autocomplete="off"></div>
+            <div class="form-group"><label>🔒 Contraseña</label><input type="password" id="password" placeholder="••••••••" required></div>
+            <button type="submit" class="btn-login" id="btnLogin">Ingresar al Panel</button>
         </form>
         
-        <div class="error-message" id="errorMessage">
-            <i class="ph ph-warning-circle"></i>
-            <span id="errorText"></span>
-        </div>
-        <p class="footer-text">© 2026 Aventura Total · Acceso Restringido</p>
+        <div class="error-message" id="errorMessage"></div>
+        <p class="footer-text">© 2026 Aventura Total - Acceso Restringido</p>
     </div>
-    
-    <div class="security-badge"><i class="ph ph-shield-check"></i> Conexión segura</div>
+    <div class="security-badge">🔒 SHA-256</div>
     
     <script>
         // ==================================================
@@ -290,7 +144,7 @@
         // ==================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
+                navigator.serviceWorker.register('/sw.js')
                     .then(function(registration) {
                         console.log('✅ Service Worker registrado con éxito:', registration.scope);
                     })
@@ -300,7 +154,9 @@
             });
         }
         
+        // Detectar si la app está instalada y se abre desde la pantalla de inicio
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
             document.body.classList.add('pwa-mode');
         }
         
@@ -393,19 +249,12 @@
             }
         }
         
-        function mostrarError(mensaje) {
-            const errorMsg = document.getElementById('errorMessage');
-            const errorText = document.getElementById('errorText');
-            errorText.textContent = mensaje;
-            errorMsg.classList.add('show');
-            setTimeout(() => errorMsg.classList.remove('show'), 4000);
-        }
-        
         // ==================================================
         // MANEJAR LOGIN
         // ==================================================
         const loginForm = document.getElementById('loginForm');
         const btnLogin = document.getElementById('btnLogin');
+        const errorMsg = document.getElementById('errorMessage');
         
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -414,19 +263,23 @@
             const password = document.getElementById('password').value;
             
             if (!email || !password) {
-                mostrarError('Complete todos los campos');
+                errorMsg.textContent = '⚠️ Complete todos los campos';
+                errorMsg.classList.add('show');
+                setTimeout(() => errorMsg.classList.remove('show'), 3000);
                 return;
             }
             
             try {
                 verificarRateLimiting();
             } catch (error) {
-                mostrarError(error.message);
+                errorMsg.textContent = error.message;
+                errorMsg.classList.add('show');
+                setTimeout(() => errorMsg.classList.remove('show'), 3000);
                 return;
             }
             
             btnLogin.disabled = true;
-            btnLogin.innerHTML = 'Verificando <span class="spinner"></span>';
+            btnLogin.innerHTML = 'Verificando <span class="loading"></span>';
             
             try {
                 const hashIngresado = await hashPassword(password);
@@ -435,27 +288,24 @@
                 if (usuario && hashIngresado === usuario.hash) {
                     registrarSesion(email, usuario.rol);
                     intentosFallidos = 0;
-                    btnLogin.innerHTML = '<i class="ph ph-check-circle"></i> Ingresando...';
-                    btnLogin.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    btnLogin.innerHTML = '✅ Ingresando...';
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 500);
                 } else {
                     registrarIntentoFallido();
                     btnLogin.disabled = false;
-                    btnLogin.innerHTML = '<i class="ph ph-sign-in"></i> Ingresar al Panel';
-                    btnLogin.style.background = '';
-                    mostrarError('Email o contraseña incorrectos');
+                    btnLogin.innerHTML = 'Ingresar al Panel';
+                    errorMsg.textContent = '❌ Email o contraseña incorrectos';
+                    errorMsg.classList.add('show');
+                    setTimeout(() => errorMsg.classList.remove('show'), 3000);
                 }
             } catch (error) {
-                if (error.message.includes('Demasiados intentos')) {
-                    mostrarError(error.message);
-                } else {
-                    btnLogin.disabled = false;
-                    btnLogin.innerHTML = '<i class="ph ph-sign-in"></i> Ingresar al Panel';
-                    btnLogin.style.background = '';
-                    mostrarError('Error de conexión. Intente nuevamente.');
-                }
+                btnLogin.disabled = false;
+                btnLogin.innerHTML = 'Ingresar al Panel';
+                errorMsg.textContent = '❌ Error de conexión';
+                errorMsg.classList.add('show');
+                setTimeout(() => errorMsg.classList.remove('show'), 3000);
             }
         });
         
@@ -476,11 +326,6 @@
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
         });
-        
-        // Redirigir si ya hay sesión activa
-        if (verificarSesionExistente()) {
-            window.location.href = 'dashboard.html';
-        }
     </script>
 </body>
 </html>
