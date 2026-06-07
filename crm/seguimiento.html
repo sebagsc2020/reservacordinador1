@@ -339,58 +339,90 @@
         .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
         .btn-whatsapp:active { transform: scale(0.98); }
 
-        /* Preloader */
+        /* ===== PRELOADER POPUP - MONTAÑAS ===== */
         .preloader-popup {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 27, 75, 0.95) 50%, rgba(49, 46, 129, 0.95) 100%);
+            backdrop-filter: blur(8px);
             display: flex; justify-content: center; align-items: center; z-index: 10000;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
         }
         .preloader-popup.oculto { opacity: 0; visibility: hidden; pointer-events: none; }
-        .preloader-content { 
-            background: var(--bg-surface); border-radius: var(--radius); 
-            padding: 40px 50px; text-align: center; box-shadow: var(--shadow-lg);
+        
+        .preloader-content { text-align: center; animation: fadeInUp 0.5s ease; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .preloader-logo-wrapper { position: relative; width: 90px; height: 90px; margin: 0 auto 28px; }
+        .preloader-logo-circle {
+            width: 90px; height: 90px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 22px; display: flex; align-items: center; justify-content: center;
+            animation: logoPulse 2s ease-in-out infinite; box-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
+            position: relative; z-index: 2;
         }
-        .preloader-spinner { 
-            width: 56px; height: 56px; border: 4px solid var(--border-color); 
-            border-top-color: var(--primary); border-right-color: #8b5cf6;
-            border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; 
+        .preloader-logo-circle .logo-icon { font-size: 42px; color: white; animation: logoFloat 3s ease-in-out infinite; }
+        @keyframes logoPulse { 0%,100%{transform:scale(1);box-shadow:0 0 40px rgba(99,102,241,0.5)} 50%{transform:scale(1.06);box-shadow:0 0 60px rgba(99,102,241,0.7)} }
+        @keyframes logoFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        
+        .preloader-ripple {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            border: 2px solid rgba(99,102,241,0.4); border-radius: 50%; animation: rippleEffect 2.5s ease-out infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .preloader-title { font-size: 16px; font-weight: 600; color: var(--text-main); }
-        .preloader-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+        .preloader-ripple:nth-child(1){width:110px;height:110px;animation-delay:0s}
+        .preloader-ripple:nth-child(2){width:130px;height:130px;animation-delay:.6s}
+        .preloader-ripple:nth-child(3){width:150px;height:150px;animation-delay:1.2s}
+        @keyframes rippleEffect { 0%{width:90px;height:90px;opacity:1} 100%{width:200px;height:200px;opacity:0} }
+        
+        .preloader-title { font-size: 26px; font-weight: 800; color: white; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .preloader-title span { color: #818cf8; }
+        .preloader-subtitle { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 28px; font-weight: 400; }
+        
+        .preloader-progress-container { width: 260px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 0 auto 14px; overflow: hidden; }
+        .preloader-progress-bar {
+            height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6, #a78bfa);
+            border-radius: 10px; width: 0%; animation: progressLoading 2.5s ease-in-out forwards; position: relative;
+        }
+        .preloader-progress-bar::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            animation: shimmer 1.8s ease-in-out infinite;
+        }
+        @keyframes progressLoading { 0%{width:0%} 30%{width:35%} 60%{width:70%} 85%{width:92%} 100%{width:100%} }
+        @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
+        
+        .preloader-loading-text { font-size: 12px; color: rgba(255,255,255,0.45); font-weight: 500; letter-spacing: 0.5px; }
+        .preloader-loading-text .dots::after { content: ''; animation: dotsAnim 1.5s steps(4,end) infinite; }
+        @keyframes dotsAnim { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} 100%{content:''} }
+        
+        .preloader-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .preloader-particle { position: absolute; width: 3px; height: 3px; background: rgba(99,102,241,0.5); border-radius: 50%; animation: particleFloat 5s ease-in-out infinite; }
+        .preloader-particle:nth-child(1){left:8%;top:25%;animation-delay:0s}
+        .preloader-particle:nth-child(2){left:22%;top:55%;animation-delay:.4s;width:2px;height:2px}
+        .preloader-particle:nth-child(3){left:68%;top:35%;animation-delay:.8s}
+        .preloader-particle:nth-child(4){left:82%;top:65%;animation-delay:1.2s;width:4px;height:4px}
+        .preloader-particle:nth-child(5){left:45%;top:15%;animation-delay:1.6s;width:2px;height:2px}
+        .preloader-particle:nth-child(6){left:35%;top:75%;animation-delay:2s}
+        .preloader-particle:nth-child(7){left:88%;top:48%;animation-delay:2.4s;width:3px;height:3px}
+        .preloader-particle:nth-child(8){left:55%;top:85%;animation-delay:2.8s;width:2px;height:2px}
+        @keyframes particleFloat { 0%,100%{transform:translateY(0)translateX(0);opacity:0} 15%{opacity:.7} 85%{opacity:0} 100%{transform:translateY(-120px)translateX(25px);opacity:0} }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .kanban-board { grid-template-columns: repeat(2, 1fr); }
-            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
+        @media (max-width: 1024px) { .kanban-board { grid-template-columns: repeat(2, 1fr); } .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); width: 280px; }
-            .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
-            .main-content { margin-left: 0; padding: 20px; padding-top: 76px; }
-            .menu-toggle { display: flex; }
-            
-            .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
-            .actions-group { width: 100%; justify-content: space-between; }
-            
-            .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .stat-card { padding: 14px; gap: 12px; }
-            .stat-icon-wrapper { width: 40px; height: 40px; font-size: 20px; }
-            .stat-value { font-size: 22px; }
-            
-            .kanban-board { grid-template-columns: 1fr; gap: 16px; }
-            .kanban-column { padding: 16px; }
-            .kanban-cards { max-height: 350px; }
-            
+            .sidebar { transform: translateX(-100%); width: 280px; } .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 76px; } .menu-toggle { display: flex; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 16px; } .actions-group { width: 100%; justify-content: space-between; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .stat-card { padding: 14px; gap: 12px; }
+            .stat-icon-wrapper { width: 40px; height: 40px; font-size: 20px; } .stat-value { font-size: 22px; }
+            .kanban-board { grid-template-columns: 1fr; gap: 16px; } .kanban-column { padding: 16px; } .kanban-cards { max-height: 350px; }
             .modal-content { max-height: 90vh; }
+            .preloader-logo-wrapper { width: 70px; height: 70px; } .preloader-logo-circle { width: 70px; height: 70px; border-radius: 18px; }
+            .preloader-logo-circle .logo-icon { font-size: 32px; } .preloader-title { font-size: 22px; } .preloader-progress-container { width: 220px; }
         }
-
         @media (max-width: 480px) {
-            .page-title h1 { font-size: 20px; }
-            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-            .kanban-card { padding: 12px; }
+            .page-title h1 { font-size: 20px; } .metrics-grid { grid-template-columns: repeat(2, 1fr); } .kanban-card { padding: 12px; }
+            .preloader-logo-wrapper { width: 60px; height: 60px; } .preloader-logo-circle { width: 60px; height: 60px; border-radius: 16px; }
+            .preloader-logo-circle .logo-icon { font-size: 28px; } .preloader-title { font-size: 20px; }
+            .preloader-subtitle { font-size: 12px; } .preloader-progress-container { width: 200px; height: 4px; }
         }
     </style>
 </head>
@@ -421,10 +453,7 @@
             <div class="sidebar-footer">
                 <div class="user-profile" onclick="logout()">
                     <div class="avatar">AD</div>
-                    <div class="user-details">
-                        <h4>Administrador</h4>
-                        <p>Cerrar Sesión</p>
-                    </div>
+                    <div class="user-details"><h4>Administrador</h4><p>Cerrar Sesión</p></div>
                     <i class="ph ph-sign-out" style="margin-left: auto; color: var(--text-muted); font-size: 18px;"></i>
                 </div>
             </div>
@@ -432,83 +461,44 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Header -->
             <header class="page-header">
-                <div class="page-title">
-                    <h1>Seguimiento</h1>
-                    <p>Pipeline de reservas - Estado actual</p>
-                </div>
+                <div class="page-title"><h1>Seguimiento</h1><p>Pipeline de reservas - Estado actual</p></div>
                 <div class="actions-group">
                     <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
                     <button class="btn btn-success" onclick="cargarDatos()"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
                 </div>
             </header>
 
-            <!-- Metrics -->
             <div class="metrics-grid">
-                <div class="stat-card">
-                    <div class="stat-icon-wrapper icon-indigo"><i class="ph-fill ph-squares-four"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="metricaTotal">--</div>
-                        <div class="stat-label">Total Reservas</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon-wrapper icon-green"><i class="ph-fill ph-check-circle"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="metricaConfirmadas">--</div>
-                        <div class="stat-label">Confirmadas</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon-wrapper icon-amber"><i class="ph-fill ph-clock"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="metricaPendientes">--</div>
-                        <div class="stat-label">Pendientes</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon-wrapper icon-blue"><i class="ph-fill ph-currency-dollar"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="metricaPagadas">--</div>
-                        <div class="stat-label">Pagadas</div>
-                    </div>
-                </div>
+                <div class="stat-card"><div class="stat-icon-wrapper icon-indigo"><i class="ph-fill ph-squares-four"></i></div><div class="stat-info"><div class="stat-value" id="metricaTotal">--</div><div class="stat-label">Total Reservas</div></div></div>
+                <div class="stat-card"><div class="stat-icon-wrapper icon-green"><i class="ph-fill ph-check-circle"></i></div><div class="stat-info"><div class="stat-value" id="metricaConfirmadas">--</div><div class="stat-label">Confirmadas</div></div></div>
+                <div class="stat-card"><div class="stat-icon-wrapper icon-amber"><i class="ph-fill ph-clock"></i></div><div class="stat-info"><div class="stat-value" id="metricaPendientes">--</div><div class="stat-label">Pendientes</div></div></div>
+                <div class="stat-card"><div class="stat-icon-wrapper icon-blue"><i class="ph-fill ph-currency-dollar"></i></div><div class="stat-info"><div class="stat-value" id="metricaPagadas">--</div><div class="stat-label">Pagadas</div></div></div>
             </div>
 
-            <!-- Kanban Board -->
             <div class="kanban-board" id="kanbanBoard">
-                <div class="kanban-column pendiente">
-                    <div class="kanban-header">
-                        <span class="kanban-title"><i class="ph ph-clock" style="color: var(--warning);"></i> Pendientes</span>
-                        <span class="kanban-count" id="countPendiente">0</span>
-                    </div>
-                    <div class="kanban-cards" id="kanbanPendiente"><div class="loading-text">Cargando...</div></div>
-                </div>
-                <div class="kanban-column confirmado">
-                    <div class="kanban-header">
-                        <span class="kanban-title"><i class="ph ph-check-circle" style="color: var(--success);"></i> Confirmadas</span>
-                        <span class="kanban-count" id="countConfirmado">0</span>
-                    </div>
-                    <div class="kanban-cards" id="kanbanConfirmado"><div class="loading-text">Cargando...</div></div>
-                </div>
-                <div class="kanban-column pagado">
-                    <div class="kanban-header">
-                        <span class="kanban-title"><i class="ph ph-currency-dollar" style="color: var(--info);"></i> Pagadas</span>
-                        <span class="kanban-count" id="countPagado">0</span>
-                    </div>
-                    <div class="kanban-cards" id="kanbanPagado"><div class="loading-text">Cargando...</div></div>
-                </div>
+                <div class="kanban-column pendiente"><div class="kanban-header"><span class="kanban-title"><i class="ph ph-clock" style="color:var(--warning);"></i> Pendientes</span><span class="kanban-count" id="countPendiente">0</span></div><div class="kanban-cards" id="kanbanPendiente"><div class="loading-text">Cargando...</div></div></div>
+                <div class="kanban-column confirmado"><div class="kanban-header"><span class="kanban-title"><i class="ph ph-check-circle" style="color:var(--success);"></i> Confirmadas</span><span class="kanban-count" id="countConfirmado">0</span></div><div class="kanban-cards" id="kanbanConfirmado"><div class="loading-text">Cargando...</div></div></div>
+                <div class="kanban-column pagado"><div class="kanban-header"><span class="kanban-title"><i class="ph ph-currency-dollar" style="color:var(--info);"></i> Pagadas</span><span class="kanban-count" id="countPagado">0</span></div><div class="kanban-cards" id="kanbanPagado"><div class="loading-text">Cargando...</div></div></div>
             </div>
         </main>
     </div>
 
-    <!-- Preloader -->
+    <!-- Preloader Popup - MONTAÑAS -->
     <div id="preloaderPopup" class="preloader-popup oculto">
+        <div class="preloader-particles">
+            <div class="preloader-particle"></div><div class="preloader-particle"></div><div class="preloader-particle"></div><div class="preloader-particle"></div>
+            <div class="preloader-particle"></div><div class="preloader-particle"></div><div class="preloader-particle"></div><div class="preloader-particle"></div>
+        </div>
         <div class="preloader-content">
-            <div class="preloader-spinner"></div>
-            <div class="preloader-title">Sincronizando</div>
-            <div class="preloader-subtitle">Cargando datos desde Google Sheets...</div>
+            <div class="preloader-logo-wrapper">
+                <div class="preloader-ripple"></div><div class="preloader-ripple"></div><div class="preloader-ripple"></div>
+                <div class="preloader-logo-circle"><span class="logo-icon">🏔️</span></div>
+            </div>
+            <h2 class="preloader-title">Aventura <span>Total</span></h2>
+            <p class="preloader-subtitle">Sincronizando pipeline</p>
+            <div class="preloader-progress-container"><div class="preloader-progress-bar"></div></div>
+            <p class="preloader-loading-text">Cargando datos<span class="dots"></span></p>
         </div>
     </div>
 
@@ -521,69 +511,31 @@
         const overlay = document.getElementById('menuOverlay');
         const themeIcon = document.getElementById('themeIcon');
         
-        function toggleMenu() {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-        }
-        
-        function closeMenu() {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        menuBtn.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', closeMenu);
-        
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) closeMenu();
-            });
-        });
+        function toggleMenu() { sidebar.classList.toggle('open'); overlay.classList.toggle('active'); document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : ''; }
+        function closeMenu() { sidebar.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
+        menuBtn.addEventListener('click', toggleMenu); overlay.addEventListener('click', closeMenu);
+        document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', () => { if (window.innerWidth <= 768) closeMenu(); }); });
 
         function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDark);
-            themeIcon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
+            document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark); themeIcon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
         }
-
         if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.body.classList.add('dark-mode');
-            themeIcon.className = 'ph ph-sun';
+            document.body.classList.add('dark-mode'); themeIcon.className = 'ph ph-sun';
         }
 
-        // ==================================================
-        // SERVICE WORKER
-        // ==================================================
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log(err)); });
-        }
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            document.body.classList.add('pwa-mode');
-        }
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log(err)); }); }
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) { document.body.classList.add('pwa-mode'); }
 
-        // ==================================================
-        // CONFIGURACIÓN
-        // ==================================================
-        if (sessionStorage.getItem('crm_logged') !== 'true') { 
-            window.location.href = 'index.html'; 
-        }
-        
-        function logout() { 
-            sessionStorage.clear(); 
-            window.location.href = 'index.html'; 
-        }
+        if (sessionStorage.getItem('crm_logged') !== 'true') { window.location.href = 'index.html'; }
+        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
 
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=Hoja%201&tq=order%20by%20A%20desc%20limit%20100';
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         const MERCADO_PAGO_LINK = 'https://link.mercadopago.com.ar/scphotobr';
         
-        let reservasData = [];
-        let estadosGlobales = {};
-
+        let reservasData = []; let estadosGlobales = {};
         const preloaderPopup = document.getElementById('preloaderPopup');
         function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
         function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
@@ -591,245 +543,81 @@
         async function cargarEstadosDesdeNube() {
             try {
                 const localEstados = localStorage.getItem('estadosReservasCloud');
-                if (localEstados) {
-                    const parsed = JSON.parse(localEstados);
-                    if (Object.keys(parsed).length > 0) estadosGlobales = parsed;
-                }
-                
-                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now());
-                const data = await response.json();
-                if (data.success && data.estados) {
-                    estadosGlobales = data.estados;
-                    localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
-                }
+                if (localEstados) { const parsed = JSON.parse(localEstados); if (Object.keys(parsed).length > 0) estadosGlobales = parsed; }
+                const response = await fetch(ESTADOS_SCRIPT_URL + '?action=obtener&t=' + Date.now()); const data = await response.json();
+                if (data.success && data.estados) { estadosGlobales = data.estados; localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales)); }
                 return estadosGlobales;
-            } catch (error) {
-                const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
-                estadosGlobales = estadosLocal;
-                return estadosLocal;
-            }
+            } catch (error) { const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}'); estadosGlobales = estadosLocal; return estadosLocal; }
         }
 
         async function cargarDatos() {
             try {
-                mostrarPreloader();
-                console.log('🚀 Cargando datos desde Google Sheets (últimas 100 reservas)...');
-
-                await cargarEstadosDesdeNube();
-
-                const response = await fetch(JSON_URL + '&t=' + Date.now());
-                const texto = await response.text();
-
-                let jsonStr = texto;
-                jsonStr = jsonStr.replace("/*O_o*/", "");
-                jsonStr = jsonStr.replace("google.visualization.Query.setResponse(", "");
-                jsonStr = jsonStr.slice(0, -2);
-
-                const data = JSON.parse(jsonStr);
-                const rows = data.table.rows;
-
+                mostrarPreloader(); await cargarEstadosDesdeNube();
+                const response = await fetch(JSON_URL + '&t=' + Date.now()); const texto = await response.text();
+                let jsonStr = texto.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2);
+                const data = JSON.parse(jsonStr); const rows = data.table.rows;
                 if (!rows || rows.length === 0) throw new Error('No hay datos');
-
-                reservasData = [];
-                const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
-
+                reservasData = []; const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 for (let i = 0; i < rows.length; i++) {
-                    const c = rows[i].c;
-                    if (!c || c.length < 5) continue;
-
-                    const id = (c[1] && c[1].v) ? String(c[1].v) : '';
-                    if (!id || excluidos.includes(id)) continue;
-
-                    const nombre = (c[2] && c[2].v) ? String(c[2].v) : '';
-                    const apellido = (c[3] && c[3].v) ? String(c[3].v) : '';
-                    const email = (c[4] && c[4].v) ? String(c[4].v) : '';
-                    const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
+                    const c = rows[i].c; if (!c || c.length < 5) continue;
+                    const id = (c[1] && c[1].v) ? String(c[1].v) : ''; if (!id || excluidos.includes(id)) continue;
+                    const nombre = (c[2] && c[2].v) ? String(c[2].v) : ''; const apellido = (c[3] && c[3].v) ? String(c[3].v) : '';
+                    const email = (c[4] && c[4].v) ? String(c[4].v) : ''; const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
                     const ciudad = (c[7] && c[7].v) ? String(c[7].v) : '';
-
-                    let excursionesLista = [];
-                    const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
-                    if (excursionesRaw) {
-                        if (excursionesRaw.includes('\n')) excursionesLista = excursionesRaw.split('\n');
-                        else if (excursionesRaw.includes(' | ')) excursionesLista = excursionesRaw.split(' | ');
-                        else excursionesLista = [excursionesRaw];
-                        excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e);
-                    }
-
-                    let fecha = '';
-                    const timestamp = (c[0] && c[0].v) ? c[0].v : null;
-                    if (timestamp) {
-                        const fechaObj = new Date(timestamp);
-                        if (!isNaN(fechaObj.getTime())) {
-                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
-                        }
-                    }
-
-                    const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
-                    const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
+                    let excursionesLista = []; const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
+                    if (excursionesRaw) { if (excursionesRaw.includes('\n')) excursionesLista = excursionesRaw.split('\n'); else if (excursionesRaw.includes(' | ')) excursionesLista = excursionesRaw.split(' | '); else excursionesLista = [excursionesRaw]; excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e); }
+                    let fecha = ''; const timestamp = (c[0] && c[0].v) ? c[0].v : null;
+                    if (timestamp) { const fechaObj = new Date(timestamp); if (!isNaN(fechaObj.getTime())) { fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear(); } }
+                    const personas = (c[10] && c[10].v) ? String(c[10].v) : '1'; const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
                     const nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
-
-                    let estado = estadosGlobales[id];
-                    if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
-                        estado = 'confirmado';
-                    }
-
-                    reservasData.push({
-                        id: id,
-                        fecha: fecha,
-                        nombre: nombreCompleto,
-                        email: email,
-                        telefono: telefono,
-                        ciudad: ciudad,
-                        excursionesLista: excursionesLista,
-                        personas: parseInt(personas) || 1,
-                        formaPago: formaPago,
-                        estado: estado
-                    });
+                    let estado = estadosGlobales[id]; if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) { estado = 'confirmado'; }
+                    reservasData.push({ id, fecha, nombre: nombreCompleto, email, telefono, ciudad, excursionesLista, personas: parseInt(personas) || 1, formaPago, estado });
                 }
-
-                console.log(`📊 Cargadas ${reservasData.length} reservas`);
                 actualizarDashboard();
-
-            } catch (error) {
-                console.error('❌ Error:', error);
-                document.getElementById('kanbanPendiente').innerHTML = '<div class="loading-text">Error al cargar datos</div>';
-                document.getElementById('kanbanConfirmado').innerHTML = '<div class="loading-text">Error al cargar datos</div>';
-                document.getElementById('kanbanPagado').innerHTML = '<div class="loading-text">Error al cargar datos</div>';
-            } finally {
-                ocultarPreloader();
-            }
+            } catch (error) { console.error('❌ Error:', error); document.getElementById('kanbanPendiente').innerHTML = '<div class="loading-text">Error al cargar datos</div>'; document.getElementById('kanbanConfirmado').innerHTML = '<div class="loading-text">Error al cargar datos</div>'; document.getElementById('kanbanPagado').innerHTML = '<div class="loading-text">Error al cargar datos</div>'; }
+            finally { ocultarPreloader(); }
         }
 
         function actualizarDashboard() {
-            const total = reservasData.length;
-            const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
-            const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
-            const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
-            
-            document.getElementById('metricaTotal').textContent = total;
-            document.getElementById('metricaConfirmadas').textContent = confirmadas;
-            document.getElementById('metricaPendientes').textContent = pendientes;
-            document.getElementById('metricaPagadas').textContent = pagadas;
-            
-            document.getElementById('countPendiente').textContent = pendientes;
-            document.getElementById('countConfirmado').textContent = confirmadas;
-            document.getElementById('countPagado').textContent = pagadas;
-            
+            const total = reservasData.length; const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
+            const pendientes = reservasData.filter(r => r.estado === 'pendiente').length; const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
+            document.getElementById('metricaTotal').textContent = total; document.getElementById('metricaConfirmadas').textContent = confirmadas;
+            document.getElementById('metricaPendientes').textContent = pendientes; document.getElementById('metricaPagadas').textContent = pagadas;
+            document.getElementById('countPendiente').textContent = pendientes; document.getElementById('countConfirmado').textContent = confirmadas; document.getElementById('countPagado').textContent = pagadas;
             document.getElementById('kanbanPendiente').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pendiente'));
             document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'confirmado'));
             document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pagado'));
         }
 
         function renderizarTarjetas(reservas) {
-            if (reservas.length === 0) {
-                return '<div class="loading-text">📭 Sin reservas</div>';
-            }
+            if (reservas.length === 0) return '<div class="loading-text">📭 Sin reservas</div>';
             return reservas.map(r => {
-                const excursionPrimera = r.excursionesLista && r.excursionesLista.length > 0 ? r.excursionesLista[0] : 'Sin excursiones';
-                const excursionesTexto = excursionPrimera + (r.excursionesLista && r.excursionesLista.length > 1 ? ` (+${r.excursionesLista.length-1} más)` : '');
-                
-                return `
-                    <div class="kanban-card ${r.estado}" onclick="verDetalle('${escapeHtml(r.id)}')">
-                        <div class="kanban-card-header">
-                            <span class="kanban-card-id">#${escapeHtml(r.id).substring(0,8)}</span>
-                            <span class="kanban-card-fecha"><i class="ph ph-calendar"></i> ${escapeHtml(r.fecha)}</span>
-                        </div>
-                        <div class="kanban-card-cliente">${escapeHtml(r.nombre)}</div>
-                        <div class="kanban-card-excursion">${escapeHtml(excursionesTexto)}</div>
-                        <div class="kanban-card-footer">
-                            <span class="kanban-card-personas"><i class="ph ph-users"></i> ${escapeHtml(r.personas)}</span>
-                            <span class="kanban-card-formapago">${escapeHtml(r.formaPago)}</span>
-                        </div>
-                    </div>
-                `;
+                const ep = r.excursionesLista && r.excursionesLista.length > 0 ? r.excursionesLista[0] : 'Sin excursiones';
+                const et = ep + (r.excursionesLista && r.excursionesLista.length > 1 ? ` (+${r.excursionesLista.length-1} más)` : '');
+                return `<div class="kanban-card ${r.estado}" onclick="verDetalle('${escapeHtml(r.id)}')"><div class="kanban-card-header"><span class="kanban-card-id">#${escapeHtml(r.id).substring(0,8)}</span><span class="kanban-card-fecha"><i class="ph ph-calendar"></i> ${escapeHtml(r.fecha)}</span></div><div class="kanban-card-cliente">${escapeHtml(r.nombre)}</div><div class="kanban-card-excursion">${escapeHtml(et)}</div><div class="kanban-card-footer"><span class="kanban-card-personas"><i class="ph ph-users"></i> ${escapeHtml(r.personas)}</span><span class="kanban-card-formapago">${escapeHtml(r.formaPago)}</span></div></div>`;
             }).join('');
         }
 
         function enviarLinkPagoWhatsApp(reserva) {
-            let telefono = reserva.telefono.replace(/\D/g, '');
-            if (telefono.length === 10) telefono = '54' + telefono;
-            
+            let telefono = reserva.telefono.replace(/\D/g, ''); if (telefono.length === 10) telefono = '54' + telefono;
             const mensaje = `🏔️ *AVENTURA TOTAL* 🏔️\n\n💰 *SOLICITUD DE PAGO*\n\nHola *${reserva.nombre}*, tu reserva *N° ${reserva.id}* está confirmada.\n\n🔗 *Link de pago (Mercado Pago):*\n${MERCADO_PAGO_LINK}\n\n⚠️ *IMPORTANTE:* Caso no recuerde el monto total de su reserva, solicítelo vía WhatsApp. Muchas Gracias.\n\n📌 Una vez realizado el pago, envianos el comprobante para confirmar.\n\n🏔️ ¡Gracias por confiar en Aventura Total!`;
-            
             window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
         function verDetalle(id) {
-            const reserva = reservasData.find(r => r.id === id);
-            if (!reserva) return;
-            
+            const reserva = reservasData.find(r => r.id === id); if (!reserva) return;
             let estadoText = '', estadoColor = '';
-            switch(reserva.estado) {
-                case 'pendiente': estadoText = 'Pendiente'; estadoColor = '#f59e0b'; break;
-                case 'confirmado': estadoText = 'Confirmado'; estadoColor = '#10b981'; break;
-                case 'pagado': estadoText = 'Pagado'; estadoColor = '#3b82f6'; break;
-                default: estadoText = 'Confirmado'; estadoColor = '#10b981';
-            }
-            
-            let excursionesHtml = '<ul>';
-            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
-                reserva.excursionesLista.forEach(exc => {
-                    excursionesHtml += `<li>${escapeHtml(exc)}</li>`;
-                });
-            } else {
-                excursionesHtml += '<li>Sin excursiones</li>';
-            }
-            excursionesHtml += '</ul>';
-            
-            const modalHtml = `
-                <div id="modalDetalle" class="modal-overlay" onclick="if(event.target===this) cerrarModal()">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3><i class="ph ph-info"></i> Detalle de Reserva</h3>
-                            <button class="modal-close" onclick="cerrarModal()"><i class="ph ph-x"></i></button>
-                        </div>
-                        <div class="modal-body">
-                            <p><strong>ID:</strong> <span style="font-family:monospace; color:var(--primary);">#${escapeHtml(reserva.id)}</span></p>
-                            <p><strong>Fecha:</strong> ${escapeHtml(reserva.fecha)}</p>
-                            <p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p>
-                            <p><strong>Email:</strong> ${escapeHtml(reserva.email)}</p>
-                            <p><strong>Teléfono:</strong> ${escapeHtml(reserva.telefono)}</p>
-                            <p><strong>Ciudad:</strong> ${escapeHtml(reserva.ciudad)}</p>
-                            <p><strong>Personas:</strong> ${escapeHtml(reserva.personas)}</p>
-                            <p><strong>Excursiones:</strong> ${excursionesHtml}</p>
-                            <p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p>
-                            <p><strong>Estado:</strong> <span style="background:${estadoColor}20; color:${estadoColor}; padding:3px 10px; border-radius:20px; font-weight:700; font-size:12px;">${estadoText}</span></p>
-                            
-                            <div class="aviso-pago">
-                                <i class="ph ph-warning"></i> <strong>Importante:</strong> Caso no recuerde el monto total de su reserva, solicítelo vía WhatsApp.
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn-whatsapp" onclick="enviarLinkPagoWhatsApp(reservasData.find(r => r.id === '${reserva.id}'))">
-                                <i class="ph ph-whatsapp-logo" style="font-size: 20px;"></i> Enviar link de pago por WhatsApp
-                            </button>
-                            <button onclick="cerrarModal()" class="btn btn-primary" style="width:100%; justify-content:center;">Cerrar</button>
-                        </div>
-                    </div>
-                </div>
-            `;
+            switch(reserva.estado) { case 'pendiente': estadoText='Pendiente'; estadoColor='#f59e0b'; break; case 'confirmado': estadoText='Confirmado'; estadoColor='#10b981'; break; case 'pagado': estadoText='Pagado'; estadoColor='#3b82f6'; break; default: estadoText='Confirmado'; estadoColor='#10b981'; }
+            let excHtml = '<ul>'; if (reserva.excursionesLista && reserva.excursionesLista.length > 0) { reserva.excursionesLista.forEach(exc => { excHtml += `<li>${escapeHtml(exc)}</li>`; }); } else { excHtml += '<li>Sin excursiones</li>'; } excHtml += '</ul>';
+            const modalHtml = `<div id="modalDetalle" class="modal-overlay" onclick="if(event.target===this) cerrarModal()"><div class="modal-content"><div class="modal-header"><h3><i class="ph ph-info"></i> Detalle de Reserva</h3><button class="modal-close" onclick="cerrarModal()"><i class="ph ph-x"></i></button></div><div class="modal-body"><p><strong>ID:</strong> <span style="font-family:monospace;color:var(--primary);">#${escapeHtml(reserva.id)}</span></p><p><strong>Fecha:</strong> ${escapeHtml(reserva.fecha)}</p><p><strong>Cliente:</strong> ${escapeHtml(reserva.nombre)}</p><p><strong>Email:</strong> ${escapeHtml(reserva.email)}</p><p><strong>Teléfono:</strong> ${escapeHtml(reserva.telefono)}</p><p><strong>Ciudad:</strong> ${escapeHtml(reserva.ciudad)}</p><p><strong>Personas:</strong> ${escapeHtml(reserva.personas)}</p><p><strong>Excursiones:</strong> ${excHtml}</p><p><strong>Forma de Pago:</strong> ${escapeHtml(reserva.formaPago)}</p><p><strong>Estado:</strong> <span style="background:${estadoColor}20;color:${estadoColor};padding:3px 10px;border-radius:20px;font-weight:700;font-size:12px;">${estadoText}</span></p><div class="aviso-pago"><i class="ph ph-warning"></i> <strong>Importante:</strong> Caso no recuerde el monto total de su reserva, solicítelo vía WhatsApp.</div></div><div class="modal-footer"><button class="btn-whatsapp" onclick="enviarLinkPagoWhatsApp(reservasData.find(r => r.id === '${reserva.id}'))"><i class="ph ph-whatsapp-logo" style="font-size:20px;"></i> Enviar link de pago por WhatsApp</button><button onclick="cerrarModal()" class="btn btn-primary" style="width:100%;justify-content:center;">Cerrar</button></div></div></div>`;
             document.body.insertAdjacentHTML('beforeend', modalHtml);
         }
 
-        function cerrarModal() {
-            const modal = document.getElementById('modalDetalle');
-            if (modal) modal.remove();
-        }
+        function cerrarModal() { const modal = document.getElementById('modalDetalle'); if (modal) modal.remove(); }
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
-        function escapeHtml(text) { 
-            if (!text) return ''; 
-            const div = document.createElement('div'); 
-            div.textContent = text; 
-            return div.innerHTML; 
-        }
-
-        window.verDetalle = verDetalle;
-        window.cerrarModal = cerrarModal;
-        window.cargarDatos = cargarDatos;
-        window.logout = logout;
-        window.enviarLinkPagoWhatsApp = enviarLinkPagoWhatsApp;
-        window.toggleTheme = toggleTheme;
-
+        window.verDetalle = verDetalle; window.cerrarModal = cerrarModal; window.cargarDatos = cargarDatos;
+        window.logout = logout; window.enviarLinkPagoWhatsApp = enviarLinkPagoWhatsApp; window.toggleTheme = toggleTheme;
         cargarDatos();
     </script>
 </body>
