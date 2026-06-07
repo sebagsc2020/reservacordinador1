@@ -2,524 +2,403 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Clima - CRM Aventura Total</title>
     
+    <!-- PWA CONFIGURACIÓN -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AVT CRM">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="application-name" content="Aventura Total CRM">
+    
+    <!-- Fuentes: Inter vía Fontsource -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.15/index.css">
+    
+    <!-- Iconos: Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --whatsapp: #25D366;
+            --whatsapp-hover: #1da851;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            --purple: #8b5cf6;
+            --purple-light: #f3e8ff;
+            
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #475569;
+            --sidebar-active-bg: #e0e7ff;
+            --sidebar-active-text: #4338ca;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        body.dark-mode {
+            --bg-body: #0f172a;
+            --bg-surface: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #cbd5e1;
+            --sidebar-active-bg: #334155;
+            --sidebar-active-text: #818cf8;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            font-family: -apple-system, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #f0f2f5; 
-            min-height: 100vh;
-            transition: background 0.3s, color 0.3s;
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
         }
+
+        /* ===== LAYOUT ===== */
+        .app-container { display: flex; min-height: 100vh; }
         
-        /* Modo oscuro */
-        body.dark-mode {
-            background: #0a0a12;
-        }
-        
-        body.dark-mode .main-content {
-            background: linear-gradient(180deg, #0f0f1a 0%, #0a0a12 100%);
-        }
-        
-        body.dark-mode .top-bar,
-        body.dark-mode .detail-card,
-        body.dark-mode .card,
-        body.dark-mode .user-info,
-        body.dark-mode .forecast-card,
-        body.dark-mode .alerta {
-            background: #1a1a2e;
-            color: #e0e0e0;
-        }
-        
-        body.dark-mode .alerta.verde { background: #1a2a1a; border-left-color: #27ae60; }
-        body.dark-mode .alerta.amarilla { background: #2a2a1a; border-left-color: #f1c40f; }
-        body.dark-mode .alerta.naranja { background: #2a1f1a; border-left-color: #f39c12; }
-        body.dark-mode .alerta.roja { background: #2a1a1a; border-left-color: #e74c3c; }
-        body.dark-mode .detail-value { color: white; }
-        body.dark-mode .detail-label { color: #aaa; }
-        body.dark-mode .card-title { color: white; border-bottom-color: #2a2a3e; }
-        body.dark-mode .header h1 { color: white; }
-        body.dark-mode .top-bar input { background: #2a2a3e; border-color: #3a3a4e; color: white; }
-        body.dark-mode .forecast-dia { color: white; }
-        body.dark-mode .forecast-card.hoy { background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 100%); border-color: #667eea; }
-        body.dark-mode .btn-theme { color: white; }
-        body.dark-mode .menu-btn { color: white; }
-        
-        /* Sidebar - SIN scrollbar visible */
         .sidebar {
-            width: 280px;
-            background: #1a1a2e;
-            color: white;
-            padding: 25px 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1001;
+            width: 260px; 
+            background: var(--sidebar-bg); 
+            border-right: 1px solid var(--border-color);
+            position: fixed; height: 100vh; z-index: 1001;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateX(-100%);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            /* Ocultar scrollbar pero mantener funcionalidad */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
+            display: flex; flex-direction: column;
         }
         
-        /* Ocultar scrollbar en Chrome, Safari, Opera */
-        .sidebar::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .sidebar.open { transform: translateX(0); }
-        
-        .menu-btn {
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            width: 44px;
-            height: 44px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 12px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1002;
-            border: none;
-            font-size: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        
-        body.dark-mode .menu-btn {
-            background: #1a1a2e;
-            color: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: none;
-            backdrop-filter: blur(2px);
-        }
-        
-        .menu-overlay.active { display: block; }
-        
-        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 44px; }
-        .sidebar-logo h2 { font-size: 20px; margin-top: 8px; }
-        .sidebar-logo h2 span { color: #667eea; }
-        
-        .nav-menu { list-style: none; padding: 0 15px; }
-        .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 15px;
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; }
-        .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 20px; width: 28px; text-align: center; }
-        
-        .sidebar-footer { padding: 20px 15px; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .btn-logout-sidebar {
-            width: 100%; padding: 12px; background: rgba(231,76,60,0.2);
-            color: #e74c3c; border: 1px solid rgba(231,76,60,0.3);
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        .btn-logout-sidebar:hover { background: rgba(231,76,60,0.4); }
-        
-        /* Contenido principal - totalmente fluido */
-        .main-content {
-            min-height: 100vh;
-            background: linear-gradient(180deg, #f0f2f5 0%, #e8ecf1 100%);
-            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        /* Desktop */
-        @media (min-width: 1024px) {
-            .menu-btn { display: none !important; }
-            .sidebar { transform: translateX(0) !important; }
-            .main-content { margin-left: 280px; }
-        }
-        
-        /* Tablet y móvil */
-        @media (max-width: 1023px) {
-            .menu-btn { display: flex; }
-            .main-content { margin-left: 0; }
-        }
-        
-        /* Contenedor interno con padding fluido */
-        .content-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            width: 100%;
-        }
-        
-        /* Header */
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 20px; 
-            flex-wrap: wrap; 
-            gap: 12px; 
-        }
-        .header h1 { font-size: clamp(18px, 5vw, 24px); color: #1a1a2e; }
-        
-        .header-actions { display: flex; align-items: center; gap: 12px; }
-        
-        .btn-theme {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            transition: background 0.2s;
-        }
-        .btn-theme:hover { background: rgba(0,0,0,0.05); }
-        
-        .user-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            background: white; 
-            padding: 5px 12px; 
-            border-radius: 40px; 
-            font-size: 13px; 
-            font-weight: 500;
-        }
-        .user-avatar { 
-            width: 32px; 
-            height: 32px; 
-            background: #667eea; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: 700;
-        }
-        
-        /* Alertas */
-        .alertas-container { margin-bottom: 16px; }
-        .alerta { 
-            padding: 12px 16px; 
-            border-radius: 14px; 
-            margin-bottom: 8px; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px;
-            background: white;
-        }
-        .alerta-icono { font-size: 22px; }
-        .alerta-info h4 { font-size: 13px; font-weight: 700; }
-        .alerta-info p { font-size: 11px; color: #666; margin-top: 2px; }
-        body.dark-mode .alerta-info p { color: #aaa; }
-        
-        /* Top bar */
-        .top-bar { 
-            background: white; 
-            padding: 12px 16px; 
-            border-radius: 16px; 
-            margin-bottom: 16px; 
-            display: flex; 
-            gap: 8px; 
-            flex-wrap: wrap; 
-        }
-        .top-bar input { 
-            flex: 1; 
-            min-width: 160px; 
-            padding: 10px 14px; 
-            border: 1.5px solid #e0e0e0; 
-            border-radius: 12px; 
-            font-size: 14px; 
-        }
-        .top-bar input:focus { outline: none; border-color: #667eea; }
-        .btn { 
-            padding: 10px 16px; 
-            border: none; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 13px; 
-            transition: all 0.2s;
-        }
-        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-        .btn-success { background: #27ae60; color: white; }
-        .btn-whatsapp { background: #25D366; color: white; display: flex; align-items: center; gap: 6px; }
-        
-        /* Hero clima - fluido */
-        .hero-clima { 
-            background: linear-gradient(135deg, #667eea, #764ba2); 
-            border-radius: 20px; 
+        .sidebar-header { 
             padding: 20px 24px; 
-            margin-bottom: 16px; 
-            color: white; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            gap: 16px;
+            display: flex; align-items: center; gap: 12px; 
+            border-bottom: 1px solid var(--border-color); 
+            flex-shrink: 0;
         }
-        .hero-info { flex: 2; min-width: 160px; }
-        .hero-info h2 { font-size: 12px; opacity: 0.8; margin-bottom: 4px; letter-spacing: 0.5px; }
-        .hero-info .ciudad { font-size: clamp(18px, 6vw, 24px); font-weight: 700; }
-        .hero-info .fecha { font-size: 10px; opacity: 0.7; margin-top: 6px; }
-        .hero-temp { text-align: center; min-width: 100px; }
-        .hero-temp .icono { font-size: clamp(40px, 10vw, 50px); }
-        .hero-temp .temp { font-size: clamp(36px, 10vw, 44px); font-weight: 700; line-height: 1; }
-        .hero-temp .desc { font-size: 12px; opacity: 0.9; margin-top: 4px; }
-        .hero-detalles { display: flex; gap: 16px; flex-wrap: wrap; }
-        .hero-detalle { text-align: center; min-width: 55px; }
-        .hero-detalle .valor { font-size: clamp(14px, 4vw, 18px); font-weight: 700; }
-        .hero-detalle .label { font-size: 9px; opacity: 0.7; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+        .brand-icon { 
+            width: 36px; height: 36px; 
+            background: linear-gradient(135deg, var(--primary), #8b5cf6); 
+            border-radius: var(--radius-sm); 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 20px; 
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
+        }
+        .brand-text { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; color: var(--text-main); }
+        .brand-text span { color: var(--primary); }
+
+        .nav-menu { list-style: none; padding: 16px 12px; flex: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            color: var(--sidebar-text); text-decoration: none; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 500; transition: all 0.2s ease;
+        }
+        .nav-link i { font-size: 20px; flex-shrink: 0; }
+        .nav-link:hover { background: var(--bg-body); color: var(--primary); }
+        .nav-link.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); font-weight: 600; }
         
-        /* Details grid - responsive grid */
+        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
+        .user-profile { 
+            display: flex; align-items: center; gap: 12px; padding: 12px; 
+            border-radius: var(--radius-sm); background: var(--bg-body); 
+            cursor: pointer; transition: background 0.2s;
+        }
+        .user-profile:hover { background: var(--border-color); }
+        .avatar { 
+            width: 36px; height: 36px; background: var(--primary); color: white; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-weight: 600; font-size: 14px; flex-shrink: 0;
+        }
+        .user-details { overflow: hidden; }
+        .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-details p { font-size: 11px; color: var(--text-muted); }
+
+        .main-content { margin-left: 260px; flex: 1; padding: 32px; transition: margin-left 0.3s; width: 100%; }
+        
+        /* Mobile Menu */
+        .menu-toggle { 
+            display: none; position: fixed; top: 16px; left: 16px; z-index: 1002; 
+            background: var(--bg-surface); border: 1px solid var(--border-color); 
+            width: 44px; height: 44px; border-radius: var(--radius-sm); cursor: pointer; 
+            color: var(--text-main); box-shadow: var(--shadow-md); 
+            align-items: center; justify-content: center;
+        }
+        .overlay { 
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
+            z-index: 1000; opacity: 0; pointer-events: none; 
+            transition: opacity 0.3s; backdrop-filter: blur(4px); 
+        }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* ===== HEADER ===== */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
+        .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+        
+        .actions-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .btn { 
+            padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; 
+            cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; 
+            transition: all 0.2s ease; white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-whatsapp { background: var(--whatsapp); color: white; }
+        .btn-whatsapp:hover { background: var(--whatsapp-hover); }
+        .btn-icon { 
+            width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); 
+            border: 1px solid var(--border-color); color: var(--text-muted); 
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
+
+        /* ===== ALERTS ===== */
+        .alertas-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .alerta { 
+            padding: 14px 18px; border-radius: var(--radius); 
+            display: flex; align-items: flex-start; gap: 12px; 
+            background: var(--bg-surface); border: 1px solid var(--border-color);
+            border-left: 4px solid var(--success);
+        }
+        .alerta.verde { border-left-color: var(--success); background: var(--success-light); }
+        .alerta.amarilla { border-left-color: var(--warning); background: var(--warning-light); }
+        .alerta.naranja { border-left-color: #f97316; background: #fff7ed; }
+        .alerta.roja { border-left-color: var(--danger); background: var(--danger-light); }
+        .dark-mode .alerta.verde { background: rgba(16, 185, 129, 0.1); }
+        .dark-mode .alerta.amarilla { background: rgba(245, 158, 11, 0.1); }
+        .dark-mode .alerta.naranja { background: rgba(249, 115, 22, 0.1); }
+        .dark-mode .alerta.roja { background: rgba(239, 68, 68, 0.1); }
+        .alerta-icono { font-size: 22px; flex-shrink: 0; }
+        .alerta-info h4 { font-size: 13px; font-weight: 700; color: var(--text-main); }
+        .alerta-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ===== SEARCH BAR ===== */
+        .search-bar { 
+            background: var(--bg-surface); padding: 16px 20px; border-radius: var(--radius); 
+            box-shadow: var(--shadow-sm); display: flex; gap: 12px; align-items: center; 
+            flex-wrap: wrap; margin-bottom: 24px; border: 1px solid var(--border-color); 
+        }
+        .search-input { 
+            flex: 1; min-width: 180px; padding: 10px 14px; 
+            border: 1px solid var(--border-color); border-radius: var(--radius-sm); 
+            font-size: 13px; font-family: inherit; background: var(--bg-body); color: var(--text-main); 
+        }
+        .search-input:focus { border-color: var(--primary); }
+
+        /* ===== HERO ===== */
+        .hero-clima { 
+            background: linear-gradient(135deg, var(--primary), var(--purple)); 
+            border-radius: var(--radius); padding: 28px 32px; margin-bottom: 24px; 
+            color: white; display: flex; justify-content: space-between; 
+            align-items: center; flex-wrap: wrap; gap: 20px; 
+        }
+        .hero-info { min-width: 160px; }
+        .hero-info .hero-label { font-size: 11px; opacity: 0.75; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .hero-info .ciudad { font-size: 26px; font-weight: 700; }
+        .hero-info .fecha { font-size: 12px; opacity: 0.7; margin-top: 6px; }
+        .hero-temp { text-align: center; min-width: 100px; }
+        .hero-temp .icono { font-size: 52px; }
+        .hero-temp .temp { font-size: 48px; font-weight: 700; line-height: 1; margin: 4px 0; }
+        .hero-temp .desc { font-size: 13px; opacity: 0.9; }
+        .hero-detalles { display: flex; gap: 24px; }
+        .hero-detalle { text-align: center; }
+        .hero-detalle .valor { font-size: 20px; font-weight: 700; }
+        .hero-detalle .label { font-size: 10px; opacity: 0.7; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+
+        /* ===== DETAILS GRID ===== */
         .details-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); 
-            gap: 12px; 
-            margin-bottom: 20px; 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 16px; margin-bottom: 24px; 
         }
         .detail-card { 
-            background: white; 
-            border-radius: 16px; 
-            padding: 12px 8px; 
-            text-align: center; 
+            background: var(--bg-surface); border-radius: var(--radius); padding: 20px 16px; 
+            text-align: center; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
             transition: transform 0.2s;
         }
         .detail-card:hover { transform: translateY(-2px); }
-        .detail-icon { font-size: 24px; margin-bottom: 6px; }
-        .detail-value { font-size: clamp(16px, 4vw, 20px); font-weight: 800; color: #1a1a2e; }
-        .detail-label { font-size: 10px; color: #999; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
-        
-        /* Main grid - responsive */
+        .detail-icon { font-size: 28px; margin-bottom: 8px; }
+        .detail-value { font-size: 22px; font-weight: 700; color: var(--text-main); }
+        .detail-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+
+        /* ===== CHARTS & FORECAST ===== */
         .main-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 16px; 
-            margin-bottom: 20px; 
+            display: grid; grid-template-columns: 2fr 1fr; gap: 20px; 
         }
         .card { 
-            background: white; 
-            border-radius: 20px; 
-            padding: 16px; 
+            background: var(--bg-surface); border-radius: var(--radius); padding: 20px; 
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); 
         }
         .card-title { 
-            font-size: 14px; 
-            font-weight: 700; 
-            color: #1a1a2e; 
-            margin-bottom: 12px; 
-            padding-bottom: 8px; 
-            border-bottom: 2px solid #eef2ff; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
+            font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; 
+            padding-bottom: 12px; border-bottom: 1px solid var(--border-color); 
+            display: flex; align-items: center; gap: 8px; 
         }
+        .chart-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .chart-line-svg { display: block; min-width: 500px; width: 100%; height: auto; }
         
-        /* Gráfico responsive */
-        .chart-wrapper { 
-            width: 100%; 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch;
-        }
-        .chart-line-svg { 
-            display: block; 
-            min-width: 500px; 
-            width: 100%; 
-            height: auto; 
-        }
-        
-        /* Pronóstico responsive */
-        .forecast-wrapper { 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch;
-        }
-        .forecast-grid { 
-            display: flex; 
-            gap: 10px; 
-        }
+        .forecast-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .forecast-grid { display: flex; gap: 10px; }
         .forecast-card { 
-            flex: 0 0 auto; 
-            width: 85px; 
-            background: #f8f9fa; 
-            border-radius: 14px; 
-            padding: 10px 6px; 
-            text-align: center; 
-            transition: all 0.2s;
+            flex: 0 0 auto; width: 90px; background: var(--bg-body); 
+            border-radius: var(--radius-sm); padding: 12px 8px; text-align: center; 
+            transition: all 0.2s; border: 1px solid var(--border-color);
         }
         .forecast-card.hoy { 
-            background: linear-gradient(135deg, #eef2ff, #e0e7ff); 
-            border: 1px solid #667eea; 
+            background: var(--primary-light); border-color: var(--primary); 
         }
-        .forecast-dia { font-size: 11px; font-weight: 700; }
-        .forecast-icono { font-size: 22px; margin: 4px 0; }
-        .forecast-max { font-size: 13px; font-weight: 800; color: #e74c3c; }
-        .forecast-min { font-size: 11px; color: #667eea; font-weight: 600; }
-        .forecast-rain { font-size: 9px; color: #3498db; margin-top: 3px; }
+        .dark-mode .forecast-card.hoy { background: rgba(99, 102, 241, 0.15); }
+        .forecast-dia { font-size: 11px; font-weight: 700; color: var(--text-main); }
+        .forecast-icono { font-size: 24px; margin: 6px 0; }
+        .forecast-max { font-size: 14px; font-weight: 800; color: var(--danger); }
+        .forecast-min { font-size: 12px; color: var(--primary); font-weight: 600; }
+        .forecast-rain { font-size: 10px; color: var(--info); margin-top: 4px; }
         
-        .chart-legend { display: flex; gap: 16px; justify-content: center; margin-top: 12px; }
-        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #666; }
-        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
-        .legend-dot.temp { background: #667eea; }
-        .legend-dot.rain { background: #3498db; }
-        
-        /* Desktop grande - centrado y compacto */
-        @media (min-width: 1400px) {
-            .content-inner {
-                max-width: 1200px;
-            }
-            .forecast-grid {
-                justify-content: center;
-            }
-            .forecast-card {
-                width: auto;
-                min-width: 90px;
-            }
-            .chart-line-svg {
-                min-width: auto;
-            }
-        }
-        
-        /* Móvil pequeño */
-        @media (max-width: 480px) {
-            .content-inner {
-                padding: 12px;
-            }
-            .header h1 {
-                font-size: 18px;
-            }
-            .hero-clima {
-                padding: 16px;
-            }
-            .hero-detalle {
-                min-width: 45px;
-            }
-            .details-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-            .detail-card {
-                padding: 10px 6px;
-            }
-            .detail-icon {
-                font-size: 20px;
-            }
-            .detail-value {
-                font-size: 14px;
-            }
-            .forecast-card {
-                width: 75px;
-                padding: 8px 4px;
-            }
-            .forecast-icono {
-                font-size: 18px;
-            }
-            .forecast-max {
-                font-size: 12px;
-            }
-            .top-bar {
-                flex-direction: column;
-            }
-            .top-bar input, .top-bar .btn {
-                width: 100%;
-            }
-        }
-        
+        .chart-legend { display: flex; gap: 20px; justify-content: center; margin-top: 12px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .legend-dot.temp { background: var(--primary); }
+        .legend-dot.rain { background: var(--info); }
+
         /* SVG styles */
-        .chart-line-path { fill: none; stroke: #667eea; stroke-width: 2.5; }
+        .chart-line-path { fill: none; stroke: #6366f1; stroke-width: 2.5; }
         .chart-line-area { fill: url(#gradienteArea); }
-        .chart-line-grid { stroke: #ddd; stroke-width: 0.5; stroke-dasharray: 3; }
-        body.dark-mode .chart-line-grid { stroke: #444; }
-        .chart-line-label { font-size: 9px; fill: #888; }
-        body.dark-mode .chart-line-label { fill: #aaa; }
-        .chart-line-value { font-size: 9px; fill: #667eea; font-weight: bold; text-anchor: middle; }
-        .chart-line-dot { fill: #667eea; stroke: white; stroke-width: 1.5; }
-        .chart-line-dot.frio { fill: #3498db; }
-        .chart-line-dot.templado { fill: #f39c12; }
-        .chart-line-dot.caliente { fill: #e74c3c; }
-        .chart-line-rain-dot { fill: #3498db; opacity: 0.6; }
+        .chart-line-grid { stroke: #cbd5e1; stroke-width: 0.5; stroke-dasharray: 3; }
+        .dark-mode .chart-line-grid { stroke: #475569; }
+        .chart-line-label { font-size: 9px; fill: #94a3b8; }
+        .chart-line-value { font-size: 9px; fill: #6366f1; font-weight: bold; text-anchor: middle; }
+        .chart-line-dot { fill: #6366f1; stroke: white; stroke-width: 1.5; }
+        .chart-line-dot.frio { fill: #3b82f6; }
+        .chart-line-dot.templado { fill: #f59e0b; }
+        .chart-line-dot.caliente { fill: #ef4444; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 76px; }
+            .menu-toggle { display: flex; }
+            
+            .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .hero-clima { padding: 20px; flex-direction: column; text-align: center; }
+            .hero-detalles { justify-content: center; }
+            .search-bar { flex-direction: column; }
+            .search-bar .btn { width: 100%; justify-content: center; }
+            .details-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .forecast-card { width: 80px; padding: 10px 6px; }
+        }
+
+        @media (max-width: 480px) {
+            .page-title h1 { font-size: 20px; }
+            .hero-info .ciudad { font-size: 22px; }
+            .hero-temp .temp { font-size: 38px; }
+            .hero-temp .icono { font-size: 40px; }
+            .details-grid { grid-template-columns: repeat(2, 1fr); }
+            .detail-value { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
-    <button class="menu-btn" id="menuBtn">☰</button>
-    <div class="menu-overlay" id="menuOverlay"></div>
-    
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🏔️</div>
-            <h2>Aventura <span>Total</span></h2>
-            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="#"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="#"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
-            <li><a href="#"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
-            <li><a href="#"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="#"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
-            <li><a href="#"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
-            <li><a href="#" class="active"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar Sesión</button>
-        </div>
-    </nav>
-    
-    <div class="main-content">
-        <div class="content-inner">
-            <div class="header">
-                <h1>🌤️ Estación Meteorológica</h1>
-                <div class="header-actions">
-                    <button class="btn-theme" onclick="toggleTheme()">🌙</button>
-                    <div class="user-info"><div class="user-avatar">A</div><span>Admin</span></div>
+
+    <!-- Mobile Toggle -->
+    <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú"><i class="ph ph-list" style="font-size: 24px;"></i></button>
+    <div class="overlay" id="menuOverlay"></div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-icon"><i class="ph-bold ph-mountains"></i></div>
+                <div class="brand-text">Aventura<span>Total</span></div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="ph ph-squares-four"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="clientes.html" class="nav-link"><i class="ph ph-users"></i> Clientes</a></li>
+                <li class="nav-item"><a href="reservas.html" class="nav-link"><i class="ph ph-calendar-check"></i> Reservas</a></li>
+                <li class="nav-item"><a href="seguimiento.html" class="nav-link"><i class="ph ph-chart-line-up"></i> Seguimiento</a></li>
+                <li class="nav-item"><a href="emails.html" class="nav-link"><i class="ph ph-whatsapp-logo"></i> WhatsApp</a></li>
+                <li class="nav-item"><a href="calendario.html" class="nav-link"><i class="ph ph-calendar"></i> Calendario</a></li>
+                <li class="nav-item"><a href="clima.html" class="nav-link active"><i class="ph ph-cloud-sun"></i> Clima</a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-profile" onclick="logout()">
+                    <div class="avatar">AD</div>
+                    <div class="user-details">
+                        <h4>Administrador</h4>
+                        <p>Cerrar Sesión</p>
+                    </div>
+                    <i class="ph ph-sign-out" style="margin-left: auto; color: var(--text-muted); font-size: 18px;"></i>
                 </div>
             </div>
-            
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="page-title">
+                    <h1>Estación Meteorológica</h1>
+                    <p>Consulta el clima en tiempo real para tus destinos turísticos.</p>
+                </div>
+                <div class="actions-group">
+                    <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
+                </div>
+            </header>
+
+            <!-- Alertas -->
             <div class="alertas-container" id="alertasContainer">
-                <div class="alerta verde"><div class="alerta-icono">✅</div><div class="alerta-info"><h4>Cargando...</h4><p>Obteniendo datos meteorológicos.</p></div></div>
+                <div class="alerta verde">
+                    <div class="alerta-icono"><i class="ph ph-check-circle"></i></div>
+                    <div class="alerta-info"><h4>Cargando...</h4><p>Obteniendo datos meteorológicos.</p></div>
+                </div>
             </div>
-            
-            <div class="top-bar">
-                <input type="text" id="buscarCiudad" placeholder="🔍 Buscar ciudad...">
-                <button class="btn btn-primary" onclick="buscarCiudad()">Buscar</button>
-                <button class="btn btn-success" onclick="usarUbicacion()">📍 Mi ubicación</button>
-                <button class="btn btn-whatsapp" onclick="compartirPorWhatsApp()">💬 Compartir</button>
+
+            <!-- Search -->
+            <div class="search-bar">
+                <input type="text" class="search-input" id="buscarCiudad" placeholder="Buscar ciudad...">
+                <button class="btn btn-primary" onclick="buscarCiudad()"><i class="ph ph-magnifying-glass"></i> Buscar</button>
+                <button class="btn btn-success" onclick="usarUbicacion()"><i class="ph ph-map-pin"></i> Mi ubicación</button>
+                <button class="btn btn-whatsapp" onclick="compartirPorWhatsApp()"><i class="ph ph-whatsapp-logo"></i> Compartir</button>
             </div>
-            
+
+            <!-- Hero -->
             <div class="hero-clima" id="heroClima">
                 <div class="hero-info">
-                    <h2>📍 UBICACIÓN</h2>
+                    <div class="hero-label">Ubicación</div>
                     <div class="ciudad" id="ciudadNombre">Cargando...</div>
                     <div class="fecha" id="fechaActual"></div>
                 </div>
@@ -533,7 +412,8 @@
                     <div class="hero-detalle"><div class="valor" id="heroMin">--°</div><div class="label">Mín</div></div>
                 </div>
             </div>
-            
+
+            <!-- Details -->
             <div class="details-grid">
                 <div class="detail-card"><div class="detail-icon">💧</div><div class="detail-value" id="humedad">--%</div><div class="detail-label">Humedad</div></div>
                 <div class="detail-card"><div class="detail-icon">💨</div><div class="detail-value" id="viento">-- km/h</div><div class="detail-label">Viento</div></div>
@@ -542,10 +422,11 @@
                 <div class="detail-card"><div class="detail-icon">👁️</div><div class="detail-value" id="visibilidad">-- km</div><div class="detail-label">Visibilidad</div></div>
                 <div class="detail-card"><div class="detail-icon">📊</div><div class="detail-value" id="presion">-- hPa</div><div class="detail-label">Presión</div></div>
             </div>
-            
+
+            <!-- Charts -->
             <div class="main-grid">
                 <div class="card">
-                    <div class="card-title"><span>📈</span> Temperatura 24h</div>
+                    <div class="card-title"><i class="ph ph-chart-line"></i> Temperatura 24h</div>
                     <div class="chart-wrapper">
                         <svg class="chart-line-svg" id="graficoLinealSVG" viewBox="0 0 700 240" preserveAspectRatio="xMidYMid meet"></svg>
                     </div>
@@ -555,59 +436,69 @@
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-title"><span>📅</span> Pronóstico 7 días</div>
+                    <div class="card-title"><i class="ph ph-calendar"></i> Pronóstico 7 días</div>
                     <div class="forecast-wrapper">
                         <div class="forecast-grid" id="pronostico7dias"></div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
-    
+
     <script>
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-            const btn = document.querySelector('.btn-theme');
-            if (btn) btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-        }
-        
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            const btn = document.querySelector('.btn-theme');
-            if (btn) btn.textContent = '☀️';
-        }
-        
-        function logout() { 
-            sessionStorage.clear(); 
-            window.location.href = 'index.html'; 
-        }
-        
-        // Menú responsive
+        // ==================================================
+        // LOGICA UI & TEMA
+        // ==================================================
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.getElementById('sidebar');
-        const menuOverlay = document.getElementById('menuOverlay');
+        const overlay = document.getElementById('menuOverlay');
+        const themeIcon = document.getElementById('themeIcon');
         
         function toggleMenu() {
             sidebar.classList.toggle('open');
-            menuOverlay.classList.toggle('active');
+            overlay.classList.toggle('active');
             document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
         }
         
         function closeMenu() {
             sidebar.classList.remove('open');
-            menuOverlay.classList.remove('active');
+            overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', closeMenu);
         
-        if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
-        if (menuOverlay) menuOverlay.addEventListener('click', closeMenu);
-        
-        document.querySelectorAll('.nav-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 1023) closeMenu();
-            });
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => { if (window.innerWidth <= 768) closeMenu(); });
         });
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            themeIcon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
+        }
+
+        if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.body.classList.add('dark-mode');
+            themeIcon.className = 'ph ph-sun';
+        }
+
+        // ==================================================
+        // SERVICE WORKER
+        // ==================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log(err)); });
+        }
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            document.body.classList.add('pwa-mode');
+        }
+
+        // ==================================================
+        // CONFIGURACIÓN
+        // ==================================================
+        function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         
         let datosClimaActual = null;
         
@@ -615,46 +506,29 @@
             const ahora = new Date();
             document.getElementById('fechaActual').textContent = ahora.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) + ' | ' + ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         }
-        actualizarFecha(); 
-        setInterval(actualizarFecha, 60000);
+        actualizarFecha(); setInterval(actualizarFecha, 60000);
         
         async function obtenerClima(lat, lon, ciudad) {
             try {
                 document.getElementById('ciudadNombre').textContent = ciudad || 'Cargando...';
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,windspeed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max&timezone=auto&forecast_days=7`;
-                const r = await fetch(url); 
-                const d = await r.json();
-                const a = d.current_weather; 
-                const hoy = d.daily;
-                const hourly = d.hourly;
+                const r = await fetch(url); const d = await r.json();
+                const a = d.current_weather; const hoy = d.daily; const hourly = d.hourly;
                 
                 datosClimaActual = {
                     ciudad, lat, lon,
-                    temp: Math.round(a.temperature), 
-                    desc: obtenerDesc(a.weathercode),
-                    viento: Math.round(a.windspeed), 
-                    humedad: hourly.relativehumidity_2m?.[0] || 65,
-                    lluvia: hoy.precipitation_sum?.[0] || 0, 
-                    uv: hoy.uv_index_max?.[0] || '--',
+                    temp: Math.round(a.temperature), desc: obtenerDesc(a.weathercode),
+                    viento: Math.round(a.windspeed), humedad: hourly.relativehumidity_2m?.[0] || 65,
+                    lluvia: hoy.precipitation_sum?.[0] || 0, uv: hoy.uv_index_max?.[0] || '--',
                     visibilidad: (Math.random() * 8 + 5).toFixed(1),
                     maxima: Math.round(hoy.temperature_2m_max?.[0] || a.temperature), 
                     minima: Math.round(hoy.temperature_2m_min?.[0] || a.temperature),
                     icono: obtenerIcono(a.weathercode),
-                    hourly: hourly.time.slice(0, 24).map((t, i) => ({ 
-                        hora: new Date(t).getHours(), 
-                        temp: Math.round(hourly.temperature_2m[i]), 
-                        lluvia: hourly.precipitation_probability?.[i] || 0 
-                    })),
-                    pronostico: hoy.time.map((t, i) => ({ 
-                        fecha: t, 
-                        max: Math.round(hoy.temperature_2m_max[i]), 
-                        min: Math.round(hoy.temperature_2m_min[i]), 
-                        lluvia: hoy.precipitation_sum?.[i] || 0 
-                    }))
+                    hourly: hourly.time.slice(0, 24).map((t, i) => ({ hora: new Date(t).getHours(), temp: Math.round(hourly.temperature_2m[i]), lluvia: hourly.precipitation_probability?.[i] || 0 })),
+                    pronostico: hoy.time.map((t, i) => ({ fecha: t, max: Math.round(hoy.temperature_2m_max[i]), min: Math.round(hoy.temperature_2m_min[i]), lluvia: hoy.precipitation_sum?.[i] || 0 }))
                 };
                 
                 const dt = datosClimaActual;
-                
                 document.getElementById('tempPrincipal').textContent = dt.temp + '°';
                 document.getElementById('descPrincipal').textContent = dt.desc;
                 document.getElementById('iconoPrincipal').textContent = dt.icono;
@@ -694,10 +568,7 @@
                 document.getElementById('alertasContainer').innerHTML = alertas.map(a => `
                     <div class="alerta ${a.tipo}">
                         <div class="alerta-icono">${a.icono}</div>
-                        <div class="alerta-info">
-                            <h4>${a.titulo}</h4>
-                            <p>${a.texto}</p>
-                        </div>
+                        <div class="alerta-info"><h4>${a.titulo}</h4><p>${a.texto}</p></div>
                     </div>
                 `).join('');
                 
@@ -711,17 +582,11 @@
             const svgNS = "http://www.w3.org/2000/svg";
             const svg = document.getElementById('graficoLinealSVG');
             svg.innerHTML = '';
-            
             const width = 700, height = 240;
             const pad = { top: 20, right: 25, bottom: 30, left: 40 };
-            const cw = width - pad.left - pad.right;
-            const ch = height - pad.top - pad.bottom;
-            
+            const cw = width - pad.left - pad.right, ch = height - pad.top - pad.bottom;
             const temps = hourly.map(h => h.temp);
-            const lluvias = hourly.map(h => h.lluvia);
-            const maxT = Math.max(...temps, 30);
-            const minT = Math.min(...temps, 5);
-            const rango = maxT - minT || 1;
+            const maxT = Math.max(...temps, 30), minT = Math.min(...temps, 5), rango = maxT - minT || 1;
             
             const g = document.createElementNS(svgNS, 'g');
             g.setAttribute('transform', `translate(${pad.left},${pad.top})`);
@@ -729,97 +594,55 @@
             
             const defs = document.createElementNS(svgNS, 'defs');
             const grad = document.createElementNS(svgNS, 'linearGradient');
-            grad.setAttribute('id', 'gradienteArea');
-            grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0'); grad.setAttribute('x2', '0'); grad.setAttribute('y2', '1');
-            const s1 = document.createElementNS(svgNS, 'stop'); s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#667eea'); s1.setAttribute('stop-opacity', '0.3');
-            const s2 = document.createElementNS(svgNS, 'stop'); s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#667eea'); s2.setAttribute('stop-opacity', '0.02');
-            grad.appendChild(s1); grad.appendChild(s2);
-            defs.appendChild(grad);
+            grad.setAttribute('id', 'gradienteArea'); grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0'); grad.setAttribute('x2', '0'); grad.setAttribute('y2', '1');
+            const s1 = document.createElementNS(svgNS, 'stop'); s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#6366f1'); s1.setAttribute('stop-opacity', '0.3');
+            const s2 = document.createElementNS(svgNS, 'stop'); s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#6366f1'); s2.setAttribute('stop-opacity', '0.02');
+            grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad);
             svg.insertBefore(defs, g);
             
             for (let i = 0; i <= 4; i++) {
                 const y = (ch / 4) * i;
                 const line = document.createElementNS(svgNS, 'line');
                 line.setAttribute('x1', 0); line.setAttribute('y1', y); line.setAttribute('x2', cw); line.setAttribute('y2', y);
-                line.setAttribute('class', 'chart-line-grid');
-                g.appendChild(line);
-                
+                line.setAttribute('class', 'chart-line-grid'); g.appendChild(line);
                 const label = document.createElementNS(svgNS, 'text');
                 label.setAttribute('x', -5); label.setAttribute('y', y + 3);
-                label.setAttribute('class', 'chart-line-label');
-                label.setAttribute('text-anchor', 'end');
-                label.textContent = Math.round(maxT - (rango / 4) * i) + '°';
-                g.appendChild(label);
+                label.setAttribute('class', 'chart-line-label'); label.setAttribute('text-anchor', 'end');
+                label.textContent = Math.round(maxT - (rango / 4) * i) + '°'; g.appendChild(label);
             }
             
             let pathD = '', areaD = '';
             for (let i = 0; i < 24; i++) {
-                const x = (cw / 23) * i;
-                const y = ch - ((temps[i] - minT) / rango) * ch;
-                if (i === 0) { 
-                    pathD += `M${x},${y}`; 
-                    areaD += `M${x},${y}`; 
-                } else { 
-                    pathD += ` L${x},${y}`; 
-                    areaD += ` L${x},${y}`; 
-                }
+                const x = (cw / 23) * i, y = ch - ((temps[i] - minT) / rango) * ch;
+                if (i === 0) { pathD += `M${x},${y}`; areaD += `M${x},${y}`; }
+                else { pathD += ` L${x},${y}`; areaD += ` L${x},${y}`; }
             }
             areaD += ` L${cw},${ch} L0,${ch} Z`;
             
-            const area = document.createElementNS(svgNS, 'path');
-            area.setAttribute('d', areaD);
-            area.setAttribute('fill', 'url(#gradienteArea)');
-            g.appendChild(area);
-            
-            const path = document.createElementNS(svgNS, 'path');
-            path.setAttribute('d', pathD);
-            path.setAttribute('class', 'chart-line-path');
-            g.appendChild(path);
+            const area = document.createElementNS(svgNS, 'path'); area.setAttribute('d', areaD); area.setAttribute('fill', 'url(#gradienteArea)'); g.appendChild(area);
+            const path = document.createElementNS(svgNS, 'path'); path.setAttribute('d', pathD); path.setAttribute('class', 'chart-line-path'); g.appendChild(path);
             
             for (let i = 0; i < 24; i++) {
-                const x = (cw / 23) * i;
-                const y = ch - ((temps[i] - minT) / rango) * ch;
-                
+                const x = (cw / 23) * i, y = ch - ((temps[i] - minT) / rango) * ch;
                 if (i % 3 === 0) {
                     const circle = document.createElementNS(svgNS, 'circle');
                     circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', '3.5');
-                    let cls = 'frio';
-                    if (temps[i] > 30) cls = 'caliente';
-                    else if (temps[i] > 18) cls = 'templado';
-                    circle.setAttribute('class', `chart-line-dot ${cls}`);
-                    g.appendChild(circle);
-                    
+                    let cls = temps[i] > 30 ? 'caliente' : (temps[i] > 18 ? 'templado' : 'frio');
+                    circle.setAttribute('class', `chart-line-dot ${cls}`); g.appendChild(circle);
                     const val = document.createElementNS(svgNS, 'text');
-                    val.setAttribute('x', x); val.setAttribute('y', y - 8);
-                    val.setAttribute('class', 'chart-line-value');
-                    val.textContent = temps[i] + '°';
-                    g.appendChild(val);
+                    val.setAttribute('x', x); val.setAttribute('y', y - 8); val.setAttribute('class', 'chart-line-value');
+                    val.textContent = temps[i] + '°'; g.appendChild(val);
                 }
-                
                 if (i % 4 === 0) {
                     const label = document.createElementNS(svgNS, 'text');
-                    label.setAttribute('x', x); label.setAttribute('y', ch + 15);
-                    label.setAttribute('class', 'chart-line-label');
-                    label.textContent = hourly[i].hora + 'h';
-                    g.appendChild(label);
+                    label.setAttribute('x', x); label.setAttribute('y', ch + 15); label.setAttribute('class', 'chart-line-label');
+                    label.textContent = hourly[i].hora + 'h'; g.appendChild(label);
                 }
             }
         }
         
-        function obtenerDesc(c) { 
-            const desc = {0:'Despejado',1:'Mayormente despejado',2:'Parcialmente nublado',3:'Nublado',45:'Neblina',48:'Niebla',51:'Llovizna',61:'Lluvia',63:'Lluvia',65:'Lluvia intensa',71:'Nieve',80:'Chubascos',95:'Tormenta'};
-            return desc[c] || 'Variable'; 
-        }
-        
-        function obtenerIcono(c) { 
-            if(c <= 1) return '☀️'; 
-            if(c <= 3) return '⛅'; 
-            if(c <= 48) return '🌫️'; 
-            if(c <= 65) return '🌧️'; 
-            if(c <= 75) return '❄️'; 
-            if(c <= 82) return '🌧️'; 
-            return '⛈️'; 
-        }
+        function obtenerDesc(c) { const desc = {0:'Despejado',1:'Mayormente despejado',2:'Parcialmente nublado',3:'Nublado',45:'Neblina',48:'Niebla',51:'Llovizna',61:'Lluvia',63:'Lluvia',65:'Lluvia intensa',71:'Nieve',80:'Chubascos',95:'Tormenta'}; return desc[c] || 'Variable'; }
+        function obtenerIcono(c) { if(c <= 1) return '☀️'; if(c <= 3) return '⛅'; if(c <= 48) return '🌫️'; if(c <= 65) return '🌧️'; if(c <= 75) return '❄️'; if(c <= 82) return '🌧️'; return '⛈️'; }
         
         async function buscarCiudad() {
             const ciudad = document.getElementById('buscarCiudad').value.trim();
@@ -827,10 +650,8 @@
             try {
                 const gr = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(ciudad)}&count=1&language=es`);
                 const gd = await gr.json();
-                if (gd.results?.length > 0) {
-                    const res = gd.results[0];
-                    obtenerClima(res.latitude, res.longitude, res.name + ', ' + res.country);
-                } else alert('Ciudad no encontrada');
+                if (gd.results?.length > 0) { const res = gd.results[0]; obtenerClima(res.latitude, res.longitude, res.name + ', ' + res.country); }
+                else alert('Ciudad no encontrada');
             } catch(e) { alert('Error al buscar'); }
         }
         
@@ -840,9 +661,7 @@
                     p => obtenerClima(p.coords.latitude, p.coords.longitude, 'Mi ubicación'),
                     () => obtenerClima(-34.6037, -58.3816, 'Buenos Aires, AR')
                 );
-            } else {
-                obtenerClima(-34.6037, -58.3816, 'Buenos Aires, AR');
-            }
+            } else { obtenerClima(-34.6037, -58.3816, 'Buenos Aires, AR'); }
         }
         
         function compartirPorWhatsApp() {
