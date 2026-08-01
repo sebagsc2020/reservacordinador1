@@ -479,7 +479,13 @@
             <div class="filters-bar">
                 <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
                 <input type="text" class="filter-input" placeholder="📍 Filtrar por ciudad..." id="filtroCiudad">
-                <!-- NUEVOS INPUTS DE FECHA -->
+                
+                <!-- NUEVO FILTRO POR EVENTO DE CALENDARIO -->
+                <select class="filter-select" id="filtroEventoCalendario">
+                    <option value="">📅 Seleccionar Evento</option>
+                    <!-- Los eventos se cargarán aquí dinámicamente -->
+                </select>
+
                 <input type="date" class="filter-date" id="filtroFechaDesde" title="Fecha Desde">
                 <input type="date" class="filter-date" id="filtroFechaHasta" title="Fecha Hasta">
                 
@@ -562,6 +568,16 @@
         let reservasData = [];
         let reservasFiltradas = [];
         let estadosGlobales = {};
+
+        // ==================================================
+        // CONFIGURACIÓN DE EVENTOS DE CALENDARIO (¡Puedes modificarlos aquí!)
+        // ==================================================
+        const eventosCalendario = [
+            { id: 'semana_santa', nombre: 'Semana Santa 2026', inicio: '2026-03-29', fin: '2026-04-05' },
+            { id: 'verano_alta', nombre: 'Temporada Alta Verano', inicio: '2026-01-15', fin: '2026-02-28' },
+            { id: 'invierno_alta', nombre: 'Temporada Alta Invierno', inicio: '2026-07-10', fin: '2026-08-20' },
+            { id: 'finde_largo', nombre: 'Fin de Semana Largo (Mayo)', inicio: '2026-05-01', fin: '2026-05-03' }
+        ];
 
         async function guardarNombreEnNube(id, nuevoNombre) {
             try {
@@ -883,7 +899,56 @@
         }
 
         // ==================================================
-        // NUEVA FUNCIÓN PARA FILTRAR POR FECHA
+        // NUEVA FUNCIÓN PARA CARGAR EVENTOS EN EL SELECT
+        // ==================================================
+        function cargarEventosCalendario() {
+            const selectEventos = document.getElementById('filtroEventoCalendario');
+            if (!selectEventos) return;
+
+            // Limpiar opciones por defecto (dejar solo la primera)
+            selectEventos.innerHTML = '<option value="">📅 Seleccionar Evento</option>';
+            
+            eventosCalendario.forEach(evento => {
+                const option = document.createElement('option');
+                option.value = evento.id;
+                option.textContent = evento.nombre;
+                option.dataset.inicio = evento.inicio;
+                option.dataset.fin = evento.fin;
+                selectEventos.appendChild(option);
+            });
+        }
+
+        // ==================================================
+        // NUEVA FUNCIÓN PARA SELECCIONAR EVENTO Y FILTRAR AUTOMÁTICAMENTE
+        // ==================================================
+        function aplicarFiltroEventoCalendario() {
+            const selectEventos = document.getElementById('filtroEventoCalendario');
+            const inputFechaDesde = document.getElementById('filtroFechaDesde');
+            const inputFechaHasta = document.getElementById('filtroFechaHasta');
+            
+            if (!selectEventos || !inputFechaDesde || !inputFechaHasta) return;
+
+            const eventoId = selectEventos.value;
+            if (eventoId) {
+                // Buscar el evento seleccionado en el array
+                const evento = eventosCalendario.find(e => e.id === eventoId);
+                if (evento) {
+                    // Asignar las fechas a los inputs de tipo date (formato YYYY-MM-DD)
+                    inputFechaDesde.value = evento.inicio;
+                    inputFechaHasta.value = evento.fin;
+                }
+            } else {
+                // Si el usuario vuelve a "Seleccionar Evento", limpiamos las fechas manuales
+                inputFechaDesde.value = '';
+                inputFechaHasta.value = '';
+            }
+            
+            // Ejecutar el filtro automáticamente
+            filtrarReservas();
+        }
+
+        // ==================================================
+        // FUNCIÓN PRINCIPAL DE FILTRADO (ACTUALIZADA)
         // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
@@ -929,23 +994,21 @@
                     coincideEstado = r.estado === estado;
                 }
 
-                // NUEVO FILTRO DE FECHA
                 let coincideFecha = true;
                 if (fechaDesdeObj || fechaHastaObj) {
                     if (r.fecha && r.fecha !== 'Sin fecha') {
                         // Convertir la fecha de la reserva (DD/MM/AAAA) a un objeto Date
                         const partesFecha = r.fecha.split('/');
                         if (partesFecha.length === 3) {
-                            // Meses en JS van de 0 a 11, por eso restamos 1 al mes
                             const fechaReservaObj = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
                             
                             if (fechaDesdeObj && fechaReservaObj < fechaDesdeObj) coincideFecha = false;
                             if (fechaHastaObj && fechaReservaObj > fechaHastaObj) coincideFecha = false;
                         } else {
-                            coincideFecha = false; // Si la fecha está mal formateada, no se muestra
+                            coincideFecha = false; 
                         }
                     } else {
-                        coincideFecha = false; // Si no tiene fecha, no se muestra al filtrar por fecha
+                        coincideFecha = false; 
                     }
                 }
                 
@@ -1113,9 +1176,13 @@
         }
 
         function init() {
+            // Cargar eventos en el select al iniciar
+            cargarEventosCalendario();
+
             const btnFiltrar = document.getElementById('btnFiltrar');
             const btnRecargar = document.getElementById('btnRecargar');
             const btnPDFExterno = document.getElementById('btnPDFExterno');
+            const selectEvento = document.getElementById('filtroEventoCalendario');
             const busquedaInput = document.getElementById('busquedaReserva');
             const filtroCiudad = document.getElementById('filtroCiudad');
             const filtroEstado = document.getElementById('filtroEstado');
@@ -1126,13 +1193,17 @@
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
             if (btnPDFExterno) btnPDFExterno.addEventListener('click', generarPDFExterno);
             
+            // Cuando se selecciona un evento, se autocompletan las fechas y se filtra
+            if (selectEvento) {
+                selectEvento.addEventListener('change', aplicarFiltroEventoCalendario);
+            }
+            
             // Eventos para filtrar al presionar Enter o cambiar fecha
             [busquedaInput, filtroCiudad, filtroEstado, filtroFechaDesde, filtroFechaHasta].forEach(function(input) {
                 if (input) {
                     input.addEventListener('keypress', function(e) { 
                         if (e.key === 'Enter') filtrarReservas(); 
                     });
-                    // Para los inputs de fecha, filtrar al cambiar el valor (sin necesidad de Enter)
                     if (input.type === 'date') {
                         input.addEventListener('change', filtrarReservas);
                     }
