@@ -77,7 +77,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== LAYOUT ===== */
         .app-container { display: flex; min-height: 100vh; }
         
         .sidebar {
@@ -136,7 +135,6 @@
 
         .main-content { margin-left: 260px; flex: 1; padding: 32px; transition: margin-left 0.3s; width: 100%; }
         
-        /* Mobile Menu */
         .menu-toggle { 
             display: none; position: fixed; top: 16px; left: 16px; z-index: 1002; 
             background: var(--bg-surface); border: 1px solid var(--border-color); 
@@ -151,7 +149,6 @@
         }
         .overlay.active { opacity: 1; pointer-events: auto; }
 
-        /* ===== HEADER ===== */
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
         .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
         .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
@@ -197,7 +194,6 @@
         .btn-reserva-manual:hover { background: #dc2626; transform: translateY(-2px); }
         .btn-reserva-manual:active { transform: scale(0.97); }
 
-        /* ===== FILTERS BAR ===== */
         .filters-bar { 
             background: var(--bg-surface); 
             padding: 16px 20px; 
@@ -256,7 +252,6 @@
             font-weight: 500;
         }
 
-        /* ===== CARDS GRID ===== */
         .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
         .reserva-card {
@@ -398,7 +393,6 @@
         .btn-whatsapp-card { background: #25D366; color: white; }
         .btn-excluir-card { background: var(--danger); color: white; }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); width: 280px; } 
@@ -423,12 +417,10 @@
 </head>
 <body>
 
-    <!-- Mobile Toggle -->
     <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú"><i class="ph ph-list" style="font-size: 24px;"></i></button>
     <div class="overlay" id="menuOverlay"></div>
 
     <div class="app-container">
-        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="brand-icon"><i class="ph-bold ph-mountains"></i></div>
@@ -454,7 +446,6 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <header class="page-header">
                 <div class="page-title"><h1>📋 Reservas</h1><p>Gestión completa de todas las reservas</p></div>
@@ -502,22 +493,15 @@
             });
         }
         
-        // Detectar si la app está instalada y se abre desde la pantalla de inicio
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
             console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
             document.body.classList.add('pwa-mode');
         }
         
-        // ==================================================
-        // FUNCIÓN PARA ABRIR RESERVA MANUAL
-        // ==================================================
         function abrirReservaManual() {
             window.open('https://sebagsc2020.github.io/reservacordinador1/reservar.html', '_blank');
         }
 
-        // ==================================================
-        // MENÚ FLOTANTE
-        // ==================================================
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('menuOverlay');
@@ -545,9 +529,6 @@
             window.location.href = 'index.html'; 
         }
 
-        // ==================================================
-        // CONFIGURACIÓN
-        // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
@@ -557,9 +538,6 @@
         let reservasFiltradas = [];
         let estadosGlobales = {};
 
-        // ==================================================
-        // GUARDAR NOMBRE EDITADO EN LA NUBE
-        // ==================================================
         async function guardarNombreEnNube(id, nuevoNombre) {
             try {
                 const formData = new URLSearchParams();
@@ -569,9 +547,7 @@
                 
                 const response = await fetch(ESTADOS_SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData.toString()
                 });
                 
@@ -584,9 +560,6 @@
             }
         }
 
-        // ==================================================
-        // EDITAR NOMBRE DE LA RESERVA
-        // ==================================================
         async function editarNombreReserva(id, nombreActual) {
             const nuevoNombre = prompt('✏️ Editar nombre del cliente:', nombreActual);
             if (!nuevoNombre || nuevoNombre.trim() === '') return;
@@ -619,9 +592,6 @@
             return JSON.parse(localStorage.getItem('nombresEditados') || '{}');
         }
 
-        // ==================================================
-        // GUARDAR ESTADO EN LA NUBE
-        // ==================================================
         async function guardarEstadoEnNube(id, nuevoEstado) {
             try {
                 const formData = new URLSearchParams();
@@ -631,9 +601,7 @@
                 
                 const response = await fetch(ESTADOS_SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData.toString()
                 });
                 
@@ -646,9 +614,6 @@
             }
         }
 
-        // ==================================================
-        // CARGAR ESTADOS DESDE LA NUBE
-        // ==================================================
         async function cargarEstadosDesdeNube() {
             try {
                 const localEstados = localStorage.getItem('estadosReservasCloud');
@@ -676,9 +641,6 @@
             }
         }
 
-        // ==================================================
-        // CARGAR RESERVAS
-        // ==================================================
         async function cargarReservas() {
             const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
@@ -732,12 +694,37 @@
                         }).filter(function(e) { return e; });
                     }
 
+                    // ==================================================
+                    // LECTURA DE FECHA - PRIORIDAD: columna J (índice 9)
+                    // ==================================================
                     let fecha = '';
-                    const timestamp = (c[0] && c[0].v) ? c[0].v : null;
-                    if (timestamp) {
-                        const fechaObj = new Date(timestamp);
-                        if (!isNaN(fechaObj.getTime())) {
-                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
+                    // Primero intentar leer la columna J (índice 9) que es el campo "fecha" del formulario
+                    if (c[9] && c[9].v) {
+                        const fechaRaw = String(c[9].v);
+                        // Si la fecha viene en formato DD/MM/YYYY o DD-MM-YYYY
+                        if (fechaRaw.includes('/') || fechaRaw.includes('-')) {
+                            fecha = fechaRaw.replace(/-/g, '/');
+                        } else {
+                            // Si es un timestamp, convertirlo
+                            const fechaObj = new Date(fechaRaw);
+                            if (!isNaN(fechaObj.getTime())) {
+                                fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + 
+                                        (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
+                                        fechaObj.getFullYear();
+                            }
+                        }
+                    }
+                    
+                    // Si no hay fecha en la columna J, intentar con el timestamp de la columna A (índice 0)
+                    if (!fecha) {
+                        const timestamp = (c[0] && c[0].v) ? c[0].v : null;
+                        if (timestamp) {
+                            const fechaObj = new Date(timestamp);
+                            if (!isNaN(fechaObj.getTime())) {
+                                fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + 
+                                        (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
+                                        fechaObj.getFullYear();
+                            }
                         }
                     }
 
@@ -757,7 +744,7 @@
 
                     reservasData.push({
                         id: id,
-                        fecha: fecha,
+                        fecha: fecha || 'Sin fecha',
                         nombre: nombreCompleto,
                         email: email,
                         telefono: telefono,
@@ -830,9 +817,6 @@
             window.open('https://wa.me/' + telefono + '?text=' + mensajeCodificado, '_blank');
         }
 
-        // ==================================================
-        // FUNCIÓN PARA CALCULAR TOTAL DE PASAJEROS
-        // ==================================================
         function calcularTotalPasajeros(reservas) {
             let total = 0;
             for (let i = 0; i < reservas.length; i++) {
@@ -841,9 +825,6 @@
             return total;
         }
 
-        // ==================================================
-        // FUNCIÓN PARA FILTRAR RESERVAS (MULTIPLE FILTRO)
-        // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
             const filtroCiudad = document.getElementById('filtroCiudad');
@@ -854,7 +835,6 @@
             const estado = filtroEstado ? filtroEstado.value : 'todos';
 
             reservasFiltradas = reservasData.filter(function(r) {
-                // Filtro por nombre o excursión
                 let coincideBusqueda = true;
                 if (texto) {
                     const coincideNombre = r.nombre.toLowerCase().includes(texto);
@@ -864,13 +844,11 @@
                     coincideBusqueda = coincideNombre || coincideExcursion;
                 }
                 
-                // Filtro por ciudad
                 let coincideCiudad = true;
                 if (ciudad) {
                     coincideCiudad = r.ciudad.toLowerCase().includes(ciudad);
                 }
                 
-                // Filtro por estado
                 let coincideEstado = true;
                 if (estado !== 'todos') {
                     coincideEstado = r.estado === estado;
@@ -940,7 +918,6 @@
                 }
                 excursionesHtml += '</ul>';
 
-                // Mostrar la fecha de solicitud en el encabezado
                 const fechaSolicitud = r.fecha || 'Sin fecha';
 
                 html += '<div class="reserva-card">' +
@@ -973,7 +950,6 @@
             }
             container.innerHTML = html;
 
-            // Actualizar contador con total de pasajeros
             const totalPasajeros = calcularTotalPasajeros(reservasFiltradas);
             const totalReservas = reservasFiltradas.length;
             const totalOriginal = reservasData.length;
@@ -1041,9 +1017,6 @@
             }
         }
 
-        // ==================================================
-        // INICIALIZAR
-        // ==================================================
         function init() {
             const btnFiltrar = document.getElementById('btnFiltrar');
             const btnRecargar = document.getElementById('btnRecargar');
@@ -1056,7 +1029,6 @@
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
             if (btnPDFExterno) btnPDFExterno.addEventListener('click', generarPDFExterno);
             
-            // Evento Enter en todos los inputs de filtro
             [busquedaInput, filtroCiudad, filtroEstado].forEach(function(input) {
                 if (input) {
                     input.addEventListener('keypress', function(e) { 
