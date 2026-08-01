@@ -478,12 +478,15 @@
 
             <div class="filters-bar">
                 <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
-                <input type="text" class="filter-input" placeholder="📍 Filtrar por ciudad..." id="filtroCiudad">
                 
-                <!-- NUEVO FILTRO POR EVENTO DE CALENDARIO DINÁMICO -->
+                <!-- CAMBIO: FILTRO DE CIUDAD AHORA ES UN SELECT DINÁMICO -->
+                <select class="filter-select" id="filtroCiudad">
+                    <option value="">📍 Todas las ciudades</option>
+                </select>
+                
+                <!-- FILTRO POR EVENTO DE CALENDARIO DINÁMICO -->
                 <select class="filter-select" id="filtroEventoCalendario">
                     <option value="">📅 Todos los eventos</option>
-                    <!-- Los eventos se cargarán aquí dinámicamente desde la BD -->
                 </select>
 
                 <input type="date" class="filter-date" id="filtroFechaDesde" title="Fecha Desde">
@@ -565,13 +568,12 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
-        // MISMA URL DE APPS SCRIPT QUE USA EL CALENDARIO
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
         
         let reservasData = [];
         let reservasFiltradas = [];
         let estadosGlobales = {};
-        let eventosCalendario = []; // Array para guardar los eventos traídos de la BD
+        let eventosCalendario = []; 
 
         async function guardarNombreEnNube(id, nuevoNombre) {
             try {
@@ -587,7 +589,6 @@
                 });
                 
                 const text = await response.text();
-                console.log(`✅ Nombre guardado en nube: ${id} -> ${nuevoNombre}`, text);
                 return true;
             } catch (error) {
                 console.error('Error al guardar nombre en nube:', error);
@@ -618,7 +619,6 @@
                     alert('✅ Nombre actualizado correctamente en la nube');
                 }
             } catch (error) {
-                console.error('Error al editar nombre:', error);
                 alert('❌ Error al actualizar el nombre');
             }
         }
@@ -640,8 +640,6 @@
                     body: formData.toString()
                 });
                 
-                const text = await response.text();
-                console.log(`✅ Estado guardado en nube: ${id} -> ${nuevoEstado}`, text);
                 return true;
             } catch (error) {
                 console.error('Error al guardar en nube:', error);
@@ -656,7 +654,6 @@
                     const parsed = JSON.parse(localEstados);
                     if (Object.keys(parsed).length > 0) {
                         estadosGlobales = parsed;
-                        console.log('📥 Estados cargados desde localStorage:', Object.keys(estadosGlobales).length);
                     }
                 }
                 
@@ -665,11 +662,9 @@
                 if (data.success && data.estados) {
                     estadosGlobales = data.estados;
                     localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
-                    console.log('📥 Estados sincronizados desde nube:', Object.keys(estadosGlobales).length);
                 }
                 return estadosGlobales;
             } catch (error) {
-                console.error('Error al cargar desde nube:', error);
                 const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
                 estadosGlobales = estadosLocal;
                 return estadosLocal;
@@ -677,7 +672,7 @@
         }
 
         // ==================================================
-        // FUNCIONES DE FECHAS (EXTRAÍDAS DE CALENDARIO.HTML)
+        // FUNCIONES DE FECHAS
         // ==================================================
         function convertirFechaISOtoDDMMYYYY(fechaIso) {
             if (!fechaIso) return '';
@@ -689,12 +684,10 @@
             return `${dia}/${mes}/${anio}`;
         }
 
-        // NUEVA FUNCIÓN PARA CONVERTIR A FORMATO HTML DATE (YYYY-MM-DD)
         function convertirISOaInputDate(fechaIso) {
             if (!fechaIso) return '';
             const fecha = new Date(fechaIso);
             if (isNaN(fecha.getTime())) return '';
-            // El input type="date" requiere YYYY-MM-DD
             const anio = fecha.getFullYear();
             const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
             const dia = fecha.getDate().toString().padStart(2, '0');
@@ -702,14 +695,13 @@
         }
 
         // ==================================================
-        // NUEVA FUNCIÓN PARA CARGAR EVENTOS REALES DESDE LA BD
+        // CARGAR EVENTOS
         // ==================================================
         async function cargarEventosCalendario() {
             const selectEventos = document.getElementById('filtroEventoCalendario');
             if (!selectEventos) return;
 
             try {
-                // Llamada al mismo script que usa calendario.html
                 const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
                 const response = await fetch(url);
                 const data = await response.json();
@@ -720,31 +712,23 @@
                     eventosCalendario = [];
                 }
             } catch (error) {
-                console.warn('⚠️ No se pudieron cargar los eventos de calendario:', error);
                 eventosCalendario = [];
             }
 
-            // Limpiar opciones por defecto (dejar solo la primera)
             selectEventos.innerHTML = '<option value="">📅 Todos los eventos</option>';
             
-            // Si hay eventos, agregarlos al select
             eventosCalendario.forEach(evento => {
                 const option = document.createElement('option');
                 option.value = evento.id;
-                // Mostrar el nombre y el rango de fechas
                 const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
                 const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
                 option.textContent = `${evento.nombre} (${fechaInicio} - ${fechaFin})`;
-                // Guardamos las fechas completas en los atributos data
                 option.dataset.inicio = evento.fechaInicio;
                 option.dataset.fin = evento.fechaFin;
                 selectEventos.appendChild(option);
             });
         }
 
-        // ==================================================
-        // FUNCIÓN CORREGIDA PARA APLICAR FILTRO POR EVENTO
-        // ==================================================
         function aplicarFiltroEventoCalendario() {
             const selectEventos = document.getElementById('filtroEventoCalendario');
             const inputFechaDesde = document.getElementById('filtroFechaDesde');
@@ -754,27 +738,23 @@
 
             const eventoId = selectEventos.value;
             if (eventoId) {
-                // Buscar el evento seleccionado en el array traído de la BD
                 const evento = eventosCalendario.find(e => e.id === eventoId);
                 if (evento) {
-                    // CORRECCIÓN: Convertir a formato YYYY-MM-DD antes de asignar al input
                     inputFechaDesde.value = convertirISOaInputDate(evento.fechaInicio);
                     inputFechaHasta.value = convertirISOaInputDate(evento.fechaFin);
                 }
             } else {
-                // Si el usuario vuelve a "Todos los eventos", limpiamos las fechas manuales
                 inputFechaDesde.value = '';
                 inputFechaHasta.value = '';
             }
             
-            // Ejecutar el filtro automáticamente
             filtrarReservas();
         }
 
         // ==================================================
-        // FUNCIÓN PARA FORMATEAR FECHA DE SHEETS
+        // FORMATEAR FECHA DE SHEETS
         // ==================================================
-        function formatearFecha(valor, formatoTexto) {
+        function formatearFecha(valor) {
             if (valor && typeof valor === 'object' && valor.v !== undefined) {
                 if (valor.f && typeof valor.f === 'string') {
                     let fechaStr = valor.f.replace(/-/g, '/');
@@ -825,6 +805,9 @@
             return '';
         }
 
+        // ==================================================
+        // FUNCIÓN PRINCIPAL (CARGAR RESERVAS Y CIUDADES)
+        // ==================================================
         async function cargarReservas() {
             const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
@@ -849,6 +832,9 @@
                 reservasData = [];
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 const nombresEditados = cargarNombresEditados();
+                
+                // Variable temporal para recolectar ciudades únicas
+                const ciudadesSet = new Set();
 
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
@@ -862,6 +848,11 @@
                     const email = (c[4] && c[4].v) ? String(c[4].v) : '';
                     const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
                     const ciudad = (c[7] && c[7].v) ? String(c[7].v) : '';
+
+                    // Si la ciudad no está vacía, la guardamos en el Set
+                    if (ciudad && ciudad.trim() !== '') {
+                        ciudadesSet.add(ciudad.trim());
+                    }
 
                     let excursionesLista = [];
                     const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
@@ -919,11 +910,31 @@
                     });
                 }
 
+                // ORDENAR RESERVAS
                 reservasData.sort(function(a, b) {
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
                     const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
                     return numB - numA;
                 });
+
+                // ==============================================
+                // ACTUALIZAR EL FILTRO DE CIUDADES
+                // ==============================================
+                const selectCiudad = document.getElementById('filtroCiudad');
+                if (selectCiudad) {
+                    // Limpiar opciones viejas, dejando solo la primera
+                    selectCiudad.innerHTML = '<option value="">📍 Todas las ciudades</option>';
+                    
+                    // Convertir Set a Array y ordenar alfabéticamente
+                    const ciudadesArray = Array.from(ciudadesSet).sort();
+                    
+                    ciudadesArray.forEach(ciudad => {
+                        const option = document.createElement('option');
+                        option.value = ciudad;
+                        option.textContent = ciudad;
+                        selectCiudad.appendChild(option);
+                    });
+                }
 
                 reservasFiltradas = reservasData.slice();
                 renderizarCards();
@@ -988,7 +999,7 @@
         }
 
         // ==================================================
-        // FUNCIÓN PRINCIPAL DE FILTRADO (ACTUALIZADA)
+        // FILTRADO
         // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
@@ -998,15 +1009,14 @@
             const filtroFechaHasta = document.getElementById('filtroFechaHasta');
             
             const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
-            const ciudad = filtroCiudad ? filtroCiudad.value.toLowerCase().trim() : '';
+            const ciudad = filtroCiudad ? filtroCiudad.value : ''; // Ahora es string directo
             const estado = filtroEstado ? filtroEstado.value : 'todos';
             
-            // Convertir las fechas del filtro a objetos Date (medianoche para abarcar el día completo)
             let fechaDesdeObj = null;
             let fechaHastaObj = null;
             
             if (filtroFechaDesde && filtroFechaDesde.value) {
-                const partes = filtroFechaDesde.value.split('-'); // El input date devuelve YYYY-MM-DD
+                const partes = filtroFechaDesde.value.split('-'); 
                 fechaDesdeObj = new Date(partes[0], partes[1] - 1, partes[2], 0, 0, 0, 0);
             }
             if (filtroFechaHasta && filtroFechaHasta.value) {
@@ -1026,7 +1036,7 @@
                 
                 let coincideCiudad = true;
                 if (ciudad) {
-                    coincideCiudad = r.ciudad.toLowerCase().includes(ciudad);
+                    coincideCiudad = r.ciudad === ciudad;
                 }
                 
                 let coincideEstado = true;
@@ -1037,7 +1047,6 @@
                 let coincideFecha = true;
                 if (fechaDesdeObj || fechaHastaObj) {
                     if (r.fecha && r.fecha !== 'Sin fecha') {
-                        // Convertir la fecha de la reserva (DD/MM/AAAA) a un objeto Date
                         const partesFecha = r.fecha.split('/');
                         if (partesFecha.length === 3) {
                             const fechaReservaObj = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
@@ -1202,9 +1211,7 @@
             try {
                 localStorage.setItem('filtroExcursionPDF', filtroTexto);
                 localStorage.setItem('reservasFiltradasPDF', JSON.stringify(reservasFiltradas));
-                console.log('✅ Datos guardados para PDF:', { filtro: filtroTexto || '(vacio)', total: reservasFiltradas.length });
             } catch(e) {
-                console.error('Error al guardar:', e);
                 alert('❌ Error al preparar los datos para el PDF.');
                 return;
             }
@@ -1216,7 +1223,6 @@
         }
 
         function init() {
-            // Cargar eventos de calendario reales al iniciar
             cargarEventosCalendario();
 
             const btnFiltrar = document.getElementById('btnFiltrar');
@@ -1233,12 +1239,10 @@
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
             if (btnPDFExterno) btnPDFExterno.addEventListener('click', generarPDFExterno);
             
-            // Cuando se selecciona un evento, se autocompletan las fechas y se filtra
             if (selectEvento) {
                 selectEvento.addEventListener('change', aplicarFiltroEventoCalendario);
             }
             
-            // Eventos para filtrar al presionar Enter o cambiar fecha
             [busquedaInput, filtroCiudad, filtroEstado, filtroFechaDesde, filtroFechaHasta].forEach(function(input) {
                 if (input) {
                     input.addEventListener('keypress', function(e) { 
@@ -1254,7 +1258,6 @@
             
             setInterval(() => {
                 if (document.visibilityState === 'visible') {
-                    console.log('🔄 Actualización automática - pestaña visible');
                     cargarReservas();
                 }
             }, 120000);
