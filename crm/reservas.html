@@ -642,27 +642,52 @@
         }
 
         // ==================================================
-        // FUNCIÓN PARA FORMATEAR FECHA CORRECTAMENTE
+        // NUEVA FUNCIÓN PARA FORMATEAR FECHA CORRECTAMENTE
+        // (Soporta el objeto de Google Sheets gviz/tq)
         // ==================================================
-        function formatearFecha(valor) {
+        function formatearFecha(valor, formatoTexto) {
+            // 1. Si el valor es un objeto con formato predefinido (viene de gviz/tq)
+            if (valor && typeof valor === 'object' && valor.v !== undefined) {
+                // Prioridad absoluta a 'f' (formato texto de Google Sheets)
+                if (valor.f && typeof valor.f === 'string') {
+                    let fechaStr = valor.f.replace(/-/g, '/');
+                    const partes = fechaStr.split('/');
+                    if (partes.length === 3) {
+                        const dia = partes[0].padStart(2, '0');
+                        const mes = partes[1].padStart(2, '0');
+                        const anio = partes[2];
+                        // Asegurar año de 4 dígitos
+                        return anio.length === 2 ? `${dia}/${mes}/20${anio}` : `${dia}/${mes}/${anio}`;
+                    }
+                    return fechaStr;
+                }
+                
+                // Si no tiene 'f', usar el timestamp 'v' (número)
+                if (typeof valor.v === 'number') {
+                    const fechaObj = new Date(valor.v);
+                    if (!isNaN(fechaObj.getTime())) {
+                        return fechaObj.getDate().toString().padStart(2,'0') + '/' + 
+                               (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
+                               fechaObj.getFullYear();
+                    }
+                }
+                return '';
+            }
+            
+            // 2. Si ya es un string o número normal (por si acaso)
             if (!valor) return '';
             
-            // Si es un string, procesarlo
+            // Si es string
             if (typeof valor === 'string') {
-                // Reemplazar guiones por barras
                 let fechaStr = valor.replace(/-/g, '/');
-                
-                // Verificar si tiene formato DD/MM/YYYY o DD-MM-YYYY
                 const partes = fechaStr.split('/');
                 if (partes.length === 3) {
-                    // Asegurar que día y mes tengan 2 dígitos
                     const dia = partes[0].padStart(2, '0');
                     const mes = partes[1].padStart(2, '0');
                     const anio = partes[2];
-                    return `${dia}/${mes}/${anio}`;
+                    return anio.length === 2 ? `${dia}/${mes}/20${anio}` : `${dia}/${mes}/${anio}`;
                 }
                 
-                // Si es un timestamp en string
                 const fechaObj = new Date(valor);
                 if (!isNaN(fechaObj.getTime())) {
                     return fechaObj.getDate().toString().padStart(2,'0') + '/' + 
@@ -740,15 +765,13 @@
                     }
 
                     // ==================================================
-                    // LEER FECHA DE LA COLUMNA J (índice 9)
+                    // LEER FECHA DE LA COLUMNA J (índice 9) CORREGIDO
                     // ==================================================
                     let fecha = '';
-                    let fechaRaw = '';
+                    let fechaRaw = c[9]; // Pasamos el objeto completo, no solo .v
                     
-                    // Intentar leer la columna J (índice 9) - campo "fecha" del formulario
-                    if (c[9] && c[9].v) {
-                        fechaRaw = String(c[9].v);
-                        console.log(`📅 Fecha raw para reserva ${id}: "${fechaRaw}"`);
+                    if (fechaRaw) {
+                        console.log(`📅 Objeto fecha raw para reserva ${id}:`, fechaRaw);
                         fecha = formatearFecha(fechaRaw);
                     }
                     
