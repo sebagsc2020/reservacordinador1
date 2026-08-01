@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -35,133 +34,160 @@
     <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
-        
-        /* Modo PWA (sin barra de navegación) */
-        .pwa-mode {
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #475569;
+            --sidebar-active-bg: #e0e7ff;
+            --sidebar-active-text: #4338ca;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
         }
 
-        /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
-        .menu-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            width: 50px;
-            height: 50px;
-            background: #667eea;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            border: none;
+        body.dark-mode {
+            --bg-body: #0f172a;
+            --bg-surface: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #cbd5e1;
+            --sidebar-active-bg: #334155;
+            --sidebar-active-text: #818cf8;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== MENÚ RETRÁCTIL UNIVERSAL ===== */
+        .app-container { display: flex; min-height: 100vh; }
+        
+        .sidebar {
+            width: 260px; 
+            background: var(--sidebar-bg); 
+            border-right: 1px solid var(--border-color);
+            position: fixed; height: 100vh; z-index: 1001;
+            transform: translateX(-100%); 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
+        }
+        .sidebar.open { 
+            transform: translateX(0); 
+            box-shadow: var(--shadow-lg); 
         }
         
-        .menu-btn:hover {
-            background: #5a6fd6;
-            transform: scale(1.05);
+        .sidebar-header { 
+            padding: 20px 24px; 
+            display: flex; align-items: center; gap: 12px; 
+            border-bottom: 1px solid var(--border-color); 
+            flex-shrink: 0;
         }
-        
-        .menu-btn span {
-            font-size: 24px;
-            color: white;
+        .brand-icon { 
+            width: 36px; height: 36px; 
+            background: linear-gradient(135deg, var(--primary), #8b5cf6); 
+            border-radius: var(--radius-sm); 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 20px; 
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
         }
-        
-        /* ===== SIDEBAR ===== */
-        .sidebar { 
-            width: 250px; 
-            background: #1a1a2e; 
-            color: white; 
-            padding: 25px 0; 
-            position: fixed; 
-            height: 100vh; 
-            overflow-y: auto; 
-            z-index: 1001;
-            transition: transform 0.3s ease;
-            transform: translateX(-100%);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        .brand-text { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; color: var(--text-main); }
+        .brand-text span { color: var(--primary); }
+
+        .nav-menu { list-style: none; padding: 16px 12px; flex: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            color: var(--sidebar-text); text-decoration: none; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 500; transition: all 0.2s ease;
         }
+        .nav-link i { font-size: 20px; flex-shrink: 0; }
+        .nav-link:hover { background: var(--bg-body); color: var(--primary); }
+        .nav-link.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); font-weight: 600; }
         
-        .sidebar.open {
-            transform: translateX(0);
+        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
+        .user-profile { 
+            display: flex; align-items: center; gap: 12px; padding: 12px; 
+            border-radius: var(--radius-sm); background: var(--bg-body); 
+            cursor: pointer; transition: background 0.2s;
         }
-        
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .user-profile:hover { background: var(--border-color); }
+        .avatar { 
+            width: 36px; height: 36px; background: var(--primary); color: white; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-weight: 600; font-size: 14px; flex-shrink: 0;
         }
-        
-        .menu-overlay.active {
-            display: block;
-            opacity: 1;
-        }
-        
-        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; } 
-        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } 
-        .sidebar-logo h2 span { color: #667eea; }
-        
-        .nav-menu { list-style: none; padding: 0 15px; } 
-        .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a { 
+        .user-details { overflow: hidden; }
+        .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-details p { font-size: 11px; color: var(--text-muted); }
+
+        /* Botón fijo en la esquina superior izquierda */
+        .menu-toggle { 
             display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            padding: 12px 15px; 
-            color: rgba(255,255,255,0.7); 
-            text-decoration: none; 
-            border-radius: 10px; 
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
-        .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        
-        .sidebar-footer { 
-            position: absolute; 
-            bottom: 20px; 
-            left: 15px; 
-            right: 15px; 
-        }
-        .btn-logout-sidebar { 
-            width: 100%; 
-            padding: 12px; 
-            background: rgba(231,76,60,0.2); 
-            color: #e74c3c; 
-            border: 1px solid rgba(231,76,60,0.3);
-            border-radius: 10px; 
+            position: fixed; 
+            top: 16px; 
+            left: 16px; 
+            z-index: 1002; 
+            background: var(--bg-surface); 
+            border: 1px solid var(--border-color); 
+            width: 44px; 
+            height: 44px; 
+            border-radius: var(--radius-sm); 
             cursor: pointer; 
-            font-weight: 600; 
-            font-size: 13px; 
-            transition: all 0.2s ease;
+            color: var(--text-main); 
+            box-shadow: var(--shadow-md); 
+            align-items: center; 
+            justify-content: center;
         }
-        .btn-logout-sidebar:hover {
-            background: rgba(231,76,60,0.4);
+        .overlay { 
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
+            z-index: 1000; opacity: 0; pointer-events: none; 
+            transition: opacity 0.3s; backdrop-filter: blur(4px); 
+        }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* Contenido principal ocupa TODO el ancho */
+        .main-content { 
+            margin-left: 0; 
+            flex: 1; 
+            padding: 32px; 
+            padding-top: 76px; /* Espacio para el botón del menú */
+            transition: margin-left 0.3s; 
+            width: 100%; 
         }
 
-        /* ===== CONTENIDO PRINCIPAL ===== */
-        .main-content { 
-            margin-left: 0;
-            flex: 1; 
-            padding: 20px; 
-            min-width: 0;
-            transition: margin-left 0.3s ease;
-        }
+        /* ===== HEADER Y ACCIONES ===== */
         .header { 
             display: flex; 
             justify-content: space-between; 
@@ -170,12 +196,12 @@
             flex-wrap: wrap; 
             gap: 10px; 
         }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
+        .header h1 { font-size: 26px; color: var(--text-main); }
         
         .user-area {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
         }
         
@@ -183,16 +209,17 @@
             display: flex; 
             align-items: center; 
             gap: 10px; 
-            background: white; 
+            background: var(--bg-surface); 
             padding: 8px 20px; 
             border-radius: 50px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
             font-size: 14px; 
         }
         .user-avatar { 
             width: 35px; 
             height: 35px; 
-            background: #667eea; 
+            background: var(--primary); 
             border-radius: 50%; 
             display: flex; 
             align-items: center; 
@@ -201,8 +228,9 @@
             font-weight: 700; 
         }
         
+        /* Botón Reserva Manual (Rojo) */
         .btn-reserva-manual {
-            background: #e74c3c;
+            background: var(--danger);
             color: white;
             border: none;
             padding: 8px 20px;
@@ -217,18 +245,46 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .btn-reserva-manual:hover {
-            background: #c0392b;
+            background: #dc2626;
             transform: scale(1.02);
         }
         .btn-reserva-manual:active {
             transform: scale(0.98);
         }
 
+        /* Botones de acción (Recargar y PDF) al lado del rojo */
+        .btn-action-header {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-action-header:hover {
+            background: var(--bg-body);
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .btn-action-header:active {
+            transform: scale(0.98);
+        }
+
+        /* ===== BARRA DE FILTROS ===== */
         .filters-bar { 
-            background: white; 
+            background: var(--bg-surface); 
             padding: 15px 20px; 
             border-radius: 15px; 
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); 
+            box-shadow: var(--shadow-sm); 
+            border: 1px solid var(--border-color);
             margin-bottom: 20px; 
             display: flex; 
             gap: 10px; 
@@ -237,52 +293,70 @@
         }
         .filter-input { 
             padding: 12px 15px; 
-            border: 2px solid #e0e0e0; 
+            border: 1px solid var(--border-color); 
             border-radius: 10px; 
             font-size: 13px; 
-            flex: 2; 
-            min-width: 200px; 
+            flex: 1; 
+            min-width: 150px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            transition: border-color 0.2s;
         }
         .filter-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
-        .btn-filtrar, .btn-recargar, .btn-pdf { 
-            padding: 10px 18px; 
+        .filter-select {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 13px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            min-width: 150px;
+            flex: 1;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .btn-filtrar { 
+            padding: 10px 25px; 
             border: none; 
-            border-radius: 10px; 
+            border-radius: var(--radius-sm); 
             cursor: pointer; 
             font-weight: 600; 
             font-size: 12px; 
             white-space: nowrap; 
             transition: all 0.2s;
+            background: var(--primary); 
+            color: white; 
         }
-        .btn-filtrar:active, .btn-recargar:active, .btn-pdf:active {
-            transform: scale(0.96);
-        }
-        .btn-filtrar { background: #667eea; color: white; }
-        .btn-recargar { background: #27ae60; color: white; }
-        .btn-pdf { background: #2c7da0; color: white; }
+        .btn-filtrar:active { transform: scale(0.96); }
+        .btn-filtrar:hover { background: var(--primary-hover); }
 
+        /* ===== TARJETAS DE RESERVA ===== */
         .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .total-reservas { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
 
         .reserva-card {
-            background: white;
-            border-radius: 16px;
+            background: var(--bg-surface);
+            border-radius: var(--radius);
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .reserva-card:active {
-            transform: scale(0.99);
-        }
-        .reserva-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-        }
+        .reserva-card:active { transform: scale(0.99); }
+        .reserva-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 
         .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
             color: white;
             padding: 12px 15px;
             display: flex;
@@ -308,13 +382,8 @@
             color: white;
             transition: all 0.2s;
         }
-        .btn-editar-nombre:hover {
-            background: rgba(255,255,255,0.4);
-            transform: scale(1.05);
-        }
-        .btn-editar-nombre:active {
-            transform: scale(0.95);
-        }
+        .btn-editar-nombre:hover { background: rgba(255,255,255,0.4); transform: scale(1.05); }
+        .btn-editar-nombre:active { transform: scale(0.95); }
         .card-estado-header {
             font-weight: 700;
             font-size: 12px;
@@ -323,26 +392,23 @@
             letter-spacing: 0.5px;
             color: white;
         }
-        .card-fecha {
-            font-size: 10px;
-            opacity: 0.85;
-        }
+        .card-fecha { font-size: 10px; opacity: 0.85; }
 
         .card-body { padding: 15px; }
         .card-info { margin-bottom: 12px; }
-        .card-label { font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .card-value { font-size: 13px; font-weight: 500; color: #333; word-break: break-word; }
+        .card-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 4px; }
+        .card-value { font-size: 13px; font-weight: 500; color: var(--text-main); word-break: break-word; }
 
         .excursiones-lista-card { margin: 0; padding-left: 16px; list-style: none; }
-        .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: #555; border-bottom: 1px dashed #eee; }
+        .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: var(--text-muted); border-bottom: 1px dashed var(--border-color); }
         .excursiones-lista-card li:last-child { border-bottom: none; }
 
         .card-actions {
             display: flex;
             gap: 8px;
             padding: 12px 15px;
-            background: #f8f9fa;
-            border-top: 1px solid #f0f0f0;
+            background: var(--bg-body);
+            border-top: 1px solid var(--border-color);
             flex-wrap: wrap;
         }
         .btn-card {
@@ -356,19 +422,15 @@
             transition: all 0.2s;
             text-align: center;
         }
-        .btn-card:active {
-            transform: scale(0.96);
-        }
+        .btn-card:active { transform: scale(0.96); }
         .btn-card:hover { opacity: 0.9; }
-        .btn-confirmar-card { background: #27ae60; color: white; }
-        .btn-pendiente-card { background: #ffc107; color: #856404; }
-        .btn-pagar-card { background: #3498db; color: white; }
+        .btn-confirmar-card { background: var(--success); color: white; }
+        .btn-pendiente-card { background: var(--warning); color: #856404; }
+        .btn-pagar-card { background: var(--info); color: white; }
         .btn-whatsapp-card { background: #25D366; color: white; }
-        .btn-excluir-card { background: #e74c3c; color: white; }
+        .btn-excluir-card { background: var(--danger); color: white; }
 
-        .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
-
-        /* ===== PRELOADER POPUP ===== */
+        /* ===== PRELOADER ===== */
         .preloader-popup {
             position: fixed;
             top: 0;
@@ -388,11 +450,12 @@
             visibility: hidden;
         }
         .preloader-popup-contenido {
-            background: white;
+            background: var(--bg-surface);
             border-radius: 24px;
             padding: 35px 45px;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
             animation: popupFadeIn 0.3s ease;
         }
         @keyframes popupFadeIn {
@@ -402,234 +465,120 @@
         .preloader-popup-icono {
             width: 70px;
             height: 70px;
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #667eea;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary);
             border-right: 4px solid #764ba2;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .preloader-popup-titulo {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 8px;
-        }
-        .preloader-popup-subtitulo {
-            font-size: 14px;
-            color: #666;
-        }
-        .puntos::after {
-            content: '';
-            animation: puntosAnim 1.5s infinite;
-        }
-        @keyframes puntosAnim {
-            0% { content: ''; }
-            25% { content: '.'; }
-            50% { content: '..'; }
-            75% { content: '...'; }
-            100% { content: ''; }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .preloader-popup-titulo { font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .preloader-popup-subtitulo { font-size: 14px; color: var(--text-muted); }
 
-        /* Scroll sidebar */
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar::-webkit-scrollbar-track {
-            background: #1a1a2e;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
-        }
-
-        /* Desktop */
-        @media (min-width: 1201px) {
-            .cards-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        /* Tablet */
-        @media (min-width: 769px) and (max-width: 1200px) {
-            .cards-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        /* Desktop menú */
-        @media (min-width: 769px) {
-            .menu-btn {
-                display: none !important;
-            }
-            
-            .sidebar {
-                transform: translateX(0) !important;
-                width: 250px;
-            }
-            
-            .menu-overlay {
-                display: none !important;
-            }
-            
-            .main-content {
-                margin-left: 250px;
-                padding: 30px;
-            }
-        }
-
-        /* Móvil */
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+        
         @media (max-width: 768px) {
-            .menu-btn {
-                display: flex;
-            }
+            .sidebar { width: 280px; }
+            .main-content { padding: 16px; padding-top: 76px; }
+            .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .header h1 { font-size: 20px; }
             
-            .main-content {
-                padding: 60px 12px 20px;
-            }
+            .user-area { width: 100%; justify-content: space-between; }
+            .user-info { padding: 5px 12px; font-size: 12px; }
+            .user-avatar { width: 28px; height: 28px; font-size: 12px; }
+            .btn-reserva-manual { padding: 5px 12px; font-size: 11px; }
+            .btn-action-header { padding: 5px 12px; font-size: 11px; }
             
-            .header h1 {
-                font-size: 20px;
-            }
+            .cards-grid { grid-template-columns: 1fr; gap: 15px; }
             
-            .user-area {
-                width: 100%;
-                justify-content: space-between;
-            }
+            .filters-bar { flex-direction: column; }
+            .filter-input, .filter-select { width: 100%; }
+            .btn-filtrar { width: 100%; text-align: center; }
             
-            .user-info {
-                padding: 5px 12px;
-                font-size: 12px;
-            }
+            .card-header { flex-direction: column; align-items: flex-start; }
+            .card-actions { flex-direction: column; }
+            .btn-card { width: 100%; }
             
-            .user-avatar {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
-            
-            .btn-reserva-manual {
-                padding: 5px 12px;
-                font-size: 11px;
-            }
-            
-            .cards-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .filters-bar {
-                flex-direction: column;
-            }
-            
-            .filter-input {
-                width: 100%;
-            }
-            
-            .btn-filtrar, .btn-recargar, .btn-pdf {
-                width: 100%;
-                text-align: center;
-            }
-            
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .card-actions {
-                flex-direction: column;
-            }
-            
-            .btn-card {
-                width: 100%;
-            }
-            
-            .preloader-popup-contenido {
-                padding: 25px 35px;
-            }
-            
-            .preloader-popup-icono {
-                width: 55px;
-                height: 55px;
-            }
-            
-            .preloader-popup-titulo {
-                font-size: 18px;
-            }
+            .preloader-popup-contenido { padding: 25px 35px; }
+            .preloader-popup-icono { width: 55px; height: 55px; }
+            .preloader-popup-titulo { font-size: 18px; }
         }
         
         @media (max-width: 480px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .user-area {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .btn-reserva-manual {
-                justify-content: center;
-            }
+            .header { flex-direction: column; align-items: flex-start; }
+            .user-area { flex-direction: column; align-items: stretch; }
+            .btn-reserva-manual { justify-content: center; }
+            .btn-action-header { justify-content: center; }
         }
     </style>
 </head>
 <body>
-    <!-- Botón menú hamburguesa (solo móvil) -->
-    <button class="menu-btn" id="menuBtn">
-        <span>☰</span>
-    </button>
-    
-    <!-- Overlay para cerrar menú -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-    
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🏔️</div>
-            <h2>Aventura <span>Total</span></h2>
-            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
-            <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
-            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
-            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
-            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
-        </div>
-    </nav>
 
-    <div class="main-content">
-        <div class="header">
-            <div><h1>📋 Reservas</h1></div>
-            <div class="user-area">
-                <div class="user-info">
-                    <div class="user-avatar">A</div>
-                    <span>Admin</span>
-                </div>
-                <button class="btn-reserva-manual" onclick="abrirReservaManual()">
-                    ➕ Reserva manual
-                </button>
+    <!-- Botón para abrir el menú -->
+    <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú"><i class="ph ph-list" style="font-size: 24px;"></i></button>
+    <div class="overlay" id="menuOverlay"></div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-icon"><i class="ph-bold ph-mountains"></i></div>
+                <div class="brand-text">Aventura<span>Total</span></div>
             </div>
-        </div>
+            
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" class="nav-link"><i class="ph ph-squares-four"></i> Dashboard</a></li>
+                <li><a href="clientes.html" class="nav-link"><i class="ph ph-users"></i> Clientes</a></li>
+                <li><a href="reservas.html" class="nav-link active"><i class="ph ph-calendar-check"></i> Reservas</a></li>
+                <li><a href="seguimiento.html" class="nav-link"><i class="ph ph-chart-line-up"></i> Seguimiento</a></li>
+                <li><a href="emails.html" class="nav-link"><i class="ph ph-whatsapp-logo"></i> WhatsApp</a></li>
+                <li><a href="calendario.html" class="nav-link"><i class="ph ph-calendar"></i> Calendario</a></li>
+                <li><a href="clima.html" class="nav-link"><i class="ph ph-cloud-sun"></i> Clima</a></li>
+            </ul>
 
-        <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
-            <button class="btn-filtrar" id="btnFiltrar">🔍 Filtrar</button>
-            <button class="btn-recargar" id="btnRecargar">🔄 Recargar</button>
-            <button class="btn-pdf" id="btnPDFExterno">📄 Generar PDF</button>
-        </div>
+            <div class="sidebar-footer">
+                <div class="user-profile" onclick="logout()">
+                    <div class="avatar">AD</div>
+                    <div class="user-details"><h4>Administrador</h4><p>Cerrar Sesión</p></div>
+                    <i class="ph ph-sign-out" style="margin-left: auto; color: var(--text-muted); font-size: 18px;"></i>
+                </div>
+            </div>
+        </nav>
 
-        <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
+        <div class="main-content">
+            <div class="header">
+                <div><h1>📋 Reservas</h1></div>
+                <div class="user-area">
+                    <div class="user-info">
+                        <div class="user-avatar">A</div>
+                        <span>Admin</span>
+                    </div>
+                    <!-- Botones de acción alineados juntos -->
+                    <button class="btn-action-header" id="btnRecargar"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
+                    <button class="btn-action-header" id="btnPDFExterno"><i class="ph ph-file-pdf"></i> PDF</button>
+                    <button class="btn-reserva-manual" onclick="abrirReservaManual()"><i class="ph ph-plus"></i> Reserva manual</button>
+                </div>
+            </div>
 
-        <div id="cardsContainer" class="cards-grid">
-            <div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>
+            <div class="filters-bar">
+                <!-- Primer campo: Todos los eventos -->
+                <select class="filter-select" id="filtroEventoCalendario">
+                    <option value="">📅 Todos los eventos</option>
+                </select>
+                
+                <!-- Campo de búsqueda general -->
+                <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
+                
+                <button class="btn-filtrar" id="btnFiltrar"><i class="ph ph-funnel"></i> Filtrar</button>
+            </div>
+
+            <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
+
+            <div id="cardsContainer" class="cards-grid">
+                <div style="text-align:center; grid-column:1/-1; padding:50px; color: var(--text-muted);">⏳ Cargando...</div>
+            </div>
         </div>
     </div>
 
@@ -672,39 +621,47 @@
         }
 
         // ==================================================
-        // MENÚ FLOTANTE
+        // MENÚ LATERAL RETRÁCTIL
         // ==================================================
-        function initMenu() {
-            const menuBtn = document.getElementById('menuBtn');
-            const sidebar = document.getElementById('sidebar');
-            const menuOverlay = document.getElementById('menuOverlay');
-            
-            if (!menuBtn || !sidebar || !menuOverlay) return;
-            
-            function toggleMenu() {
-                sidebar.classList.toggle('open');
-                menuOverlay.classList.toggle('active');
-                document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-            }
-            
-            function closeMenu() {
-                sidebar.classList.remove('open');
-                menuOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-            
-            menuBtn.addEventListener('click', toggleMenu);
-            menuOverlay.addEventListener('click', closeMenu);
-            
-            document.querySelectorAll('.nav-menu a').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth <= 768) {
-                        closeMenu();
-                    }
-                });
-            });
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('menuOverlay');
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
         }
         
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', closeMenu);
+        
+        // Cerrar menú al hacer clic en un enlace (SIEMPRE, para que no estorbe al navegar)
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                closeMenu();
+            });
+        });
+
+        // ==================================================
+        // MODO OSCURO
+        // ==================================================
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+        }
+
+        if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.body.classList.add('dark-mode');
+        }
+
         // ==================================================
         // CONFIGURACIÓN
         // ==================================================
@@ -721,12 +678,15 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         
-        // URL del Google Apps Script - ACTUALIZAR CON TU URL
+        // URL del Google Apps Script para estados
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
+        // URL del Apps Script para eventos del calendario
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
         
         let reservasData = [];
         let reservasFiltradas = [];
         let estadosGlobales = {};
+        let eventosCalendario = [];
 
         // Preloader Popup
         const preloaderPopup = document.getElementById('preloaderPopup');
@@ -871,6 +831,52 @@
         }
 
         // ==================================================
+        // CARGAR EVENTOS DEL CALENDARIO
+        // ==================================================
+        async function cargarEventosCalendario() {
+            const selectEventos = document.getElementById('filtroEventoCalendario');
+            if (!selectEventos) return;
+
+            try {
+                const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success && data.eventos) {
+                    eventosCalendario = data.eventos;
+                } else {
+                    eventosCalendario = [];
+                }
+            } catch (error) {
+                console.warn('⚠️ No se pudieron cargar los eventos de calendario:', error);
+                eventosCalendario = [];
+            }
+
+            selectEventos.innerHTML = '<option value="">📅 Todos los eventos</option>';
+            
+            function convertirFechaISOtoDDMMYYYY(fechaIso) {
+                if (!fechaIso) return '';
+                const fecha = new Date(fechaIso);
+                if (isNaN(fecha.getTime())) return fechaIso;
+                const dia = fecha.getDate().toString().padStart(2, '0');
+                const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+                const anio = fecha.getFullYear();
+                return `${dia}/${mes}/${anio}`;
+            }
+
+            eventosCalendario.forEach(evento => {
+                const option = document.createElement('option');
+                option.value = evento.id;
+                const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
+                const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
+                option.textContent = `${evento.nombre} (${fechaInicio} - ${fechaFin})`;
+                option.dataset.inicio = evento.fechaInicio;
+                option.dataset.fin = evento.fechaFin;
+                selectEventos.appendChild(option);
+            });
+        }
+
+        // ==================================================
         // CARGAR RESERVAS
         // ==================================================
         async function cargarReservas() {
@@ -882,6 +888,7 @@
                 mostrarPreloader();
 
                 await cargarEstadosDesdeNube();
+                await cargarEventosCalendario();
 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
                 const texto = await response.text();
@@ -978,7 +985,7 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                container.innerHTML = '<div style="text-align:center; color:red; grid-column:1/-1; padding:50px;">❌ Error: ' + error.message + '</div>';
+                container.innerHTML = '<div style="text-align:center; color:var(--danger); grid-column:1/-1; padding:50px;">❌ Error: ' + error.message + '</div>';
             } finally {
                 ocultarPreloader();
             }
@@ -1034,7 +1041,7 @@
             if (!container) return;
 
             if (reservasFiltradas.length === 0) {
-                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">📋 No hay reservas</div>';
+                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px; color: var(--text-muted);">📋 No hay reservas</div>';
                 if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
@@ -1135,22 +1142,60 @@
             });
         }
 
+        // ==================================================
+        // FILTRADO (CON SOPORTE PARA EVENTOS DE CALENDARIO)
+        // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
-            if (!busqueda) return;
-            const texto = busqueda.value.toLowerCase().trim();
+            const filtroEvento = document.getElementById('filtroEventoCalendario');
+            
+            const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
+            const eventoId = filtroEvento ? filtroEvento.value : '';
 
-            if (!texto) {
-                reservasFiltradas = reservasData.slice();
-            } else {
-                reservasFiltradas = reservasData.filter(function(r) {
+            let fechaDesdeObj = null;
+            let fechaHastaObj = null;
+
+            // Si se seleccionó un evento, calcular sus fechas para filtrar
+            if (eventoId) {
+                const evento = eventosCalendario.find(e => e.id === eventoId);
+                if (evento) {
+                    // Crear las fechas en horario local para que no se desfasen
+                    fechaDesdeObj = new Date(evento.fechaInicio + 'T00:00:00'); 
+                    fechaHastaObj = new Date(evento.fechaFin + 'T23:59:59');
+                }
+            }
+
+            reservasFiltradas = reservasData.filter(function(r) {
+                let coincideBusqueda = true;
+                if (texto) {
                     const coincideNombre = r.nombre.toLowerCase().includes(texto);
                     const coincideExcursion = r.excursionesLista.some(function(exc) {
                         return exc.toLowerCase().includes(texto);
                     });
-                    return coincideNombre || coincideExcursion;
-                });
-            }
+                    coincideBusqueda = coincideNombre || coincideExcursion;
+                }
+
+                let coincideFecha = true;
+                if (fechaDesdeObj || fechaHastaObj) {
+                    if (r.fecha && r.fecha !== '') {
+                        const partesFecha = r.fecha.split('/');
+                        if (partesFecha.length === 3) {
+                            const fechaReservaObj = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
+                            fechaReservaObj.setHours(0,0,0,0);
+
+                            if (fechaDesdeObj && fechaReservaObj < fechaDesdeObj) coincideFecha = false;
+                            if (fechaHastaObj && fechaReservaObj > fechaHastaObj) coincideFecha = false;
+                        } else {
+                            coincideFecha = false; 
+                        }
+                    } else {
+                        coincideFecha = false; 
+                    }
+                }
+                
+                return coincideBusqueda && coincideFecha;
+            });
+            
             renderizarCards();
         }
 
@@ -1195,12 +1240,11 @@
         // INICIALIZAR
         // ==================================================
         function init() {
-            initMenu();
-            
             const btnFiltrar = document.getElementById('btnFiltrar');
             const btnRecargar = document.getElementById('btnRecargar');
             const btnPDFExterno = document.getElementById('btnPDFExterno');
             const busquedaInput = document.getElementById('busquedaReserva');
+            const filtroEvento = document.getElementById('filtroEventoCalendario');
             
             if (btnFiltrar) btnFiltrar.addEventListener('click', filtrarReservas);
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
@@ -1209,6 +1253,9 @@
                 busquedaInput.addEventListener('keypress', function(e) { 
                     if (e.key === 'Enter') filtrarReservas(); 
                 });
+            }
+            if (filtroEvento) {
+                filtroEvento.addEventListener('change', filtrarReservas);
             }
             
             cargarReservas();
@@ -1227,6 +1274,7 @@
         window.generarPDFExterno = generarPDFExterno;
         window.abrirReservaManual = abrirReservaManual;
         window.editarNombreReserva = editarNombreReserva;
+        window.toggleTheme = toggleTheme;
         
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
