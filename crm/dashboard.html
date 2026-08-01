@@ -23,8 +23,6 @@
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Chart.js DataLabels Plugin (para mostrar números dentro de la barra) -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     
     <style>
         :root {
@@ -86,13 +84,24 @@
         /* ===== LAYOUT ===== */
         .app-container { display: flex; min-height: 100vh; }
         
+        /* ================================================== */
+        /* CAMBIOS EN EL CSS DEL SIDEBAR Y MAIN-CONTENT      */
+        /* ================================================== */
+        
+        /* 1. El sidebar arranca retraído (transform: translateX(-100%)) */
         .sidebar {
             width: 260px; 
             background: var(--sidebar-bg); 
             border-right: 1px solid var(--border-color);
             position: fixed; height: 100vh; z-index: 1001;
+            transform: translateX(-100%); 
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column;
+        }
+        
+        .sidebar.open { 
+            transform: translateX(0); 
+            box-shadow: var(--shadow-lg); 
         }
         
         .sidebar-header { 
@@ -140,24 +149,51 @@
         .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-details p { font-size: 11px; color: var(--text-muted); }
 
-        .main-content { margin-left: 260px; flex: 1; padding: 32px; transition: margin-left 0.3s; width: 100%; }
-        
-        /* Mobile Menu */
-        .menu-toggle { 
-            display: none; position: fixed; top: 16px; left: 16px; z-index: 1002; 
-            background: var(--bg-surface); border: 1px solid var(--border-color); 
-            width: 44px; height: 44px; border-radius: var(--radius-sm); cursor: pointer; 
-            color: var(--text-main); box-shadow: var(--shadow-md); 
-            align-items: center; justify-content: center;
+        /* 2. El contenido ocupa todo el ancho (margin-left: 0) */
+        .main-content { 
+            margin-left: 0; 
+            flex: 1; 
+            padding: 32px; 
+            padding-top: 76px; /* Espacio para el botón hamburguesa */
+            transition: margin-left 0.3s; 
+            width: 100%; 
         }
+        
+        /* 3. El botón del menú siempre está visible en la esquina */
+        .menu-toggle { 
+            display: flex; 
+            position: fixed; 
+            top: 16px; 
+            left: 16px; 
+            z-index: 1002; 
+            background: var(--bg-surface); 
+            border: 1px solid var(--border-color); 
+            width: 44px; 
+            height: 44px; 
+            border-radius: var(--radius-sm); 
+            cursor: pointer; 
+            color: var(--text-main); 
+            box-shadow: var(--shadow-md); 
+            align-items: center; 
+            justify-content: center;
+        }
+        /* En móviles también se ve */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex !important; }
+        }
+
         .overlay { 
             position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
             z-index: 1000; opacity: 0; pointer-events: none; 
             transition: opacity 0.3s; backdrop-filter: blur(4px); 
         }
         .overlay.active { opacity: 1; pointer-events: auto; }
+        
+        /* ================================================== */
+        /* FIN DE LOS CAMBIOS CSS                            */
+        /* ================================================== */
 
-        /* ===== HEADER ===== */
+        /* ===== HEADER & FILTERS ===== */
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
         .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
         .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
@@ -181,62 +217,19 @@
         }
         .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
         
-        /* ===== FILTERS BAR (SOLO CIUDAD) ===== */
-        .filters-bar { 
-            background: var(--bg-surface); 
-            padding: 12px 16px; 
-            border-radius: var(--radius); 
-            box-shadow: var(--shadow-sm); 
-            border: 1px solid var(--border-color);
-            margin-bottom: 24px; 
-            display: flex; 
-            gap: 8px; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            position: relative;
+        .filter-bar { 
+            background: var(--bg-surface); padding: 16px 20px; border-radius: var(--radius); 
+            box-shadow: var(--shadow-sm); display: flex; gap: 16px; align-items: center; 
+            flex-wrap: wrap; margin-bottom: 28px; border: 1px solid var(--border-color); 
         }
-        .filter-select {
-            padding: 8px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            background: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            min-width: 160px;
-            cursor: pointer;
-            transition: border-color 0.2s;
+        .input-group { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 140px; }
+        .input-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        input[type="date"] { 
+            flex: 1; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); 
+            background: var(--bg-body); color: var(--text-main); font-family: inherit; font-size: 13px; 
+            transition: border-color 0.2s; min-width: 0;
         }
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-
-        /* Botones compactos en barra de filtros */
-        .btn-filter-action {
-            padding: 8px 12px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            min-height: 38px;
-        }
-        .btn-filter-action:active { transform: scale(0.97); }
-        .btn-filter-secondary {
-            background: var(--bg-surface);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            min-width: 70px;
-        }
-        .btn-filter-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
+        input[type="date"]:focus { border-color: var(--primary); }
 
         /* ===== METRICS GRID ===== */
         .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
@@ -262,18 +255,21 @@
         
         .stat-value { font-size: 28px; font-weight: 700; color: var(--text-main); line-height: 1.1; letter-spacing: -1px; word-break: break-word; }
         .stat-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .stat-trend { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
 
         /* ===== CHARTS SECTION ===== */
-        .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 28px; }
         .chart-card { 
             background: var(--bg-surface); border-radius: var(--radius); padding: 20px; 
             box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); 
         }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .card-title { font-size: 15px; font-weight: 600; color: var(--text-main); }
-        .chart-wrapper { position: relative; height: 300px; width: 100%; }
+        .chart-wrapper { position: relative; height: 280px; width: 100%; }
 
-        /* ===== TOP CLIENTS TABLE ===== */
+        /* ===== TABLES ===== */
         .table-section { 
             background: var(--bg-surface); border-radius: var(--radius); 
             box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); 
@@ -297,6 +293,25 @@
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(99, 102, 241, 0.02); }
         
+        .badge { 
+            padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; 
+            text-transform: capitalize; display: inline-flex; align-items: center; gap: 4px; 
+        }
+        .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+        .badge-pendiente { background: var(--warning-light); color: #b45309; }
+        .badge-pendiente::before { background: #b45309; }
+        .badge-confirmado { background: var(--success-light); color: #047857; }
+        .badge-confirmado::before { background: #047857; }
+        .badge-pagado { background: var(--info-light); color: #1d4ed8; }
+        .badge-pagado::before { background: #1d4ed8; }
+        
+        .dark-mode .badge-pendiente { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .dark-mode .badge-pendiente::before { background: #fbbf24; }
+        .dark-mode .badge-confirmado { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .dark-mode .badge-confirmado::before { background: #34d399; }
+        .dark-mode .badge-pagado { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        .dark-mode .badge-pagado::before { background: #60a5fa; }
+
         .client-avatar-sm { 
             width: 30px; height: 30px; border-radius: 50%; background: var(--primary-light); 
             color: var(--primary); display: inline-flex; align-items: center; justify-content: center; 
@@ -331,22 +346,21 @@
         /* ===== RESPONSIVE DESIGN ===== */
         @media (max-width: 1024px) {
             .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-            .charts-container { grid-template-columns: 1fr; } /* En pantallas medianas, los gráficos se ponen uno arriba del otro */
+            .charts-container { grid-template-columns: 1fr; }
             .chart-wrapper { height: 250px; }
         }
 
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); width: 280px; }
-            .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
-            .main-content { margin-left: 0; padding: 20px; padding-top: 76px; }
-            .menu-toggle { display: flex; }
+            .sidebar { width: 280px; }
+            .main-content { padding: 20px; padding-top: 76px; }
             
             .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
             .actions-group { width: 100%; justify-content: space-between; }
             
-            .filters-bar { flex-direction: column; align-items: stretch; }
-            .filter-select { width: 100%; min-width: 100%; }
-            .btn-filter-action { width: 100%; justify-content: center; }
+            .filter-bar { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
+            .input-group { width: 100%; }
+            input[type="date"] { width: 100%; }
+            .filter-bar .btn { width: 100%; justify-content: center; }
             
             .metrics-grid { grid-template-columns: 1fr; gap: 12px; }
             .stat-card { padding: 16px; flex-direction: row; align-items: center; gap: 16px; }
@@ -368,7 +382,7 @@
 </head>
 <body>
 
-    <!-- Mobile Toggle -->
+    <!-- Mobile Toggle (Botón para abrir menú) -->
     <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú"><i class="ph ph-list" style="font-size: 24px;"></i></button>
     <div class="overlay" id="menuOverlay"></div>
 
@@ -416,13 +430,18 @@
                 </div>
             </header>
 
-            <!-- Filters Bar -->
-            <div class="filters-bar">
-                <select class="filter-select" id="filtroCiudad">
-                    <option value="">📍 Todas las ciudades</option>
-                </select>
-
-                <button class="btn-filter-action btn-filter-secondary" id="btnLimpiarFiltros"><i class="ph ph-x"></i> Limpiar</button>
+            <!-- Filters -->
+            <div class="filter-bar">
+                <div class="input-group">
+                    <label>Desde:</label>
+                    <input type="date" id="fechaInicio">
+                </div>
+                <div class="input-group">
+                    <label>Hasta:</label>
+                    <input type="date" id="fechaFin">
+                </div>
+                <button class="btn btn-secondary" onclick="filtrarPorFecha()"><i class="ph ph-funnel"></i> Aplicar</button>
+                <button class="btn btn-secondary" onclick="resetFechas()"><i class="ph ph-x"></i> Limpiar</button>
             </div>
 
             <!-- Metrics Grid -->
@@ -490,20 +509,17 @@
 
             <div id="totalReservasSpan" style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">0 reservas</div>
 
-            <!-- Charts Row (Nueva estructura: 2 gráficos lado a lado) -->
+            <!-- Charts Row -->
             <div class="charts-container">
-                
-                <!-- GRÁFICO DE BARRAS HORIZONTAL: PROMEDIO DE EXCURSIONES POR CIUDAD -->
                 <div class="chart-card">
                     <div class="card-header">
-                        <h3 class="card-title">📊 Promedio Excursiones / Pasajero (por Ciudad)</h3>
+                        <h3 class="card-title">Evolución de Pasajeros</h3>
+                        <button class="btn-icon" style="width: 32px; height: 32px;"><i class="ph ph-dots-three-outline"></i></button>
                     </div>
                     <div class="chart-wrapper">
-                        <canvas id="promedioCiudadChart"></canvas>
+                        <canvas id="pasajerosChart"></canvas>
                     </div>
                 </div>
-
-                <!-- GRÁFICO DE DONA: ESTADO DE RESERVAS (SE MANTIENE) -->
                 <div class="chart-card">
                     <div class="card-header">
                         <h3 class="card-title">Estado de Reservas</h3>
@@ -512,7 +528,32 @@
                         <canvas id="estadosChart"></canvas>
                     </div>
                 </div>
+            </div>
 
+            <!-- Recent Reservations Table -->
+            <div class="table-section">
+                <div class="section-header">
+                    <h3 class="card-title">Últimas Reservas</h3>
+                    <button class="btn btn-secondary">Ver todas</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Excursión</th>
+                                <th>Fecha</th>
+                                <th>Pax</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaUltimasReservas">
+                            <tr><td colspan="7"><div class="loader-container"><div class="spinner"></div></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Top Clients Table -->
@@ -573,9 +614,10 @@
         menuBtn.addEventListener('click', toggleMenu);
         overlay.addEventListener('click', closeMenu);
         
+        // Cerrar menú al hacer clic en un enlace (SIEMPRE, para que no estorbe al navegar)
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) closeMenu();
+                closeMenu();
             });
         });
 
@@ -601,16 +643,17 @@
         }
 
         // ==================================================
-        // DATA & LOGIC
+        // DATA & LOGIC (Todo el resto permanece igual)
         // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const JSON_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Hoja%201`;
+        const JSON_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Hoja%201&tq=order%20by%20A%20desc%20limit%2050`;
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
 
         let reservasDataArray = [];
         let estadosGlobales = {};
-        let chartInstancePromedio = null;
+        let chartInstanceLine = null;
         let chartInstanceDoughnut = null;
+        let fechaInicio = null, fechaFin = null;
 
         async function cargarEstados() {
             try {
@@ -629,11 +672,11 @@
         }
 
         async function cargarDatos() {
+            document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="7"><div class="loader-container"><div class="spinner"></div></div></td></tr>';
             document.getElementById('topClientesBody').innerHTML = '<tr><td colspan="5"><div class="loader-container"><div class="spinner"></div></div></td></tr>';
             
             try {
                 await cargarEstados();
-                
                 const res = await fetch(JSON_URL + '&t=' + Date.now());
                 let text = await res.text();
                 text = text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2);
@@ -644,8 +687,6 @@
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 const nombresEditados = JSON.parse(localStorage.getItem('nombresEditados') || '{}');
                 
-                const ciudadesSet = new Set();
-
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
                     if(!c || c.length < 5) continue;
@@ -656,12 +697,9 @@
                     const nombre = c[2]?.v ? String(c[2].v) : '';
                     const apellido = c[3]?.v ? String(c[3].v) : '';
                     const email = c[4]?.v ? String(c[4].v) : '';
-                    const ciudad = c[7]?.v ? String(c[7].v) : '';
                     
                     let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
                     if (nombresEditados[id]) nombreCompleto = nombresEditados[id];
-                    
-                    if (ciudad && ciudad.trim() !== '') ciudadesSet.add(ciudad.trim());
                     
                     let excursionesLista = [];
                     const excRaw = c[8]?.v ? String(c[8].v) : '';
@@ -690,7 +728,6 @@
                         id,
                         nombreCompleto,
                         email,
-                        ciudad,
                         excursion: excursionNombre,
                         excursionesLista,
                         fecha: fechaStr,
@@ -702,48 +739,32 @@
                 reservasDataArray = nuevasReservas;
                 reservasDataArray.sort((a,b) => (parseInt(b.id.replace(/\D/g,''))||0) - (parseInt(a.id.replace(/\D/g,''))||0));
                 
-                // Poblar filtro de ciudades
-                const selectCiudad = document.getElementById('filtroCiudad');
-                if (selectCiudad) {
-                    selectCiudad.innerHTML = '<option value="">📍 Todas las ciudades</option>';
-                    const ciudadesArray = Array.from(ciudadesSet).sort();
-                    ciudadesArray.forEach(ciudad => {
-                        const option = document.createElement('option');
-                        option.value = ciudad;
-                        option.textContent = ciudad;
-                        selectCiudad.appendChild(option);
-                    });
-                }
-                
-                // Aplicar filtros iniciales y renderizar
-                aplicarFiltros();
+                renderizarTodo();
                 showToast('Datos actualizados', 'Información sincronizada correctamente desde la nube.');
 
             } catch (error) {
                 console.error('Error cargando datos:', error);
-                document.getElementById('topClientesBody').innerHTML = '<tr><td colspan="5" style="color:var(--danger); text-align:center; padding: 40px;">❌ Error al cargar datos. Verifica tu conexión.</td></tr>';
+                document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="7" style="color:var(--danger); text-align:center; padding: 40px;">❌ Error al cargar datos. Verifica tu conexión.</td></tr>';
             }
         }
 
-        function aplicarFiltros() {
-            const filtroCiudad = document.getElementById('filtroCiudad');
-            
-            const ciudad = filtroCiudad ? filtroCiudad.value : ''; 
-
-            const reservasFiltradas = reservasDataArray.filter(r => {
-                let coincideCiudad = true;
-                if (ciudad) coincideCiudad = r.ciudad === ciudad;
-                
-                return coincideCiudad;
-            });
-
-            renderizarTodo(reservasFiltradas);
+        function renderizarTodo() {
+            const reservasFiltradas = filtrarReservasPorFecha();
+            calcularMetricas(reservasFiltradas);
+            renderizarTablas(reservasFiltradas);
+            renderizarGraficos(reservasFiltradas);
         }
 
-        function renderizarTodo(reservas) {
-            calcularMetricas(reservas);
-            renderizarTopClientes(reservas);
-            renderizarGraficos(reservas);
+        function filtrarReservasPorFecha() {
+            if (!fechaInicio && !fechaFin) return reservasDataArray;
+            return reservasDataArray.filter(r => {
+                if (r.fecha === '--/--/----') return true;
+                const partes = r.fecha.split('/');
+                const fechaR = new Date(partes[2], partes[1]-1, partes[0]);
+                if (fechaInicio && fechaR < fechaInicio) return false;
+                if (fechaFin && fechaR > fechaFin) return false;
+                return true;
+            });
         }
 
         function calcularMetricas(reservas) {
@@ -811,7 +832,25 @@
             document.getElementById('topExcursion').innerText = topExc;
         }
 
-        function renderizarTopClientes(reservas) {
+        function renderizarTablas(reservas) {
+            const tbodyRes = document.getElementById('tablaUltimasReservas');
+            tbodyRes.innerHTML = reservas.slice(0, 5).map(r => `
+                <tr>
+                    <td><span style="font-family:monospace; color:var(--text-muted); font-size:12px;">#${r.id.substring(0,6)}</span></td>
+                    <td>
+                        <div style="display:flex; align-items:center;">
+                            <div class="client-avatar-sm">${r.nombreCompleto.charAt(0).toUpperCase()}</div>
+                            <span style="font-weight:500;">${escapeHtml(r.nombreCompleto)}</span>
+                        </div>
+                    </td>
+                    <td>${escapeHtml(r.excursion)}</td>
+                    <td>${r.fecha}</td>
+                    <td style="font-weight:600;">${r.personas}</td>
+                    <td><span class="badge badge-${r.estado}">${r.estado}</span></td>
+                    <td><button class="btn-icon" style="width:32px; height:32px; padding:0;" title="Ver detalles"><i class="ph ph-eye"></i></button></td>
+                </tr>
+            `).join('');
+
             const clientesMap = {};
             reservas.forEach(r => {
                 if(!r.email) return;
@@ -842,89 +881,56 @@
             const textColor = isDark ? '#94a3b8' : '#64748b';
             const gridColor = isDark ? '#334155' : '#e2e8f0';
 
-            // ==========================================
-            // GRÁFICO 1: BARRAS HORIZONTAL (PROMEDIO EXCURSIONES POR CIUDAD)
-            // ==========================================
-            // Agrupar datos por ciudad
-            const datosCiudades = {};
+            const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const dataMensual = new Array(12).fill(0);
+            
             reservas.forEach(r => {
-                if (!r.ciudad) return;
-                if (!datosCiudades[r.ciudad]) datosCiudades[r.ciudad] = { pasajeros: 0, excursiones: 0 };
-                datosCiudades[r.ciudad].pasajeros += r.personas;
-                if (r.excursionesLista && r.excursionesLista.length > 0) {
-                    datosCiudades[r.ciudad].excursiones += r.excursionesLista.length * r.personas;
+                if(r.fecha !== '--/--/----') {
+                    const parts = r.fecha.split('/');
+                    const mesIdx = parseInt(parts[1]) - 1;
+                    if(!isNaN(mesIdx) && mesIdx >= 0 && mesIdx < 12) {
+                        dataMensual[mesIdx] += r.personas;
+                    }
                 }
             });
 
-            // Calcular el promedio (Excursiones / Pasajeros)
-            const ciudadesLabels = [];
-            const promediosData = [];
-            const coloresBarra = [];
+            if(chartInstanceLine) chartInstanceLine.destroy();
+            const ctxLine = document.getElementById('pasajerosChart').getContext('2d');
+            
+            const gradient = ctxLine.createLinearGradient(0, 0, 0, 280);
+            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.2)');
+            gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
 
-            for (const [ciudad, data] of Object.entries(datosCiudades)) {
-                if (data.pasajeros > 0) {
-                    ciudadesLabels.push(ciudad);
-                    const promedio = (data.excursiones / data.pasajeros).toFixed(2);
-                    promediosData.push(parseFloat(promedio));
-                    // Color aleatorio pero bonito para cada barra
-                    const hue = Math.floor(Math.random() * 360);
-                    coloresBarra.push(`hsla(${hue}, 70%, 60%, 0.8)`);
-                }
-            }
-
-            if(chartInstancePromedio) chartInstancePromedio.destroy();
-            const ctxPromedio = document.getElementById('promedioCiudadChart').getContext('2d');
-
-            // Registramos el plugin de DataLabels para este gráfico específico
-            chartInstancePromedio = new Chart(ctxPromedio, {
-                type: 'bar',
+            chartInstanceLine = new Chart(ctxLine, {
+                type: 'line',
                 data: {
-                    labels: ciudadesLabels,
+                    labels: meses,
                     datasets: [{
-                        label: 'Promedio de Excursiones x Pasajero',
-                        data: promediosData,
-                        backgroundColor: coloresBarra,
-                        borderColor: coloresBarra.map(c => c.replace('0.8', '1')),
-                        borderWidth: 1,
-                        borderRadius: 4
+                        label: 'Pasajeros',
+                        data: dataMensual,
+                        borderColor: '#6366f1',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // Esto convierte el gráfico en HORIZONTAL
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        // Configuración para mostrar el número dentro de la barra
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'end',
-                            color: textColor,
-                            font: { weight: 'bold', size: 12 },
-                            formatter: function(value) {
-                                return value > 0 ? value : '';
-                            }
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        x: { 
-                            beginAtZero: true, 
-                            grid: { color: gridColor, borderDash: [4, 4] }, 
-                            ticks: { color: textColor, font: { size: 11 } } 
-                        },
-                        y: { 
-                            grid: { display: false }, 
-                            ticks: { color: textColor, font: { size: 11 } } 
-                        }
+                        y: { beginAtZero: true, grid: { color: gridColor, borderDash: [4, 4] }, ticks: { color: textColor, font: { size: 11 } } },
+                        x: { grid: { display: false }, ticks: { color: textColor, font: { size: 11 } } }
                     }
-                },
-                // Activamos el plugin de datalabels solo para este gráfico
-                plugins: [ChartDataLabels]
+                }
             });
 
-            // ==========================================
-            // GRÁFICO 2: DONA (ESTADO DE RESERVAS) - SE MANTIENE
-            // ==========================================
             const counts = { pendiente: 0, confirmado: 0, pagado: 0 };
             reservas.forEach(r => counts[r.estado] = (counts[r.estado] || 0) + 1);
 
@@ -949,16 +955,14 @@
                         legend: { 
                             position: 'bottom', 
                             labels: { usePointStyle: true, pointStyle: 'circle', color: textColor, padding: 16, font: { size: 11 } } 
-                        },
-                        datalabels: { display: false } // Desactivamos datalabels para la dona, se ve mejor así
+                        }
                     }
-                },
-                plugins: [ChartDataLabels] // Lo mantenemos registrado pero desactivado en opciones
+                }
             });
         }
 
         function updateChartsTheme() {
-            aplicarFiltros(); // Re-renderiza todo con el tema nuevo
+            if(reservasDataArray.length > 0) renderizarGraficos(filtrarReservasPorFecha());
         }
 
         function showToast(title, msg) {
@@ -980,9 +984,21 @@
             window.location.href = `clientes.html?email=${encodeURIComponent(email)}`; 
         }
 
-        function limpiarFiltros() {
-            document.getElementById('filtroCiudad').value = '';
-            aplicarFiltros();
+        function filtrarPorFecha() {
+            const inicio = document.getElementById('fechaInicio').value;
+            const fin = document.getElementById('fechaFin').value;
+            fechaInicio = inicio ? new Date(inicio) : null;
+            fechaFin = fin ? new Date(fin) : null;
+            renderizarTodo();
+            showToast('Filtro aplicado', 'Mostrando resultados del período seleccionado.');
+        }
+
+        function resetFechas() { 
+            document.getElementById('fechaInicio').value = ''; 
+            document.getElementById('fechaFin').value = ''; 
+            fechaInicio = null;
+            fechaFin = null;
+            renderizarTodo();
             showToast('Filtros limpiados', 'Mostrando todas las reservas.');
         }
 
@@ -995,16 +1011,12 @@
             setInterval(cargarDatos, 60000);
         };
 
-        // Listeners de los filtros
-        document.getElementById('btnLimpiarFiltros').addEventListener('click', limpiarFiltros);
-        document.getElementById('filtroCiudad').addEventListener('change', aplicarFiltros);
-
+        window.filtrarPorFecha = filtrarPorFecha;
+        window.resetFechas = resetFechas;
         window.cargarDatos = cargarDatos;
         window.logout = logout;
         window.toggleTheme = toggleTheme;
         window.verCliente = verCliente;
-        window.aplicarFiltros = aplicarFiltros;
-        window.limpiarFiltros = limpiarFiltros;
     </script>
 </body>
 </html>
