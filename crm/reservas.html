@@ -171,8 +171,6 @@
         .btn-success:hover { background: #059669; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-danger:hover { background: #dc2626; }
-        .btn-warning { background: var(--warning); color: #78350f; }
-        .btn-warning:hover { background: #d97706; }
         .btn-icon { 
             width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); 
             border: 1px solid var(--border-color); color: var(--text-muted); 
@@ -217,8 +215,8 @@
             border: 1px solid var(--border-color); 
             border-radius: var(--radius-sm); 
             font-size: 13px; 
-            flex: 2; 
-            min-width: 200px; 
+            flex: 1; 
+            min-width: 150px; 
             background: var(--bg-body);
             color: var(--text-main);
             transition: border-color 0.2s;
@@ -229,7 +227,25 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px var(--primary-light);
         }
-        .dark-mode .filter-input:focus {
+        .filter-select {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-width: 140px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        .dark-mode .filter-input:focus,
+        .dark-mode .filter-select:focus {
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
 
@@ -388,6 +404,7 @@
             .actions-group { width: 100%; justify-content: space-between; }
             .filters-bar { flex-direction: column; }
             .filter-input { width: 100%; }
+            .filter-select { width: 100%; }
             .cards-grid { grid-template-columns: 1fr; gap: 16px; }
             .card-header { flex-direction: column; align-items: flex-start; }
             .card-actions { flex-direction: column; }
@@ -444,6 +461,13 @@
 
             <div class="filters-bar">
                 <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
+                <input type="text" class="filter-input" placeholder="📍 Filtrar por ciudad..." id="filtroCiudad">
+                <select class="filter-select" id="filtroEstado">
+                    <option value="todos">📌 Todos los estados</option>
+                    <option value="confirmado">✅ Confirmado</option>
+                    <option value="pendiente">⏳ Pendiente</option>
+                    <option value="pagado">💰 Pagado</option>
+                </select>
                 <button class="btn btn-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Filtrar</button>
                 <button class="btn btn-success" id="btnRecargar"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
                 <button class="btn btn-secondary" id="btnPDFExterno"><i class="ph ph-file-pdf"></i> Generar PDF</button>
@@ -812,13 +836,54 @@
             return total;
         }
 
+        // ==================================================
+        // FUNCIÓN PARA FILTRAR RESERVAS (MULTIPLE FILTRO)
+        // ==================================================
+        function filtrarReservas() {
+            const busqueda = document.getElementById('busquedaReserva');
+            const filtroCiudad = document.getElementById('filtroCiudad');
+            const filtroEstado = document.getElementById('filtroEstado');
+            
+            const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
+            const ciudad = filtroCiudad ? filtroCiudad.value.toLowerCase().trim() : '';
+            const estado = filtroEstado ? filtroEstado.value : 'todos';
+
+            reservasFiltradas = reservasData.filter(function(r) {
+                // Filtro por nombre o excursión
+                let coincideBusqueda = true;
+                if (texto) {
+                    const coincideNombre = r.nombre.toLowerCase().includes(texto);
+                    const coincideExcursion = r.excursionesLista.some(function(exc) {
+                        return exc.toLowerCase().includes(texto);
+                    });
+                    coincideBusqueda = coincideNombre || coincideExcursion;
+                }
+                
+                // Filtro por ciudad
+                let coincideCiudad = true;
+                if (ciudad) {
+                    coincideCiudad = r.ciudad.toLowerCase().includes(ciudad);
+                }
+                
+                // Filtro por estado
+                let coincideEstado = true;
+                if (estado !== 'todos') {
+                    coincideEstado = r.estado === estado;
+                }
+                
+                return coincideBusqueda && coincideCiudad && coincideEstado;
+            });
+            
+            renderizarCards();
+        }
+
         function renderizarCards() {
             const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
             if (!container) return;
 
             if (reservasFiltradas.length === 0) {
-                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px; color: var(--text-muted);">📋 No hay reservas</div>';
+                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px; color: var(--text-muted);">📋 No hay reservas que coincidan con los filtros</div>';
                 if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
@@ -931,25 +996,6 @@
             });
         }
 
-        function filtrarReservas() {
-            const busqueda = document.getElementById('busquedaReserva');
-            if (!busqueda) return;
-            const texto = busqueda.value.toLowerCase().trim();
-
-            if (!texto) {
-                reservasFiltradas = reservasData.slice();
-            } else {
-                reservasFiltradas = reservasData.filter(function(r) {
-                    const coincideNombre = r.nombre.toLowerCase().includes(texto);
-                    const coincideExcursion = r.excursionesLista.some(function(exc) {
-                        return exc.toLowerCase().includes(texto);
-                    });
-                    return coincideNombre || coincideExcursion;
-                });
-            }
-            renderizarCards();
-        }
-
         function excluirReserva(id) {
             if (confirm('⚠️ ¿Estás seguro de excluir la reserva ' + id + '?')) {
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
@@ -995,15 +1041,21 @@
             const btnRecargar = document.getElementById('btnRecargar');
             const btnPDFExterno = document.getElementById('btnPDFExterno');
             const busquedaInput = document.getElementById('busquedaReserva');
+            const filtroCiudad = document.getElementById('filtroCiudad');
+            const filtroEstado = document.getElementById('filtroEstado');
             
             if (btnFiltrar) btnFiltrar.addEventListener('click', filtrarReservas);
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
             if (btnPDFExterno) btnPDFExterno.addEventListener('click', generarPDFExterno);
-            if (busquedaInput) {
-                busquedaInput.addEventListener('keypress', function(e) { 
-                    if (e.key === 'Enter') filtrarReservas(); 
-                });
-            }
+            
+            // Evento Enter en todos los inputs de filtro
+            [busquedaInput, filtroCiudad, filtroEstado].forEach(function(input) {
+                if (input) {
+                    input.addEventListener('keypress', function(e) { 
+                        if (e.key === 'Enter') filtrarReservas(); 
+                    });
+                }
+            });
             
             cargarReservas();
             
