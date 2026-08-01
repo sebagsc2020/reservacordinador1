@@ -598,11 +598,11 @@
 
     <script>
         // ==================================================
-        // REGISTRAR SERVICE WORKER PARA PWA
+        // REGISTRAR SERVICE WORKER PARA PWA (CORREGIDO CON /crm/)
         // ==================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('/crm/sw.js')
                     .then(function(registration) {
                         console.log('✅ Service Worker registrado con éxito:', registration.scope);
                     })
@@ -626,7 +626,7 @@
         }
 
         // ==================================================
-        // MENÚ LATERAL RETRÁCTIL
+        // MENÚ LATERAL RETRÁCTIL (CORREGIDO CON LAS 3 LÍNEAS)
         // ==================================================
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.getElementById('sidebar');
@@ -655,9 +655,8 @@
         });
 
         // ==================================================
-        // MODO OSCURO (CON VARIABLES CSS)
+        // MODO OSCURO
         // ==================================================
-        const themeBtn = document.getElementById('themeBtn');
         const themeIcon = document.getElementById('themeIcon');
         
         function toggleTheme() {
@@ -667,7 +666,7 @@
             themeIcon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
         }
 
-        // Cargar preferencia guardada al iniciar
+        // Cargar preferencia guardada
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
             themeIcon.className = 'ph ph-sun';
