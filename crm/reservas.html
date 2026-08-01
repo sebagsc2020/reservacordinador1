@@ -319,13 +319,18 @@
         .dark-mode .estado-confirmado { background: rgba(16, 185, 129, 0.15); color: #34d399; }
         .dark-mode .estado-pagado { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
         
-        .card-fecha {
+        .card-fecha-solicitud {
             font-size: 11px;
             color: var(--text-muted);
             display: flex;
             align-items: center;
             gap: 4px;
+            background: var(--bg-body);
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
         }
+        .dark-mode .card-fecha-solicitud { border-color: var(--border-color); }
 
         .card-body { padding: 16px; }
         .card-info { margin-bottom: 10px; }
@@ -468,9 +473,6 @@
                     <option value="pendiente">⏳ Pendiente</option>
                     <option value="pagado">💰 Pagado</option>
                 </select>
-                <select class="filter-select" id="filtroEvento">
-                    <option value="todos">📅 Todos los eventos</option>
-                </select>
                 <button class="btn btn-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Filtrar</button>
                 <button class="btn btn-success" id="btnRecargar"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
                 <button class="btn btn-secondary" id="btnPDFExterno"><i class="ph ph-file-pdf"></i> Generar PDF</button>
@@ -550,63 +552,10 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
-        const CALENDARIO_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
         
         let reservasData = [];
         let reservasFiltradas = [];
         let estadosGlobales = {};
-        let eventosCalendario = [];
-
-        // ==================================================
-        // CARGAR EVENTOS DEL CALENDARIO
-        // ==================================================
-        async function cargarEventosCalendario() {
-            try {
-                const url = `${CALENDARIO_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.success && data.eventos) {
-                    eventosCalendario = data.eventos;
-                    // Actualizar el selector de eventos
-                    const selectEvento = document.getElementById('filtroEvento');
-                    if (selectEvento) {
-                        let options = '<option value="todos">📅 Todos los eventos</option>';
-                        eventosCalendario.forEach(evento => {
-                            const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
-                            const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
-                            options += `<option value="${evento.id}">📅 ${evento.nombre} (${fechaInicio} - ${fechaFin})</option>`;
-                        });
-                        selectEvento.innerHTML = options;
-                    }
-                    console.log('📅 Eventos cargados:', eventosCalendario.length);
-                }
-                return eventosCalendario;
-            } catch (error) {
-                console.error('Error al cargar eventos del calendario:', error);
-                return [];
-            }
-        }
-
-        // ==================================================
-        // FUNCIONES DE FECHAS
-        // ==================================================
-        function convertirFechaISOtoDDMMYYYY(fechaIso) {
-            if (!fechaIso) return '';
-            const fecha = new Date(fechaIso);
-            if (isNaN(fecha.getTime())) return fechaIso;
-            const dia = fecha.getDate().toString().padStart(2, '0');
-            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-            const anio = fecha.getFullYear();
-            return `${dia}/${mes}/${anio}`;
-        }
-
-        function fechaDDMMYYYYtoNumero(fechaStr) {
-            if (!fechaStr) return 0;
-            const partes = fechaStr.split('/');
-            if (partes.length !== 3) return 0;
-            return parseInt(partes[2] + partes[1] + partes[0]);
-        }
 
         // ==================================================
         // GUARDAR NOMBRE EDITADO EN LA NUBE
@@ -736,7 +685,6 @@
             if (!container) return;
 
             try {
-                await cargarEventosCalendario();
                 await cargarEstadosDesdeNube();
 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
@@ -876,7 +824,7 @@
                 default: estadoTexto = 'Confirmado';
             }
 
-            const mensaje = '🏔️ *AVENTURA TOTAL* 🏔️\n\n✅ *CONFIRMACIÓN DE RESERVA*\n\n🆔 *N° de reserva:* ' + reserva.id + '\n📅 *Fecha:* ' + reserva.fecha + '\n\n👤 *DATOS DEL PASAJERO:*\n   Nombre: ' + reserva.nombre + '\n   📞 Teléfono: ' + reserva.telefono + '\n   📧 Email: ' + reserva.email + '\n\n📍 *DESTINO:*\n   ' + reserva.ciudad + '\n\n✨ *EXCURSIONES SELECCIONADAS:*\n' + excursionesTexto + '\n\n👥 *Cantidad de personas:* ' + reserva.personas + '\n💳 *Forma de pago:* ' + reserva.formaPago + '\n🚐 *Punto de encuentro:* ' + reserva.lugar + '\n📌 *Estado:* ' + estadoTexto + '\n\n📌 *PRÓXIMOS PASOS:*\n• En las próximas 24hs recibirás detalles de pago\n• Punto de encuentro exacto será confirmado\n\n🏔️ ¡Gracias por confiar en Aventura Total!';
+            const mensaje = '🏔️ *AVENTURA TOTAL* 🏔️\n\n✅ *CONFIRMACIÓN DE RESERVA*\n\n🆔 *N° de reserva:* ' + reserva.id + '\n📅 *Fecha solicitud:* ' + reserva.fecha + '\n\n👤 *DATOS DEL PASAJERO:*\n   Nombre: ' + reserva.nombre + '\n   📞 Teléfono: ' + reserva.telefono + '\n   📧 Email: ' + reserva.email + '\n\n📍 *DESTINO:*\n   ' + reserva.ciudad + '\n\n✨ *EXCURSIONES SELECCIONADAS:*\n' + excursionesTexto + '\n\n👥 *Cantidad de personas:* ' + reserva.personas + '\n💳 *Forma de pago:* ' + reserva.formaPago + '\n🚐 *Punto de encuentro:* ' + reserva.lugar + '\n📌 *Estado:* ' + estadoTexto + '\n\n📌 *PRÓXIMOS PASOS:*\n• En las próximas 24hs recibirás detalles de pago\n• Punto de encuentro exacto será confirmado\n\n🏔️ ¡Gracias por confiar en Aventura Total!';
 
             const mensajeCodificado = encodeURIComponent(mensaje);
             window.open('https://wa.me/' + telefono + '?text=' + mensajeCodificado, '_blank');
@@ -894,40 +842,16 @@
         }
 
         // ==================================================
-        // FUNCIÓN PARA VERIFICAR SI UNA RESERVA PERTENECE A UN EVENTO
-        // ==================================================
-        function reservaPerteneceAEvento(reserva, eventoId) {
-            if (eventoId === 'todos') return true;
-            
-            const evento = eventosCalendario.find(e => e.id === eventoId);
-            if (!evento) return true;
-            
-            const fechaReserva = reserva.fecha;
-            if (!fechaReserva) return false;
-            
-            const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
-            const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
-            
-            const fechaReservaNum = fechaDDMMYYYYtoNumero(fechaReserva);
-            const fechaInicioNum = fechaDDMMYYYYtoNumero(fechaInicio);
-            const fechaFinNum = fechaDDMMYYYYtoNumero(fechaFin);
-            
-            return fechaReservaNum >= fechaInicioNum && fechaReservaNum <= fechaFinNum;
-        }
-
-        // ==================================================
         // FUNCIÓN PARA FILTRAR RESERVAS (MULTIPLE FILTRO)
         // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
             const filtroCiudad = document.getElementById('filtroCiudad');
             const filtroEstado = document.getElementById('filtroEstado');
-            const filtroEvento = document.getElementById('filtroEvento');
             
             const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
             const ciudad = filtroCiudad ? filtroCiudad.value.toLowerCase().trim() : '';
             const estado = filtroEstado ? filtroEstado.value : 'todos';
-            const eventoId = filtroEvento ? filtroEvento.value : 'todos';
 
             reservasFiltradas = reservasData.filter(function(r) {
                 // Filtro por nombre o excursión
@@ -952,13 +876,7 @@
                     coincideEstado = r.estado === estado;
                 }
                 
-                // Filtro por evento del calendario (por rango de fechas)
-                let coincideEvento = true;
-                if (eventoId !== 'todos') {
-                    coincideEvento = reservaPerteneceAEvento(r, eventoId);
-                }
-                
-                return coincideBusqueda && coincideCiudad && coincideEstado && coincideEvento;
+                return coincideBusqueda && coincideCiudad && coincideEstado;
             });
             
             renderizarCards();
@@ -1022,6 +940,9 @@
                 }
                 excursionesHtml += '</ul>';
 
+                // Mostrar la fecha de solicitud en el encabezado
+                const fechaSolicitud = r.fecha || 'Sin fecha';
+
                 html += '<div class="reserva-card">' +
                             '<div class="card-header">' +
                                 '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">' +
@@ -1029,7 +950,7 @@
                                     '<button class="btn-editar-nombre" onclick="editarNombreReserva(\'' + r.id + '\', \'' + escapeHtml(r.nombre).replace(/'/g, "\\'") + '\')" title="Editar nombre"><i class="ph ph-pencil"></i></button>' +
                                     '<span class="card-estado-header ' + estadoClass + '">' + estadoText + '</span>' +
                                 '</div>' +
-                                '<span class="card-fecha"><i class="ph ph-calendar"></i> ' + escapeHtml(r.fecha) + '</span>' +
+                                '<span class="card-fecha-solicitud"><i class="ph ph-calendar"></i> ' + escapeHtml(fechaSolicitud) + '</span>' +
                             '</div>' +
                             '<div class="card-body">' +
                                 '<div class="card-info"><div class="card-label"><i class="ph ph-user"></i> CLIENTE</div><div class="card-value">' + escapeHtml(r.nombre) + '</div></div>' +
@@ -1052,6 +973,7 @@
             }
             container.innerHTML = html;
 
+            // Actualizar contador con total de pasajeros
             const totalPasajeros = calcularTotalPasajeros(reservasFiltradas);
             const totalReservas = reservasFiltradas.length;
             const totalOriginal = reservasData.length;
@@ -1129,23 +1051,19 @@
             const busquedaInput = document.getElementById('busquedaReserva');
             const filtroCiudad = document.getElementById('filtroCiudad');
             const filtroEstado = document.getElementById('filtroEstado');
-            const filtroEvento = document.getElementById('filtroEvento');
             
             if (btnFiltrar) btnFiltrar.addEventListener('click', filtrarReservas);
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
             if (btnPDFExterno) btnPDFExterno.addEventListener('click', generarPDFExterno);
             
-            [busquedaInput, filtroCiudad, filtroEstado, filtroEvento].forEach(function(input) {
+            // Evento Enter en todos los inputs de filtro
+            [busquedaInput, filtroCiudad, filtroEstado].forEach(function(input) {
                 if (input) {
                     input.addEventListener('keypress', function(e) { 
                         if (e.key === 'Enter') filtrarReservas(); 
                     });
                 }
             });
-            
-            if (filtroEvento) {
-                filtroEvento.addEventListener('change', filtrarReservas);
-            }
             
             cargarReservas();
             
