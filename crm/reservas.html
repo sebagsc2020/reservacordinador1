@@ -382,7 +382,11 @@
             letter-spacing: 0.5px;
             color: white;
         }
-        .card-fecha { font-size: 10px; opacity: 0.85; }
+        .card-fecha { 
+            font-size: 10px; 
+            opacity: 0.85; 
+            white-space: nowrap; /* Evita que se corte la fecha */
+        }
 
         .card-body { padding: 15px; }
         .card-info { margin-bottom: 12px; }
@@ -947,14 +951,28 @@
                         });
                     }
 
+                    // ==================================================
+                    // CORRECCIÓN: LEER FECHA DE LA COLUMNA J (índice 9)
+                    // ==================================================
                     let fecha = '';
-                    const timestamp = (c[0] && c[0].v) ? c[0].v : null;
-                    if (timestamp) {
-                        const fechaObj = new Date(timestamp);
-                        if (!isNaN(fechaObj.getTime())) {
-                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
+                    let fechaRaw = c[9]; 
+                    if (fechaRaw && fechaRaw.v) {
+                        fecha = formatearFecha(fechaRaw);
+                    }
+                    
+                    // Si no hay fecha en la columna J, usar el timestamp
+                    if (!fecha) {
+                        const timestamp = (c[0] && c[0].v) ? c[0].v : null;
+                        if (timestamp) {
+                            const fechaObj = new Date(timestamp);
+                            if (!isNaN(fechaObj.getTime())) {
+                                fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + 
+                                       (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
+                                       fechaObj.getFullYear();
+                            }
                         }
                     }
+                    // ==================================================
 
                     const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
                     const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
@@ -967,7 +985,7 @@
 
                     reservasData.push({
                         id: id,
-                        fecha: fecha,
+                        fecha: fecha || 'Sin fecha',
                         nombre: nombreCompleto,
                         email: email,
                         telefono: telefono,
@@ -1015,6 +1033,35 @@
             } finally {
                 ocultarPreloader();
             }
+        }
+
+        // ==================================================
+        // FUNCIÓN AUXILIAR PARA FORMATEAR LA FECHA DE SHEETS
+        // ==================================================
+        function formatearFecha(valor) {
+            if (valor && typeof valor === 'object' && valor.v !== undefined) {
+                if (valor.f && typeof valor.f === 'string') {
+                    let fechaStr = valor.f.replace(/-/g, '/');
+                    const partes = fechaStr.split('/');
+                    if (partes.length === 3) {
+                        const dia = partes[0].padStart(2, '0');
+                        const mes = partes[1].padStart(2, '0');
+                        const anio = partes[2];
+                        return anio.length === 2 ? `${dia}/${mes}/20${anio}` : `${dia}/${mes}/${anio}`;
+                    }
+                    return fechaStr;
+                }
+                if (typeof valor.v === 'number') {
+                    const fechaObj = new Date(valor.v);
+                    if (!isNaN(fechaObj.getTime())) {
+                        return fechaObj.getDate().toString().padStart(2,'0') + '/' + 
+                               (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
+                               fechaObj.getFullYear();
+                    }
+                }
+                return '';
+            }
+            return '';
         }
 
         // ==================================================
@@ -1264,7 +1311,7 @@
                 // Filtro por Fecha
                 let coincideFecha = true;
                 if (fechaDesdeObj || fechaHastaObj) {
-                    if (r.fecha && r.fecha !== '') {
+                    if (r.fecha && r.fecha !== 'Sin fecha') {
                         const partesFecha = r.fecha.split('/');
                         if (partesFecha.length === 3) {
                             const fechaReservaObj = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
