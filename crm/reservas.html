@@ -245,6 +245,26 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
 
+        /* Estilos para inputs de fecha */
+        .filter-date {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            min-width: 150px;
+            flex: 1;
+        }
+        .filter-date:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
         .total-reservas { 
             font-size: 13px; 
             color: var(--text-muted); 
@@ -403,6 +423,7 @@
             .actions-group { width: 100%; justify-content: space-between; }
             .filters-bar { flex-direction: column; }
             .filter-input { width: 100%; }
+            .filter-date { width: 100%; }
             .filter-select { width: 100%; }
             .cards-grid { grid-template-columns: 1fr; gap: 16px; }
             .card-header { flex-direction: column; align-items: flex-start; }
@@ -458,6 +479,10 @@
             <div class="filters-bar">
                 <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
                 <input type="text" class="filter-input" placeholder="📍 Filtrar por ciudad..." id="filtroCiudad">
+                <!-- NUEVOS INPUTS DE FECHA -->
+                <input type="date" class="filter-date" id="filtroFechaDesde" title="Fecha Desde">
+                <input type="date" class="filter-date" id="filtroFechaHasta" title="Fecha Hasta">
+                
                 <select class="filter-select" id="filtroEstado">
                     <option value="todos">📌 Todos los estados</option>
                     <option value="confirmado">✅ Confirmado</option>
@@ -642,13 +667,10 @@
         }
 
         // ==================================================
-        // NUEVA FUNCIÓN PARA FORMATEAR FECHA CORRECTAMENTE
-        // (Soporta el objeto de Google Sheets gviz/tq)
+        // FUNCIÓN PARA FORMATEAR FECHA CORRECTAMENTE
         // ==================================================
         function formatearFecha(valor, formatoTexto) {
-            // 1. Si el valor es un objeto con formato predefinido (viene de gviz/tq)
             if (valor && typeof valor === 'object' && valor.v !== undefined) {
-                // Prioridad absoluta a 'f' (formato texto de Google Sheets)
                 if (valor.f && typeof valor.f === 'string') {
                     let fechaStr = valor.f.replace(/-/g, '/');
                     const partes = fechaStr.split('/');
@@ -656,13 +678,10 @@
                         const dia = partes[0].padStart(2, '0');
                         const mes = partes[1].padStart(2, '0');
                         const anio = partes[2];
-                        // Asegurar año de 4 dígitos
                         return anio.length === 2 ? `${dia}/${mes}/20${anio}` : `${dia}/${mes}/${anio}`;
                     }
                     return fechaStr;
                 }
-                
-                // Si no tiene 'f', usar el timestamp 'v' (número)
                 if (typeof valor.v === 'number') {
                     const fechaObj = new Date(valor.v);
                     if (!isNaN(fechaObj.getTime())) {
@@ -673,11 +692,7 @@
                 }
                 return '';
             }
-            
-            // 2. Si ya es un string o número normal (por si acaso)
             if (!valor) return '';
-            
-            // Si es string
             if (typeof valor === 'string') {
                 let fechaStr = valor.replace(/-/g, '/');
                 const partes = fechaStr.split('/');
@@ -687,7 +702,6 @@
                     const anio = partes[2];
                     return anio.length === 2 ? `${dia}/${mes}/20${anio}` : `${dia}/${mes}/${anio}`;
                 }
-                
                 const fechaObj = new Date(valor);
                 if (!isNaN(fechaObj.getTime())) {
                     return fechaObj.getDate().toString().padStart(2,'0') + '/' + 
@@ -695,8 +709,6 @@
                            fechaObj.getFullYear();
                 }
             }
-            
-            // Si es un número (timestamp)
             if (typeof valor === 'number') {
                 const fechaObj = new Date(valor);
                 if (!isNaN(fechaObj.getTime())) {
@@ -705,7 +717,6 @@
                            fechaObj.getFullYear();
                 }
             }
-            
             return '';
         }
 
@@ -733,8 +744,6 @@
                 reservasData = [];
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 const nombresEditados = cargarNombresEditados();
-
-                console.log('📊 Columnas disponibles:', rows.length > 0 ? rows[0].c.length : 0);
 
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
@@ -764,23 +773,15 @@
                         }).filter(function(e) { return e; });
                     }
 
-                    // ==================================================
-                    // LEER FECHA DE LA COLUMNA J (índice 9) CORREGIDO
-                    // ==================================================
                     let fecha = '';
-                    let fechaRaw = c[9]; // Pasamos el objeto completo, no solo .v
-                    
+                    let fechaRaw = c[9]; 
                     if (fechaRaw) {
-                        console.log(`📅 Objeto fecha raw para reserva ${id}:`, fechaRaw);
                         fecha = formatearFecha(fechaRaw);
                     }
-                    
-                    // Si no hay fecha en la columna J, intentar con el timestamp de la columna A (índice 0)
                     if (!fecha) {
                         const timestamp = (c[0] && c[0].v) ? c[0].v : null;
                         if (timestamp) {
                             fecha = formatearFecha(timestamp);
-                            console.log(`📅 Usando timestamp para reserva ${id}: "${fecha}"`);
                         }
                     }
 
@@ -881,14 +882,32 @@
             return total;
         }
 
+        // ==================================================
+        // NUEVA FUNCIÓN PARA FILTRAR POR FECHA
+        // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
             const filtroCiudad = document.getElementById('filtroCiudad');
             const filtroEstado = document.getElementById('filtroEstado');
+            const filtroFechaDesde = document.getElementById('filtroFechaDesde');
+            const filtroFechaHasta = document.getElementById('filtroFechaHasta');
             
             const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
             const ciudad = filtroCiudad ? filtroCiudad.value.toLowerCase().trim() : '';
             const estado = filtroEstado ? filtroEstado.value : 'todos';
+            
+            // Convertir las fechas del filtro a objetos Date (medianoche para abarcar el día completo)
+            let fechaDesdeObj = null;
+            let fechaHastaObj = null;
+            
+            if (filtroFechaDesde && filtroFechaDesde.value) {
+                const partes = filtroFechaDesde.value.split('-'); // El input date devuelve YYYY-MM-DD
+                fechaDesdeObj = new Date(partes[0], partes[1] - 1, partes[2], 0, 0, 0, 0);
+            }
+            if (filtroFechaHasta && filtroFechaHasta.value) {
+                const partes = filtroFechaHasta.value.split('-');
+                fechaHastaObj = new Date(partes[0], partes[1] - 1, partes[2], 23, 59, 59, 999);
+            }
 
             reservasFiltradas = reservasData.filter(function(r) {
                 let coincideBusqueda = true;
@@ -909,8 +928,28 @@
                 if (estado !== 'todos') {
                     coincideEstado = r.estado === estado;
                 }
+
+                // NUEVO FILTRO DE FECHA
+                let coincideFecha = true;
+                if (fechaDesdeObj || fechaHastaObj) {
+                    if (r.fecha && r.fecha !== 'Sin fecha') {
+                        // Convertir la fecha de la reserva (DD/MM/AAAA) a un objeto Date
+                        const partesFecha = r.fecha.split('/');
+                        if (partesFecha.length === 3) {
+                            // Meses en JS van de 0 a 11, por eso restamos 1 al mes
+                            const fechaReservaObj = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
+                            
+                            if (fechaDesdeObj && fechaReservaObj < fechaDesdeObj) coincideFecha = false;
+                            if (fechaHastaObj && fechaReservaObj > fechaHastaObj) coincideFecha = false;
+                        } else {
+                            coincideFecha = false; // Si la fecha está mal formateada, no se muestra
+                        }
+                    } else {
+                        coincideFecha = false; // Si no tiene fecha, no se muestra al filtrar por fecha
+                    }
+                }
                 
-                return coincideBusqueda && coincideCiudad && coincideEstado;
+                return coincideBusqueda && coincideCiudad && coincideEstado && coincideFecha;
             });
             
             renderizarCards();
@@ -1080,16 +1119,23 @@
             const busquedaInput = document.getElementById('busquedaReserva');
             const filtroCiudad = document.getElementById('filtroCiudad');
             const filtroEstado = document.getElementById('filtroEstado');
+            const filtroFechaDesde = document.getElementById('filtroFechaDesde');
+            const filtroFechaHasta = document.getElementById('filtroFechaHasta');
             
             if (btnFiltrar) btnFiltrar.addEventListener('click', filtrarReservas);
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
             if (btnPDFExterno) btnPDFExterno.addEventListener('click', generarPDFExterno);
             
-            [busquedaInput, filtroCiudad, filtroEstado].forEach(function(input) {
+            // Eventos para filtrar al presionar Enter o cambiar fecha
+            [busquedaInput, filtroCiudad, filtroEstado, filtroFechaDesde, filtroFechaHasta].forEach(function(input) {
                 if (input) {
                     input.addEventListener('keypress', function(e) { 
                         if (e.key === 'Enter') filtrarReservas(); 
                     });
+                    // Para los inputs de fecha, filtrar al cambiar el valor (sin necesidad de Enter)
+                    if (input.type === 'date') {
+                        input.addEventListener('change', filtrarReservas);
+                    }
                 }
             });
             
