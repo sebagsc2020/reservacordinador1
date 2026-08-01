@@ -339,6 +339,72 @@
         .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
         .btn-whatsapp:active { transform: scale(0.98); }
 
+        /* ===== PRELOADER POPUP - MONTAÑAS ===== */
+        .preloader-popup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 27, 75, 0.95) 50%, rgba(49, 46, 129, 0.95) 100%);
+            backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center; z-index: 10000;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        .preloader-popup.oculto { opacity: 0; visibility: hidden; pointer-events: none; }
+        
+        .preloader-content { text-align: center; animation: fadeInUp 0.5s ease; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .preloader-logo-wrapper { position: relative; width: 90px; height: 90px; margin: 0 auto 28px; }
+        .preloader-logo-circle {
+            width: 90px; height: 90px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 22px; display: flex; align-items: center; justify-content: center;
+            animation: logoPulse 2s ease-in-out infinite; box-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
+            position: relative; z-index: 2;
+        }
+        .preloader-logo-circle .logo-icon { font-size: 42px; color: white; animation: logoFloat 3s ease-in-out infinite; }
+        @keyframes logoPulse { 0%,100%{transform:scale(1);box-shadow:0 0 40px rgba(99,102,241,0.5)} 50%{transform:scale(1.06);box-shadow:0 0 60px rgba(99,102,241,0.7)} }
+        @keyframes logoFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        
+        .preloader-ripple {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            border: 2px solid rgba(99,102,241,0.4); border-radius: 50%; animation: rippleEffect 2.5s ease-out infinite;
+        }
+        .preloader-ripple:nth-child(1){width:110px;height:110px;animation-delay:0s}
+        .preloader-ripple:nth-child(2){width:130px;height:130px;animation-delay:.6s}
+        .preloader-ripple:nth-child(3){width:150px;height:150px;animation-delay:1.2s}
+        @keyframes rippleEffect { 0%{width:90px;height:90px;opacity:1} 100%{width:200px;height:200px;opacity:0} }
+        
+        .preloader-title { font-size: 26px; font-weight: 800; color: white; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .preloader-title span { color: #818cf8; }
+        .preloader-subtitle { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 28px; font-weight: 400; }
+        
+        .preloader-progress-container { width: 260px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 0 auto 14px; overflow: hidden; }
+        .preloader-progress-bar {
+            height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6, #a78bfa);
+            border-radius: 10px; width: 0%; animation: progressLoading 2.5s ease-in-out forwards; position: relative;
+        }
+        .preloader-progress-bar::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            animation: shimmer 1.8s ease-in-out infinite;
+        }
+        @keyframes progressLoading { 0%{width:0%} 30%{width:35%} 60%{width:70%} 85%{width:92%} 100%{width:100%} }
+        @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
+        
+        .preloader-loading-text { font-size: 12px; color: rgba(255,255,255,0.45); font-weight: 500; letter-spacing: 0.5px; }
+        .preloader-loading-text .dots::after { content: ''; animation: dotsAnim 1.5s steps(4,end) infinite; }
+        @keyframes dotsAnim { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} 100%{content:''} }
+        
+        .preloader-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .preloader-particle { position: absolute; width: 3px; height: 3px; background: rgba(99,102,241,0.5); border-radius: 50%; animation: particleFloat 5s ease-in-out infinite; }
+        .preloader-particle:nth-child(1){left:8%;top:25%;animation-delay:0s}
+        .preloader-particle:nth-child(2){left:22%;top:55%;animation-delay:.4s;width:2px;height:2px}
+        .preloader-particle:nth-child(3){left:68%;top:35%;animation-delay:.8s}
+        .preloader-particle:nth-child(4){left:82%;top:65%;animation-delay:1.2s;width:4px;height:4px}
+        .preloader-particle:nth-child(5){left:45%;top:15%;animation-delay:1.6s;width:2px;height:2px}
+        .preloader-particle:nth-child(6){left:35%;top:75%;animation-delay:2s}
+        .preloader-particle:nth-child(7){left:88%;top:48%;animation-delay:2.4s;width:3px;height:3px}
+        .preloader-particle:nth-child(8){left:55%;top:85%;animation-delay:2.8s;width:2px;height:2px}
+        @keyframes particleFloat { 0%,100%{transform:translateY(0)translateX(0);opacity:0} 15%{opacity:.7} 85%{opacity:0} 100%{transform:translateY(-120px)translateX(25px);opacity:0} }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) { .kanban-board { grid-template-columns: repeat(2, 1fr); } .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) {
@@ -349,9 +415,14 @@
             .stat-icon-wrapper { width: 40px; height: 40px; font-size: 20px; } .stat-value { font-size: 22px; }
             .kanban-board { grid-template-columns: 1fr; gap: 16px; } .kanban-column { padding: 16px; } .kanban-cards { max-height: 350px; }
             .modal-content { max-height: 90vh; }
+            .preloader-logo-wrapper { width: 70px; height: 70px; } .preloader-logo-circle { width: 70px; height: 70px; border-radius: 18px; }
+            .preloader-logo-circle .logo-icon { font-size: 32px; } .preloader-title { font-size: 22px; } .preloader-progress-container { width: 220px; }
         }
         @media (max-width: 480px) {
             .page-title h1 { font-size: 20px; } .metrics-grid { grid-template-columns: repeat(2, 1fr); } .kanban-card { padding: 12px; }
+            .preloader-logo-wrapper { width: 60px; height: 60px; } .preloader-logo-circle { width: 60px; height: 60px; border-radius: 16px; }
+            .preloader-logo-circle .logo-icon { font-size: 28px; } .preloader-title { font-size: 20px; }
+            .preloader-subtitle { font-size: 12px; } .preloader-progress-container { width: 200px; height: 4px; }
         }
     </style>
 </head>
@@ -413,6 +484,24 @@
         </main>
     </div>
 
+    <!-- Preloader Popup - MONTAÑAS -->
+    <div id="preloaderPopup" class="preloader-popup oculto">
+        <div class="preloader-particles">
+            <div class="preloader-particle"></div><div class="preloader-particle"></div><div class="preloader-particle"></div><div class="preloader-particle"></div>
+            <div class="preloader-particle"></div><div class="preloader-particle"></div><div class="preloader-particle"></div><div class="preloader-particle"></div>
+        </div>
+        <div class="preloader-content">
+            <div class="preloader-logo-wrapper">
+                <div class="preloader-ripple"></div><div class="preloader-ripple"></div><div class="preloader-ripple"></div>
+                <div class="preloader-logo-circle"><span class="logo-icon">🏔️</span></div>
+            </div>
+            <h2 class="preloader-title">Aventura <span>Total</span></h2>
+            <p class="preloader-subtitle">Sincronizando pipeline</p>
+            <div class="preloader-progress-container"><div class="preloader-progress-bar"></div></div>
+            <p class="preloader-loading-text">Cargando datos<span class="dots"></span></p>
+        </div>
+    </div>
+
     <script>
         // ==================================================
         // LOGICA UI & TEMA
@@ -447,6 +536,9 @@
         const MERCADO_PAGO_LINK = 'https://link.mercadopago.com.ar/scphotobr';
         
         let reservasData = []; let estadosGlobales = {};
+        const preloaderPopup = document.getElementById('preloaderPopup');
+        function mostrarPreloader() { if (preloaderPopup) preloaderPopup.classList.remove('oculto'); }
+        function ocultarPreloader() { if (preloaderPopup) setTimeout(() => preloaderPopup.classList.add('oculto'), 300); }
 
         async function cargarEstadosDesdeNube() {
             try {
@@ -460,7 +552,7 @@
 
         async function cargarDatos() {
             try {
-                await cargarEstadosDesdeNube();
+                mostrarPreloader(); await cargarEstadosDesdeNube();
                 const response = await fetch(JSON_URL + '&t=' + Date.now()); const texto = await response.text();
                 let jsonStr = texto.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2);
                 const data = JSON.parse(jsonStr); const rows = data.table.rows;
@@ -483,14 +575,31 @@
                 }
                 actualizarDashboard();
             } catch (error) { console.error('❌ Error:', error); document.getElementById('kanbanPendiente').innerHTML = '<div class="loading-text">Error al cargar datos</div>'; document.getElementById('kanbanConfirmado').innerHTML = '<div class="loading-text">Error al cargar datos</div>'; document.getElementById('kanbanPagado').innerHTML = '<div class="loading-text">Error al cargar datos</div>'; }
+            finally { ocultarPreloader(); }
         }
 
         function actualizarDashboard() {
-            const total = reservasData.length; const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
-            const pendientes = reservasData.filter(r => r.estado === 'pendiente').length; const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
-            document.getElementById('metricaTotal').textContent = total; document.getElementById('metricaConfirmadas').textContent = confirmadas;
-            document.getElementById('metricaPendientes').textContent = pendientes; document.getElementById('metricaPagadas').textContent = pagadas;
-            document.getElementById('countPendiente').textContent = pendientes; document.getElementById('countConfirmado').textContent = confirmadas; document.getElementById('countPagado').textContent = pagadas;
+            const total = reservasData.length;
+            const confirmadas = reservasData.filter(r => r.estado === 'confirmado').length;
+            const pendientes = reservasData.filter(r => r.estado === 'pendiente').length;
+            const pagadas = reservasData.filter(r => r.estado === 'pagado').length;
+            
+            // Calcular total de pasajeros por estado
+            const totalPax = reservasData.reduce((sum, r) => sum + (r.personas || 1), 0);
+            const confirmadasPax = reservasData.filter(r => r.estado === 'confirmado').reduce((sum, r) => sum + (r.personas || 1), 0);
+            const pendientesPax = reservasData.filter(r => r.estado === 'pendiente').reduce((sum, r) => sum + (r.personas || 1), 0);
+            const pagadasPax = reservasData.filter(r => r.estado === 'pagado').reduce((sum, r) => sum + (r.personas || 1), 0);
+            
+            // Actualizar métricas con formato "cantidad - XX Pax"
+            document.getElementById('metricaTotal').textContent = `${total} - ${totalPax} Pax`;
+            document.getElementById('metricaConfirmadas').textContent = `${confirmadas} - ${confirmadasPax} Pax`;
+            document.getElementById('metricaPendientes').textContent = `${pendientes} - ${pendientesPax} Pax`;
+            document.getElementById('metricaPagadas').textContent = `${pagadas} - ${pagadasPax} Pax`;
+            
+            document.getElementById('countPendiente').textContent = pendientes;
+            document.getElementById('countConfirmado').textContent = confirmadas;
+            document.getElementById('countPagado').textContent = pagadas;
+            
             document.getElementById('kanbanPendiente').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pendiente'));
             document.getElementById('kanbanConfirmado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'confirmado'));
             document.getElementById('kanbanPagado').innerHTML = renderizarTarjetas(reservasData.filter(r => r.estado === 'pagado'));
