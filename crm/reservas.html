@@ -2,607 +2,700 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Reservas - CRM Aventura Total</title>
     
-    <!-- PWA CONFIGURACIÓN -->
+    <!-- ================================================== -->
+    <!-- PWA CONFIGURACIÓN                                      -->
+    <!-- ================================================== -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AVT CRM">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#6366f1">
+    <meta name="theme-color" content="#1a1a2e">
     <meta name="application-name" content="Aventura Total CRM">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+    <meta name="msapplication-TileImage" content="icons/icon-144.png">
     
-    <!-- Fuentes: Inter vía Fontsource -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.15/index.css">
-    
-    <!-- Iconos: Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Iconos para diferentes plataformas -->
+    <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="icons/icon-76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="icons/icon-114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
     
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --primary-light: #e0e7ff;
-            --success: #10b981;
-            --success-light: #d1fae5;
-            --warning: #f59e0b;
-            --warning-light: #fef3c7;
-            --danger: #ef4444;
-            --danger-light: #fee2e2;
-            --info: #3b82f6;
-            --info-light: #dbeafe;
-            
-            --bg-body: #f8fafc;
-            --bg-surface: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --sidebar-bg: #ffffff;
-            --sidebar-text: #475569;
-            --sidebar-active-bg: #e0e7ff;
-            --sidebar-active-text: #4338ca;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-            --radius: 12px;
-            --radius-sm: 8px;
-        }
-
-        body.dark-mode {
-            --bg-body: #0f172a;
-            --bg-surface: #1e293b;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --sidebar-bg: #1e293b;
-            --sidebar-text: #cbd5e1;
-            --sidebar-active-bg: #334155;
-            --sidebar-active-text: #818cf8;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
         
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg-body); 
-            color: var(--text-main); 
-            min-height: 100vh; 
-            overflow-x: hidden; 
-            transition: background-color 0.3s ease, color 0.3s ease;
-            -webkit-font-smoothing: antialiased;
+        /* Modo PWA (sin barra de navegación) */
+        .pwa-mode {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        .app-container { display: flex; min-height: 100vh; }
-        
-        /* ================================================== */
-        /* CAMBIOS CSS PARA MENÚ RETRÁCTIL                   */
-        /* ================================================== */
-        
-        .sidebar {
-            width: 260px; 
-            background: var(--sidebar-bg); 
-            border-right: 1px solid var(--border-color);
-            position: fixed; height: 100vh; z-index: 1001;
-            transform: translateX(-100%); 
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column;
+        /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
+        .menu-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 50px;
+            height: 50px;
+            background: #667eea;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: none;
         }
-        .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
         
-        .sidebar-header { 
-            padding: 20px 24px; 
-            display: flex; align-items: center; gap: 12px; 
-            border-bottom: 1px solid var(--border-color); 
-            flex-shrink: 0;
+        .menu-btn:hover {
+            background: #5a6fd6;
+            transform: scale(1.05);
         }
-        .brand-icon { 
-            width: 36px; height: 36px; 
-            background: linear-gradient(135deg, var(--primary), #8b5cf6); 
-            border-radius: var(--radius-sm); 
-            display: flex; align-items: center; justify-content: center; 
-            color: white; font-size: 20px; 
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-            flex-shrink: 0;
+        
+        .menu-btn span {
+            font-size: 24px;
+            color: white;
         }
-        .brand-text { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; color: var(--text-main); }
-        .brand-text span { color: var(--primary); }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar { 
+            width: 250px; 
+            background: #1a1a2e; 
+            color: white; 
+            padding: 25px 0; 
+            position: fixed; 
+            height: 100vh; 
+            overflow-y: auto; 
+            z-index: 1001;
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo .logo-icon { font-size: 40px; } 
+        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } 
+        .sidebar-logo h2 span { color: #667eea; }
+        
+        .nav-menu { list-style: none; padding: 0 15px; } 
+        .nav-menu li { margin-bottom: 5px; }
+        .nav-menu a { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 12px 15px; 
+            color: rgba(255,255,255,0.7); 
+            text-decoration: none; 
+            border-radius: 10px; 
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
+        .nav-menu a.active { background: #667eea; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        
+        .sidebar-footer { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 15px; 
+            right: 15px; 
+        }
+        .btn-logout-sidebar { 
+            width: 100%; 
+            padding: 12px; 
+            background: rgba(231,76,60,0.2); 
+            color: #e74c3c; 
+            border: 1px solid rgba(231,76,60,0.3);
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 13px; 
+            transition: all 0.2s ease;
+        }
+        .btn-logout-sidebar:hover {
+            background: rgba(231,76,60,0.4);
+        }
 
-        .nav-menu { list-style: none; padding: 16px 12px; flex: 1; overflow-y: auto; }
-        .nav-item { margin-bottom: 4px; }
-        .nav-link {
-            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-            color: var(--sidebar-text); text-decoration: none; border-radius: var(--radius-sm);
-            font-size: 14px; font-weight: 500; transition: all 0.2s ease;
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        .main-content { 
+            margin-left: 0;
+            flex: 1; 
+            padding: 20px; 
+            min-width: 0;
+            transition: margin-left 0.3s ease;
         }
-        .nav-link i { font-size: 20px; flex-shrink: 0; }
-        .nav-link:hover { background: var(--bg-body); color: var(--primary); }
-        .nav-link.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); font-weight: 600; }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+        }
+        .header h1 { font-size: 26px; color: #1a1a2e; }
         
-        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
-        .user-profile { 
-            display: flex; align-items: center; gap: 12px; padding: 12px; 
-            border-radius: var(--radius-sm); background: var(--bg-body); 
-            cursor: pointer; transition: background 0.2s;
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .user-profile:hover { background: var(--border-color); }
-        .avatar { 
-            width: 36px; height: 36px; background: var(--primary); color: white; 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-weight: 600; font-size: 14px; flex-shrink: 0;
-        }
-        .user-details { overflow: hidden; }
-        .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-details p { font-size: 11px; color: var(--text-muted); }
-
-        .main-content { margin-left: 0; flex: 1; padding: 32px; padding-top: 76px; transition: margin-left 0.3s; width: 100%; }
         
-        .menu-toggle { 
-            display: flex; position: fixed; top: 16px; left: 16px; z-index: 1002; 
-            background: var(--bg-surface); border: 1px solid var(--border-color); 
-            width: 44px; height: 44px; border-radius: var(--radius-sm); cursor: pointer; 
-            color: var(--text-main); box-shadow: var(--shadow-md); 
-            align-items: center; justify-content: center;
+        .user-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            background: white; 
+            padding: 8px 20px; 
+            border-radius: 50px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            font-size: 14px; 
         }
-        .overlay { 
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
-            z-index: 1000; opacity: 0; pointer-events: none; 
-            transition: opacity 0.3s; backdrop-filter: blur(4px); 
+        .user-avatar { 
+            width: 35px; 
+            height: 35px; 
+            background: #667eea; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-weight: 700; 
         }
-        .overlay.active { opacity: 1; pointer-events: auto; }
-
-        /* ================================================== */
-        /* FIN DE CAMBIOS CSS                                */
-        /* ================================================== */
-
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
-        .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
-        .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
         
-        .actions-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-        .btn { 
-            padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; 
-            cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; 
-            transition: all 0.2s ease; white-space: nowrap;
-        }
-        .btn:active { transform: scale(0.97); }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
-        .btn-primary:hover { background: var(--primary-hover); }
-        .btn-secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
-        .btn-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-success:hover { background: #059669; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-danger:hover { background: #dc2626; }
-        .btn-icon { 
-            width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); 
-            border: 1px solid var(--border-color); color: var(--text-muted); 
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: all 0.2s; flex-shrink: 0;
-        }
-        .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
-
         .btn-reserva-manual {
-            background: var(--danger);
+            background: #e74c3c;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: var(--radius-sm);
+            padding: 8px 20px;
+            border-radius: 50px;
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
             transition: all 0.2s ease;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .btn-reserva-manual:hover { background: #dc2626; transform: translateY(-2px); }
-        .btn-reserva-manual:active { transform: scale(0.97); }
+        .btn-reserva-manual:hover {
+            background: #c0392b;
+            transform: scale(1.02);
+        }
+        .btn-reserva-manual:active {
+            transform: scale(0.98);
+        }
+
+        /* Estilos unificados para botones de acción (Recargar y PDF) al lado del botón rojo */
+        .btn-action-header {
+            background: white;
+            color: #1a1a2e;
+            border: 2px solid #e0e0e0;
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .btn-action-header:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .btn-action-header:active {
+            transform: scale(0.98);
+        }
 
         .filters-bar { 
-            background: var(--bg-surface); 
-            padding: 12px 16px; 
-            border-radius: var(--radius); 
-            box-shadow: var(--shadow-sm); 
-            border: 1px solid var(--border-color);
-            margin-bottom: 24px; 
+            background: white; 
+            padding: 15px 20px; 
+            border-radius: 15px; 
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); 
+            margin-bottom: 20px; 
             display: flex; 
-            gap: 8px; 
+            gap: 10px; 
             align-items: center; 
             flex-wrap: wrap; 
-            position: relative;
         }
         .filter-input { 
-            padding: 8px 14px; 
-            border: 1px solid var(--border-color); 
-            border-radius: var(--radius-sm); 
+            padding: 12px 15px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
             font-size: 13px; 
             flex: 1; 
-            min-width: 120px; 
-            background: var(--bg-body);
-            color: var(--text-main);
-            transition: border-color 0.2s;
-            font-family: 'Inter', sans-serif;
+            min-width: 150px; 
         }
         .filter-input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            border-color: #667eea;
         }
         .filter-select {
-            padding: 8px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 13px;
-            background: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            min-width: 130px;
+            background: white;
+            min-width: 150px;
+            flex: 1;
             cursor: pointer;
-            transition: border-color 0.2s;
         }
         .filter-select:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            border-color: #667eea;
         }
-        .dark-mode .filter-input:focus,
-        .dark-mode .filter-select:focus {
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        
+        .btn-filtrar { 
+            padding: 10px 25px; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 12px; 
+            white-space: nowrap; 
+            transition: all 0.2s;
+            background: #667eea; 
+            color: white; 
         }
-
-        .filter-date {
-            padding: 8px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            background: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            transition: border-color 0.2s;
-            min-width: 130px;
+        .btn-filtrar:active {
+            transform: scale(0.96);
         }
-        .filter-date:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-
-        .autocomplete-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-top: none;
-            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-            box-shadow: var(--shadow-md);
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 2000;
-            display: none;
-            margin-top: -4px;
-        }
-        .autocomplete-list.active {
-            display: block;
-        }
-        .autocomplete-item {
-            padding: 10px 16px;
-            cursor: pointer;
-            font-size: 13px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-main);
-            transition: background 0.2s;
-        }
-        .autocomplete-item:last-child {
-            border-bottom: none;
-        }
-        .autocomplete-item:hover,
-        .autocomplete-item.selected {
-            background: var(--bg-body);
-            color: var(--primary);
-        }
-        .autocomplete-item small {
-            color: var(--text-muted);
-            font-size: 11px;
-            margin-left: 8px;
-        }
-
-        .btn-filter-action {
-            padding: 8px 12px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            min-height: 38px;
-        }
-        .btn-filter-action:active { transform: scale(0.97); }
-        .btn-filter-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
-            min-width: 70px;
-        }
-        .btn-filter-primary:hover { background: var(--primary-hover); }
-        .btn-filter-success {
-            background: var(--success);
-            color: white;
-            width: 38px;
-            padding: 0;
-        }
-        .btn-filter-success:hover { background: #059669; }
-        .btn-filter-secondary {
-            background: var(--bg-surface);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            min-width: 50px;
-        }
-        .btn-filter-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
-
-        .total-reservas { 
-            font-size: 13px; 
-            color: var(--text-muted); 
-            margin-bottom: 20px; 
-            font-weight: 500;
+        .btn-filtrar:hover {
+            background: #5a6fd6;
         }
 
         .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
         .reserva-card {
-            background: var(--bg-surface);
-            border-radius: var(--radius);
+            background: white;
+            border-radius: 16px;
             overflow: hidden;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .reserva-card:active { transform: scale(0.98); }
-        .reserva-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .reserva-card:active {
+            transform: scale(0.99);
+        }
+        .reserva-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
 
         .card-header {
-            padding: 14px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-body);
         }
         .card-id {
             font-weight: 700;
-            font-size: 12px;
-            color: var(--primary);
-            background: var(--primary-light);
-            padding: 4px 12px;
+            font-size: 13px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
             border-radius: 20px;
         }
-        .dark-mode .card-id { background: rgba(99, 102, 241, 0.15); }
-        
         .btn-editar-nombre {
-            background: var(--primary-light);
+            background: rgba(255,255,255,0.2);
             border: none;
             border-radius: 20px;
-            padding: 4px 10px;
+            padding: 4px 8px;
             cursor: pointer;
-            font-size: 11px;
-            color: var(--primary);
+            font-size: 10px;
+            color: white;
             transition: all 0.2s;
-            font-weight: 600;
         }
-        .btn-editar-nombre:hover { background: var(--primary); color: white; }
-        .btn-editar-nombre:active { transform: scale(0.95); }
-        
+        .btn-editar-nombre:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+        .btn-editar-nombre:active {
+            transform: scale(0.95);
+        }
         .card-estado-header {
             font-weight: 700;
-            font-size: 11px;
-            padding: 4px 12px;
+            font-size: 12px;
+            padding: 4px 10px;
             border-radius: 20px;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
         }
-        .estado-pendiente { background: var(--warning-light); color: #b45309; }
-        .estado-confirmado { background: var(--success-light); color: #047857; }
-        .estado-pagado { background: var(--info-light); color: #1d4ed8; }
-        .dark-mode .estado-pendiente { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-        .dark-mode .estado-confirmado { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-        .dark-mode .estado-pagado { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-        
-        .card-fecha-solicitud {
-            font-size: 11px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--bg-body);
-            padding: 2px 10px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-        }
-        .dark-mode .card-fecha-solicitud { border-color: var(--border-color); }
-
-        .card-body { padding: 16px; }
-        .card-info { margin-bottom: 10px; }
-        .card-info:last-child { margin-bottom: 0; }
-        .card-label { 
-            font-size: 10px; 
-            text-transform: uppercase; 
-            color: var(--text-muted); 
-            letter-spacing: 0.5px; 
-            margin-bottom: 3px; 
-            font-weight: 600;
-        }
-        .card-value { 
-            font-size: 13px; 
-            font-weight: 500; 
-            color: var(--text-main); 
-            word-break: break-word; 
+        .card-fecha {
+            font-size: 10px;
+            opacity: 0.85;
         }
 
-        .excursiones-lista-card { 
-            margin: 0; 
-            padding-left: 16px; 
-            list-style: none; 
-        }
-        .excursiones-lista-card li { 
-            font-size: 12px; 
-            padding: 3px 0; 
-            color: var(--text-muted); 
-            border-bottom: 1px dashed var(--border-color); 
-            position: relative;
-        }
+        .card-body { padding: 15px; }
+        .card-info { margin-bottom: 12px; }
+        .card-label { font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .card-value { font-size: 13px; font-weight: 500; color: #333; word-break: break-word; }
+
+        .excursiones-lista-card { margin: 0; padding-left: 16px; list-style: none; }
+        .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: #555; border-bottom: 1px dashed #eee; }
         .excursiones-lista-card li:last-child { border-bottom: none; }
-        .excursiones-lista-card li::before {
-            content: '▸';
-            color: var(--primary);
-            position: absolute;
-            left: -14px;
-        }
 
         .card-actions {
             display: flex;
             gap: 8px;
-            padding: 12px 16px;
-            background: var(--bg-body);
-            border-top: 1px solid var(--border-color);
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #f0f0f0;
             flex-wrap: wrap;
         }
         .btn-card {
             flex: 1;
-            padding: 8px 10px;
+            padding: 8px;
             border: none;
-            border-radius: var(--radius-sm);
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
             transition: all 0.2s;
             text-align: center;
-            font-family: 'Inter', sans-serif;
         }
-        .btn-card:active { transform: scale(0.96); }
-        .btn-card:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-confirmar-card { background: var(--success); color: white; }
-        .btn-pendiente-card { background: var(--warning); color: #78350f; }
-        .btn-pagar-card { background: var(--info); color: white; }
+        .btn-card:active {
+            transform: scale(0.96);
+        }
+        .btn-card:hover { opacity: 0.9; }
+        .btn-confirmar-card { background: #27ae60; color: white; }
+        .btn-pendiente-card { background: #ffc107; color: #856404; }
+        .btn-pagar-card { background: #3498db; color: white; }
         .btn-whatsapp-card { background: #25D366; color: white; }
-        .btn-excluir-card { background: var(--danger); color: white; }
+        .btn-excluir-card { background: #e74c3c; color: white; }
 
-        @media (max-width: 1024px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); width: 280px; } 
-            .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
-            .main-content { margin-left: 0; padding: 20px; padding-top: 76px; } 
-            /* Ya no hay necesidad de cambiar display del menu-toggle, siempre es flex */
-            .page-header { flex-direction: column; align-items: flex-start; gap: 16px; } 
-            .actions-group { width: 100%; justify-content: space-between; }
-            
-            .filters-bar { flex-direction: column; align-items: stretch; }
-            .filter-input, .filter-select, .filter-date { width: 100%; min-width: 100%; }
-            .btn-filter-action { width: 100%; justify-content: center; }
-            .btn-filter-success, .btn-filter-secondary { width: 100%; }
-            
-            .cards-grid { grid-template-columns: 1fr; gap: 16px; }
-            .card-header { flex-direction: column; align-items: flex-start; }
-            .card-actions { flex-direction: column; }
-            .btn-card { width: 100%; }
+        .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
+
+        /* ===== PRELOADER POPUP ===== */
+        .preloader-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.3s ease;
         }
+        .preloader-popup.oculto {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .preloader-popup-contenido {
+            background: white;
+            border-radius: 24px;
+            padding: 35px 45px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: popupFadeIn 0.3s ease;
+        }
+        @keyframes popupFadeIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .preloader-popup-icono {
+            width: 70px;
+            height: 70px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-right: 4px solid #764ba2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .preloader-popup-titulo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .preloader-popup-subtitulo {
+            font-size: 14px;
+            color: #666;
+        }
+        .puntos::after {
+            content: '';
+            animation: puntosAnim 1.5s infinite;
+        }
+        @keyframes puntosAnim {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+        }
+
+        /* Scroll sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        /* Desktop */
+        @media (min-width: 1201px) {
+            .cards-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* Tablet */
+        @media (min-width: 769px) and (max-width: 1200px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Desktop menú */
+        @media (min-width: 769px) {
+            .menu-btn {
+                display: none !important;
+            }
+            
+            .sidebar {
+                transform: translateX(0) !important;
+                width: 250px;
+            }
+            
+            .menu-overlay {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 250px;
+                padding: 30px;
+            }
+        }
+
+        /* Móvil */
+        @media (max-width: 768px) {
+            .menu-btn {
+                display: flex;
+            }
+            
+            .main-content {
+                padding: 60px 12px 20px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .user-area {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .user-info {
+                padding: 5px 12px;
+                font-size: 12px;
+            }
+            
+            .user-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            
+            .btn-reserva-manual {
+                padding: 5px 12px;
+                font-size: 11px;
+            }
+            .btn-action-header {
+                padding: 5px 12px;
+                font-size: 11px;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+            }
+            
+            .filter-input, .filter-select {
+                width: 100%;
+            }
+            
+            .btn-filtrar {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-actions {
+                flex-direction: column;
+            }
+            
+            .btn-card {
+                width: 100%;
+            }
+            
+            .preloader-popup-contenido {
+                padding: 25px 35px;
+            }
+            
+            .preloader-popup-icono {
+                width: 55px;
+                height: 55px;
+            }
+            
+            .preloader-popup-titulo {
+                font-size: 18px;
+            }
+        }
+        
         @media (max-width: 480px) {
-            .page-title h1 { font-size: 20px; }
-            .btn-reserva-manual { width: 100%; justify-content: center; }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn-reserva-manual {
+                justify-content: center;
+            }
+            .btn-action-header {
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Botón menú hamburguesa (solo móvil) -->
+    <button class="menu-btn" id="menuBtn">
+        <span>☰</span>
+    </button>
+    
+    <!-- Overlay para cerrar menú -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">🏔️</div>
+            <h2>Aventura <span>Total</span></h2>
+            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+            <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
+            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
+            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
+            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
+            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
+        </div>
+    </nav>
 
-    <!-- Botón para abrir el menú (Siempre visible) -->
-    <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú"><i class="ph ph-list" style="font-size: 24px;"></i></button>
-    <div class="overlay" id="menuOverlay"></div>
-
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="brand-icon"><i class="ph-bold ph-mountains"></i></div>
-                <div class="brand-text">Aventura<span>Total</span></div>
+    <div class="main-content">
+        <div class="header">
+            <div><h1>📋 Reservas</h1></div>
+            <div class="user-area">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span>Admin</span>
+                </div>
+                <!-- Botones de acción alineados juntos -->
+                <button class="btn-action-header" id="btnRecargar">🔄 Recargar</button>
+                <button class="btn-action-header" id="btnPDFExterno">📄 PDF</button>
+                <button class="btn-reserva-manual" onclick="abrirReservaManual()">➕ Reserva manual</button>
             </div>
+        </div>
+
+        <div class="filters-bar">
+            <!-- Primer campo: Todos los eventos -->
+            <select class="filter-select" id="filtroEventoCalendario">
+                <option value="">📅 Todos los eventos</option>
+            </select>
             
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="ph ph-squares-four"></i> Dashboard</a></li>
-                <li class="nav-item"><a href="clientes.html" class="nav-link"><i class="ph ph-users"></i> Clientes</a></li>
-                <li class="nav-item"><a href="reservas.html" class="nav-link active"><i class="ph ph-calendar-check"></i> Reservas</a></li>
-                <li class="nav-item"><a href="seguimiento.html" class="nav-link"><i class="ph ph-chart-line-up"></i> Seguimiento</a></li>
-                <li class="nav-item"><a href="emails.html" class="nav-link"><i class="ph ph-whatsapp-logo"></i> WhatsApp</a></li>
-                <li class="nav-item"><a href="calendario.html" class="nav-link"><i class="ph ph-calendar"></i> Calendario</a></li>
-                <li class="nav-item"><a href="clima.html" class="nav-link"><i class="ph ph-cloud-sun"></i> Clima</a></li>
-            </ul>
+            <!-- Campo de búsqueda general -->
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
+            
+            <button class="btn-filtrar" id="btnFiltrar">🔍 Filtrar</button>
+        </div>
 
-            <div class="sidebar-footer">
-                <div class="user-profile" onclick="logout()">
-                    <div class="avatar">AD</div>
-                    <div class="user-details"><h4>Administrador</h4><p>Cerrar Sesión</p></div>
-                    <i class="ph ph-sign-out" style="margin-left: auto; color: var(--text-muted); font-size: 18px;"></i>
-                </div>
-            </div>
-        </aside>
+        <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
 
-        <main class="main-content">
-            <header class="page-header">
-                <div class="page-title"><h1>📋 Reservas</h1><p>Gestión completa de todas las reservas</p></div>
-                <div class="actions-group">
-                    <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
-                    <button class="btn-reserva-manual" onclick="abrirReservaManual()"><i class="ph ph-plus"></i> Reserva manual</button>
-                </div>
-            </header>
+        <div id="cardsContainer" class="cards-grid">
+            <div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>
+        </div>
+    </div>
 
-            <div class="filters-bar">
-                <div style="flex:1; min-width:150px; position:relative;">
-                    <input type="text" class="filter-input" placeholder="🔍 Buscar nombre o excursión..." id="busquedaReserva" autocomplete="off">
-                    <div class="autocomplete-list" id="autocompleteList"></div>
-                </div>
-                
-                <select class="filter-select" id="filtroEventoCalendario">
-                    <option value="">📅 Todos los eventos</option>
-                </select>
-                
-                <select class="filter-select" id="filtroCiudad">
-                    <option value="">📍 Todas las ciudades</option>
-                </select>
-                
-                <select class="filter-select" id="filtroEstado">
-                    <option value="todos">📌 Todos los estados</option>
-                    <option value="confirmado">✅ Confirmado</option>
-                    <option value="pendiente">⏳ Pendiente</option>
-                    <option value="pagado">💰 Pagado</option>
-                </select>
-
-                <input type="date" class="filter-date" id="filtroFechaDesde" title="Fecha Desde">
-                <input type="date" class="filter-date" id="filtroFechaHasta" title="Fecha Hasta">
-                
-                <button class="btn-filter-action btn-filter-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Filtrar</button>
-                <button class="btn-filter-action btn-filter-success" id="btnRecargar" title="Recargar"><i class="ph ph-arrows-clockwise"></i></button>
-                <button class="btn-filter-action btn-filter-secondary" id="btnPDFExterno">PDF</button>
-            </div>
-
-            <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
-
-            <div id="cardsContainer" class="cards-grid">
-                <div style="text-align:center; grid-column:1/-1; padding:50px; color: var(--text-muted);">⏳ Cargando...</div>
-            </div>
-        </main>
+    <!-- PRELOADER POPUP -->
+    <div id="preloaderPopup" class="preloader-popup oculto">
+        <div class="preloader-popup-contenido">
+            <div class="preloader-popup-icono"></div>
+            <div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div>
+            <div class="preloader-popup-subtitulo">Guardando datos en el servidor...</div>
+        </div>
     </div>
 
     <script>
@@ -621,37 +714,56 @@
             });
         }
         
+        // Detectar si la app está instalada y se abre desde la pantalla de inicio
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
             console.log('📱 App ejecutándose en modo standalone (sin barra de navegación)');
             document.body.classList.add('pwa-mode');
         }
         
+        // ==================================================
+        // FUNCIÓN PARA ABRIR RESERVA MANUAL
+        // ==================================================
         function abrirReservaManual() {
             window.open('https://sebagsc2020.github.io/reservacordinador1/reservar.html', '_blank');
         }
 
-        const menuBtn = document.getElementById('menuBtn');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('menuOverlay');
-        const themeIcon = document.getElementById('themeIcon');
-        
-        function toggleMenu() { sidebar.classList.toggle('open'); overlay.classList.toggle('active'); document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : ''; }
-        function closeMenu() { sidebar.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
-        menuBtn.addEventListener('click', toggleMenu); overlay.addEventListener('click', closeMenu);
-        
-        // Cerrar menú SIEMPRE al hacer clic en un enlace (para que el contenido ocupe toda la pantalla)
-        document.querySelectorAll('.nav-link').forEach(link => { 
-            link.addEventListener('click', () => { closeMenu(); }); 
-        });
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDark); themeIcon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
+        // ==================================================
+        // MENÚ FLOTANTE
+        // ==================================================
+        function initMenu() {
+            const menuBtn = document.getElementById('menuBtn');
+            const sidebar = document.getElementById('sidebar');
+            const menuOverlay = document.getElementById('menuOverlay');
+            
+            if (!menuBtn || !sidebar || !menuOverlay) return;
+            
+            function toggleMenu() {
+                sidebar.classList.toggle('open');
+                menuOverlay.classList.toggle('active');
+                document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+            }
+            
+            function closeMenu() {
+                sidebar.classList.remove('open');
+                menuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            menuBtn.addEventListener('click', toggleMenu);
+            menuOverlay.addEventListener('click', closeMenu);
+            
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        closeMenu();
+                    }
+                });
+            });
         }
-        if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.body.classList.add('dark-mode'); themeIcon.className = 'ph ph-sun';
-        }
-
+        
+        // ==================================================
+        // CONFIGURACIÓN
+        // ==================================================
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
         }
@@ -664,15 +776,37 @@
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
+        
+        // URL del Google Apps Script - ACTUALIZAR CON TU URL
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
+        // URL del Apps Script para eventos del calendario
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
         
         let reservasData = [];
         let reservasFiltradas = [];
         let estadosGlobales = {};
-        let eventosCalendario = []; 
-        let datosBusqueda = []; 
+        let eventosCalendario = [];
 
+        // Preloader Popup
+        const preloaderPopup = document.getElementById('preloaderPopup');
+        
+        function mostrarPreloader() {
+            if (preloaderPopup) {
+                preloaderPopup.classList.remove('oculto');
+            }
+        }
+        
+        function ocultarPreloader() {
+            if (preloaderPopup) {
+                setTimeout(() => {
+                    preloaderPopup.classList.add('oculto');
+                }, 300);
+            }
+        }
+
+        // ==================================================
+        // GUARDAR NOMBRE EDITADO EN LA NUBE
+        // ==================================================
         async function guardarNombreEnNube(id, nuevoNombre) {
             try {
                 const formData = new URLSearchParams();
@@ -682,10 +816,14 @@
                 
                 const response = await fetch(ESTADOS_SCRIPT_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
                     body: formData.toString()
                 });
                 
+                const text = await response.text();
+                console.log(`✅ Nombre guardado en nube: ${id} -> ${nuevoNombre}`, text);
                 return true;
             } catch (error) {
                 console.error('Error al guardar nombre en nube:', error);
@@ -693,12 +831,17 @@
             }
         }
 
+        // ==================================================
+        // EDITAR NOMBRE DE LA RESERVA
+        // ==================================================
         async function editarNombreReserva(id, nombreActual) {
             const nuevoNombre = prompt('✏️ Editar nombre del cliente:', nombreActual);
             if (!nuevoNombre || nuevoNombre.trim() === '') return;
             if (nuevoNombre === nombreActual) return;
             
             try {
+                mostrarPreloader();
+                
                 const reserva = reservasData.find(r => r.id === id);
                 if (reserva) {
                     reserva.nombre = nuevoNombre.trim();
@@ -706,17 +849,22 @@
                     const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
                     if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].nombre = nuevoNombre.trim();
                     
+                    // Guardar en localStorage como backup
                     const nombresEditados = JSON.parse(localStorage.getItem('nombresEditados') || '{}');
                     nombresEditados[id] = nuevoNombre.trim();
                     localStorage.setItem('nombresEditados', JSON.stringify(nombresEditados));
                     
+                    // Guardar en la nube
                     await guardarNombreEnNube(id, nuevoNombre.trim());
                     
                     renderizarCards();
                     alert('✅ Nombre actualizado correctamente en la nube');
                 }
             } catch (error) {
+                console.error('Error al editar nombre:', error);
                 alert('❌ Error al actualizar el nombre');
+            } finally {
+                ocultarPreloader();
             }
         }
 
@@ -724,6 +872,9 @@
             return JSON.parse(localStorage.getItem('nombresEditados') || '{}');
         }
 
+        // ==================================================
+        // GUARDAR ESTADO EN LA NUBE
+        // ==================================================
         async function guardarEstadoEnNube(id, nuevoEstado) {
             try {
                 const formData = new URLSearchParams();
@@ -733,10 +884,14 @@
                 
                 const response = await fetch(ESTADOS_SCRIPT_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
                     body: formData.toString()
                 });
                 
+                const text = await response.text();
+                console.log(`✅ Estado guardado en nube: ${id} -> ${nuevoEstado}`, text);
                 return true;
             } catch (error) {
                 console.error('Error al guardar en nube:', error);
@@ -744,6 +899,9 @@
             }
         }
 
+        // ==================================================
+        // CARGAR ESTADOS DESDE LA NUBE
+        // ==================================================
         async function cargarEstadosDesdeNube() {
             try {
                 const localEstados = localStorage.getItem('estadosReservasCloud');
@@ -751,6 +909,7 @@
                     const parsed = JSON.parse(localEstados);
                     if (Object.keys(parsed).length > 0) {
                         estadosGlobales = parsed;
+                        console.log('📥 Estados cargados desde localStorage:', Object.keys(estadosGlobales).length);
                     }
                 }
                 
@@ -759,9 +918,11 @@
                 if (data.success && data.estados) {
                     estadosGlobales = data.estados;
                     localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
+                    console.log('📥 Estados sincronizados desde nube:', Object.keys(estadosGlobales).length);
                 }
                 return estadosGlobales;
             } catch (error) {
+                console.error('Error al cargar desde nube:', error);
                 const estadosLocal = JSON.parse(localStorage.getItem('estadosReservasCloud') || '{}');
                 estadosGlobales = estadosLocal;
                 return estadosLocal;
@@ -769,30 +930,7 @@
         }
 
         // ==================================================
-        // FUNCIONES DE FECHAS
-        // ==================================================
-        function convertirFechaISOtoDDMMYYYY(fechaIso) {
-            if (!fechaIso) return '';
-            const fecha = new Date(fechaIso);
-            if (isNaN(fecha.getTime())) return fechaIso;
-            const dia = fecha.getDate().toString().padStart(2, '0');
-            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-            const anio = fecha.getFullYear();
-            return `${dia}/${mes}/${anio}`;
-        }
-
-        function convertirISOaInputDate(fechaIso) {
-            if (!fechaIso) return '';
-            const fecha = new Date(fechaIso);
-            if (isNaN(fecha.getTime())) return '';
-            const anio = fecha.getFullYear();
-            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-            const dia = fecha.getDate().toString().padStart(2, '0');
-            return `${anio}-${mes}-${dia}`;
-        }
-
-        // ==================================================
-        // CARGAR EVENTOS
+        // CARGAR EVENTOS DEL CALENDARIO
         // ==================================================
         async function cargarEventosCalendario() {
             const selectEventos = document.getElementById('filtroEventoCalendario');
@@ -809,101 +947,34 @@
                     eventosCalendario = [];
                 }
             } catch (error) {
+                console.warn('⚠️ No se pudieron cargar los eventos de calendario:', error);
                 eventosCalendario = [];
             }
 
             selectEventos.innerHTML = '<option value="">📅 Todos los eventos</option>';
             
+            function convertirFechaISOtoDDMMYYYY(fechaIso) {
+                if (!fechaIso) return '';
+                const fecha = new Date(fechaIso);
+                if (isNaN(fecha.getTime())) return fechaIso;
+                const dia = fecha.getDate().toString().padStart(2, '0');
+                const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+                const anio = fecha.getFullYear();
+                return `${dia}/${mes}/${anio}`;
+            }
+
             eventosCalendario.forEach(evento => {
                 const option = document.createElement('option');
                 option.value = evento.id;
                 const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
                 const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
                 option.textContent = `${evento.nombre} (${fechaInicio} - ${fechaFin})`;
-                option.dataset.inicio = evento.fechaInicio;
-                option.dataset.fin = evento.fechaFin;
                 selectEventos.appendChild(option);
             });
         }
 
-        function aplicarFiltroEventoCalendario() {
-            const selectEventos = document.getElementById('filtroEventoCalendario');
-            const inputFechaDesde = document.getElementById('filtroFechaDesde');
-            const inputFechaHasta = document.getElementById('filtroFechaHasta');
-            
-            if (!selectEventos || !inputFechaDesde || !inputFechaHasta) return;
-
-            const eventoId = selectEventos.value;
-            if (eventoId) {
-                const evento = eventosCalendario.find(e => e.id === eventoId);
-                if (evento) {
-                    inputFechaDesde.value = convertirISOaInputDate(evento.fechaInicio);
-                    inputFechaHasta.value = convertirISOaInputDate(evento.fechaFin);
-                }
-            } else {
-                inputFechaDesde.value = '';
-                inputFechaHasta.value = '';
-            }
-            
-            filtrarReservas();
-        }
-
         // ==================================================
-        // FORMATEAR FECHA DE SHEETS
-        // ==================================================
-        function formatearFecha(valor) {
-            if (valor && typeof valor === 'object' && valor.v !== undefined) {
-                if (valor.f && typeof valor.f === 'string') {
-                    let fechaStr = valor.f.replace(/-/g, '/');
-                    const partes = fechaStr.split('/');
-                    if (partes.length === 3) {
-                        const dia = partes[0].padStart(2, '0');
-                        const mes = partes[1].padStart(2, '0');
-                        const anio = partes[2];
-                        return anio.length === 2 ? `${dia}/${mes}/20${anio}` : `${dia}/${mes}/${anio}`;
-                    }
-                    return fechaStr;
-                }
-                if (typeof valor.v === 'number') {
-                    const fechaObj = new Date(valor.v);
-                    if (!isNaN(fechaObj.getTime())) {
-                        return fechaObj.getDate().toString().padStart(2,'0') + '/' + 
-                               (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
-                               fechaObj.getFullYear();
-                    }
-                }
-                return '';
-            }
-            if (!valor) return '';
-            if (typeof valor === 'string') {
-                let fechaStr = valor.replace(/-/g, '/');
-                const partes = fechaStr.split('/');
-                if (partes.length === 3) {
-                    const dia = partes[0].padStart(2, '0');
-                    const mes = partes[1].padStart(2, '0');
-                    const anio = partes[2];
-                    return anio.length === 2 ? `${dia}/${mes}/20${anio}` : `${dia}/${mes}/${anio}`;
-                }
-                const fechaObj = new Date(valor);
-                if (!isNaN(fechaObj.getTime())) {
-                    return fechaObj.getDate().toString().padStart(2,'0') + '/' + 
-                           (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
-                           fechaObj.getFullYear();
-                }
-            }
-            if (typeof valor === 'number') {
-                const fechaObj = new Date(valor);
-                if (!isNaN(fechaObj.getTime())) {
-                    return fechaObj.getDate().toString().padStart(2,'0') + '/' + 
-                           (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
-                           fechaObj.getFullYear();
-                }
-            }
-            return '';
-        }
-
-        // ==================================================
-        // FUNCIÓN PRINCIPAL (CARGAR RESERVAS, CIUDADES Y DATOS DE BÚSQUEDA)
+        // CARGAR RESERVAS
         // ==================================================
         async function cargarReservas() {
             const container = document.getElementById('cardsContainer');
@@ -911,7 +982,10 @@
             if (!container) return;
 
             try {
+                mostrarPreloader();
+
                 await cargarEstadosDesdeNube();
+                await cargarEventosCalendario();
 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
                 const texto = await response.text();
@@ -929,10 +1003,6 @@
                 reservasData = [];
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 const nombresEditados = cargarNombresEditados();
-                
-                const ciudadesSet = new Set();
-                const nombresSet = new Set();
-                const excursionesSet = new Set();
 
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
@@ -947,17 +1017,6 @@
                     const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
                     const ciudad = (c[7] && c[7].v) ? String(c[7].v) : '';
 
-                    let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
-                    if (nombresEditados[id]) {
-                        nombreCompleto = nombresEditados[id];
-                    }
-                    if (nombreCompleto && nombreCompleto !== 'No especificado') {
-                        nombresSet.add(nombreCompleto.trim());
-                    }
-                    if (ciudad && ciudad.trim() !== '') {
-                        ciudadesSet.add(ciudad.trim());
-                    }
-
                     let excursionesLista = [];
                     const excursionesRaw = (c[8] && c[8].v) ? String(c[8].v) : '';
                     if (excursionesRaw) {
@@ -971,30 +1030,26 @@
                         excursionesLista = excursionesLista.map(function(e) { 
                             return e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
                         }).filter(function(e) { return e; });
-
-                        excursionesLista.forEach(exc => {
-                            if (exc && exc.trim() !== '') {
-                                excursionesSet.add(exc.trim());
-                            }
-                        });
                     }
 
                     let fecha = '';
-                    let fechaRaw = c[9]; 
-                    if (fechaRaw) {
-                        fecha = formatearFecha(fechaRaw);
-                    }
-                    if (!fecha) {
-                        const timestamp = (c[0] && c[0].v) ? c[0].v : null;
-                        if (timestamp) {
-                            fecha = formatearFecha(timestamp);
+                    const timestamp = (c[0] && c[0].v) ? c[0].v : null;
+                    if (timestamp) {
+                        const fechaObj = new Date(timestamp);
+                        if (!isNaN(fechaObj.getTime())) {
+                            fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + fechaObj.getFullYear();
                         }
                     }
 
                     const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
                     const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
                     const lugar = (c[12] && c[12].v) ? String(c[12].v) : 'No especificado';
+                    let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
                     
+                    if (nombresEditados[id]) {
+                        nombreCompleto = nombresEditados[id];
+                    }
+
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
@@ -1002,7 +1057,7 @@
 
                     reservasData.push({
                         id: id,
-                        fecha: fecha || 'Sin fecha',
+                        fecha: fecha,
                         nombre: nombreCompleto,
                         email: email,
                         telefono: telefono,
@@ -1021,157 +1076,60 @@
                     return numB - numA;
                 });
 
-                const selectCiudad = document.getElementById('filtroCiudad');
-                if (selectCiudad) {
-                    selectCiudad.innerHTML = '<option value="">📍 Todas las ciudades</option>';
-                    const ciudadesArray = Array.from(ciudadesSet).sort();
-                    ciudadesArray.forEach(ciudad => {
-                        const option = document.createElement('option');
-                        option.value = ciudad;
-                        option.textContent = ciudad;
-                        selectCiudad.appendChild(option);
-                    });
-                }
-
-                datosBusqueda = [];
-                nombresSet.forEach(n => datosBusqueda.push({texto: n, tipo: '👤 Cliente'}));
-                excursionesSet.forEach(e => datosBusqueda.push({texto: e, tipo: '🏔️ Excursión'}));
-                datosBusqueda.sort((a, b) => a.texto.localeCompare(b.texto));
-
                 reservasFiltradas = reservasData.slice();
                 renderizarCards();
                 if (totalSpan) totalSpan.textContent = reservasData.length + ' reservas';
 
             } catch (error) {
                 console.error('Error:', error);
-                container.innerHTML = '<div style="text-align:center; color:var(--danger); grid-column:1/-1; padding:50px;">❌ Error: ' + error.message + '</div>';
+                container.innerHTML = '<div style="text-align:center; color:red; grid-column:1/-1; padding:50px;">❌ Error: ' + error.message + '</div>';
+            } finally {
+                ocultarPreloader();
             }
         }
 
-        // ==================================================
-        // AUTOCOMPLETADO DE BÚSQUEDA
-        // ==================================================
-        function initAutocomplete() {
-            const input = document.getElementById('busquedaReserva');
-            const listContainer = document.getElementById('autocompleteList');
-            if (!input || !listContainer) return;
-
-            input.addEventListener('input', function() {
-                const value = this.value.toLowerCase().trim();
-                listContainer.innerHTML = '';
+        async function cambiarEstado(id, nuevoEstado) {
+            const reserva = reservasData.find(function(r) { return r.id === id; });
+            if (reserva) {
+                reserva.estado = nuevoEstado;
+                estadosGlobales[id] = nuevoEstado;
+                const indexFiltrada = reservasFiltradas.findIndex(function(r) { return r.id === id; });
+                if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
                 
-                if (!value || value.length < 1) {
-                    listContainer.classList.remove('active');
-                    return;
-                }
-
-                const matches = datosBusqueda.filter(item => 
-                    item.texto.toLowerCase().includes(value)
-                ).slice(0, 8);
-
-                if (matches.length === 0) {
-                    listContainer.classList.remove('active');
-                    return;
-                }
-
-                matches.forEach((match, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'autocomplete-item';
-                    item.innerHTML = `${match.texto} <small>${match.tipo}</small>`;
-                    
-                    item.addEventListener('click', function() {
-                        input.value = match.texto;
-                        listContainer.classList.remove('active');
-                        filtrarReservas();
-                    });
-                    listContainer.appendChild(item);
-                });
-
-                listContainer.classList.add('active');
-            });
-
-            document.addEventListener('click', function(e) {
-                if (e.target !== input && e.target !== listContainer) {
-                    listContainer.classList.remove('active');
-                }
-            });
+                localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
+                await guardarEstadoEnNube(id, nuevoEstado);
+                renderizarCards();
+                
+                const estadoText = nuevoEstado === 'confirmado' ? 'Confirmada' : (nuevoEstado === 'pendiente' ? 'Pendiente' : 'Pagada');
+                alert(`✅ Estado cambiado a: ${estadoText}`);
+            }
         }
 
-        // ==================================================
-        // FILTRADO
-        // ==================================================
-        function filtrarReservas() {
-            const busqueda = document.getElementById('busquedaReserva');
-            const filtroCiudad = document.getElementById('filtroCiudad');
-            const filtroEstado = document.getElementById('filtroEstado');
-            const filtroFechaDesde = document.getElementById('filtroFechaDesde');
-            const filtroFechaHasta = document.getElementById('filtroFechaHasta');
-            
-            const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
-            const ciudad = filtroCiudad ? filtroCiudad.value : ''; 
-            const estado = filtroEstado ? filtroEstado.value : 'todos';
-            
-            let fechaDesdeObj = null;
-            let fechaHastaObj = null;
-            
-            if (filtroFechaDesde && filtroFechaDesde.value) {
-                const partes = filtroFechaDesde.value.split('-'); 
-                fechaDesdeObj = new Date(partes[0], partes[1] - 1, partes[2], 0, 0, 0, 0);
-            }
-            if (filtroFechaHasta && filtroFechaHasta.value) {
-                const partes = filtroFechaHasta.value.split('-');
-                fechaHastaObj = new Date(partes[0], partes[1] - 1, partes[2], 23, 59, 59, 999);
+        function enviarWhatsApp(reserva) {
+            let telefono = reserva.telefono.replace(/\D/g, '');
+            if (telefono.length === 10) {
+                telefono = '54' + telefono;
             }
 
-            reservasFiltradas = reservasData.filter(function(r) {
-                let coincideBusqueda = true;
-                if (texto) {
-                    const coincideNombre = r.nombre.toLowerCase().includes(texto);
-                    const coincideExcursion = r.excursionesLista.some(function(exc) {
-                        return exc.toLowerCase().includes(texto);
-                    });
-                    coincideBusqueda = coincideNombre || coincideExcursion;
-                }
-                
-                let coincideCiudad = true;
-                if (ciudad) {
-                    coincideCiudad = r.ciudad === ciudad;
-                }
-                
-                let coincideEstado = true;
-                if (estado !== 'todos') {
-                    coincideEstado = r.estado === estado;
-                }
-
-                let coincideFecha = true;
-                if (fechaDesdeObj || fechaHastaObj) {
-                    if (r.fecha && r.fecha !== 'Sin fecha') {
-                        const partesFecha = r.fecha.split('/');
-                        if (partesFecha.length === 3) {
-                            const fechaReservaObj = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
-                            
-                            if (fechaDesdeObj && fechaReservaObj < fechaDesdeObj) coincideFecha = false;
-                            if (fechaHastaObj && fechaReservaObj > fechaHastaObj) coincideFecha = false;
-                        } else {
-                            coincideFecha = false; 
-                        }
-                    } else {
-                        coincideFecha = false; 
-                    }
-                }
-                
-                return coincideBusqueda && coincideCiudad && coincideEstado && coincideFecha;
-            });
-            
-            renderizarCards();
-        }
-
-        function calcularTotalPasajeros(reservas) {
-            let total = 0;
-            for (let i = 0; i < reservas.length; i++) {
-                total += reservas[i].personas || 1;
+            let excursionesTexto = '';
+            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
+                excursionesTexto = reserva.excursionesLista.map(function(exc, idx) { return (idx+1) + '. ' + exc; }).join('\n');
+            } else {
+                excursionesTexto = 'Sin excursiones específicas';
             }
-            return total;
+
+            let estadoTexto = '';
+            switch(reserva.estado) {
+                case 'pendiente': estadoTexto = 'Pendiente'; break;
+                case 'confirmado': estadoTexto = 'Confirmado'; break;
+                case 'pagado': estadoTexto = 'Pagado'; break;
+                default: estadoTexto = 'Confirmado';
+            }
+
+            const mensaje = '🏔️ *AVENTURA TOTAL* 🏔️\n\n✅ *CONFIRMACIÓN DE RESERVA*\n\n🆔 *N° de reserva:* ' + reserva.id + '\n📅 *Fecha:* ' + reserva.fecha + '\n\n👤 *DATOS DEL PASAJERO:*\n   Nombre: ' + reserva.nombre + '\n   📞 Teléfono: ' + reserva.telefono + '\n   📧 Email: ' + reserva.email + '\n\n📍 *DESTINO:*\n   ' + reserva.ciudad + '\n\n✨ *EXCURSIONES SELECCIONADAS:*\n' + excursionesTexto + '\n\n👥 *Cantidad de personas:* ' + reserva.personas + '\n💳 *Forma de pago:* ' + reserva.formaPago + '\n🚐 *Punto de encuentro:* ' + reserva.lugar + '\n📌 *Estado:* ' + estadoTexto + '\n\n📌 *PRÓXIMOS PASOS:*\n• En las próximas 24hs recibirás detalles de pago\n• Punto de encuentro exacto será confirmado\n\n🏔️ ¡Gracias por confiar en Aventura Total!';
+
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            window.open('https://wa.me/' + telefono + '?text=' + mensajeCodificado, '_blank');
         }
 
         function renderizarCards() {
@@ -1180,7 +1138,7 @@
             if (!container) return;
 
             if (reservasFiltradas.length === 0) {
-                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px; color: var(--text-muted);">📋 No hay reservas que coincidan con los filtros</div>';
+                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">📋 No hay reservas</div>';
                 if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
@@ -1203,23 +1161,23 @@
             for (let idx = 0; idx < reservasFiltradas.length; idx++) {
                 const r = reservasFiltradas[idx];
                 let estadoText = '';
-                let estadoClass = '';
+                let estadoColor = '';
                 switch(r.estado) {
                     case 'pendiente': 
                         estadoText = 'Pendiente'; 
-                        estadoClass = 'estado-pendiente';
+                        estadoColor = '#ffc107';
                         break;
                     case 'confirmado': 
                         estadoText = 'Confirmado'; 
-                        estadoClass = 'estado-confirmado';
+                        estadoColor = '#27ae60';
                         break;
                     case 'pagado': 
                         estadoText = 'Pagado'; 
-                        estadoClass = 'estado-pagado';
+                        estadoColor = '#3498db';
                         break;
                     default: 
                         estadoText = 'Confirmado'; 
-                        estadoClass = 'estado-confirmado';
+                        estadoColor = '#27ae60';
                 }
 
                 let excursionesHtml = '<ul class="excursiones-lista-card">';
@@ -1232,49 +1190,36 @@
                 }
                 excursionesHtml += '</ul>';
 
-                const fechaSolicitud = r.fecha || 'Sin fecha';
-
                 html += '<div class="reserva-card">' +
                             '<div class="card-header">' +
                                 '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">' +
-                                    '<span class="card-id"><i class="ph ph-hash" style="font-size:10px;"></i> ' + escapeHtml(r.id) + '</span>' +
-                                    '<button class="btn-editar-nombre" onclick="editarNombreReserva(\'' + r.id + '\', \'' + escapeHtml(r.nombre).replace(/'/g, "\\'") + '\')" title="Editar nombre"><i class="ph ph-pencil"></i></button>' +
-                                    '<span class="card-estado-header ' + estadoClass + '">' + estadoText + '</span>' +
+                                    '<span class="card-id">ID: ' + escapeHtml(r.id) + '</span>' +
+                                    '<button class="btn-editar-nombre" onclick="editarNombreReserva(\'' + r.id + '\', \'' + escapeHtml(r.nombre).replace(/'/g, "\\'") + '\')" title="Editar nombre">✏️</button>' +
+                                    '<span class="card-estado-header" style="font-weight: 700; background: ' + estadoColor + ';">' + estadoText + '</span>' +
                                 '</div>' +
-                                '<span class="card-fecha-solicitud"><i class="ph ph-calendar"></i> ' + escapeHtml(fechaSolicitud) + '</span>' +
+                                '<span class="card-fecha">' + escapeHtml(r.fecha) + '</span>' +
                             '</div>' +
                             '<div class="card-body">' +
-                                '<div class="card-info"><div class="card-label"><i class="ph ph-user"></i> CLIENTE</div><div class="card-value">' + escapeHtml(r.nombre) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label"><i class="ph ph-envelope"></i> EMAIL</div><div class="card-value">' + escapeHtml(r.email) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label"><i class="ph ph-phone"></i> TELÉFONO</div><div class="card-value">' + escapeHtml(r.telefono) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label"><i class="ph ph-map-pin"></i> CIUDAD</div><div class="card-value">' + escapeHtml(r.ciudad) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label"><i class="ph ph-tree"></i> EXCURSIONES</div>' + excursionesHtml + '</div>' +
-                                '<div class="card-info"><div class="card-label"><i class="ph ph-users"></i> PERSONAS</div><div class="card-value">' + escapeHtml(r.personas) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label"><i class="ph ph-credit-card"></i> FORMA DE PAGO</div><div class="card-value">' + escapeHtml(r.formaPago) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label"><i class="ph ph-map-trifold"></i> LUGAR</div><div class="card-value">' + escapeHtml(r.lugar) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">👤 CLIENTE</div><div class="card-value">' + escapeHtml(r.nombre) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📧 EMAIL</div><div class="card-value">' + escapeHtml(r.email) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📞 TELÉFONO</div><div class="card-value">' + escapeHtml(r.telefono) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">📍 CIUDAD</div><div class="card-value">' + escapeHtml(r.ciudad) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">✨ EXCURSIONES</div>' + excursionesHtml + '</div>' +
+                                '<div class="card-info"><div class="card-label">👥 PERSONAS</div><div class="card-value">' + escapeHtml(r.personas) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">💳 FORMA DE PAGO</div><div class="card-value">' + escapeHtml(r.formaPago) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label">🚐 LUGAR</div><div class="card-value">' + escapeHtml(r.lugar) + '</div></div>' +
                             '</div>' +
                             '<div class="card-actions">' +
-                                '<button class="btn-card btn-confirmar-card" data-id="' + escapeHtml(r.id) + '" data-estado="confirmado"><i class="ph ph-check-circle"></i> Confirmada</button>' +
-                                '<button class="btn-card btn-pendiente-card" data-id="' + escapeHtml(r.id) + '" data-estado="pendiente"><i class="ph ph-clock"></i> Pendiente</button>' +
-                                '<button class="btn-card btn-pagar-card" data-id="' + escapeHtml(r.id) + '" data-estado="pagado"><i class="ph ph-currency-dollar"></i> Pagada</button>' +
-                                '<button class="btn-card btn-whatsapp-card" data-id="' + escapeHtml(r.id) + '"><i class="ph ph-whatsapp-logo"></i> WhatsApp</button>' +
-                                '<button class="btn-card btn-excluir-card" data-id="' + escapeHtml(r.id) + '"><i class="ph ph-trash"></i> Apagar</button>' +
+                                '<button class="btn-card btn-confirmar-card" data-id="' + escapeHtml(r.id) + '" data-estado="confirmado">✅ Confirmada</button>' +
+                                '<button class="btn-card btn-pendiente-card" data-id="' + escapeHtml(r.id) + '" data-estado="pendiente">⏳ Pendiente</button>' +
+                                '<button class="btn-card btn-pagar-card" data-id="' + escapeHtml(r.id) + '" data-estado="pagado">💰 Paga</button>' +
+                                '<button class="btn-card btn-whatsapp-card" data-id="' + escapeHtml(r.id) + '">💬 WhatsApp</button>' +
+                                '<button class="btn-card btn-excluir-card" data-id="' + escapeHtml(r.id) + '">🗑️ Apagar Reserva</button>' +
                             '</div>' +
                         '</div>';
             }
             container.innerHTML = html;
-
-            const totalPasajeros = calcularTotalPasajeros(reservasFiltradas);
-            const totalReservas = reservasFiltradas.length;
-            const totalOriginal = reservasData.length;
-            
-            if (totalSpan) {
-                if (totalReservas === totalOriginal) {
-                    totalSpan.textContent = totalReservas + ' reservas - ' + totalPasajeros + ' pasajeros';
-                } else {
-                    totalSpan.textContent = totalReservas + ' de ' + totalOriginal + ' reservas - ' + totalPasajeros + ' pasajeros';
-                }
-            }
+            if (totalSpan) totalSpan.textContent = reservasFiltradas.length + ' de ' + reservasData.length + ' reservas';
 
             document.querySelectorAll('.btn-confirmar-card').forEach(function(btn) {
                 btn.addEventListener('click', function() { cambiarEstado(btn.dataset.id, 'confirmado'); });
@@ -1292,6 +1237,25 @@
             document.querySelectorAll('.btn-excluir-card').forEach(function(btn) {
                 btn.addEventListener('click', function() { excluirReserva(btn.dataset.id); });
             });
+        }
+
+        function filtrarReservas() {
+            const busqueda = document.getElementById('busquedaReserva');
+            if (!busqueda) return;
+            const texto = busqueda.value.toLowerCase().trim();
+
+            if (!texto) {
+                reservasFiltradas = reservasData.slice();
+            } else {
+                reservasFiltradas = reservasData.filter(function(r) {
+                    const coincideNombre = r.nombre.toLowerCase().includes(texto);
+                    const coincideExcursion = r.excursionesLista.some(function(exc) {
+                        return exc.toLowerCase().includes(texto);
+                    });
+                    return coincideNombre || coincideExcursion;
+                });
+            }
+            renderizarCards();
         }
 
         function excluirReserva(id) {
@@ -1318,7 +1282,9 @@
             try {
                 localStorage.setItem('filtroExcursionPDF', filtroTexto);
                 localStorage.setItem('reservasFiltradasPDF', JSON.stringify(reservasFiltradas));
+                console.log('✅ Datos guardados para PDF:', { filtro: filtroTexto || '(vacio)', total: reservasFiltradas.length });
             } catch(e) {
+                console.error('Error al guardar:', e);
                 alert('❌ Error al preparar los datos para el PDF.');
                 return;
             }
@@ -1329,44 +1295,31 @@
             }
         }
 
+        // ==================================================
+        // INICIALIZAR
+        // ==================================================
         function init() {
-            cargarEventosCalendario();
-
+            initMenu();
+            
             const btnFiltrar = document.getElementById('btnFiltrar');
             const btnRecargar = document.getElementById('btnRecargar');
             const btnPDFExterno = document.getElementById('btnPDFExterno');
-            const selectEvento = document.getElementById('filtroEventoCalendario');
             const busquedaInput = document.getElementById('busquedaReserva');
-            const filtroCiudad = document.getElementById('filtroCiudad');
-            const filtroEstado = document.getElementById('filtroEstado');
-            const filtroFechaDesde = document.getElementById('filtroFechaDesde');
-            const filtroFechaHasta = document.getElementById('filtroFechaHasta');
             
-            initAutocomplete();
-
             if (btnFiltrar) btnFiltrar.addEventListener('click', filtrarReservas);
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
             if (btnPDFExterno) btnPDFExterno.addEventListener('click', generarPDFExterno);
-            
-            if (selectEvento) {
-                selectEvento.addEventListener('change', aplicarFiltroEventoCalendario);
+            if (busquedaInput) {
+                busquedaInput.addEventListener('keypress', function(e) { 
+                    if (e.key === 'Enter') filtrarReservas(); 
+                });
             }
-            
-            [busquedaInput, filtroCiudad, filtroEstado, filtroFechaDesde, filtroFechaHasta].forEach(function(input) {
-                if (input) {
-                    input.addEventListener('keypress', function(e) { 
-                        if (e.key === 'Enter') filtrarReservas(); 
-                    });
-                    if (input.type === 'date') {
-                        input.addEventListener('change', filtrarReservas);
-                    }
-                }
-            });
             
             cargarReservas();
             
             setInterval(() => {
                 if (document.visibilityState === 'visible') {
+                    console.log('🔄 Actualización automática - pestaña visible');
                     cargarReservas();
                 }
             }, 120000);
@@ -1378,7 +1331,6 @@
         window.generarPDFExterno = generarPDFExterno;
         window.abrirReservaManual = abrirReservaManual;
         window.editarNombreReserva = editarNombreReserva;
-        window.toggleTheme = toggleTheme;
         
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
