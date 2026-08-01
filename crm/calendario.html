@@ -817,11 +817,9 @@
             return Object.keys(EXCURSIONES_DATA[pais]);
         }
 
-        function getCiudadConEmoji(pais, ciudad) {
-            // Devuelve el nombre de la ciudad con su emoji
-            const ciudades = EXCURSIONES_DATA[pais] || {};
-            const ciudadEncontrada = Object.keys(ciudades).find(c => c === ciudad);
-            return ciudadEncontrada || ciudad;
+        function getCiudadSinEmoji(ciudad) {
+            // Elimina el emoji del nombre de la ciudad (ej: "🏖️ Balneario Camboriú" -> "Balneario Camboriú")
+            return ciudad.replace(/^[^\w]+\s*/, '');
         }
 
         // ==================================================
@@ -971,13 +969,41 @@
         }
         
         // ==================================================
+        // FUNCIÓN PARA GENERAR NOMBRE DEL EVENTO AUTOMÁTICAMENTE
+        // ==================================================
+        function generarNombreEvento() {
+            const ciudadSelect = document.getElementById('eventoCiudad');
+            const paxInput = document.getElementById('eventoPax');
+            
+            const ciudad = ciudadSelect ? ciudadSelect.value : '';
+            const pax = paxInput ? paxInput.value : '0';
+            
+            if (ciudad && pax && parseInt(pax) > 0) {
+                // Limpiar el nombre de la ciudad (eliminar emoji)
+                const ciudadLimpia = getCiudadSinEmoji(ciudad);
+                const nombreInput = document.getElementById('eventoNombre');
+                if (nombreInput) {
+                    nombreInput.value = `${ciudadLimpia} ${pax} Pax`;
+                }
+            } else if (ciudad && (!pax || parseInt(pax) === 0)) {
+                // Si solo hay ciudad, poner solo la ciudad
+                const ciudadLimpia = getCiudadSinEmoji(ciudad);
+                const nombreInput = document.getElementById('eventoNombre');
+                if (nombreInput) {
+                    nombreInput.value = ciudadLimpia;
+                }
+            }
+        }
+
+        // ==================================================
         // CREAR EVENTO (con países y ciudades del formulario)
         // ==================================================
         function mostrarModalCrearEvento() {
             const paises = getPaises();
             let paisesOptions = '<option value="">Selecciona un país</option>';
             paises.forEach(pais => {
-                paisesOptions += `<option value="${pais}">${pais.charAt(0).toUpperCase() + pais.slice(1)}</option>`;
+                const paisDisplay = pais.charAt(0).toUpperCase() + pais.slice(1);
+                paisesOptions += `<option value="${pais}">${paisDisplay}</option>`;
             });
 
             const modalHtml = `
@@ -989,7 +1015,8 @@
                         </div>
                         <div class="form-group">
                             <label>Nombre del evento</label>
-                            <input type="text" id="eventoNombre" placeholder="Ej: Camboriu 45 Pax">
+                            <input type="text" id="eventoNombre" placeholder="Ej: Bombinhas 20 Pax" readonly style="background: #f1f5f9; cursor: default;">
+                            <small style="color: var(--text-muted); font-size: 11px;">⚠️ El nombre se genera automáticamente al seleccionar ciudad y cantidad de pasajeros</small>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
@@ -1000,7 +1027,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Ciudad</label>
-                                <select id="eventoCiudad" disabled>
+                                <select id="eventoCiudad" disabled onchange="generarNombreEvento()">
                                     <option value="">Selecciona un país primero</option>
                                 </select>
                             </div>
@@ -1017,18 +1044,13 @@
                         </div>
                         <div class="form-group">
                             <label>Cantidad de pasajeros</label>
-                            <input type="number" id="eventoPax" placeholder="0">
+                            <input type="number" id="eventoPax" placeholder="0" min="0" oninput="generarNombreEvento()">
                         </div>
                         <button class="btn btn-success" style="width:100%; margin-top:10px;" onclick="crearEvento()"><i class="ph ph-check"></i> Crear evento</button>
                     </div>
                 </div>
             `;
             document.body.insertAdjacentHTML('beforeend', modalHtml);
-            
-            // Si ya hay países disponibles, inicializar el selector de ciudades
-            if (paises.length > 0) {
-                // No hacer nada, esperar a que el usuario seleccione un país
-            }
         }
 
         // Función para actualizar ciudades según el país seleccionado
@@ -1057,7 +1079,16 @@
                 ciudadSelect.disabled = true;
                 ciudadSelect.innerHTML = '<option value="">Selecciona un país primero</option>';
             }
+            
+            // Limpiar el nombre del evento cuando cambia el país
+            const nombreInput = document.getElementById('eventoNombre');
+            if (nombreInput) {
+                nombreInput.value = '';
+            }
         };
+        
+        // Exponer la función generarNombreEvento globalmente
+        window.generarNombreEvento = generarNombreEvento;
         
         async function crearEvento() {
             const nombre = document.getElementById('eventoNombre')?.value;
@@ -1528,6 +1559,7 @@
         window.toggleTheme = toggleTheme;
         window.cargarEventos = cargarEventos;
         window.actualizarCiudadesEvento = actualizarCiudadesEvento;
+        window.generarNombreEvento = generarNombreEvento;
         
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
