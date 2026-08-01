@@ -551,7 +551,7 @@
                 </div>
             </div>
 
-            <!-- FILTROS CON FECHAS AUTOMÁTICAS -->
+            <!-- FILTROS CON FECHAS AUTOMÁTICAS Y ESTADOS -->
             <div class="filters-bar">
                 <!-- Filtro por Evento -->
                 <select class="filter-select" id="filtroEventoCalendario">
@@ -563,7 +563,15 @@
                     <option value="">📍 Todas las ciudades</option>
                 </select>
 
-                <!-- NUEVOS CAMPOS DE FECHA -->
+                <!-- NUEVO FILTRO POR ESTADO -->
+                <select class="filter-select" id="filtroEstado">
+                    <option value="todos">📌 Todos los estados</option>
+                    <option value="confirmado">✅ Confirmado</option>
+                    <option value="pendiente">⏳ Pendiente</option>
+                    <option value="pagado">💰 Pagado</option>
+                </select>
+
+                <!-- Campos de fecha -->
                 <input type="date" class="filter-date" id="filtroFechaDesde" title="Fecha Desde">
                 <input type="date" class="filter-date" id="filtroFechaHasta" title="Fecha Hasta">
                 
@@ -1283,16 +1291,18 @@
         }
 
         // ==================================================
-        // FILTRADO (EVENTO + FECHAS + CIUDAD + BÚSQUEDA)
+        // FILTRADO (ESTADO + EVENTO/FECHAS + CIUDAD + BÚSQUEDA)
         // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
             const filtroCiudad = document.getElementById('filtroCiudad');
+            const filtroEstado = document.getElementById('filtroEstado');
             const inputFechaDesde = document.getElementById('filtroFechaDesde');
             const inputFechaHasta = document.getElementById('filtroFechaHasta');
             
             const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
             const ciudad = filtroCiudad ? filtroCiudad.value : '';
+            const estado = filtroEstado ? filtroEstado.value : 'todos';
             const fechaDesdeValue = inputFechaDesde ? inputFechaDesde.value : '';
             const fechaHastaValue = inputFechaHasta ? inputFechaHasta.value : '';
 
@@ -1324,6 +1334,12 @@
                     coincideCiudad = r.ciudad === ciudad;
                 }
 
+                // Filtro por Estado (NUEVO)
+                let coincideEstado = true;
+                if (estado !== 'todos') {
+                    coincideEstado = r.estado === estado;
+                }
+
                 // Filtro por Fecha
                 let coincideFecha = true;
                 if (fechaDesdeObj || fechaHastaObj) {
@@ -1343,7 +1359,7 @@
                     }
                 }
                 
-                return coincideBusqueda && coincideCiudad && coincideFecha;
+                return coincideBusqueda && coincideCiudad && coincideEstado && coincideFecha;
             });
             
             renderizarCards();
@@ -1396,6 +1412,7 @@
             const busquedaInput = document.getElementById('busquedaReserva');
             const filtroEvento = document.getElementById('filtroEventoCalendario');
             const filtroCiudad = document.getElementById('filtroCiudad');
+            const filtroEstado = document.getElementById('filtroEstado');
             
             if (btnFiltrar) btnFiltrar.addEventListener('click', filtrarReservas);
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
@@ -1411,6 +1428,9 @@
             }
             if (filtroCiudad) {
                 filtroCiudad.addEventListener('change', filtrarReservas);
+            }
+            if (filtroEstado) {
+                filtroEstado.addEventListener('change', filtrarReservas);
             }
             document.getElementById('filtroFechaDesde').addEventListener('change', filtrarReservas);
             document.getElementById('filtroFechaHasta').addEventListener('change', filtrarReservas);
