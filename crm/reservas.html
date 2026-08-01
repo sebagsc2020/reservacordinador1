@@ -571,10 +571,11 @@
                     // Actualizar el selector de eventos
                     const selectEvento = document.getElementById('filtroEvento');
                     if (selectEvento) {
-                        // Mantener la opción "todos"
                         let options = '<option value="todos">📅 Todos los eventos</option>';
                         eventosCalendario.forEach(evento => {
-                            options += `<option value="${evento.id}">📅 ${evento.nombre} (${evento.pax} pax)</option>`;
+                            const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
+                            const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
+                            options += `<option value="${evento.id}">📅 ${evento.nombre} (${fechaInicio} - ${fechaFin})</option>`;
                         });
                         selectEvento.innerHTML = options;
                     }
@@ -585,6 +586,26 @@
                 console.error('Error al cargar eventos del calendario:', error);
                 return [];
             }
+        }
+
+        // ==================================================
+        // FUNCIONES DE FECHAS
+        // ==================================================
+        function convertirFechaISOtoDDMMYYYY(fechaIso) {
+            if (!fechaIso) return '';
+            const fecha = new Date(fechaIso);
+            if (isNaN(fecha.getTime())) return fechaIso;
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const anio = fecha.getFullYear();
+            return `${dia}/${mes}/${anio}`;
+        }
+
+        function fechaDDMMYYYYtoNumero(fechaStr) {
+            if (!fechaStr) return 0;
+            const partes = fechaStr.split('/');
+            if (partes.length !== 3) return 0;
+            return parseInt(partes[2] + partes[1] + partes[0]);
         }
 
         // ==================================================
@@ -715,9 +736,7 @@
             if (!container) return;
 
             try {
-                // Cargar eventos del calendario primero
                 await cargarEventosCalendario();
-                
                 await cargarEstadosDesdeNube();
 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
@@ -883,39 +902,17 @@
             const evento = eventosCalendario.find(e => e.id === eventoId);
             if (!evento) return true;
             
-            // Convertir fecha de la reserva a formato comparable
-            const fechaReserva = reserva.fecha; // Formato DD/MM/YYYY
+            const fechaReserva = reserva.fecha;
             if (!fechaReserva) return false;
             
-            // Obtener fecha inicio y fin del evento en formato DD/MM/YYYY
             const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
             const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
             
-            // Comparar fechas (simple comparación de strings en formato DD/MM/YYYY)
-            // Para comparación correcta, convertimos a números
-            const partesReserva = fechaReserva.split('/');
-            const partesInicio = fechaInicio.split('/');
-            const partesFin = fechaFin.split('/');
-            
-            if (partesReserva.length !== 3 || partesInicio.length !== 3 || partesFin.length !== 3) {
-                return false;
-            }
-            
-            const fechaReservaNum = parseInt(partesReserva[2] + partesReserva[1] + partesReserva[0]);
-            const fechaInicioNum = parseInt(partesInicio[2] + partesInicio[1] + partesInicio[0]);
-            const fechaFinNum = parseInt(partesFin[2] + partesFin[1] + partesFin[0]);
+            const fechaReservaNum = fechaDDMMYYYYtoNumero(fechaReserva);
+            const fechaInicioNum = fechaDDMMYYYYtoNumero(fechaInicio);
+            const fechaFinNum = fechaDDMMYYYYtoNumero(fechaFin);
             
             return fechaReservaNum >= fechaInicioNum && fechaReservaNum <= fechaFinNum;
-        }
-
-        function convertirFechaISOtoDDMMYYYY(fechaIso) {
-            if (!fechaIso) return '';
-            const fecha = new Date(fechaIso);
-            if (isNaN(fecha.getTime())) return fechaIso;
-            const dia = fecha.getDate().toString().padStart(2, '0');
-            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-            const anio = fecha.getFullYear();
-            return `${dia}/${mes}/${anio}`;
         }
 
         // ==================================================
@@ -955,7 +952,7 @@
                     coincideEstado = r.estado === estado;
                 }
                 
-                // Filtro por evento del calendario
+                // Filtro por evento del calendario (por rango de fechas)
                 let coincideEvento = true;
                 if (eventoId !== 'todos') {
                     coincideEvento = reservaPerteneceAEvento(r, eventoId);
@@ -1055,7 +1052,6 @@
             }
             container.innerHTML = html;
 
-            // Actualizar contador con total de pasajeros
             const totalPasajeros = calcularTotalPasajeros(reservasFiltradas);
             const totalReservas = reservasFiltradas.length;
             const totalOriginal = reservasData.length;
@@ -1139,7 +1135,6 @@
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
             if (btnPDFExterno) btnPDFExterno.addEventListener('click', generarPDFExterno);
             
-            // Evento Enter en todos los inputs de filtro
             [busquedaInput, filtroCiudad, filtroEstado, filtroEvento].forEach(function(input) {
                 if (input) {
                     input.addEventListener('keypress', function(e) { 
@@ -1148,7 +1143,6 @@
                 }
             });
             
-            // Cambio en select de evento también dispara el filtro
             if (filtroEvento) {
                 filtroEvento.addEventListener('change', filtrarReservas);
             }
