@@ -310,7 +310,7 @@
         .filter-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
 
         /* ================================================== */
-        /* CAMBIO: Inputs de fecha                            */
+        /* Inputs de fecha                                     */
         /* ================================================== */
         .filter-date {
             padding: 12px 15px;
@@ -326,7 +326,6 @@
             transition: border-color 0.2s;
         }
         .filter-date:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
-        /* ================================================== */
         
         .btn-filtrar { 
             padding: 10px 25px; 
@@ -1288,13 +1287,11 @@
         // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
-            const filtroEvento = document.getElementById('filtroEventoCalendario');
             const filtroCiudad = document.getElementById('filtroCiudad');
             const inputFechaDesde = document.getElementById('filtroFechaDesde');
             const inputFechaHasta = document.getElementById('filtroFechaHasta');
             
             const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
-            const eventoId = filtroEvento ? filtroEvento.value : '';
             const ciudad = filtroCiudad ? filtroCiudad.value : '';
             const fechaDesdeValue = inputFechaDesde ? inputFechaDesde.value : '';
             const fechaHastaValue = inputFechaHasta ? inputFechaHasta.value : '';
@@ -1302,15 +1299,8 @@
             let fechaDesdeObj = null;
             let fechaHastaObj = null;
 
-            // Prioridad: Si se seleccionó un evento, usar sus fechas
-            if (eventoId) {
-                const evento = eventosCalendario.find(e => e.id === eventoId);
-                if (evento) {
-                    fechaDesdeObj = new Date(evento.fechaInicio + 'T00:00:00'); 
-                    fechaHastaObj = new Date(evento.fechaFin + 'T23:59:59');
-                }
-            } else if (fechaDesdeValue && fechaHastaValue) {
-                // Si no hay evento, pero hay fechas manuales, usar esas
+            // Si hay fechas en los inputs, úsalas para filtrar
+            if (fechaDesdeValue && fechaHastaValue) {
                 const partesDesde = fechaDesdeValue.split('-');
                 const partesHasta = fechaHastaValue.split('-');
                 fechaDesdeObj = new Date(partesDesde[0], partesDesde[1]-1, partesDesde[2], 0,0,0,0);
