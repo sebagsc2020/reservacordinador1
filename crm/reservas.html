@@ -246,7 +246,6 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
 
-        /* Estilos para inputs de fecha */
         .filter-date {
             padding: 8px 14px;
             border: 1px solid var(--border-color);
@@ -265,7 +264,6 @@
             box-shadow: 0 0 0 3px var(--primary-light);
         }
 
-        /* NUEVO ESTILO PARA LA LISTA DE AUTOCOMPLETADO */
         .autocomplete-list {
             position: absolute;
             top: 100%;
@@ -307,7 +305,6 @@
             margin-left: 8px;
         }
 
-        /* BOTONES COMPACTOS EN LA BARRA DE FILTROS */
         .btn-filter-action {
             padding: 8px 12px;
             border-radius: var(--radius-sm);
@@ -506,7 +503,7 @@
             .filters-bar { flex-direction: column; align-items: stretch; }
             .filter-input, .filter-select, .filter-date { width: 100%; min-width: 100%; }
             .btn-filter-action { width: 100%; justify-content: center; }
-            .btn-filter-success, .btn-filter-secondary { width: 100%; } /* En móvil se expanden */
+            .btn-filter-success, .btn-filter-secondary { width: 100%; }
             
             .cards-grid { grid-template-columns: 1fr; gap: 16px; }
             .card-header { flex-direction: column; align-items: flex-start; }
@@ -559,15 +556,12 @@
                 </div>
             </header>
 
-            <!-- BARRA DE FILTROS REORDENADA Y COMPACTA -->
             <div class="filters-bar">
-                <!-- Buscador General -->
                 <div style="flex:1; min-width:150px; position:relative;">
                     <input type="text" class="filter-input" placeholder="🔍 Buscar nombre o excursión..." id="busquedaReserva" autocomplete="off">
                     <div class="autocomplete-list" id="autocompleteList"></div>
                 </div>
                 
-                <!-- Filtros Select -->
                 <select class="filter-select" id="filtroEventoCalendario">
                     <option value="">📅 Todos los eventos</option>
                 </select>
@@ -583,11 +577,9 @@
                     <option value="pagado">💰 Pagado</option>
                 </select>
 
-                <!-- Fechas -->
                 <input type="date" class="filter-date" id="filtroFechaDesde" title="Fecha Desde">
                 <input type="date" class="filter-date" id="filtroFechaHasta" title="Fecha Hasta">
                 
-                <!-- Botones compactos -->
                 <button class="btn-filter-action btn-filter-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Filtrar</button>
                 <button class="btn-filter-action btn-filter-success" id="btnRecargar" title="Recargar"><i class="ph ph-arrows-clockwise"></i></button>
                 <button class="btn-filter-action btn-filter-secondary" id="btnPDFExterno">PDF</button>
@@ -653,7 +645,6 @@
             window.location.href = 'index.html'; 
         }
 
-        // CONFIGURACIÓN DE GOOGLE SHEETS Y APPS SCRIPT
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
@@ -1157,6 +1148,14 @@
             });
             
             renderizarCards();
+        }
+
+        function calcularTotalPasajeros(reservas) {
+            let total = 0;
+            for (let i = 0; i < reservas.length; i++) {
+                total += reservas[i].personas || 1;
+            }
+            return total;
         }
 
         function renderizarCards() {
