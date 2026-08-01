@@ -179,7 +179,7 @@
         }
         .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
         
-        /* ===== FILTERS BAR (UNIFICADA CON RESERVAS.HTML) ===== */
+        /* ===== FILTERS BAR (EVENTO Y CIUDAD) ===== */
         .filters-bar { 
             background: var(--bg-surface); 
             padding: 12px 16px; 
@@ -193,23 +193,6 @@
             flex-wrap: wrap; 
             position: relative;
         }
-        .filter-input { 
-            padding: 8px 14px; 
-            border: 1px solid var(--border-color); 
-            border-radius: var(--radius-sm); 
-            font-size: 13px; 
-            flex: 1; 
-            min-width: 120px; 
-            background: var(--bg-body);
-            color: var(--text-main);
-            transition: border-color 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-        .filter-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
         .filter-select {
             padding: 8px 14px;
             border: 1px solid var(--border-color);
@@ -218,7 +201,7 @@
             background: var(--bg-body);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            min-width: 130px;
+            min-width: 160px;
             cursor: pointer;
             transition: border-color 0.2s;
         }
@@ -227,37 +210,6 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px var(--primary-light);
         }
-
-        /* Autocompletado del buscador */
-        .autocomplete-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-top: none;
-            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-            box-shadow: var(--shadow-md);
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 2000;
-            display: none;
-            margin-top: -4px;
-        }
-        .autocomplete-list.active { display: block; }
-        .autocomplete-item {
-            padding: 10px 16px;
-            cursor: pointer;
-            font-size: 13px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-main);
-            transition: background 0.2s;
-        }
-        .autocomplete-item:last-child { border-bottom: none; }
-        .autocomplete-item:hover,
-        .autocomplete-item.selected { background: var(--bg-body); color: var(--primary); }
-        .autocomplete-item small { color: var(--text-muted); font-size: 11px; margin-left: 8px; }
 
         /* Botones compactos en barra de filtros */
         .btn-filter-action {
@@ -417,7 +369,7 @@
             .actions-group { width: 100%; justify-content: space-between; }
             
             .filters-bar { flex-direction: column; align-items: stretch; }
-            .filter-input, .filter-select { width: 100%; min-width: 100%; }
+            .filter-select { width: 100%; min-width: 100%; }
             .btn-filter-action { width: 100%; justify-content: center; }
             
             .metrics-grid { grid-template-columns: 1fr; gap: 12px; }
@@ -488,27 +440,14 @@
                 </div>
             </header>
 
-            <!-- Filters Bar (NUEVA, UNIFICADA CON RESERVAS.HTML) -->
+            <!-- Filters Bar (SOLO EVENTO Y CIUDAD) -->
             <div class="filters-bar">
-                <!-- Buscador General con Autocompletado -->
-                <div style="flex:1; min-width:150px; position:relative;">
-                    <input type="text" class="filter-input" placeholder="🔍 Buscar nombre o excursión..." id="busquedaReserva" autocomplete="off">
-                    <div class="autocomplete-list" id="autocompleteList"></div>
-                </div>
-                
                 <select class="filter-select" id="filtroEventoCalendario">
                     <option value="">📅 Todos los eventos</option>
                 </select>
                 
                 <select class="filter-select" id="filtroCiudad">
                     <option value="">📍 Todas las ciudades</option>
-                </select>
-                
-                <select class="filter-select" id="filtroEstado">
-                    <option value="todos">📌 Todos los estados</option>
-                    <option value="confirmado">✅ Confirmado</option>
-                    <option value="pendiente">⏳ Pendiente</option>
-                    <option value="pagado">💰 Pagado</option>
                 </select>
 
                 <button class="btn-filter-action btn-filter-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Aplicar</button>
@@ -725,7 +664,6 @@
         let chartInstanceLine = null;
         let chartInstanceDoughnut = null;
         let eventosCalendario = [];
-        let datosBusqueda = [];
 
         async function cargarEstados() {
             try {
@@ -762,7 +700,6 @@
             eventosCalendario.forEach(evento => {
                 const option = document.createElement('option');
                 option.value = evento.id;
-                // Mostrar nombre y rango de fechas en el menú
                 const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
                 const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
                 option.textContent = `${evento.nombre} (${fechaInicio} - ${fechaFin})`;
@@ -811,8 +748,6 @@
                 const nombresEditados = JSON.parse(localStorage.getItem('nombresEditados') || '{}');
                 
                 const ciudadesSet = new Set();
-                const nombresSet = new Set();
-                const excursionesSet = new Set();
 
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
@@ -829,7 +764,6 @@
                     let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
                     if (nombresEditados[id]) nombreCompleto = nombresEditados[id];
                     
-                    if (nombreCompleto && nombreCompleto !== 'No especificado') nombresSet.add(nombreCompleto.trim());
                     if (ciudad && ciudad.trim() !== '') ciudadesSet.add(ciudad.trim());
                     
                     let excursionesLista = [];
@@ -839,7 +773,6 @@
                         else if (excRaw.includes(' | ')) excursionesLista = excRaw.split(' | ');
                         else excursionesLista = [excRaw];
                         excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e);
-                        excursionesLista.forEach(exc => { if (exc && exc.trim() !== '') excursionesSet.add(exc.trim()); });
                     }
                     
                     const excursionNombre = excursionesLista.length > 0 ? excursionesLista[0].substring(0, 35) : 'Sin excursión';
@@ -872,7 +805,7 @@
                 reservasDataArray = nuevasReservas;
                 reservasDataArray.sort((a,b) => (parseInt(b.id.replace(/\D/g,''))||0) - (parseInt(a.id.replace(/\D/g,''))||0));
                 
-                // Poblar filtro de ciudades y datos de autocompletado
+                // Poblar filtro de ciudades
                 const selectCiudad = document.getElementById('filtroCiudad');
                 if (selectCiudad) {
                     selectCiudad.innerHTML = '<option value="">📍 Todas las ciudades</option>';
@@ -884,11 +817,6 @@
                         selectCiudad.appendChild(option);
                     });
                 }
-
-                datosBusqueda = [];
-                nombresSet.forEach(n => datosBusqueda.push({texto: n, tipo: '👤 Cliente'}));
-                excursionesSet.forEach(e => datosBusqueda.push({texto: e, tipo: '🏔️ Excursión'}));
-                datosBusqueda.sort((a, b) => a.texto.localeCompare(b.texto));
                 
                 // Aplicar filtros iniciales y renderizar
                 aplicarFiltros();
@@ -901,14 +829,10 @@
         }
 
         function aplicarFiltros() {
-            const busqueda = document.getElementById('busquedaReserva');
             const filtroCiudad = document.getElementById('filtroCiudad');
-            const filtroEstado = document.getElementById('filtroEstado');
             const filtroEvento = document.getElementById('filtroEventoCalendario');
             
-            const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
             const ciudad = filtroCiudad ? filtroCiudad.value : ''; 
-            const estado = filtroEstado ? filtroEstado.value : 'todos';
             const eventoId = filtroEvento ? filtroEvento.value : '';
 
             let fechaDesdeObj = null;
@@ -927,19 +851,9 @@
             }
 
             const reservasFiltradas = reservasDataArray.filter(r => {
-                let coincideBusqueda = true;
-                if (texto) {
-                    const coincideNombre = r.nombreCompleto.toLowerCase().includes(texto);
-                    const coincideExcursion = r.excursionesLista.some(exc => exc.toLowerCase().includes(texto));
-                    coincideBusqueda = coincideNombre || coincideExcursion;
-                }
-                
                 let coincideCiudad = true;
                 if (ciudad) coincideCiudad = r.ciudad === ciudad;
                 
-                let coincideEstado = true;
-                if (estado !== 'todos') coincideEstado = r.estado === estado;
-
                 let coincideFecha = true;
                 if (fechaDesdeObj || fechaHastaObj) {
                     if (r.fecha !== '--/--/----') {
@@ -952,7 +866,7 @@
                     }
                 }
                 
-                return coincideBusqueda && coincideCiudad && coincideEstado && coincideFecha;
+                return coincideCiudad && coincideFecha;
             });
 
             renderizarTodo(reservasFiltradas);
@@ -1181,59 +1095,8 @@
             window.location.href = `clientes.html?email=${encodeURIComponent(email)}`; 
         }
 
-        // ==================================================
-        // AUTOCOMPLETADO DE BÚSQUEDA
-        // ==================================================
-        function initAutocomplete() {
-            const input = document.getElementById('busquedaReserva');
-            const listContainer = document.getElementById('autocompleteList');
-            if (!input || !listContainer) return;
-
-            input.addEventListener('input', function() {
-                const value = this.value.toLowerCase().trim();
-                listContainer.innerHTML = '';
-                
-                if (!value || value.length < 1) {
-                    listContainer.classList.remove('active');
-                    return;
-                }
-
-                const matches = datosBusqueda.filter(item => 
-                    item.texto.toLowerCase().includes(value)
-                ).slice(0, 8);
-
-                if (matches.length === 0) {
-                    listContainer.classList.remove('active');
-                    return;
-                }
-
-                matches.forEach((match, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'autocomplete-item';
-                    item.innerHTML = `${match.texto} <small>${match.tipo}</small>`;
-                    
-                    item.addEventListener('click', function() {
-                        input.value = match.texto;
-                        listContainer.classList.remove('active');
-                        aplicarFiltros();
-                    });
-                    listContainer.appendChild(item);
-                });
-
-                listContainer.classList.add('active');
-            });
-
-            document.addEventListener('click', function(e) {
-                if (e.target !== input && e.target !== listContainer) {
-                    listContainer.classList.remove('active');
-                }
-            });
-        }
-
         function limpiarFiltros() {
-            document.getElementById('busquedaReserva').value = '';
             document.getElementById('filtroCiudad').value = '';
-            document.getElementById('filtroEstado').value = 'todos';
             document.getElementById('filtroEventoCalendario').value = '';
             aplicarFiltros();
             showToast('Filtros limpiados', 'Mostrando todas las reservas.');
@@ -1244,7 +1107,6 @@
             if (sessionStorage.getItem('crm_logged') !== 'true') { 
                 window.location.href = 'index.html'; 
             }
-            initAutocomplete();
             cargarDatos();
             setInterval(cargarDatos, 60000);
         };
@@ -1253,6 +1115,7 @@
         document.getElementById('btnFiltrar').addEventListener('click', aplicarFiltros);
         document.getElementById('btnLimpiarFiltros').addEventListener('click', limpiarFiltros);
         document.getElementById('filtroEventoCalendario').addEventListener('change', aplicarFiltros);
+        document.getElementById('filtroCiudad').addEventListener('change', aplicarFiltros);
 
         window.cargarDatos = cargarDatos;
         window.logout = logout;
