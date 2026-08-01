@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -174,7 +175,7 @@
         .user-area {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
         }
         
@@ -223,33 +224,6 @@
             transform: scale(0.98);
         }
 
-        /* Estilos unificados para botones de acción (Recargar y PDF) al lado del botón rojo */
-        .btn-action-header {
-            background: white;
-            color: #1a1a2e;
-            border: 2px solid #e0e0e0;
-            padding: 8px 16px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .btn-action-header:hover {
-            background: #f8f9fa;
-            border-color: #667eea;
-            color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .btn-action-header:active {
-            transform: scale(0.98);
-        }
-
         .filters-bar { 
             background: white; 
             padding: 15px 20px; 
@@ -266,30 +240,15 @@
             border: 2px solid #e0e0e0; 
             border-radius: 10px; 
             font-size: 13px; 
-            flex: 1; 
-            min-width: 150px; 
+            flex: 2; 
+            min-width: 200px; 
         }
         .filter-input:focus {
             outline: none;
             border-color: #667eea;
         }
-        .filter-select {
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 13px;
-            background: white;
-            min-width: 150px;
-            flex: 1;
-            cursor: pointer;
-        }
-        .filter-select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .btn-filtrar { 
-            padding: 10px 25px; 
+        .btn-filtrar, .btn-recargar, .btn-pdf { 
+            padding: 10px 18px; 
             border: none; 
             border-radius: 10px; 
             cursor: pointer; 
@@ -297,15 +256,13 @@
             font-size: 12px; 
             white-space: nowrap; 
             transition: all 0.2s;
-            background: #667eea; 
-            color: white; 
         }
-        .btn-filtrar:active {
+        .btn-filtrar:active, .btn-recargar:active, .btn-pdf:active {
             transform: scale(0.96);
         }
-        .btn-filtrar:hover {
-            background: #5a6fd6;
-        }
+        .btn-filtrar { background: #667eea; color: white; }
+        .btn-recargar { background: #27ae60; color: white; }
+        .btn-pdf { background: #2c7da0; color: white; }
 
         .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
@@ -555,10 +512,6 @@
                 padding: 5px 12px;
                 font-size: 11px;
             }
-            .btn-action-header {
-                padding: 5px 12px;
-                font-size: 11px;
-            }
             
             .cards-grid {
                 grid-template-columns: 1fr;
@@ -569,11 +522,11 @@
                 flex-direction: column;
             }
             
-            .filter-input, .filter-select {
+            .filter-input {
                 width: 100%;
             }
             
-            .btn-filtrar {
+            .btn-filtrar, .btn-recargar, .btn-pdf {
                 width: 100%;
                 text-align: center;
             }
@@ -619,9 +572,6 @@
             .btn-reserva-manual {
                 justify-content: center;
             }
-            .btn-action-header {
-                justify-content: center;
-            }
         }
     </style>
 </head>
@@ -663,23 +613,17 @@
                     <div class="user-avatar">A</div>
                     <span>Admin</span>
                 </div>
-                <!-- Botones de acción alineados juntos -->
-                <button class="btn-action-header" id="btnRecargar">🔄 Recargar</button>
-                <button class="btn-action-header" id="btnPDFExterno">📄 PDF</button>
-                <button class="btn-reserva-manual" onclick="abrirReservaManual()">➕ Reserva manual</button>
+                <button class="btn-reserva-manual" onclick="abrirReservaManual()">
+                    ➕ Reserva manual
+                </button>
             </div>
         </div>
 
         <div class="filters-bar">
-            <!-- Primer campo: Todos los eventos -->
-            <select class="filter-select" id="filtroEventoCalendario">
-                <option value="">📅 Todos los eventos</option>
-            </select>
-            
-            <!-- Campo de búsqueda general -->
             <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
-            
             <button class="btn-filtrar" id="btnFiltrar">🔍 Filtrar</button>
+            <button class="btn-recargar" id="btnRecargar">🔄 Recargar</button>
+            <button class="btn-pdf" id="btnPDFExterno">📄 Generar PDF</button>
         </div>
 
         <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
@@ -779,13 +723,10 @@
         
         // URL del Google Apps Script - ACTUALIZAR CON TU URL
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
-        // URL del Apps Script para eventos del calendario
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
         
         let reservasData = [];
         let reservasFiltradas = [];
         let estadosGlobales = {};
-        let eventosCalendario = [];
 
         // Preloader Popup
         const preloaderPopup = document.getElementById('preloaderPopup');
@@ -930,50 +871,6 @@
         }
 
         // ==================================================
-        // CARGAR EVENTOS DEL CALENDARIO
-        // ==================================================
-        async function cargarEventosCalendario() {
-            const selectEventos = document.getElementById('filtroEventoCalendario');
-            if (!selectEventos) return;
-
-            try {
-                const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.success && data.eventos) {
-                    eventosCalendario = data.eventos;
-                } else {
-                    eventosCalendario = [];
-                }
-            } catch (error) {
-                console.warn('⚠️ No se pudieron cargar los eventos de calendario:', error);
-                eventosCalendario = [];
-            }
-
-            selectEventos.innerHTML = '<option value="">📅 Todos los eventos</option>';
-            
-            function convertirFechaISOtoDDMMYYYY(fechaIso) {
-                if (!fechaIso) return '';
-                const fecha = new Date(fechaIso);
-                if (isNaN(fecha.getTime())) return fechaIso;
-                const dia = fecha.getDate().toString().padStart(2, '0');
-                const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-                const anio = fecha.getFullYear();
-                return `${dia}/${mes}/${anio}`;
-            }
-
-            eventosCalendario.forEach(evento => {
-                const option = document.createElement('option');
-                option.value = evento.id;
-                const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
-                const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
-                option.textContent = `${evento.nombre} (${fechaInicio} - ${fechaFin})`;
-                selectEventos.appendChild(option);
-            });
-        }
-
-        // ==================================================
         // CARGAR RESERVAS
         // ==================================================
         async function cargarReservas() {
@@ -985,7 +882,6 @@
                 mostrarPreloader();
 
                 await cargarEstadosDesdeNube();
-                await cargarEventosCalendario();
 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
                 const texto = await response.text();
