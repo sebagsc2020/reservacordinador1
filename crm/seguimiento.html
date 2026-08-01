@@ -590,11 +590,11 @@
             const pendientesPax = reservasData.filter(r => r.estado === 'pendiente').reduce((sum, r) => sum + (r.personas || 1), 0);
             const pagadasPax = reservasData.filter(r => r.estado === 'pagado').reduce((sum, r) => sum + (r.personas || 1), 0);
             
-            // Actualizar métricas con formato "cantidad - XX P"
-            document.getElementById('metricaTotal').textContent = `${total} - ${totalPax} P`;
-            document.getElementById('metricaConfirmadas').textContent = `${confirmadas} - ${confirmadasPax} P`;
-            document.getElementById('metricaPendientes').textContent = `${pendientes} - ${pendientesPax} P`;
-            document.getElementById('metricaPagadas').textContent = `${pagadas} - ${pagadasPax} P`;
+            // Actualizar métricas con formato "cantidad - XX Px"
+            document.getElementById('metricaTotal').textContent = `${total} - ${totalPax} Px`;
+            document.getElementById('metricaConfirmadas').textContent = `${confirmadas} - ${confirmadasPax} Px`;
+            document.getElementById('metricaPendientes').textContent = `${pendientes} - ${pendientesPax} Px`;
+            document.getElementById('metricaPagadas').textContent = `${pagadas} - ${pagadasPax} Px`;
             
             document.getElementById('countPendiente').textContent = pendientes;
             document.getElementById('countConfirmado').textContent = confirmadas;
