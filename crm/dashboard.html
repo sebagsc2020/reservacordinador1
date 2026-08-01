@@ -195,8 +195,19 @@
 
         /* ===== HEADER & FILTERS ===== */
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
-        .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
-        .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+        .page-title h1 { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: var(--text-main); 
+            letter-spacing: -0.5px; 
+            padding-left: 60px; /* CORRECCIÓN: Espacio para el botón hamburguesa */
+        }
+        .page-title p { 
+            color: var(--text-muted); 
+            font-size: 14px; 
+            margin-top: 4px; 
+            padding-left: 60px; 
+        }
         
         .actions-group { display: flex; gap: 12px; align-items: center; }
         .btn { 
@@ -355,6 +366,9 @@
             .main-content { padding: 20px; padding-top: 76px; }
             
             .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .page-title h1 { padding-left: 0; }
+            .page-title p { padding-left: 0; }
+            
             .actions-group { width: 100%; justify-content: space-between; }
             
             .filter-bar { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
