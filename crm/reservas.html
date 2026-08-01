@@ -480,10 +480,10 @@
                 <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
                 <input type="text" class="filter-input" placeholder="📍 Filtrar por ciudad..." id="filtroCiudad">
                 
-                <!-- NUEVO FILTRO POR EVENTO DE CALENDARIO -->
+                <!-- NUEVO FILTRO POR EVENTO DE CALENDARIO DINÁMICO -->
                 <select class="filter-select" id="filtroEventoCalendario">
-                    <option value="">📅 Seleccionar Evento</option>
-                    <!-- Los eventos se cargarán aquí dinámicamente -->
+                    <option value="">📅 Todos los eventos</option>
+                    <!-- Los eventos se cargarán aquí dinámicamente desde la BD -->
                 </select>
 
                 <input type="date" class="filter-date" id="filtroFechaDesde" title="Fecha Desde">
@@ -560,24 +560,18 @@
             window.location.href = 'index.html'; 
         }
 
+        // CONFIGURACIÓN DE GOOGLE SHEETS Y APPS SCRIPT
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
+        // MISMA URL DE APPS SCRIPT QUE USA EL CALENDARIO
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
         
         let reservasData = [];
         let reservasFiltradas = [];
         let estadosGlobales = {};
-
-        // ==================================================
-        // CONFIGURACIÓN DE EVENTOS DE CALENDARIO (¡Puedes modificarlos aquí!)
-        // ==================================================
-        const eventosCalendario = [
-            { id: 'semana_santa', nombre: 'Semana Santa 2026', inicio: '2026-03-29', fin: '2026-04-05' },
-            { id: 'verano_alta', nombre: 'Temporada Alta Verano', inicio: '2026-01-15', fin: '2026-02-28' },
-            { id: 'invierno_alta', nombre: 'Temporada Alta Invierno', inicio: '2026-07-10', fin: '2026-08-20' },
-            { id: 'finde_largo', nombre: 'Fin de Semana Largo (Mayo)', inicio: '2026-05-01', fin: '2026-05-03' }
-        ];
+        let eventosCalendario = []; // Array para guardar los eventos traídos de la BD
 
         async function guardarNombreEnNube(id, nuevoNombre) {
             try {
@@ -683,7 +677,89 @@
         }
 
         // ==================================================
-        // FUNCIÓN PARA FORMATEAR FECHA CORRECTAMENTE
+        // FUNCIONES DE FECHAS (EXTRAÍDAS DE CALENDARIO.HTML)
+        // ==================================================
+        function convertirFechaISOtoDDMMYYYY(fechaIso) {
+            if (!fechaIso) return '';
+            const fecha = new Date(fechaIso);
+            if (isNaN(fecha.getTime())) return fechaIso;
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const anio = fecha.getFullYear();
+            return `${dia}/${mes}/${anio}`;
+        }
+
+        // ==================================================
+        // NUEVA FUNCIÓN PARA CARGAR EVENTOS REALES DESDE LA BD
+        // ==================================================
+        async function cargarEventosCalendario() {
+            const selectEventos = document.getElementById('filtroEventoCalendario');
+            if (!selectEventos) return;
+
+            try {
+                // Llamada al mismo script que usa calendario.html
+                const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success && data.eventos) {
+                    eventosCalendario = data.eventos;
+                } else {
+                    eventosCalendario = [];
+                }
+            } catch (error) {
+                console.warn('⚠️ No se pudieron cargar los eventos de calendario:', error);
+                eventosCalendario = [];
+            }
+
+            // Limpiar opciones por defecto (dejar solo la primera)
+            selectEventos.innerHTML = '<option value="">📅 Todos los eventos</option>';
+            
+            // Si hay eventos, agregarlos al select
+            eventosCalendario.forEach(evento => {
+                const option = document.createElement('option');
+                option.value = evento.id;
+                // Mostrar el nombre y el rango de fechas
+                const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
+                const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
+                option.textContent = `${evento.nombre} (${fechaInicio} - ${fechaFin})`;
+                option.dataset.inicio = evento.fechaInicio;
+                option.dataset.fin = evento.fechaFin;
+                selectEventos.appendChild(option);
+            });
+        }
+
+        // ==================================================
+        // FUNCIÓN PARA APLICAR FILTRO POR EVENTO
+        // ==================================================
+        function aplicarFiltroEventoCalendario() {
+            const selectEventos = document.getElementById('filtroEventoCalendario');
+            const inputFechaDesde = document.getElementById('filtroFechaDesde');
+            const inputFechaHasta = document.getElementById('filtroFechaHasta');
+            
+            if (!selectEventos || !inputFechaDesde || !inputFechaHasta) return;
+
+            const eventoId = selectEventos.value;
+            if (eventoId) {
+                // Buscar el evento seleccionado en el array traído de la BD
+                const evento = eventosCalendario.find(e => e.id === eventoId);
+                if (evento) {
+                    // Asignar las fechas a los inputs de tipo date (formato YYYY-MM-DD)
+                    inputFechaDesde.value = evento.fechaInicio;
+                    inputFechaHasta.value = evento.fechaFin;
+                }
+            } else {
+                // Si el usuario vuelve a "Todos los eventos", limpiamos las fechas manuales
+                inputFechaDesde.value = '';
+                inputFechaHasta.value = '';
+            }
+            
+            // Ejecutar el filtro automáticamente
+            filtrarReservas();
+        }
+
+        // ==================================================
+        // FUNCIÓN PARA FORMATEAR FECHA DE SHEETS
         // ==================================================
         function formatearFecha(valor, formatoTexto) {
             if (valor && typeof valor === 'object' && valor.v !== undefined) {
@@ -896,55 +972,6 @@
                 total += reservas[i].personas || 1;
             }
             return total;
-        }
-
-        // ==================================================
-        // NUEVA FUNCIÓN PARA CARGAR EVENTOS EN EL SELECT
-        // ==================================================
-        function cargarEventosCalendario() {
-            const selectEventos = document.getElementById('filtroEventoCalendario');
-            if (!selectEventos) return;
-
-            // Limpiar opciones por defecto (dejar solo la primera)
-            selectEventos.innerHTML = '<option value="">📅 Seleccionar Evento</option>';
-            
-            eventosCalendario.forEach(evento => {
-                const option = document.createElement('option');
-                option.value = evento.id;
-                option.textContent = evento.nombre;
-                option.dataset.inicio = evento.inicio;
-                option.dataset.fin = evento.fin;
-                selectEventos.appendChild(option);
-            });
-        }
-
-        // ==================================================
-        // NUEVA FUNCIÓN PARA SELECCIONAR EVENTO Y FILTRAR AUTOMÁTICAMENTE
-        // ==================================================
-        function aplicarFiltroEventoCalendario() {
-            const selectEventos = document.getElementById('filtroEventoCalendario');
-            const inputFechaDesde = document.getElementById('filtroFechaDesde');
-            const inputFechaHasta = document.getElementById('filtroFechaHasta');
-            
-            if (!selectEventos || !inputFechaDesde || !inputFechaHasta) return;
-
-            const eventoId = selectEventos.value;
-            if (eventoId) {
-                // Buscar el evento seleccionado en el array
-                const evento = eventosCalendario.find(e => e.id === eventoId);
-                if (evento) {
-                    // Asignar las fechas a los inputs de tipo date (formato YYYY-MM-DD)
-                    inputFechaDesde.value = evento.inicio;
-                    inputFechaHasta.value = evento.fin;
-                }
-            } else {
-                // Si el usuario vuelve a "Seleccionar Evento", limpiamos las fechas manuales
-                inputFechaDesde.value = '';
-                inputFechaHasta.value = '';
-            }
-            
-            // Ejecutar el filtro automáticamente
-            filtrarReservas();
         }
 
         // ==================================================
@@ -1176,7 +1203,7 @@
         }
 
         function init() {
-            // Cargar eventos en el select al iniciar
+            // Cargar eventos de calendario reales al iniciar
             cargarEventosCalendario();
 
             const btnFiltrar = document.getElementById('btnFiltrar');
