@@ -179,7 +179,7 @@
         }
         .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
         
-        /* ===== FILTERS BAR (EVENTO Y CIUDAD) ===== */
+        /* ===== FILTERS BAR (SOLO CIUDAD) ===== */
         .filters-bar { 
             background: var(--bg-surface); 
             padding: 12px 16px; 
@@ -228,18 +228,11 @@
             min-height: 38px;
         }
         .btn-filter-action:active { transform: scale(0.97); }
-        .btn-filter-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
-            min-width: 70px;
-        }
-        .btn-filter-primary:hover { background: var(--primary-hover); }
         .btn-filter-secondary {
             background: var(--bg-surface);
             color: var(--text-main);
             border: 1px solid var(--border-color);
-            min-width: 50px;
+            min-width: 70px;
         }
         .btn-filter-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
 
@@ -440,17 +433,12 @@
                 </div>
             </header>
 
-            <!-- Filters Bar (SOLO EVENTO Y CIUDAD) -->
+            <!-- Filters Bar (SOLO CIUDAD) -->
             <div class="filters-bar">
-                <select class="filter-select" id="filtroEventoCalendario">
-                    <option value="">📅 Todos los eventos</option>
-                </select>
-                
                 <select class="filter-select" id="filtroCiudad">
                     <option value="">📍 Todas las ciudades</option>
                 </select>
 
-                <button class="btn-filter-action btn-filter-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Aplicar</button>
                 <button class="btn-filter-action btn-filter-secondary" id="btnLimpiarFiltros"><i class="ph ph-x"></i> Limpiar</button>
             </div>
 
@@ -657,13 +645,11 @@
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const JSON_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Hoja%201`;
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
 
         let reservasDataArray = [];
         let estadosGlobales = {};
         let chartInstanceLine = null;
         let chartInstanceDoughnut = null;
-        let eventosCalendario = [];
 
         async function cargarEstados() {
             try {
@@ -681,61 +667,12 @@
             }
         }
 
-        async function cargarEventosCalendario() {
-            const selectEventos = document.getElementById('filtroEventoCalendario');
-            if (!selectEventos) return;
-            try {
-                const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data.success && data.eventos) {
-                    eventosCalendario = data.eventos;
-                } else {
-                    eventosCalendario = [];
-                }
-            } catch (error) {
-                eventosCalendario = [];
-            }
-            selectEventos.innerHTML = '<option value="">📅 Todos los eventos</option>';
-            eventosCalendario.forEach(evento => {
-                const option = document.createElement('option');
-                option.value = evento.id;
-                const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
-                const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
-                option.textContent = `${evento.nombre} (${fechaInicio} - ${fechaFin})`;
-                option.dataset.inicio = evento.fechaInicio;
-                option.dataset.fin = evento.fechaFin;
-                selectEventos.appendChild(option);
-            });
-        }
-
-        function convertirFechaISOtoDDMMYYYY(fechaIso) {
-            if (!fechaIso) return '';
-            const fecha = new Date(fechaIso);
-            if (isNaN(fecha.getTime())) return fechaIso;
-            const dia = fecha.getDate().toString().padStart(2, '0');
-            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-            const anio = fecha.getFullYear();
-            return `${dia}/${mes}/${anio}`;
-        }
-
-        function convertirISOaInputDate(fechaIso) {
-            if (!fechaIso) return '';
-            const fecha = new Date(fechaIso);
-            if (isNaN(fecha.getTime())) return '';
-            const anio = fecha.getFullYear();
-            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-            const dia = fecha.getDate().toString().padStart(2, '0');
-            return `${anio}-${mes}-${dia}`;
-        }
-
         async function cargarDatos() {
             document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="7"><div class="loader-container"><div class="spinner"></div></div></td></tr>';
             document.getElementById('topClientesBody').innerHTML = '<tr><td colspan="5"><div class="loader-container"><div class="spinner"></div></div></td></tr>';
             
             try {
                 await cargarEstados();
-                await cargarEventosCalendario();
                 
                 const res = await fetch(JSON_URL + '&t=' + Date.now());
                 let text = await res.text();
@@ -830,44 +767,14 @@
 
         function aplicarFiltros() {
             const filtroCiudad = document.getElementById('filtroCiudad');
-            const filtroEvento = document.getElementById('filtroEventoCalendario');
             
             const ciudad = filtroCiudad ? filtroCiudad.value : ''; 
-            const eventoId = filtroEvento ? filtroEvento.value : '';
-
-            let fechaDesdeObj = null;
-            let fechaHastaObj = null;
-
-            // Si se seleccionó un evento, calcular sus fechas para filtrar (Corregido huso horario)
-            if (eventoId) {
-                const evento = eventosCalendario.find(e => e.id === eventoId);
-                if (evento) {
-                    // Creamos las fechas en horario local para que no se desfase con la fecha de la reserva
-                    fechaDesdeObj = new Date(evento.fechaInicio + 'T00:00:00'); 
-                    fechaHastaObj = new Date(evento.fechaFin + 'T23:59:59'); 
-                }
-            }
 
             const reservasFiltradas = reservasDataArray.filter(r => {
                 let coincideCiudad = true;
                 if (ciudad) coincideCiudad = r.ciudad === ciudad;
                 
-                let coincideFecha = true;
-                if (fechaDesdeObj || fechaHastaObj) {
-                    if (r.fecha !== '--/--/----') {
-                        const partesFecha = r.fecha.split('/');
-                        const fechaR = new Date(partesFecha[2], partesFecha[1]-1, partesFecha[0]);
-                        // Eliminamos las horas para comparar solo fechas
-                        fechaR.setHours(0,0,0,0);
-                        
-                        if (fechaDesdeObj && fechaR < fechaDesdeObj) coincideFecha = false;
-                        if (fechaHastaObj && fechaR > fechaHastaObj) coincideFecha = false;
-                    } else {
-                        coincideFecha = false;
-                    }
-                }
-                
-                return coincideCiudad && coincideFecha;
+                return coincideCiudad;
             });
 
             renderizarTodo(reservasFiltradas);
@@ -1102,7 +1009,6 @@
 
         function limpiarFiltros() {
             document.getElementById('filtroCiudad').value = '';
-            document.getElementById('filtroEventoCalendario').value = '';
             aplicarFiltros();
             showToast('Filtros limpiados', 'Mostrando todas las reservas.');
         }
@@ -1117,9 +1023,7 @@
         };
 
         // Listeners de los filtros
-        document.getElementById('btnFiltrar').addEventListener('click', aplicarFiltros);
         document.getElementById('btnLimpiarFiltros').addEventListener('click', limpiarFiltros);
-        document.getElementById('filtroEventoCalendario').addEventListener('change', aplicarFiltros);
         document.getElementById('filtroCiudad').addEventListener('change', aplicarFiltros);
 
         window.cargarDatos = cargarDatos;
