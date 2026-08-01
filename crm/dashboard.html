@@ -155,7 +155,7 @@
         }
         .overlay.active { opacity: 1; pointer-events: auto; }
 
-        /* ===== HEADER & FILTERS ===== */
+        /* ===== HEADER ===== */
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
         .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
         .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
@@ -179,19 +179,117 @@
         }
         .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
         
-        .filter-bar { 
-            background: var(--bg-surface); padding: 16px 20px; border-radius: var(--radius); 
-            box-shadow: var(--shadow-sm); display: flex; gap: 16px; align-items: center; 
-            flex-wrap: wrap; margin-bottom: 28px; border: 1px solid var(--border-color); 
+        /* ===== FILTERS BAR (UNIFICADA CON RESERVAS.HTML) ===== */
+        .filters-bar { 
+            background: var(--bg-surface); 
+            padding: 12px 16px; 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow-sm); 
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px; 
+            display: flex; 
+            gap: 8px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            position: relative;
         }
-        .input-group { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 140px; }
-        .input-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-        input[type="date"] { 
-            flex: 1; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); 
-            background: var(--bg-body); color: var(--text-main); font-family: inherit; font-size: 13px; 
-            transition: border-color 0.2s; min-width: 0;
+        .filter-input { 
+            padding: 8px 14px; 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-sm); 
+            font-size: 13px; 
+            flex: 1; 
+            min-width: 120px; 
+            background: var(--bg-body);
+            color: var(--text-main);
+            transition: border-color 0.2s;
+            font-family: 'Inter', sans-serif;
         }
-        input[type="date"]:focus { border-color: var(--primary); }
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        .filter-select {
+            padding: 8px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-width: 130px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Autocompletado del buscador */
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            box-shadow: var(--shadow-md);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 2000;
+            display: none;
+            margin-top: -4px;
+        }
+        .autocomplete-list.active { display: block; }
+        .autocomplete-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            transition: background 0.2s;
+        }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover,
+        .autocomplete-item.selected { background: var(--bg-body); color: var(--primary); }
+        .autocomplete-item small { color: var(--text-muted); font-size: 11px; margin-left: 8px; }
+
+        /* Botones compactos en barra de filtros */
+        .btn-filter-action {
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            min-height: 38px;
+        }
+        .btn-filter-action:active { transform: scale(0.97); }
+        .btn-filter-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+            min-width: 70px;
+        }
+        .btn-filter-primary:hover { background: var(--primary-hover); }
+        .btn-filter-secondary {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            min-width: 50px;
+        }
+        .btn-filter-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
 
         /* ===== METRICS GRID ===== */
         .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
@@ -217,9 +315,6 @@
         
         .stat-value { font-size: 28px; font-weight: 700; color: var(--text-main); line-height: 1.1; letter-spacing: -1px; word-break: break-word; }
         .stat-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-        .stat-trend { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
-        .trend-up { color: var(--success); }
-        .trend-down { color: var(--danger); }
 
         /* ===== CHARTS SECTION ===== */
         .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 28px; }
@@ -321,10 +416,9 @@
             .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
             .actions-group { width: 100%; justify-content: space-between; }
             
-            .filter-bar { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
-            .input-group { width: 100%; }
-            input[type="date"] { width: 100%; }
-            .filter-bar .btn { width: 100%; justify-content: center; }
+            .filters-bar { flex-direction: column; align-items: stretch; }
+            .filter-input, .filter-select { width: 100%; min-width: 100%; }
+            .btn-filter-action { width: 100%; justify-content: center; }
             
             .metrics-grid { grid-template-columns: 1fr; gap: 12px; }
             .stat-card { padding: 16px; flex-direction: row; align-items: center; gap: 16px; }
@@ -394,18 +488,31 @@
                 </div>
             </header>
 
-            <!-- Filters -->
-            <div class="filter-bar">
-                <div class="input-group">
-                    <label>Desde:</label>
-                    <input type="date" id="fechaInicio">
+            <!-- Filters Bar (NUEVA, UNIFICADA CON RESERVAS.HTML) -->
+            <div class="filters-bar">
+                <!-- Buscador General con Autocompletado -->
+                <div style="flex:1; min-width:150px; position:relative;">
+                    <input type="text" class="filter-input" placeholder="🔍 Buscar nombre o excursión..." id="busquedaReserva" autocomplete="off">
+                    <div class="autocomplete-list" id="autocompleteList"></div>
                 </div>
-                <div class="input-group">
-                    <label>Hasta:</label>
-                    <input type="date" id="fechaFin">
-                </div>
-                <button class="btn btn-secondary" onclick="filtrarPorFecha()"><i class="ph ph-funnel"></i> Aplicar</button>
-                <button class="btn btn-secondary" onclick="resetFechas()"><i class="ph ph-x"></i> Limpiar</button>
+                
+                <select class="filter-select" id="filtroEventoCalendario">
+                    <option value="">📅 Todos los eventos</option>
+                </select>
+                
+                <select class="filter-select" id="filtroCiudad">
+                    <option value="">📍 Todas las ciudades</option>
+                </select>
+                
+                <select class="filter-select" id="filtroEstado">
+                    <option value="todos">📌 Todos los estados</option>
+                    <option value="confirmado">✅ Confirmado</option>
+                    <option value="pendiente">⏳ Pendiente</option>
+                    <option value="pagado">💰 Pagado</option>
+                </select>
+
+                <button class="btn-filter-action btn-filter-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Aplicar</button>
+                <button class="btn-filter-action btn-filter-secondary" id="btnLimpiarFiltros"><i class="ph ph-x"></i> Limpiar</button>
             </div>
 
             <!-- Metrics Grid -->
@@ -578,7 +685,6 @@
         menuBtn.addEventListener('click', toggleMenu);
         overlay.addEventListener('click', closeMenu);
         
-        // Cerrar menú al hacer clic en un enlace (móvil)
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 768) closeMenu();
@@ -612,12 +718,14 @@
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const JSON_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Hoja%201&tq=order%20by%20A%20desc%20limit%2050`;
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
 
         let reservasDataArray = [];
         let estadosGlobales = {};
         let chartInstanceLine = null;
         let chartInstanceDoughnut = null;
-        let fechaInicio = null, fechaFin = null;
+        let eventosCalendario = [];
+        let datosBusqueda = [];
 
         async function cargarEstados() {
             try {
@@ -635,12 +743,63 @@
             }
         }
 
+        async function cargarEventosCalendario() {
+            const selectEventos = document.getElementById('filtroEventoCalendario');
+            if (!selectEventos) return;
+            try {
+                const url = `${APP_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.success && data.eventos) {
+                    eventosCalendario = data.eventos;
+                } else {
+                    eventosCalendario = [];
+                }
+            } catch (error) {
+                eventosCalendario = [];
+            }
+            selectEventos.innerHTML = '<option value="">📅 Todos los eventos</option>';
+            eventosCalendario.forEach(evento => {
+                const option = document.createElement('option');
+                option.value = evento.id;
+                // Mostrar nombre y rango de fechas en el menú
+                const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
+                const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
+                option.textContent = `${evento.nombre} (${fechaInicio} - ${fechaFin})`;
+                option.dataset.inicio = evento.fechaInicio;
+                option.dataset.fin = evento.fechaFin;
+                selectEventos.appendChild(option);
+            });
+        }
+
+        function convertirFechaISOtoDDMMYYYY(fechaIso) {
+            if (!fechaIso) return '';
+            const fecha = new Date(fechaIso);
+            if (isNaN(fecha.getTime())) return fechaIso;
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const anio = fecha.getFullYear();
+            return `${dia}/${mes}/${anio}`;
+        }
+
+        function convertirISOaInputDate(fechaIso) {
+            if (!fechaIso) return '';
+            const fecha = new Date(fechaIso);
+            if (isNaN(fecha.getTime())) return '';
+            const anio = fecha.getFullYear();
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            return `${anio}-${mes}-${dia}`;
+        }
+
         async function cargarDatos() {
             document.getElementById('tablaUltimasReservas').innerHTML = '<tr><td colspan="7"><div class="loader-container"><div class="spinner"></div></div></td></tr>';
             document.getElementById('topClientesBody').innerHTML = '<tr><td colspan="5"><div class="loader-container"><div class="spinner"></div></div></td></tr>';
             
             try {
                 await cargarEstados();
+                await cargarEventosCalendario();
+                
                 const res = await fetch(JSON_URL + '&t=' + Date.now());
                 let text = await res.text();
                 text = text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2);
@@ -651,6 +810,10 @@
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 const nombresEditados = JSON.parse(localStorage.getItem('nombresEditados') || '{}');
                 
+                const ciudadesSet = new Set();
+                const nombresSet = new Set();
+                const excursionesSet = new Set();
+
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
                     if(!c || c.length < 5) continue;
@@ -661,9 +824,13 @@
                     const nombre = c[2]?.v ? String(c[2].v) : '';
                     const apellido = c[3]?.v ? String(c[3].v) : '';
                     const email = c[4]?.v ? String(c[4].v) : '';
+                    const ciudad = c[7]?.v ? String(c[7].v) : '';
                     
                     let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
                     if (nombresEditados[id]) nombreCompleto = nombresEditados[id];
+                    
+                    if (nombreCompleto && nombreCompleto !== 'No especificado') nombresSet.add(nombreCompleto.trim());
+                    if (ciudad && ciudad.trim() !== '') ciudadesSet.add(ciudad.trim());
                     
                     let excursionesLista = [];
                     const excRaw = c[8]?.v ? String(c[8].v) : '';
@@ -672,6 +839,7 @@
                         else if (excRaw.includes(' | ')) excursionesLista = excRaw.split(' | ');
                         else excursionesLista = [excRaw];
                         excursionesLista = excursionesLista.map(e => e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '')).filter(e => e);
+                        excursionesLista.forEach(exc => { if (exc && exc.trim() !== '') excursionesSet.add(exc.trim()); });
                     }
                     
                     const excursionNombre = excursionesLista.length > 0 ? excursionesLista[0].substring(0, 35) : 'Sin excursión';
@@ -692,6 +860,7 @@
                         id,
                         nombreCompleto,
                         email,
+                        ciudad,
                         excursion: excursionNombre,
                         excursionesLista,
                         fecha: fechaStr,
@@ -703,7 +872,26 @@
                 reservasDataArray = nuevasReservas;
                 reservasDataArray.sort((a,b) => (parseInt(b.id.replace(/\D/g,''))||0) - (parseInt(a.id.replace(/\D/g,''))||0));
                 
-                renderizarTodo();
+                // Poblar filtro de ciudades y datos de autocompletado
+                const selectCiudad = document.getElementById('filtroCiudad');
+                if (selectCiudad) {
+                    selectCiudad.innerHTML = '<option value="">📍 Todas las ciudades</option>';
+                    const ciudadesArray = Array.from(ciudadesSet).sort();
+                    ciudadesArray.forEach(ciudad => {
+                        const option = document.createElement('option');
+                        option.value = ciudad;
+                        option.textContent = ciudad;
+                        selectCiudad.appendChild(option);
+                    });
+                }
+
+                datosBusqueda = [];
+                nombresSet.forEach(n => datosBusqueda.push({texto: n, tipo: '👤 Cliente'}));
+                excursionesSet.forEach(e => datosBusqueda.push({texto: e, tipo: '🏔️ Excursión'}));
+                datosBusqueda.sort((a, b) => a.texto.localeCompare(b.texto));
+                
+                // Aplicar filtros iniciales y renderizar
+                aplicarFiltros();
                 showToast('Datos actualizados', 'Información sincronizada correctamente desde la nube.');
 
             } catch (error) {
@@ -712,23 +900,68 @@
             }
         }
 
-        function renderizarTodo() {
-            const reservasFiltradas = filtrarReservasPorFecha();
-            calcularMetricas(reservasFiltradas);
-            renderizarTablas(reservasFiltradas);
-            renderizarGraficos(reservasFiltradas);
+        function aplicarFiltros() {
+            const busqueda = document.getElementById('busquedaReserva');
+            const filtroCiudad = document.getElementById('filtroCiudad');
+            const filtroEstado = document.getElementById('filtroEstado');
+            const filtroEvento = document.getElementById('filtroEventoCalendario');
+            
+            const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
+            const ciudad = filtroCiudad ? filtroCiudad.value : ''; 
+            const estado = filtroEstado ? filtroEstado.value : 'todos';
+            const eventoId = filtroEvento ? filtroEvento.value : '';
+
+            let fechaDesdeObj = null;
+            let fechaHastaObj = null;
+
+            // Si se seleccionó un evento, calcular sus fechas para filtrar
+            if (eventoId) {
+                const evento = eventosCalendario.find(e => e.id === eventoId);
+                if (evento) {
+                    fechaDesdeObj = new Date(evento.fechaInicio);
+                    fechaHastaObj = new Date(evento.fechaFin);
+                    // Ajustar a medianoche para abarcar todo el día
+                    fechaDesdeObj.setHours(0,0,0,0);
+                    fechaHastaObj.setHours(23,59,59,999);
+                }
+            }
+
+            const reservasFiltradas = reservasDataArray.filter(r => {
+                let coincideBusqueda = true;
+                if (texto) {
+                    const coincideNombre = r.nombreCompleto.toLowerCase().includes(texto);
+                    const coincideExcursion = r.excursionesLista.some(exc => exc.toLowerCase().includes(texto));
+                    coincideBusqueda = coincideNombre || coincideExcursion;
+                }
+                
+                let coincideCiudad = true;
+                if (ciudad) coincideCiudad = r.ciudad === ciudad;
+                
+                let coincideEstado = true;
+                if (estado !== 'todos') coincideEstado = r.estado === estado;
+
+                let coincideFecha = true;
+                if (fechaDesdeObj || fechaHastaObj) {
+                    if (r.fecha !== '--/--/----') {
+                        const partesFecha = r.fecha.split('/');
+                        const fechaR = new Date(partesFecha[2], partesFecha[1]-1, partesFecha[0]);
+                        if (fechaDesdeObj && fechaR < fechaDesdeObj) coincideFecha = false;
+                        if (fechaHastaObj && fechaR > fechaHastaObj) coincideFecha = false;
+                    } else {
+                        coincideFecha = false;
+                    }
+                }
+                
+                return coincideBusqueda && coincideCiudad && coincideEstado && coincideFecha;
+            });
+
+            renderizarTodo(reservasFiltradas);
         }
 
-        function filtrarReservasPorFecha() {
-            if (!fechaInicio && !fechaFin) return reservasDataArray;
-            return reservasDataArray.filter(r => {
-                if (r.fecha === '--/--/----') return true;
-                const partes = r.fecha.split('/');
-                const fechaR = new Date(partes[2], partes[1]-1, partes[0]);
-                if (fechaInicio && fechaR < fechaInicio) return false;
-                if (fechaFin && fechaR > fechaFin) return false;
-                return true;
-            });
+        function renderizarTodo(reservas) {
+            calcularMetricas(reservas);
+            renderizarTablas(reservas);
+            renderizarGraficos(reservas);
         }
 
         function calcularMetricas(reservas) {
@@ -926,7 +1159,7 @@
         }
 
         function updateChartsTheme() {
-            if(reservasDataArray.length > 0) renderizarGraficos(filtrarReservasPorFecha());
+            aplicarFiltros(); // Re-renderiza todo con el tema nuevo
         }
 
         function showToast(title, msg) {
@@ -948,21 +1181,61 @@
             window.location.href = `clientes.html?email=${encodeURIComponent(email)}`; 
         }
 
-        function filtrarPorFecha() {
-            const inicio = document.getElementById('fechaInicio').value;
-            const fin = document.getElementById('fechaFin').value;
-            fechaInicio = inicio ? new Date(inicio) : null;
-            fechaFin = fin ? new Date(fin) : null;
-            renderizarTodo();
-            showToast('Filtro aplicado', 'Mostrando resultados del período seleccionado.');
+        // ==================================================
+        // AUTOCOMPLETADO DE BÚSQUEDA
+        // ==================================================
+        function initAutocomplete() {
+            const input = document.getElementById('busquedaReserva');
+            const listContainer = document.getElementById('autocompleteList');
+            if (!input || !listContainer) return;
+
+            input.addEventListener('input', function() {
+                const value = this.value.toLowerCase().trim();
+                listContainer.innerHTML = '';
+                
+                if (!value || value.length < 1) {
+                    listContainer.classList.remove('active');
+                    return;
+                }
+
+                const matches = datosBusqueda.filter(item => 
+                    item.texto.toLowerCase().includes(value)
+                ).slice(0, 8);
+
+                if (matches.length === 0) {
+                    listContainer.classList.remove('active');
+                    return;
+                }
+
+                matches.forEach((match, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.innerHTML = `${match.texto} <small>${match.tipo}</small>`;
+                    
+                    item.addEventListener('click', function() {
+                        input.value = match.texto;
+                        listContainer.classList.remove('active');
+                        aplicarFiltros();
+                    });
+                    listContainer.appendChild(item);
+                });
+
+                listContainer.classList.add('active');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target !== input && e.target !== listContainer) {
+                    listContainer.classList.remove('active');
+                }
+            });
         }
 
-        function resetFechas() { 
-            document.getElementById('fechaInicio').value = ''; 
-            document.getElementById('fechaFin').value = ''; 
-            fechaInicio = null;
-            fechaFin = null;
-            renderizarTodo();
+        function limpiarFiltros() {
+            document.getElementById('busquedaReserva').value = '';
+            document.getElementById('filtroCiudad').value = '';
+            document.getElementById('filtroEstado').value = 'todos';
+            document.getElementById('filtroEventoCalendario').value = '';
+            aplicarFiltros();
             showToast('Filtros limpiados', 'Mostrando todas las reservas.');
         }
 
@@ -971,16 +1244,22 @@
             if (sessionStorage.getItem('crm_logged') !== 'true') { 
                 window.location.href = 'index.html'; 
             }
+            initAutocomplete();
             cargarDatos();
             setInterval(cargarDatos, 60000);
         };
 
-        window.filtrarPorFecha = filtrarPorFecha;
-        window.resetFechas = resetFechas;
+        // Listeners de los filtros
+        document.getElementById('btnFiltrar').addEventListener('click', aplicarFiltros);
+        document.getElementById('btnLimpiarFiltros').addEventListener('click', limpiarFiltros);
+        document.getElementById('filtroEventoCalendario').addEventListener('change', aplicarFiltros);
+
         window.cargarDatos = cargarDatos;
         window.logout = logout;
         window.toggleTheme = toggleTheme;
         window.verCliente = verCliente;
+        window.aplicarFiltros = aplicarFiltros;
+        window.limpiarFiltros = limpiarFiltros;
     </script>
 </body>
 </html>
