@@ -689,6 +689,18 @@
             return `${dia}/${mes}/${anio}`;
         }
 
+        // NUEVA FUNCIÓN PARA CONVERTIR A FORMATO HTML DATE (YYYY-MM-DD)
+        function convertirISOaInputDate(fechaIso) {
+            if (!fechaIso) return '';
+            const fecha = new Date(fechaIso);
+            if (isNaN(fecha.getTime())) return '';
+            // El input type="date" requiere YYYY-MM-DD
+            const anio = fecha.getFullYear();
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            return `${anio}-${mes}-${dia}`;
+        }
+
         // ==================================================
         // NUEVA FUNCIÓN PARA CARGAR EVENTOS REALES DESDE LA BD
         // ==================================================
@@ -723,6 +735,7 @@
                 const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
                 const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
                 option.textContent = `${evento.nombre} (${fechaInicio} - ${fechaFin})`;
+                // Guardamos las fechas completas en los atributos data
                 option.dataset.inicio = evento.fechaInicio;
                 option.dataset.fin = evento.fechaFin;
                 selectEventos.appendChild(option);
@@ -730,7 +743,7 @@
         }
 
         // ==================================================
-        // FUNCIÓN PARA APLICAR FILTRO POR EVENTO
+        // FUNCIÓN CORREGIDA PARA APLICAR FILTRO POR EVENTO
         // ==================================================
         function aplicarFiltroEventoCalendario() {
             const selectEventos = document.getElementById('filtroEventoCalendario');
@@ -744,9 +757,9 @@
                 // Buscar el evento seleccionado en el array traído de la BD
                 const evento = eventosCalendario.find(e => e.id === eventoId);
                 if (evento) {
-                    // Asignar las fechas a los inputs de tipo date (formato YYYY-MM-DD)
-                    inputFechaDesde.value = evento.fechaInicio;
-                    inputFechaHasta.value = evento.fechaFin;
+                    // CORRECCIÓN: Convertir a formato YYYY-MM-DD antes de asignar al input
+                    inputFechaDesde.value = convertirISOaInputDate(evento.fechaInicio);
+                    inputFechaHasta.value = convertirISOaInputDate(evento.fechaFin);
                 }
             } else {
                 // Si el usuario vuelve a "Todos los eventos", limpiamos las fechas manuales
