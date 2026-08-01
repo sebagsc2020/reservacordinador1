@@ -196,24 +196,24 @@
 
         .filters-bar { 
             background: var(--bg-surface); 
-            padding: 16px 20px; 
+            padding: 12px 16px; 
             border-radius: var(--radius); 
             box-shadow: var(--shadow-sm); 
             border: 1px solid var(--border-color);
             margin-bottom: 24px; 
             display: flex; 
-            gap: 12px; 
+            gap: 8px; 
             align-items: center; 
             flex-wrap: wrap; 
-            position: relative; /* Necesario para el autocompletado */
+            position: relative;
         }
         .filter-input { 
-            padding: 10px 16px; 
+            padding: 8px 14px; 
             border: 1px solid var(--border-color); 
             border-radius: var(--radius-sm); 
             font-size: 13px; 
             flex: 1; 
-            min-width: 150px; 
+            min-width: 120px; 
             background: var(--bg-body);
             color: var(--text-main);
             transition: border-color 0.2s;
@@ -225,14 +225,14 @@
             box-shadow: 0 0 0 3px var(--primary-light);
         }
         .filter-select {
-            padding: 10px 16px;
+            padding: 8px 14px;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-sm);
             font-size: 13px;
             background: var(--bg-body);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            min-width: 160px;
+            min-width: 130px;
             cursor: pointer;
             transition: border-color 0.2s;
         }
@@ -248,7 +248,7 @@
 
         /* Estilos para inputs de fecha */
         .filter-date {
-            padding: 10px 16px;
+            padding: 8px 14px;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-sm);
             font-size: 13px;
@@ -257,8 +257,7 @@
             font-family: 'Inter', sans-serif;
             cursor: pointer;
             transition: border-color 0.2s;
-            min-width: 150px;
-            flex: 1;
+            min-width: 130px;
         }
         .filter-date:focus {
             outline: none;
@@ -266,9 +265,7 @@
             box-shadow: 0 0 0 3px var(--primary-light);
         }
 
-        /* ================================================== */
-        /* NUEVO ESTILO PARA LA LISTA DE AUTOCOMPLETADO       */
-        /* ================================================== */
+        /* NUEVO ESTILO PARA LA LISTA DE AUTOCOMPLETADO */
         .autocomplete-list {
             position: absolute;
             top: 100%;
@@ -309,7 +306,45 @@
             font-size: 11px;
             margin-left: 8px;
         }
-        /* ================================================== */
+
+        /* BOTONES COMPACTOS EN LA BARRA DE FILTROS */
+        .btn-filter-action {
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            min-height: 38px;
+        }
+        .btn-filter-action:active { transform: scale(0.97); }
+        .btn-filter-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+            min-width: 70px;
+        }
+        .btn-filter-primary:hover { background: var(--primary-hover); }
+        .btn-filter-success {
+            background: var(--success);
+            color: white;
+            width: 38px;
+            padding: 0;
+        }
+        .btn-filter-success:hover { background: #059669; }
+        .btn-filter-secondary {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            min-width: 50px;
+        }
+        .btn-filter-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
 
         .total-reservas { 
             font-size: 13px; 
@@ -467,10 +502,12 @@
             .menu-toggle { display: flex; }
             .page-header { flex-direction: column; align-items: flex-start; gap: 16px; } 
             .actions-group { width: 100%; justify-content: space-between; }
-            .filters-bar { flex-direction: column; }
-            .filter-input { width: 100%; }
-            .filter-date { width: 100%; }
-            .filter-select { width: 100%; }
+            
+            .filters-bar { flex-direction: column; align-items: stretch; }
+            .filter-input, .filter-select, .filter-date { width: 100%; min-width: 100%; }
+            .btn-filter-action { width: 100%; justify-content: center; }
+            .btn-filter-success, .btn-filter-secondary { width: 100%; } /* En móvil se expanden */
+            
             .cards-grid { grid-template-columns: 1fr; gap: 16px; }
             .card-header { flex-direction: column; align-items: flex-start; }
             .card-actions { flex-direction: column; }
@@ -522,23 +559,22 @@
                 </div>
             </header>
 
+            <!-- BARRA DE FILTROS REORDENADA Y COMPACTA -->
             <div class="filters-bar">
-                <!-- CAMBIO: INPUT CON POSICIÓN RELATIVA PARA EL AUTOCOMPLETADO -->
+                <!-- Buscador General -->
                 <div style="flex:1; min-width:150px; position:relative;">
-                    <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva" autocomplete="off">
+                    <input type="text" class="filter-input" placeholder="🔍 Buscar nombre o excursión..." id="busquedaReserva" autocomplete="off">
                     <div class="autocomplete-list" id="autocompleteList"></div>
                 </div>
+                
+                <!-- Filtros Select -->
+                <select class="filter-select" id="filtroEventoCalendario">
+                    <option value="">📅 Todos los eventos</option>
+                </select>
                 
                 <select class="filter-select" id="filtroCiudad">
                     <option value="">📍 Todas las ciudades</option>
                 </select>
-                
-                <select class="filter-select" id="filtroEventoCalendario">
-                    <option value="">📅 Todos los eventos</option>
-                </select>
-
-                <input type="date" class="filter-date" id="filtroFechaDesde" title="Fecha Desde">
-                <input type="date" class="filter-date" id="filtroFechaHasta" title="Fecha Hasta">
                 
                 <select class="filter-select" id="filtroEstado">
                     <option value="todos">📌 Todos los estados</option>
@@ -546,9 +582,15 @@
                     <option value="pendiente">⏳ Pendiente</option>
                     <option value="pagado">💰 Pagado</option>
                 </select>
-                <button class="btn btn-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Filtrar</button>
-                <button class="btn btn-success" id="btnRecargar"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
-                <button class="btn btn-secondary" id="btnPDFExterno"><i class="ph ph-file-pdf"></i> Generar PDF</button>
+
+                <!-- Fechas -->
+                <input type="date" class="filter-date" id="filtroFechaDesde" title="Fecha Desde">
+                <input type="date" class="filter-date" id="filtroFechaHasta" title="Fecha Hasta">
+                
+                <!-- Botones compactos -->
+                <button class="btn-filter-action btn-filter-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Filtrar</button>
+                <button class="btn-filter-action btn-filter-success" id="btnRecargar" title="Recargar"><i class="ph ph-arrows-clockwise"></i></button>
+                <button class="btn-filter-action btn-filter-secondary" id="btnPDFExterno">PDF</button>
             </div>
 
             <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
@@ -622,8 +664,6 @@
         let reservasFiltradas = [];
         let estadosGlobales = {};
         let eventosCalendario = []; 
-        
-        // Para el autocompletado
         let datosBusqueda = []; 
 
         async function guardarNombreEnNube(id, nuevoNombre) {
@@ -883,7 +923,6 @@
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 const nombresEditados = cargarNombresEditados();
                 
-                // Variables para recolectar datos únicos
                 const ciudadesSet = new Set();
                 const nombresSet = new Set();
                 const excursionesSet = new Set();
@@ -905,13 +944,9 @@
                     if (nombresEditados[id]) {
                         nombreCompleto = nombresEditados[id];
                     }
-
-                    // Recolectar nombres únicos para autocompletar
                     if (nombreCompleto && nombreCompleto !== 'No especificado') {
                         nombresSet.add(nombreCompleto.trim());
                     }
-
-                    // Recolectar ciudades únicas para el select
                     if (ciudad && ciudad.trim() !== '') {
                         ciudadesSet.add(ciudad.trim());
                     }
@@ -930,7 +965,6 @@
                             return e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
                         }).filter(function(e) { return e; });
 
-                        // Recolectar excursiones únicas para autocompletar
                         excursionesLista.forEach(exc => {
                             if (exc && exc.trim() !== '') {
                                 excursionesSet.add(exc.trim());
@@ -974,16 +1008,12 @@
                     });
                 }
 
-                // ORDENAR RESERVAS
                 reservasData.sort(function(a, b) {
                     const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
                     const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
                     return numB - numA;
                 });
 
-                // ==============================================
-                // ACTUALIZAR EL FILTRO DE CIUDADES
-                // ==============================================
                 const selectCiudad = document.getElementById('filtroCiudad');
                 if (selectCiudad) {
                     selectCiudad.innerHTML = '<option value="">📍 Todas las ciudades</option>';
@@ -996,13 +1026,9 @@
                     });
                 }
 
-                // ==============================================
-                // ACTUALIZAR DATOS PARA AUTOCOMPLETADO
-                // ==============================================
                 datosBusqueda = [];
                 nombresSet.forEach(n => datosBusqueda.push({texto: n, tipo: '👤 Cliente'}));
                 excursionesSet.forEach(e => datosBusqueda.push({texto: e, tipo: '🏔️ Excursión'}));
-                // Ordenar alfabéticamente
                 datosBusqueda.sort((a, b) => a.texto.localeCompare(b.texto));
 
                 reservasFiltradas = reservasData.slice();
@@ -1032,17 +1058,15 @@
                     return;
                 }
 
-                // Buscar coincidencias en el array de datos
                 const matches = datosBusqueda.filter(item => 
                     item.texto.toLowerCase().includes(value)
-                ).slice(0, 8); // Limitar a 8 resultados
+                ).slice(0, 8);
 
                 if (matches.length === 0) {
                     listContainer.classList.remove('active');
                     return;
                 }
 
-                // Renderizar sugerencias
                 matches.forEach((match, index) => {
                     const item = document.createElement('div');
                     item.className = 'autocomplete-item';
@@ -1051,7 +1075,7 @@
                     item.addEventListener('click', function() {
                         input.value = match.texto;
                         listContainer.classList.remove('active');
-                        filtrarReservas(); // Filtrar automáticamente
+                        filtrarReservas();
                     });
                     listContainer.appendChild(item);
                 });
@@ -1059,7 +1083,6 @@
                 listContainer.classList.add('active');
             });
 
-            // Ocultar la lista al hacer clic fuera
             document.addEventListener('click', function(e) {
                 if (e.target !== input && e.target !== listContainer) {
                     listContainer.classList.remove('active');
@@ -1304,7 +1327,6 @@
             const filtroFechaDesde = document.getElementById('filtroFechaDesde');
             const filtroFechaHasta = document.getElementById('filtroFechaHasta');
             
-            // Inicializar autocompletado
             initAutocomplete();
 
             if (btnFiltrar) btnFiltrar.addEventListener('click', filtrarReservas);
