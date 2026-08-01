@@ -143,21 +143,9 @@
         .nav-link:hover { background: var(--bg-body); color: var(--primary); }
         .nav-link.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); font-weight: 600; }
         
-        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
-        .user-profile { 
-            display: flex; align-items: center; gap: 12px; padding: 12px; 
-            border-radius: var(--radius-sm); background: var(--bg-body); 
-            cursor: pointer; transition: background 0.2s;
-        }
-        .user-profile:hover { background: var(--border-color); }
-        .avatar { 
-            width: 36px; height: 36px; background: var(--primary); color: white; 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-weight: 600; font-size: 14px; flex-shrink: 0;
-        }
-        .user-details { overflow: hidden; }
-        .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-details p { font-size: 11px; color: var(--text-muted); }
+        /* ================================================== */
+        /* CAMBIO: Eliminado el footer del sidebar            */
+        /* ================================================== */
 
         /* Botón fijo en la esquina superior izquierda (SIEMPRE VISIBLE) */
         .menu-toggle { 
@@ -215,29 +203,6 @@
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
-        }
-        
-        .user-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            background: var(--bg-surface); 
-            padding: 8px 20px; 
-            border-radius: 50px; 
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-sm); 
-            font-size: 14px; 
-        }
-        .user-avatar { 
-            width: 35px; 
-            height: 35px; 
-            background: var(--primary); 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: 700; 
         }
         
         /* Botón Tema (Luna/Sol) */
@@ -323,7 +288,7 @@
             border-radius: 10px; 
             font-size: 13px; 
             flex: 1; 
-            min-width: 150px;
+            min-width: 120px;
             background: var(--bg-body);
             color: var(--text-main);
             transition: border-color 0.2s;
@@ -337,12 +302,31 @@
             font-size: 13px;
             background: var(--bg-body);
             color: var(--text-main);
-            min-width: 150px;
+            min-width: 140px;
             flex: 1;
             cursor: pointer;
             transition: border-color 0.2s;
         }
         .filter-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+
+        /* ================================================== */
+        /* CAMBIO: Inputs de fecha                            */
+        /* ================================================== */
+        .filter-date {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 13px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-family: inherit;
+            min-width: 140px;
+            flex: 1;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .filter-date:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        /* ================================================== */
         
         .btn-filtrar { 
             padding: 10px 25px; 
@@ -456,7 +440,7 @@
         .card-fecha { 
             font-size: 10px; 
             opacity: 0.85; 
-            white-space: nowrap; /* Evita que se corte la fecha */
+            white-space: nowrap;
         }
 
         .card-body { padding: 15px; }
@@ -507,8 +491,6 @@
             .header h1 { font-size: 20px; }
             
             .user-area { width: 100%; justify-content: space-between; }
-            .user-info { padding: 5px 12px; font-size: 12px; }
-            .user-avatar { width: 28px; height: 28px; font-size: 12px; }
             .btn-icon { width: 32px; height: 32px; font-size: 16px; }
             .btn-reserva-manual { padding: 5px 12px; font-size: 11px; }
             .btn-action-header { padding: 5px 12px; font-size: 11px; }
@@ -516,7 +498,7 @@
             .cards-grid { grid-template-columns: 1fr; gap: 15px; }
             
             .filters-bar { flex-direction: column; }
-            .filter-input, .filter-select { width: 100%; }
+            .filter-input, .filter-select, .filter-date { width: 100%; }
             .btn-filtrar { width: 100%; text-align: center; }
             .autocomplete-list { left: 15px; right: 15px; }
             
@@ -554,13 +536,6 @@
                 <li><a href="calendario.html" class="nav-link"><i class="ph ph-calendar"></i> Calendario</a></li>
                 <li><a href="clima.html" class="nav-link"><i class="ph ph-cloud-sun"></i> Clima</a></li>
             </ul>
-            <div class="sidebar-footer">
-                <div class="user-profile" onclick="logout()">
-                    <div class="avatar">AD</div>
-                    <div class="user-details"><h4>Administrador</h4><p>Cerrar Sesión</p></div>
-                    <i class="ph ph-sign-out" style="margin-left: auto; color: var(--text-muted); font-size: 18px;"></i>
-                </div>
-            </div>
         </nav>
 
         <div class="main-content">
@@ -570,10 +545,6 @@
                     <!-- Botón de tema claro/oscuro -->
                     <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
                     
-                    <div class="user-info">
-                        <div class="user-avatar">A</div>
-                        <span>Admin</span>
-                    </div>
                     <!-- Botones de acción alineados juntos -->
                     <button class="btn-action-header" id="btnRecargar"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
                     <button class="btn-action-header" id="btnPDFExterno"><i class="ph ph-file-pdf"></i> PDF</button>
@@ -581,17 +552,21 @@
                 </div>
             </div>
 
-            <!-- FILTROS ACTUALIZADOS (EVENTOS + CIUDAD + BÚSQUEDA CON AUTOCOMPLETADO) -->
+            <!-- FILTROS CON FECHAS AUTOMÁTICAS -->
             <div class="filters-bar">
                 <!-- Filtro por Evento -->
                 <select class="filter-select" id="filtroEventoCalendario">
                     <option value="">📅 Todos los eventos</option>
                 </select>
                 
-                <!-- NUEVO FILTRO POR CIUDAD -->
+                <!-- Filtro por Ciudad -->
                 <select class="filter-select" id="filtroCiudad">
                     <option value="">📍 Todas las ciudades</option>
                 </select>
+
+                <!-- NUEVOS CAMPOS DE FECHA -->
+                <input type="date" class="filter-date" id="filtroFechaDesde" title="Fecha Desde">
+                <input type="date" class="filter-date" id="filtroFechaHasta" title="Fecha Hasta">
                 
                 <!-- Buscador general con autocompletado -->
                 <div style="flex:2; min-width:200px; position:relative;">
@@ -969,9 +944,7 @@
                         });
                     }
 
-                    // ==================================================
-                    // CORRECCIÓN: LEER FECHA DE LA COLUMNA J (índice 9)
-                    // ==================================================
+                    // LEER FECHA DE LA COLUMNA J (índice 9)
                     let fecha = '';
                     let fechaRaw = c[9]; 
                     if (fechaRaw && fechaRaw.v) {
@@ -990,7 +963,6 @@
                             }
                         }
                     }
-                    // ==================================================
 
                     const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
                     const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
@@ -1130,6 +1102,34 @@
                     listContainer.classList.remove('active');
                 }
             });
+        }
+
+        // ==================================================
+        // FUNCIÓN PARA AUTOCOMPLETAR FECHAS AL SELECCIONAR UN EVENTO
+        // ==================================================
+        function aplicarFiltroEventoCalendario() {
+            const selectEventos = document.getElementById('filtroEventoCalendario');
+            const inputFechaDesde = document.getElementById('filtroFechaDesde');
+            const inputFechaHasta = document.getElementById('filtroFechaHasta');
+            
+            if (!selectEventos || !inputFechaDesde || !inputFechaHasta) return;
+
+            const eventoId = selectEventos.value;
+            if (eventoId) {
+                const evento = eventosCalendario.find(e => e.id === eventoId);
+                if (evento) {
+                    // Convertir formato ISO a YYYY-MM-DD para el input type="date"
+                    inputFechaDesde.value = evento.fechaInicio.split('T')[0];
+                    inputFechaHasta.value = evento.fechaFin.split('T')[0];
+                }
+            } else {
+                // Limpiar si se selecciona "Todos los eventos"
+                inputFechaDesde.value = '';
+                inputFechaHasta.value = '';
+            }
+            
+            // Ejecutar el filtro automáticamente
+            filtrarReservas();
         }
 
         async function cambiarEstado(id, nuevoEstado) {
@@ -1284,27 +1284,37 @@
         }
 
         // ==================================================
-        // FILTRADO (EVENTO + CIUDAD + BÚSQUEDA)
+        // FILTRADO (EVENTO + FECHAS + CIUDAD + BÚSQUEDA)
         // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
             const filtroEvento = document.getElementById('filtroEventoCalendario');
             const filtroCiudad = document.getElementById('filtroCiudad');
+            const inputFechaDesde = document.getElementById('filtroFechaDesde');
+            const inputFechaHasta = document.getElementById('filtroFechaHasta');
             
             const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
             const eventoId = filtroEvento ? filtroEvento.value : '';
             const ciudad = filtroCiudad ? filtroCiudad.value : '';
+            const fechaDesdeValue = inputFechaDesde ? inputFechaDesde.value : '';
+            const fechaHastaValue = inputFechaHasta ? inputFechaHasta.value : '';
 
             let fechaDesdeObj = null;
             let fechaHastaObj = null;
 
-            // Filtro por Evento (Fechas)
+            // Prioridad: Si se seleccionó un evento, usar sus fechas
             if (eventoId) {
                 const evento = eventosCalendario.find(e => e.id === eventoId);
                 if (evento) {
                     fechaDesdeObj = new Date(evento.fechaInicio + 'T00:00:00'); 
                     fechaHastaObj = new Date(evento.fechaFin + 'T23:59:59');
                 }
+            } else if (fechaDesdeValue && fechaHastaValue) {
+                // Si no hay evento, pero hay fechas manuales, usar esas
+                const partesDesde = fechaDesdeValue.split('-');
+                const partesHasta = fechaHastaValue.split('-');
+                fechaDesdeObj = new Date(partesDesde[0], partesDesde[1]-1, partesDesde[2], 0,0,0,0);
+                fechaHastaObj = new Date(partesHasta[0], partesHasta[1]-1, partesHasta[2], 23,59,59,999);
             }
 
             reservasFiltradas = reservasData.filter(function(r) {
@@ -1407,11 +1417,13 @@
                 });
             }
             if (filtroEvento) {
-                filtroEvento.addEventListener('change', filtrarReservas);
+                filtroEvento.addEventListener('change', aplicarFiltroEventoCalendario);
             }
             if (filtroCiudad) {
                 filtroCiudad.addEventListener('change', filtrarReservas);
             }
+            document.getElementById('filtroFechaDesde').addEventListener('change', filtrarReservas);
+            document.getElementById('filtroFechaHasta').addEventListener('change', filtrarReservas);
             
             initAutocomplete(); // Inicializar autocompletado
             
@@ -1432,6 +1444,7 @@
         window.abrirReservaManual = abrirReservaManual;
         window.editarNombreReserva = editarNombreReserva;
         window.toggleTheme = toggleTheme;
+        window.aplicarFiltroEventoCalendario = aplicarFiltroEventoCalendario;
         
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
