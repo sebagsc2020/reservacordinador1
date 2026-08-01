@@ -147,13 +147,11 @@
         
         const STORAGE_KEY = 'reservasPendientes';
         
-        // Obtener reservas pendientes del localStorage
         function getReservasPendientes() {
             const pendientes = localStorage.getItem(STORAGE_KEY);
             return pendientes ? JSON.parse(pendientes) : [];
         }
         
-        // Guardar reserva pendiente
         function guardarReservaPendiente(reserva) {
             const pendientes = getReservasPendientes();
             pendientes.push({
@@ -166,7 +164,6 @@
             console.log('💾 Reserva guardada en caché local. Pendientes:', pendientes.length);
         }
         
-        // Eliminar reserva pendiente después de sincronizar
         function eliminarReservaPendiente(index) {
             const pendientes = getReservasPendientes();
             pendientes.splice(index, 1);
@@ -174,7 +171,6 @@
             actualizarBadgeSincronizacion();
         }
         
-        // Actualizar badge de sincronización
         function actualizarBadgeSincronizacion() {
             const pendientes = getReservasPendientes();
             const badge = document.getElementById('syncBadge');
@@ -186,7 +182,6 @@
             }
         }
         
-        // Enviar una reserva al servidor
         async function enviarReservaAlServidor(reserva, index) {
             try {
                 const formData = new URLSearchParams();
@@ -210,7 +205,6 @@
             }
         }
         
-        // Sincronizar todas las reservas pendientes
         async function sincronizarReservasPendientes() {
             const pendientes = getReservasPendientes();
             if (pendientes.length === 0) {
@@ -235,7 +229,6 @@
             actualizarBadgeSincronizacion();
         }
         
-        // Mostrar mensaje en la interfaz
         function mostrarMensaje(texto, tipo = 'info') {
             const statusMessage = document.getElementById('statusMessage');
             statusMessage.textContent = texto;
@@ -249,7 +242,6 @@
             }, 5000);
         }
         
-        // Detectar cambio de conexión
         function actualizarEstadoConexion() {
             const offlineBadge = document.getElementById('offlineBadge');
             if (!navigator.onLine) {
@@ -265,7 +257,6 @@
             }
         }
         
-        // Enviar reserva con cache (función principal mejorada)
         async function enviarReservaConCache(datosReserva) {
             const reserva = {
                 datos: datosReserva,
@@ -273,7 +264,6 @@
             };
             
             if (!navigator.onLine) {
-                // Sin conexión - guardar en caché
                 guardarReservaPendiente(reserva);
                 mostrarMensaje('💾 Sin conexión. Tu reserva se ha guardado localmente y se enviará automáticamente cuando recuperes la conexión.', 'info');
                 return { success: true, cached: true };
@@ -296,15 +286,14 @@
                 return { success: true, cached: false };
             } catch (error) {
                 console.error('Error al enviar:', error);
-                // Si hay error, guardar en caché
                 guardarReservaPendiente(reserva);
-                mostrarMensage('⚠️ Error de conexión. Tu reserva se ha guardado localmente.', 'warning');
+                mostrarMensaje('⚠️ Error de conexión. Tu reserva se ha guardado localmente.', 'warning');
                 return { success: false, cached: true, error };
             }
         }
         
         // ==================================================
-        // EXCURSIONES DATA (igual que antes)
+        // EXCURSIONES DATA
         // ==================================================
         const excursionesData = {
             argentina: {
@@ -556,7 +545,6 @@
             actualizarEstadoConexion();
             actualizarBadgeSincronizacion();
             
-            // Escuchar cambios en la conexión
             window.addEventListener('online', actualizarEstadoConexion);
             window.addEventListener('offline', actualizarEstadoConexion);
         });
@@ -668,7 +656,6 @@
                 return;
             }
 
-            // Construir datos de la reserva
             const datosReserva = {
                 id: 'RES-' + Date.now(),
                 nombre: document.getElementById('nombre').value,
@@ -688,7 +675,6 @@
             submitBtn.disabled = true;
             submitBtn.textContent = '⏳ Enviando...';
 
-            // Intentar enviar con caché
             const resultado = await enviarReservaConCache(datosReserva);
 
             submitBtn.disabled = false;
@@ -698,9 +684,36 @@
                 if (resultado.cached) {
                     mostrarMensaje('💾 Reserva guardada localmente. Se sincronizará automáticamente cuando recuperes la conexión.', 'warning');
                 }
+
+                // ==================================================
+                // CAMBIO CRUCIAL: Guardar en localStorage y pasar por URL
+                // ==================================================
+                
+                // 1. Guardar para que la página de éxito lo lea
+                localStorage.setItem('ultimaReserva', JSON.stringify(datosReserva));
+                sessionStorage.setItem('ultimaReserva', JSON.stringify(datosReserva));
+
+                // 2. Construir la URL con los parámetros (respaldo absoluto)
+                const urlParams = new URLSearchParams({
+                    id: datosReserva.id,
+                    nombre: datosReserva.nombre,
+                    apellido: datosReserva.apellido,
+                    email: datosReserva.email,
+                    telefono: datosReserva.telefono,
+                    pais: datosReserva.pais,
+                    ciudad: datosReserva.ciudad,
+                    excursiones: datosReserva.excursiones,
+                    fecha: datosReserva.fecha,
+                    personas: datosReserva.personas,
+                    formaPago: datosReserva.formaPago,
+                    lugar: datosReserva.lugar
+                });
+
+                // 3. Redirigir con la URL completa
                 setTimeout(() => {
-                    window.location.href = 'gracias.html';
-                }, 2500);
+                    window.location.href = `gracias.html?${urlParams.toString()}`;
+                }, 1500);
+
             } else {
                 mostrarMensaje('❌ Error al procesar la reserva. Intenta nuevamente.', 'error');
             }
@@ -711,7 +724,6 @@
             alert("🔒 Política de Privacidad - La agencia recopila únicamente los datos necesarios para la prestación del servicio.\n\nLos datos no se venden ni se ceden comercialmente.\n\nDerechos: Acceder, Rectificar, Cancelar u Oponerse.");
         });
         
-        // Exponer función de sincronización globalmente
         window.sincronizarReservasPendientes = sincronizarReservasPendientes;
     </script>
 </body>
