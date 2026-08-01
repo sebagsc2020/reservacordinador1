@@ -156,16 +156,7 @@
         .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
         .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
         
-        .header-actions { display: flex; gap: 12px; align-items: center; }
-        .btn-icon { 
-            width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); 
-            border: 1px solid var(--border-color); color: var(--text-muted); 
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: all 0.2s; flex-shrink: 0;
-        }
-        .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
-
-        /* ===== BUTTONS ===== */
+        .actions-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
         .btn { 
             padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; 
             cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; 
@@ -174,14 +165,19 @@
         .btn:active { transform: scale(0.97); }
         .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
         .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
         .btn-success { background: var(--success); color: white; }
         .btn-success:hover { background: #059669; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-danger:hover { background: #dc2626; }
-        .btn-warning { background: var(--warning); color: #78350f; }
-        .btn-warning:hover { background: #d97706; }
-        .btn-secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
-        .btn-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
+        .btn-icon { 
+            width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); 
+            border: 1px solid var(--border-color); color: var(--text-muted); 
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
 
         /* ===== EVENTOS GRID ===== */
         .eventos-grid {
@@ -221,6 +217,14 @@
             gap: 6px;
         }
         .evento-pax {
+            font-size: 12px;
+            margin-top: 4px;
+            opacity: 0.85;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .evento-destino {
             font-size: 12px;
             margin-top: 4px;
             opacity: 0.85;
@@ -343,6 +347,8 @@
         .dark-mode .form-group textarea:focus {
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
+        .form-row { display: flex; gap: 16px; flex-wrap: wrap; }
+        .form-row .form-group { flex: 1; min-width: 180px; }
 
         /* ===== DÍAS Y NOTAS ===== */
         .dias-container { margin-top: 20px; }
@@ -483,7 +489,8 @@
             .btn-evento { width: 100%; }
             .modal-contenido { padding: 20px; }
             .preloader-popup-contenido { padding: 30px 24px; }
-            .header-actions { width: 100%; justify-content: flex-end; }
+            .form-row { flex-direction: column; }
+            .form-row .form-group { min-width: unset; }
         }
         @media (max-width: 480px) {
             .page-title h1 { font-size: 20px; }
@@ -530,8 +537,9 @@
         <main class="main-content">
             <header class="page-header">
                 <div class="page-title"><h1>📅 Calendario de Eventos</h1><p>Gestión de itinerarios y actividades</p></div>
-                <div class="header-actions">
+                <div class="actions-group">
                     <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
+                    <button class="btn btn-success" onclick="cargarEventos()"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
                 </div>
             </header>
 
@@ -553,6 +561,269 @@
     </div>
 
     <script>
+        // ==================================================
+        // DATOS DE EXCURSIONES (tomados del formulario de reserva)
+        // ==================================================
+        const EXCURSIONES_DATA = {
+            argentina: {
+                "🎿 Bariloche": [
+                    "✔️ Cerro Catedral y centro de esquí",
+                    "✔️ Cerro Tronador y el Glaciar Negro",
+                    "✔️ Día completo El Bolsón y Lago Puelo",
+                    "✔️ Circuito Grande y Valle Encantado",
+                    "✔️ San Martín de los Andes por los Siete Lagos",
+                    "✔️ Isla Victoria y Bosque de Arrayanes",
+                    "✔️ Puerto Blest y Cascada de los Cántaros",
+                    "✔️ Brazo Tristeza",
+                    "✔️ Travesía 4x4 al Cerro López",
+                    "✔️ Circuito Chico y Cerro Campanario"
+                ],
+                "❤️ Buenos Aires": [
+                    "✔️ City tour premium por los barrios históricos",
+                    "✔️ La Plata y la República de los Niños",
+                    "✔️ Bioparque Temaikèn",
+                    "✔️ Delta del Tigre con paseo en lancha",
+                    "✔️ Día de campo en San Antonio de Areco",
+                    "✔️ Río de la Plata con barra libre",
+                    "✔️ Palacio Barolo y la Avenida de Mayo",
+                    "✔️ pulperías en San Telmo y casco histórico",
+                    "✔️ Sr. tango con cena y show en vivo",
+                    "✔️ Tour temático de fútbol"
+                ],
+                "⚒️ Catamarca": [
+                    "✔️ S F del Valle de Catamarca y Gruta",
+                    "✔️ Andalgalá y las minas de Rodocrosita",
+                    "✔️ Antofagasta de la Sierra y Volcán Galán",
+                    "✔️ Los Seis Miles y el Balcón del Pissis",
+                    "✔️ Pucará de Aconquijas",
+                    "✔️ Campo de Piedra Pómez en vehículos 4x4",
+                    "✔️ Valle Viejo y el Camino de los Artesanos",
+                    "✔️ Cuesta del Portezuelo y el dique Las Pirquitas",
+                    "✔️ Ruta del Adobe y Termas de Fiambalá",
+                    "✔️ Dunas de Tatón y Medanitos"
+                ],
+                "🚤 Cataratas del Iguazú": [
+                    "✔️ Parque de las Aves",
+                    "✔️ San Ignacio y Minas de Wanda",
+                    "✔️ Saltos del Moconá",
+                    "✔️ Cataratas del Iguazú - Argentina",
+                    "✔️ Cataratas del Iguazú - Brasil",
+                    "✔️ Flotada ecológica Iguazú Superior",
+                    "✔️ Gran aventura bajo los saltos de agua",
+                    "✔️ Cataratas con Luna Llena",
+                    "✔️ 4x4 Sendero Yacaratiá",
+                    "✔️ Hito de las Tres Fronteras"
+                ],
+                "🏔️ Jujuy": [
+                    "✔️ Llamas en Salinas Grandes o Purmamarca",
+                    "✔️ City tour Jujuy y Termas de Reyes",
+                    "✔️ Laguna de Pozuelos y Puna Jujeña",
+                    "✔️ Salinas Grandes por Cuesta del Lipán",
+                    "✔️ Hornocal",
+                    "✔️ Parque Nacional Calilegua",
+                    "✔️ Quebrada de Humahuaca",
+                    "✔️ Caspalá y Santa Ana",
+                    "✔️ Valle de la Luna de Cusi Cusi",
+                    "✔️ Termas del Jordán"
+                ],
+                "🏖️ Mar del Plata": [
+                    "✔️ Aquarium",
+                    "✔️ City Tour Histórico",
+                    "✔️ Fábricas de Alfajores",
+                    "✔️ Gruta de Lourdes",
+                    "✔️ Noche de Teatros",
+                    "✔️ Puerto y Banquina",
+                    "✔️ Sierra de los Padres",
+                    "✔️ Torre Tanque"
+                ],
+                "🍷 Mendoza": [
+                    "✔️ Cabalgata al atardecer por los caminos del vino",
+                    "✔️ Caminata guiada por el Parque Provincial Aconcagua",
+                    "✔️ City tour Mendoza y Parque General San Martín",
+                    "✔️ Bodegas y olivícolas",
+                    "✔️ Termas de Cacheuta y Potrerillos",
+                    "✔️ Cañón del Atuel y San Rafael",
+                    "✔️ Alta Montaña por la Cordillera de los Andes",
+                    "✔️ De día completo a San Rafael y Embalse Los Reyunos",
+                    "✔️ Bodegas y viñedos",
+                    "✔️ 4x4 a la Reserva Natural Villavicencio"
+                ],
+                "🌄 Merlo (San Luis)": [
+                    "✔️ Caminata astronómica nocturna",
+                    "✔️ Cascadas de San Luis y Salto del Tabaquillo",
+                    "✔️ Circuito Chico y Mirador del Sol",
+                    "✔️ Circuito Sur",
+                    "✔️ Parque Nacional Sierra de las Quijadas",
+                    "✔️ Día completo al Bajo de Véliz",
+                    "✔️ Filo de la Sierra de los Comechingones",
+                    "✔️ Pasos Malos y Arroyo El Rincón",
+                    "✔️ Ruta de los Sabores y visita a los Olivares",
+                    "✔️ Minas de tungsteno"
+                ],
+                "🏔️ Salta": [
+                    "✔️ Caminata guiada por la Quebrada de San Lorenzo",
+                    "✔️ City tour Salta y Cerro San Bernardo",
+                    "✔️ Purmamarca, Salinas Grandes y Cuesta del Lipán",
+                    "✔️ San Antonio de los Cobres por Tren a las Nubes",
+                    "✔️ Dique Cabra Corral + turismo aventura",
+                    "✔️ Excursión combinada a Humahuaca, Tilcara y Purmamarca",
+                    "✔️ Cafayate y Bodegas con Quebrada de las Conchas",
+                    "✔️ Iruya y pueblos históricos",
+                    "✔️ Cuesta del Obispo y Parque Nacional Los Cardones",
+                    "✔️ 4x4 a las Cuevas de Acsibi"
+                ],
+                "🏜️ San Juan": [
+                    "✔️ Dique de Ullum y Embalse Caracoles",
+                    "✔️ Ruta del Vino de San Juan y bodegas de Tulum",
+                    "✔️ Parque Nacional El Leoncito",
+                    "✔️ Jáchal, Huaco y los Molinos Harineros",
+                    "✔️ Parque Provincial Ischigualasto",
+                    "✔️ San Juan Capital y Auditorio Juan Victoria",
+                    "✔️ Valle de Calingasta y el Cerro Alcázar",
+                    "✔️ Parque Nacional San Guillermo",
+                    "✔️ Iglesia, Rodeo y la Difunta Correa"
+                ],
+                "🎭 Villa Carlos Paz": [
+                    "✔️ Altas Cumbres y Mina Clavero",
+                    "✔️ Ascenso al Cerro de la Cruz",
+                    "✔️ Caminata guiada al Cerro Champaquí",
+                    "✔️ City tour nocturno",
+                    "✔️ Excursión a Capilla del Monte y Los Terrones",
+                    "✔️ Full Day Alta Gracia y Villa General Belgrano",
+                    "✔️ La Cumbrecita y el Bosque de los Troncos",
+                    "✔️ La Ruta del Té y las Sierras Chicas",
+                    "✔️ Valle de Calamuchita y el Dique Los Molinos",
+                    "✔️ Vuelta al Valle de Punilla",
+                    "✔️ 4x4 al Cerro Uritorco y la Cascada de los Alazanes"
+                ]
+            },
+            brasil: {
+                "🏖️ Balneario Camboriú": [
+                    "✔️ Beto Carrero World",
+                    "✔️ Cristo Luz",
+                    "✔️ City Tour",
+                    "✔️ Oceanic Aquarium",
+                    "✔️ Parque Unipraias",
+                    "✔️ Laranjeias Terrestre",
+                    "✔️ Laranjeias Barco Pirata",
+                    "✔️ Eclipse - Disco",
+                    "✔️ Green Valley - Disco",
+                    "✔️ Fiesta Bahiana",
+                    "✔️ La Gruta - Disco"
+                ],
+                "🌊 Bombinhas": [
+                    "✔️ Beto Carrero World",
+                    "✔️ Catamarán por Bombas, Bombinhas y Sepultura",
+                    "✔️ Buceo guiado en la Reserva Biológica Marina del Arvoredo",
+                    "✔️ Trekking Morro del Macaco",
+                    "✔️ Balneario Camboriú y Parque Unipraias",
+                    "✔️ 4x4 por Quatro Ilhas, Mariscal y Zimbros",
+                    "✔️ City Tour Bombinhas",
+                    "✔️ Compras en Brusque y centros textiles",
+                    "✔️ Eclipse - Disco",
+                    "✔️ Green Valley - Disco",
+                    "✔️ Fiesta Bahiana",
+                    "✔️ La Gruta - Disco"
+                ],
+                "🏝️ Florianópolis": [
+                    "✔️ City tour Florianópolis y Mercado Público",
+                    "✔️ Campeche, Armação y Pântano do Sul",
+                    "✔️ Isla de Campeche",
+                    "✔️ Jurerê Internacional, Canasvieiras y Ingleses",
+                    "✔️ Senderismo a la Playa de Lagoinha do Leste",
+                    "✔️ Santo Antônio de Lisboa",
+                    "✔️ Beto Carrero World",
+                    "✔️ Joaquina y Lagoa da Conceição",
+                    "✔️ Eclipse - Disco",
+                    "✔️ Green Valley - Disco",
+                    "✔️ Fiesta Bahiana",
+                    "✔️ La Gruta - Disco"
+                ],
+                "🏖️ Itapema": [
+                    "✔️ Beto Carrero World",
+                    "✔️ Mirador del Encanto y las playas de Itapema",
+                    "✔️ Bombas y Bombinhas",
+                    "✔️ Brusque y Nova Trento",
+                    "✔️ Balneario Camboriú y Parque Unipraias",
+                    "✔️ Florianópolis y sus playas del norte",
+                    "✔️ Porto Belo y su reserva ecológica",
+                    "✔️ Barrio de Canto da Praia",
+                    "✔️ Morro del Gavilán (Morro do Gavião)",
+                    "✔️ Catamarán por la Costa Esmeralda",
+                    "✔️ Eclipse - Disco",
+                    "✔️ Green Valley - Disco",
+                    "✔️ Fiesta Bahiana",
+                    "✔️ La Gruta - Disco"
+                ],
+                "🏖️ Maceió": [
+                    "✔️ Playa de Maragogi y sus piscinas naturales",
+                    "✔️ Playa de Francés, Playa de Gunga y Barra de São Miguel",
+                    "✔️ Playa de Antunes y el Camino de Moisés",
+                    "✔️ Catamarán por la desembocadura del Río São Francisco",
+                    "✔️ Dunas y playas de Piaçabuçu",
+                    "✔️ Playas de Hibiscus y Ipioca (Litoral Norte)",
+                    "✔️ Playa de Carro Quebrado y Capitán Nikolas",
+                    "✔️ City tour Maceió y el barrio de Jaraguá",
+                    "✔️ Piscinas naturales de Pajuçara en jangada",
+                    "✔️ San Miguel de los Milagros"
+                ],
+                "🏖️ Río de Janeiro": [
+                    "✔️ Cristo Redentor y el Pan de Azúcar",
+                    "✔️ Catamarán por la Bahía de Guanabara",
+                    "✔️ Estadio Maracaná y el Sambódromo",
+                    "✔️ Arraial do Cabo",
+                    "✔️ Búzios con paseo en barco y almuerzo",
+                    "✔️ Pedra da Gávea",
+                    "✔️ Centro de Río, Escalera Selarón y Santa Teresa",
+                    "✔️ Parque Nacional de la Tijuca",
+                    "✔️ Petrópolis",
+                    "✔️ Parque Bondinho y miradores de la ciudad"
+                ],
+                "🗼 Torres": [
+                    "✔️ Centro de Torres y el río Mampituba",
+                    "✔️ Morro del Faro",
+                    "✔️ Parque Nacional de Aparados da Serra",
+                    "✔️ Viñedos y bodegas de la Sierra Gaúcha",
+                    "✔️ Parque Nacional de la Serra Geral",
+                    "✔️ Isla de los Lobos",
+                    "✔️ Avistaje de ballenas francas",
+                    "✔️ Parque Estatal de la Guarita y los acantilados",
+                    "✔️ Ruta gastronómica del pescado y frutos de mar",
+                    "✔️ 4x4 por las dunas de la Playa de Itapeva"
+                ]
+            },
+            chile: {
+                "⛰️ Santiago de Chile": [
+                    "✔️ City Tour",
+                    "✔️ Sky Costanera",
+                    "✔️ Viña del Mar",
+                    "✔️ Viñedos del Maipo",
+                    "✔️ Cajón del Maipo",
+                    "✔️ Cerro San Cristóbal",
+                    "✔️ Valle Nevado"
+                ]
+            }
+        };
+
+        // ==================================================
+        // FUNCIÓN PARA OBTENER PAÍSES Y CIUDADES
+        // ==================================================
+        function getPaises() {
+            return Object.keys(EXCURSIONES_DATA);
+        }
+
+        function getCiudades(pais) {
+            if (!pais || !EXCURSIONES_DATA[pais]) return [];
+            return Object.keys(EXCURSIONES_DATA[pais]);
+        }
+
+        function getCiudadConEmoji(pais, ciudad) {
+            // Devuelve el nombre de la ciudad con su emoji
+            const ciudades = EXCURSIONES_DATA[pais] || {};
+            const ciudadEncontrada = Object.keys(ciudades).find(c => c === ciudad);
+            return ciudadEncontrada || ciudad;
+        }
+
         // ==================================================
         // REGISTRAR SERVICE WORKER PARA PWA
         // ==================================================
@@ -648,7 +919,7 @@
                     eventos = data.eventos;
                     renderizarEventos();
                 } else {
-                    document.getElementById('eventosContainer').innerHTML = `<div style="text-align:center; padding:50px; color: var(--danger);">❌ Error: ${data.message || 'No se pudieron cargar los eventos'}</div>`;
+                    document.getElementById('eventosContainer').innerHTML = `<div style="text-align:center; padding:50px; color: var(--danger);">❌ Error: ${data.message}</div>`;
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -677,12 +948,18 @@
                 return div.innerHTML;
             }
             
-            container.innerHTML = eventos.map(evento => `
+            container.innerHTML = eventos.map(evento => {
+                let destinoHtml = '';
+                if (evento.pais && evento.ciudad) {
+                    destinoHtml = `<div class="evento-destino"><i class="ph ph-map-pin"></i> ${escapeHtml(evento.pais)} - ${escapeHtml(evento.ciudad)}</div>`;
+                }
+                return `
                 <div class="evento-card">
                     <div class="evento-header">
                         <div class="evento-titulo">${escapeHtml(evento.nombre)}</div>
                         <div class="evento-fechas"><i class="ph ph-calendar"></i> ${formatearRangoFechas(evento.fechaInicio, evento.fechaFin)}</div>
                         <div class="evento-pax"><i class="ph ph-users"></i> ${evento.pax || '0'} pasajeros</div>
+                        ${destinoHtml}
                     </div>
                     <div class="evento-acciones">
                         <button class="btn-evento btn-ver-evento" onclick="verEvento('${evento.id}')"><i class="ph ph-eye"></i> Ver días</button>
@@ -690,13 +967,19 @@
                         <button class="btn-evento btn-eliminar-evento" onclick="eliminarEvento('${evento.id}')"><i class="ph ph-trash"></i> Eliminar</button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
         
         // ==================================================
-        // CREAR EVENTO
+        // CREAR EVENTO (con países y ciudades del formulario)
         // ==================================================
         function mostrarModalCrearEvento() {
+            const paises = getPaises();
+            let paisesOptions = '<option value="">Selecciona un país</option>';
+            paises.forEach(pais => {
+                paisesOptions += `<option value="${pais}">${pais.charAt(0).toUpperCase() + pais.slice(1)}</option>`;
+            });
+
             const modalHtml = `
                 <div id="modalCrearEvento" class="modal" onclick="if(event.target===this) cerrarModal('modalCrearEvento')">
                     <div class="modal-contenido">
@@ -708,13 +991,29 @@
                             <label>Nombre del evento</label>
                             <input type="text" id="eventoNombre" placeholder="Ej: Camboriu 45 Pax">
                         </div>
-                        <div class="form-group">
-                            <label>Fecha de inicio</label>
-                            <input type="date" id="eventoFechaInicio">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>País</label>
+                                <select id="eventoPais" onchange="actualizarCiudadesEvento()">
+                                    ${paisesOptions}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Ciudad</label>
+                                <select id="eventoCiudad" disabled>
+                                    <option value="">Selecciona un país primero</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Fecha de fin</label>
-                            <input type="date" id="eventoFechaFin">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Fecha de inicio</label>
+                                <input type="date" id="eventoFechaInicio">
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha de fin</label>
+                                <input type="date" id="eventoFechaFin">
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Cantidad de pasajeros</label>
@@ -725,16 +1024,57 @@
                 </div>
             `;
             document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Si ya hay países disponibles, inicializar el selector de ciudades
+            if (paises.length > 0) {
+                // No hacer nada, esperar a que el usuario seleccione un país
+            }
         }
+
+        // Función para actualizar ciudades según el país seleccionado
+        window.actualizarCiudadesEvento = function() {
+            const paisSelect = document.getElementById('eventoPais');
+            const ciudadSelect = document.getElementById('eventoCiudad');
+            const pais = paisSelect.value;
+            
+            ciudadSelect.innerHTML = '<option value="">Selecciona una ciudad</option>';
+            
+            if (pais) {
+                const ciudades = getCiudades(pais);
+                if (ciudades.length > 0) {
+                    ciudadSelect.disabled = false;
+                    ciudades.forEach(ciudad => {
+                        const option = document.createElement('option');
+                        option.value = ciudad;
+                        option.textContent = ciudad;
+                        ciudadSelect.appendChild(option);
+                    });
+                } else {
+                    ciudadSelect.disabled = true;
+                    ciudadSelect.innerHTML = '<option value="">No hay ciudades disponibles</option>';
+                }
+            } else {
+                ciudadSelect.disabled = true;
+                ciudadSelect.innerHTML = '<option value="">Selecciona un país primero</option>';
+            }
+        };
         
         async function crearEvento() {
             const nombre = document.getElementById('eventoNombre')?.value;
+            const pais = document.getElementById('eventoPais')?.value;
+            const ciudad = document.getElementById('eventoCiudad')?.value;
             const fechaInicioInput = document.getElementById('eventoFechaInicio')?.value;
             const fechaFinInput = document.getElementById('eventoFechaFin')?.value;
             const pax = document.getElementById('eventoPax')?.value || '0';
             
             if (!nombre || !fechaInicioInput || !fechaFinInput) {
-                alert('⚠️ Por favor, complete todos los campos');
+                alert('⚠️ Por favor, complete todos los campos obligatorios');
+                return;
+            }
+            
+            // Validar que si seleccionó país, también seleccione ciudad
+            if (pais && !ciudad) {
+                alert('⚠️ Por favor, seleccione una ciudad para el país elegido');
                 return;
             }
             
@@ -746,6 +1086,8 @@
                 formData.append('action', 'guardarEvento');
                 formData.append('id', eventoId);
                 formData.append('nombre', nombre);
+                formData.append('pais', pais || '');
+                formData.append('ciudad', ciudad || '');
                 formData.append('fechaInicio', fechaInicioInput);
                 formData.append('fechaFin', fechaFinInput);
                 formData.append('pax', pax);
@@ -844,6 +1186,11 @@
                     `;
                 }
                 
+                let destinoInfo = '';
+                if (evento.pais && evento.ciudad) {
+                    destinoInfo = `<p><strong><i class="ph ph-map-pin"></i> Destino:</strong> ${escapeHtml(evento.pais)} - ${escapeHtml(evento.ciudad)}</p>`;
+                }
+                
                 const modalHtml = `
                     <div id="modalEvento" class="modal" onclick="if(event.target===this) cerrarModal('modalEvento')">
                         <div class="modal-contenido">
@@ -854,6 +1201,7 @@
                             <div style="margin-bottom:16px;">
                                 <p><strong><i class="ph ph-calendar"></i> Período:</strong> ${formatearRangoFechas(evento.fechaInicio, evento.fechaFin)}</p>
                                 <p><strong><i class="ph ph-users"></i> Pasajeros:</strong> ${evento.pax}</p>
+                                ${destinoInfo}
                             </div>
                             <div class="dias-container">${diasHtml}</div>
                         </div>
@@ -1109,6 +1457,9 @@
                 
                 let mensaje = `🏔️ *AVENTURA TOTAL* 🏔️\n\n`;
                 mensaje += `📅 *EVENTO: ${evento.nombre}*\n`;
+                if (evento.pais && evento.ciudad) {
+                    mensaje += `📍 *Destino:* ${evento.pais} - ${evento.ciudad}\n`;
+                }
                 mensaje += `👥 *Pasajeros:* ${evento.pax}\n\n`;
                 mensaje += `📋 *ITINERARIO DIARIO:*\n`;
                 mensaje += `........................................\n\n`;
@@ -1175,6 +1526,8 @@
         window.eliminarEvento = eliminarEvento;
         window.logout = logout;
         window.toggleTheme = toggleTheme;
+        window.cargarEventos = cargarEventos;
+        window.actualizarCiudadesEvento = actualizarCiudadesEvento;
         
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
