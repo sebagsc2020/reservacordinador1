@@ -544,7 +544,7 @@
             <div class="table-section">
                 <div class="section-header">
                     <h3 class="card-title">Últimas Reservas</h3>
-                    <button class="btn btn-secondary">Ver todas</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='reservas.html'">Ver todas</button>
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -655,7 +655,7 @@
         // DATA & LOGIC
         // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
-        const JSON_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Hoja%201&tq=order%20by%20A%20desc%20limit%2050`;
+        const JSON_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Hoja%201`;
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqiiJwt3NPLXk7RbAlvF38ToqdeJ4HResvA56ZUjOhs0tYaSnq32gN8YVgnt_OT4gD6Q/exec';
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
 
@@ -838,15 +838,13 @@
             let fechaDesdeObj = null;
             let fechaHastaObj = null;
 
-            // Si se seleccionó un evento, calcular sus fechas para filtrar
+            // Si se seleccionó un evento, calcular sus fechas para filtrar (Corregido huso horario)
             if (eventoId) {
                 const evento = eventosCalendario.find(e => e.id === eventoId);
                 if (evento) {
-                    fechaDesdeObj = new Date(evento.fechaInicio);
-                    fechaHastaObj = new Date(evento.fechaFin);
-                    // Ajustar a medianoche para abarcar todo el día
-                    fechaDesdeObj.setHours(0,0,0,0);
-                    fechaHastaObj.setHours(23,59,59,999);
+                    // Creamos las fechas en horario local para que no se desfase con la fecha de la reserva
+                    fechaDesdeObj = new Date(evento.fechaInicio + 'T00:00:00'); 
+                    fechaHastaObj = new Date(evento.fechaFin + 'T23:59:59'); 
                 }
             }
 
@@ -859,6 +857,9 @@
                     if (r.fecha !== '--/--/----') {
                         const partesFecha = r.fecha.split('/');
                         const fechaR = new Date(partesFecha[2], partesFecha[1]-1, partesFecha[0]);
+                        // Eliminamos las horas para comparar solo fechas
+                        fechaR.setHours(0,0,0,0);
+                        
                         if (fechaDesdeObj && fechaR < fechaDesdeObj) coincideFecha = false;
                         if (fechaHastaObj && fechaR > fechaHastaObj) coincideFecha = false;
                     } else {
@@ -945,6 +946,10 @@
 
         function renderizarTablas(reservas) {
             const tbodyRes = document.getElementById('tablaUltimasReservas');
+            if(reservas.length === 0) {
+                tbodyRes.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">No hay reservas con estos filtros.</td></tr>';
+                return;
+            }
             tbodyRes.innerHTML = reservas.slice(0, 5).map(r => `
                 <tr>
                     <td><span style="font-family:monospace; color:var(--text-muted); font-size:12px;">#${r.id.substring(0,6)}</span></td>
@@ -958,7 +963,7 @@
                     <td>${r.fecha}</td>
                     <td style="font-weight:600;">${r.personas}</td>
                     <td><span class="badge badge-${r.estado}">${r.estado}</span></td>
-                    <td><button class="btn-icon" style="width:32px; height:32px; padding:0;" title="Ver detalles"><i class="ph ph-eye"></i></button></td>
+                    <td><button class="btn-icon" style="width:32px; height:32px; padding:0;" title="Ver detalles" onclick="window.location.href='reservas.html'"><i class="ph ph-eye"></i></button></td>
                 </tr>
             `).join('');
 
