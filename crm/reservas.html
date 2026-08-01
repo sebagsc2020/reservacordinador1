@@ -545,7 +545,7 @@
                 <div><h1>📋 Reservas</h1></div>
                 <div class="user-area">
                     <!-- Botón de tema claro/oscuro -->
-                    <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
+                    <button class="btn-icon" id="themeBtn" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
                     
                     <!-- Botones de acción alineados juntos -->
                     <button class="btn-action-header" id="btnRecargar"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
@@ -655,8 +655,9 @@
         });
 
         // ==================================================
-        // MODO OSCURO
+        // MODO OSCURO (CON VARIABLES CSS)
         // ==================================================
+        const themeBtn = document.getElementById('themeBtn');
         const themeIcon = document.getElementById('themeIcon');
         
         function toggleTheme() {
@@ -666,7 +667,7 @@
             themeIcon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
         }
 
-        // Cargar preferencia guardada
+        // Cargar preferencia guardada al iniciar
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
             themeIcon.className = 'ph ph-sun';
