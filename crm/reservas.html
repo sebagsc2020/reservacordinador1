@@ -205,6 +205,7 @@
             gap: 12px; 
             align-items: center; 
             flex-wrap: wrap; 
+            position: relative; /* Necesario para el autocompletado */
         }
         .filter-input { 
             padding: 10px 16px; 
@@ -264,6 +265,51 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px var(--primary-light);
         }
+
+        /* ================================================== */
+        /* NUEVO ESTILO PARA LA LISTA DE AUTOCOMPLETADO       */
+        /* ================================================== */
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            box-shadow: var(--shadow-md);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 2000;
+            display: none;
+            margin-top: -4px;
+        }
+        .autocomplete-list.active {
+            display: block;
+        }
+        .autocomplete-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            transition: background 0.2s;
+        }
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: var(--bg-body);
+            color: var(--primary);
+        }
+        .autocomplete-item small {
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        /* ================================================== */
 
         .total-reservas { 
             font-size: 13px; 
@@ -477,14 +523,16 @@
             </header>
 
             <div class="filters-bar">
-                <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
+                <!-- CAMBIO: INPUT CON POSICIÓN RELATIVA PARA EL AUTOCOMPLETADO -->
+                <div style="flex:1; min-width:150px; position:relative;">
+                    <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva" autocomplete="off">
+                    <div class="autocomplete-list" id="autocompleteList"></div>
+                </div>
                 
-                <!-- CAMBIO: FILTRO DE CIUDAD AHORA ES UN SELECT DINÁMICO -->
                 <select class="filter-select" id="filtroCiudad">
                     <option value="">📍 Todas las ciudades</option>
                 </select>
                 
-                <!-- FILTRO POR EVENTO DE CALENDARIO DINÁMICO -->
                 <select class="filter-select" id="filtroEventoCalendario">
                     <option value="">📅 Todos los eventos</option>
                 </select>
@@ -574,6 +622,9 @@
         let reservasFiltradas = [];
         let estadosGlobales = {};
         let eventosCalendario = []; 
+        
+        // Para el autocompletado
+        let datosBusqueda = []; 
 
         async function guardarNombreEnNube(id, nuevoNombre) {
             try {
@@ -588,7 +639,6 @@
                     body: formData.toString()
                 });
                 
-                const text = await response.text();
                 return true;
             } catch (error) {
                 console.error('Error al guardar nombre en nube:', error);
@@ -806,7 +856,7 @@
         }
 
         // ==================================================
-        // FUNCIÓN PRINCIPAL (CARGAR RESERVAS Y CIUDADES)
+        // FUNCIÓN PRINCIPAL (CARGAR RESERVAS, CIUDADES Y DATOS DE BÚSQUEDA)
         // ==================================================
         async function cargarReservas() {
             const container = document.getElementById('cardsContainer');
@@ -833,8 +883,10 @@
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 const nombresEditados = cargarNombresEditados();
                 
-                // Variable temporal para recolectar ciudades únicas
+                // Variables para recolectar datos únicos
                 const ciudadesSet = new Set();
+                const nombresSet = new Set();
+                const excursionesSet = new Set();
 
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
@@ -849,7 +901,17 @@
                     const telefono = (c[5] && c[5].v) ? String(c[5].v) : '';
                     const ciudad = (c[7] && c[7].v) ? String(c[7].v) : '';
 
-                    // Si la ciudad no está vacía, la guardamos en el Set
+                    let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
+                    if (nombresEditados[id]) {
+                        nombreCompleto = nombresEditados[id];
+                    }
+
+                    // Recolectar nombres únicos para autocompletar
+                    if (nombreCompleto && nombreCompleto !== 'No especificado') {
+                        nombresSet.add(nombreCompleto.trim());
+                    }
+
+                    // Recolectar ciudades únicas para el select
                     if (ciudad && ciudad.trim() !== '') {
                         ciudadesSet.add(ciudad.trim());
                     }
@@ -867,6 +929,13 @@
                         excursionesLista = excursionesLista.map(function(e) { 
                             return e.trim().replace(/^✔️\s*/, '').replace(/^\d+\.\s*/, '');
                         }).filter(function(e) { return e; });
+
+                        // Recolectar excursiones únicas para autocompletar
+                        excursionesLista.forEach(exc => {
+                            if (exc && exc.trim() !== '') {
+                                excursionesSet.add(exc.trim());
+                            }
+                        });
                     }
 
                     let fecha = '';
@@ -884,12 +953,7 @@
                     const personas = (c[10] && c[10].v) ? String(c[10].v) : '1';
                     const formaPago = (c[11] && c[11].v) ? String(c[11].v) : 'No especificado';
                     const lugar = (c[12] && c[12].v) ? String(c[12].v) : 'No especificado';
-                    let nombreCompleto = (nombre + ' ' + apellido).trim() || 'No especificado';
                     
-                    if (nombresEditados[id]) {
-                        nombreCompleto = nombresEditados[id];
-                    }
-
                     let estado = estadosGlobales[id];
                     if (!estado || (estado !== 'pendiente' && estado !== 'confirmado' && estado !== 'pagado')) {
                         estado = 'confirmado';
@@ -922,12 +986,8 @@
                 // ==============================================
                 const selectCiudad = document.getElementById('filtroCiudad');
                 if (selectCiudad) {
-                    // Limpiar opciones viejas, dejando solo la primera
                     selectCiudad.innerHTML = '<option value="">📍 Todas las ciudades</option>';
-                    
-                    // Convertir Set a Array y ordenar alfabéticamente
                     const ciudadesArray = Array.from(ciudadesSet).sort();
-                    
                     ciudadesArray.forEach(ciudad => {
                         const option = document.createElement('option');
                         option.value = ciudad;
@@ -935,6 +995,15 @@
                         selectCiudad.appendChild(option);
                     });
                 }
+
+                // ==============================================
+                // ACTUALIZAR DATOS PARA AUTOCOMPLETADO
+                // ==============================================
+                datosBusqueda = [];
+                nombresSet.forEach(n => datosBusqueda.push({texto: n, tipo: '👤 Cliente'}));
+                excursionesSet.forEach(e => datosBusqueda.push({texto: e, tipo: '🏔️ Excursión'}));
+                // Ordenar alfabéticamente
+                datosBusqueda.sort((a, b) => a.texto.localeCompare(b.texto));
 
                 reservasFiltradas = reservasData.slice();
                 renderizarCards();
@@ -946,56 +1015,56 @@
             }
         }
 
-        async function cambiarEstado(id, nuevoEstado) {
-            const reserva = reservasData.find(function(r) { return r.id === id; });
-            if (reserva) {
-                reserva.estado = nuevoEstado;
-                estadosGlobales[id] = nuevoEstado;
-                const indexFiltrada = reservasFiltradas.findIndex(function(r) { return r.id === id; });
-                if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].estado = nuevoEstado;
+        // ==================================================
+        // AUTOCOMPLETADO DE BÚSQUEDA
+        // ==================================================
+        function initAutocomplete() {
+            const input = document.getElementById('busquedaReserva');
+            const listContainer = document.getElementById('autocompleteList');
+            if (!input || !listContainer) return;
+
+            input.addEventListener('input', function() {
+                const value = this.value.toLowerCase().trim();
+                listContainer.innerHTML = '';
                 
-                localStorage.setItem('estadosReservasCloud', JSON.stringify(estadosGlobales));
-                await guardarEstadoEnNube(id, nuevoEstado);
-                renderizarCards();
-                
-                const estadoText = nuevoEstado === 'confirmado' ? 'Confirmada' : (nuevoEstado === 'pendiente' ? 'Pendiente' : 'Pagada');
-                alert(`✅ Estado cambiado a: ${estadoText}`);
-            }
-        }
+                if (!value || value.length < 1) {
+                    listContainer.classList.remove('active');
+                    return;
+                }
 
-        function enviarWhatsApp(reserva) {
-            let telefono = reserva.telefono.replace(/\D/g, '');
-            if (telefono.length === 10) {
-                telefono = '54' + telefono;
-            }
+                // Buscar coincidencias en el array de datos
+                const matches = datosBusqueda.filter(item => 
+                    item.texto.toLowerCase().includes(value)
+                ).slice(0, 8); // Limitar a 8 resultados
 
-            let excursionesTexto = '';
-            if (reserva.excursionesLista && reserva.excursionesLista.length > 0) {
-                excursionesTexto = reserva.excursionesLista.map(function(exc, idx) { return (idx+1) + '. ' + exc; }).join('\n');
-            } else {
-                excursionesTexto = 'Sin excursiones específicas';
-            }
+                if (matches.length === 0) {
+                    listContainer.classList.remove('active');
+                    return;
+                }
 
-            let estadoTexto = '';
-            switch(reserva.estado) {
-                case 'pendiente': estadoTexto = 'Pendiente'; break;
-                case 'confirmado': estadoTexto = 'Confirmado'; break;
-                case 'pagado': estadoTexto = 'Pagado'; break;
-                default: estadoTexto = 'Confirmado';
-            }
+                // Renderizar sugerencias
+                matches.forEach((match, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.innerHTML = `${match.texto} <small>${match.tipo}</small>`;
+                    
+                    item.addEventListener('click', function() {
+                        input.value = match.texto;
+                        listContainer.classList.remove('active');
+                        filtrarReservas(); // Filtrar automáticamente
+                    });
+                    listContainer.appendChild(item);
+                });
 
-            const mensaje = '🏔️ *AVENTURA TOTAL* 🏔️\n\n✅ *CONFIRMACIÓN DE RESERVA*\n\n🆔 *N° de reserva:* ' + reserva.id + '\n📅 *Fecha solicitud:* ' + reserva.fecha + '\n\n👤 *DATOS DEL PASAJERO:*\n   Nombre: ' + reserva.nombre + '\n   📞 Teléfono: ' + reserva.telefono + '\n   📧 Email: ' + reserva.email + '\n\n📍 *DESTINO:*\n   ' + reserva.ciudad + '\n\n✨ *EXCURSIONES SELECCIONADAS:*\n' + excursionesTexto + '\n\n👥 *Cantidad de personas:* ' + reserva.personas + '\n💳 *Forma de pago:* ' + reserva.formaPago + '\n🚐 *Punto de encuentro:* ' + reserva.lugar + '\n📌 *Estado:* ' + estadoTexto + '\n\n📌 *PRÓXIMOS PASOS:*\n• En las próximas 24hs recibirás detalles de pago\n• Punto de encuentro exacto será confirmado\n\n🏔️ ¡Gracias por confiar en Aventura Total!';
+                listContainer.classList.add('active');
+            });
 
-            const mensajeCodificado = encodeURIComponent(mensaje);
-            window.open('https://wa.me/' + telefono + '?text=' + mensajeCodificado, '_blank');
-        }
-
-        function calcularTotalPasajeros(reservas) {
-            let total = 0;
-            for (let i = 0; i < reservas.length; i++) {
-                total += reservas[i].personas || 1;
-            }
-            return total;
+            // Ocultar la lista al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (e.target !== input && e.target !== listContainer) {
+                    listContainer.classList.remove('active');
+                }
+            });
         }
 
         // ==================================================
@@ -1009,7 +1078,7 @@
             const filtroFechaHasta = document.getElementById('filtroFechaHasta');
             
             const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
-            const ciudad = filtroCiudad ? filtroCiudad.value : ''; // Ahora es string directo
+            const ciudad = filtroCiudad ? filtroCiudad.value : ''; 
             const estado = filtroEstado ? filtroEstado.value : 'todos';
             
             let fechaDesdeObj = null;
@@ -1235,6 +1304,9 @@
             const filtroFechaDesde = document.getElementById('filtroFechaDesde');
             const filtroFechaHasta = document.getElementById('filtroFechaHasta');
             
+            // Inicializar autocompletado
+            initAutocomplete();
+
             if (btnFiltrar) btnFiltrar.addEventListener('click', filtrarReservas);
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
             if (btnPDFExterno) btnPDFExterno.addEventListener('click', generarPDFExterno);
