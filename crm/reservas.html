@@ -235,7 +235,7 @@
             background: var(--bg-body);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            min-width: 140px;
+            min-width: 160px;
             cursor: pointer;
             transition: border-color 0.2s;
         }
@@ -468,6 +468,9 @@
                     <option value="pendiente">⏳ Pendiente</option>
                     <option value="pagado">💰 Pagado</option>
                 </select>
+                <select class="filter-select" id="filtroEvento">
+                    <option value="todos">📅 Todos los eventos</option>
+                </select>
                 <button class="btn btn-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Filtrar</button>
                 <button class="btn btn-success" id="btnRecargar"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
                 <button class="btn btn-secondary" id="btnPDFExterno"><i class="ph ph-file-pdf"></i> Generar PDF</button>
@@ -547,10 +550,42 @@
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
+        const CALENDARIO_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvsRbRQn-Ty10gIH7u49aOVNg7tbd_BlRFpvYVau5vPfmXs6xPDeCX2hxz4l2f0mBHjA/exec';
         
         let reservasData = [];
         let reservasFiltradas = [];
         let estadosGlobales = {};
+        let eventosCalendario = [];
+
+        // ==================================================
+        // CARGAR EVENTOS DEL CALENDARIO
+        // ==================================================
+        async function cargarEventosCalendario() {
+            try {
+                const url = `${CALENDARIO_SCRIPT_URL}?action=obtenerEventos&t=${Date.now()}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success && data.eventos) {
+                    eventosCalendario = data.eventos;
+                    // Actualizar el selector de eventos
+                    const selectEvento = document.getElementById('filtroEvento');
+                    if (selectEvento) {
+                        // Mantener la opción "todos"
+                        let options = '<option value="todos">📅 Todos los eventos</option>';
+                        eventosCalendario.forEach(evento => {
+                            options += `<option value="${evento.id}">📅 ${evento.nombre} (${evento.pax} pax)</option>`;
+                        });
+                        selectEvento.innerHTML = options;
+                    }
+                    console.log('📅 Eventos cargados:', eventosCalendario.length);
+                }
+                return eventosCalendario;
+            } catch (error) {
+                console.error('Error al cargar eventos del calendario:', error);
+                return [];
+            }
+        }
 
         // ==================================================
         // GUARDAR NOMBRE EDITADO EN LA NUBE
@@ -680,6 +715,9 @@
             if (!container) return;
 
             try {
+                // Cargar eventos del calendario primero
+                await cargarEventosCalendario();
+                
                 await cargarEstadosDesdeNube();
 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
@@ -837,16 +875,62 @@
         }
 
         // ==================================================
+        // FUNCIÓN PARA VERIFICAR SI UNA RESERVA PERTENECE A UN EVENTO
+        // ==================================================
+        function reservaPerteneceAEvento(reserva, eventoId) {
+            if (eventoId === 'todos') return true;
+            
+            const evento = eventosCalendario.find(e => e.id === eventoId);
+            if (!evento) return true;
+            
+            // Convertir fecha de la reserva a formato comparable
+            const fechaReserva = reserva.fecha; // Formato DD/MM/YYYY
+            if (!fechaReserva) return false;
+            
+            // Obtener fecha inicio y fin del evento en formato DD/MM/YYYY
+            const fechaInicio = convertirFechaISOtoDDMMYYYY(evento.fechaInicio);
+            const fechaFin = convertirFechaISOtoDDMMYYYY(evento.fechaFin);
+            
+            // Comparar fechas (simple comparación de strings en formato DD/MM/YYYY)
+            // Para comparación correcta, convertimos a números
+            const partesReserva = fechaReserva.split('/');
+            const partesInicio = fechaInicio.split('/');
+            const partesFin = fechaFin.split('/');
+            
+            if (partesReserva.length !== 3 || partesInicio.length !== 3 || partesFin.length !== 3) {
+                return false;
+            }
+            
+            const fechaReservaNum = parseInt(partesReserva[2] + partesReserva[1] + partesReserva[0]);
+            const fechaInicioNum = parseInt(partesInicio[2] + partesInicio[1] + partesInicio[0]);
+            const fechaFinNum = parseInt(partesFin[2] + partesFin[1] + partesFin[0]);
+            
+            return fechaReservaNum >= fechaInicioNum && fechaReservaNum <= fechaFinNum;
+        }
+
+        function convertirFechaISOtoDDMMYYYY(fechaIso) {
+            if (!fechaIso) return '';
+            const fecha = new Date(fechaIso);
+            if (isNaN(fecha.getTime())) return fechaIso;
+            const dia = fecha.getDate().toString().padStart(2, '0');
+            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            const anio = fecha.getFullYear();
+            return `${dia}/${mes}/${anio}`;
+        }
+
+        // ==================================================
         // FUNCIÓN PARA FILTRAR RESERVAS (MULTIPLE FILTRO)
         // ==================================================
         function filtrarReservas() {
             const busqueda = document.getElementById('busquedaReserva');
             const filtroCiudad = document.getElementById('filtroCiudad');
             const filtroEstado = document.getElementById('filtroEstado');
+            const filtroEvento = document.getElementById('filtroEvento');
             
             const texto = busqueda ? busqueda.value.toLowerCase().trim() : '';
             const ciudad = filtroCiudad ? filtroCiudad.value.toLowerCase().trim() : '';
             const estado = filtroEstado ? filtroEstado.value : 'todos';
+            const eventoId = filtroEvento ? filtroEvento.value : 'todos';
 
             reservasFiltradas = reservasData.filter(function(r) {
                 // Filtro por nombre o excursión
@@ -871,7 +955,13 @@
                     coincideEstado = r.estado === estado;
                 }
                 
-                return coincideBusqueda && coincideCiudad && coincideEstado;
+                // Filtro por evento del calendario
+                let coincideEvento = true;
+                if (eventoId !== 'todos') {
+                    coincideEvento = reservaPerteneceAEvento(r, eventoId);
+                }
+                
+                return coincideBusqueda && coincideCiudad && coincideEstado && coincideEvento;
             });
             
             renderizarCards();
@@ -1043,19 +1133,25 @@
             const busquedaInput = document.getElementById('busquedaReserva');
             const filtroCiudad = document.getElementById('filtroCiudad');
             const filtroEstado = document.getElementById('filtroEstado');
+            const filtroEvento = document.getElementById('filtroEvento');
             
             if (btnFiltrar) btnFiltrar.addEventListener('click', filtrarReservas);
             if (btnRecargar) btnRecargar.addEventListener('click', cargarReservas);
             if (btnPDFExterno) btnPDFExterno.addEventListener('click', generarPDFExterno);
             
             // Evento Enter en todos los inputs de filtro
-            [busquedaInput, filtroCiudad, filtroEstado].forEach(function(input) {
+            [busquedaInput, filtroCiudad, filtroEstado, filtroEvento].forEach(function(input) {
                 if (input) {
                     input.addEventListener('keypress', function(e) { 
                         if (e.key === 'Enter') filtrarReservas(); 
                     });
                 }
             });
+            
+            // Cambio en select de evento también dispara el filtro
+            if (filtroEvento) {
+                filtroEvento.addEventListener('change', filtrarReservas);
+            }
             
             cargarReservas();
             
