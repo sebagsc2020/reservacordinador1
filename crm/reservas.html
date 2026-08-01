@@ -641,6 +641,49 @@
             }
         }
 
+        // ==================================================
+        // FUNCIÓN PARA FORMATEAR FECHA CORRECTAMENTE
+        // ==================================================
+        function formatearFecha(valor) {
+            if (!valor) return '';
+            
+            // Si es un string, procesarlo
+            if (typeof valor === 'string') {
+                // Reemplazar guiones por barras
+                let fechaStr = valor.replace(/-/g, '/');
+                
+                // Verificar si tiene formato DD/MM/YYYY o DD-MM-YYYY
+                const partes = fechaStr.split('/');
+                if (partes.length === 3) {
+                    // Asegurar que día y mes tengan 2 dígitos
+                    const dia = partes[0].padStart(2, '0');
+                    const mes = partes[1].padStart(2, '0');
+                    const anio = partes[2];
+                    return `${dia}/${mes}/${anio}`;
+                }
+                
+                // Si es un timestamp en string
+                const fechaObj = new Date(valor);
+                if (!isNaN(fechaObj.getTime())) {
+                    return fechaObj.getDate().toString().padStart(2,'0') + '/' + 
+                           (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
+                           fechaObj.getFullYear();
+                }
+            }
+            
+            // Si es un número (timestamp)
+            if (typeof valor === 'number') {
+                const fechaObj = new Date(valor);
+                if (!isNaN(fechaObj.getTime())) {
+                    return fechaObj.getDate().toString().padStart(2,'0') + '/' + 
+                           (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
+                           fechaObj.getFullYear();
+                }
+            }
+            
+            return '';
+        }
+
         async function cargarReservas() {
             const container = document.getElementById('cardsContainer');
             const totalSpan = document.getElementById('totalReservasSpan');
@@ -665,6 +708,8 @@
                 reservasData = [];
                 const excluidos = JSON.parse(localStorage.getItem('reservasExcluidas') || '[]');
                 const nombresEditados = cargarNombresEditados();
+
+                console.log('📊 Columnas disponibles:', rows.length > 0 ? rows[0].c.length : 0);
 
                 for (let i = 0; i < rows.length; i++) {
                     const c = rows[i].c;
@@ -695,36 +740,24 @@
                     }
 
                     // ==================================================
-                    // LECTURA DE FECHA - PRIORIDAD: columna J (índice 9)
+                    // LEER FECHA DE LA COLUMNA J (índice 9)
                     // ==================================================
                     let fecha = '';
-                    // Primero intentar leer la columna J (índice 9) que es el campo "fecha" del formulario
+                    let fechaRaw = '';
+                    
+                    // Intentar leer la columna J (índice 9) - campo "fecha" del formulario
                     if (c[9] && c[9].v) {
-                        const fechaRaw = String(c[9].v);
-                        // Si la fecha viene en formato DD/MM/YYYY o DD-MM-YYYY
-                        if (fechaRaw.includes('/') || fechaRaw.includes('-')) {
-                            fecha = fechaRaw.replace(/-/g, '/');
-                        } else {
-                            // Si es un timestamp, convertirlo
-                            const fechaObj = new Date(fechaRaw);
-                            if (!isNaN(fechaObj.getTime())) {
-                                fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + 
-                                        (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
-                                        fechaObj.getFullYear();
-                            }
-                        }
+                        fechaRaw = String(c[9].v);
+                        console.log(`📅 Fecha raw para reserva ${id}: "${fechaRaw}"`);
+                        fecha = formatearFecha(fechaRaw);
                     }
                     
                     // Si no hay fecha en la columna J, intentar con el timestamp de la columna A (índice 0)
                     if (!fecha) {
                         const timestamp = (c[0] && c[0].v) ? c[0].v : null;
                         if (timestamp) {
-                            const fechaObj = new Date(timestamp);
-                            if (!isNaN(fechaObj.getTime())) {
-                                fecha = fechaObj.getDate().toString().padStart(2,'0') + '/' + 
-                                        (fechaObj.getMonth()+1).toString().padStart(2,'0') + '/' + 
-                                        fechaObj.getFullYear();
-                            }
+                            fecha = formatearFecha(timestamp);
+                            console.log(`📅 Usando timestamp para reserva ${id}: "${fecha}"`);
                         }
                     }
 
