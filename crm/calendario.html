@@ -80,14 +80,20 @@
         /* ===== LAYOUT ===== */
         .app-container { display: flex; min-height: 100vh; }
         
+        /* ================================================== */
+        /* CAMBIOS CSS PARA MENÚ RETRÁCTIL                   */
+        /* ================================================== */
+        
         .sidebar {
             width: 260px; 
             background: var(--sidebar-bg); 
             border-right: 1px solid var(--border-color);
             position: fixed; height: 100vh; z-index: 1001;
+            transform: translateX(-100%); 
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column;
         }
+        .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
         
         .sidebar-header { 
             padding: 20px 24px; 
@@ -134,11 +140,9 @@
         .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-details p { font-size: 11px; color: var(--text-muted); }
 
-        .main-content { margin-left: 260px; flex: 1; padding: 32px; transition: margin-left 0.3s; width: 100%; }
-        
-        /* Mobile Menu */
+        /* Botón del menú siempre visible */
         .menu-toggle { 
-            display: none; position: fixed; top: 16px; left: 16px; z-index: 1002; 
+            display: flex; position: fixed; top: 16px; left: 16px; z-index: 1002; 
             background: var(--bg-surface); border: 1px solid var(--border-color); 
             width: 44px; height: 44px; border-radius: var(--radius-sm); cursor: pointer; 
             color: var(--text-main); box-shadow: var(--shadow-md); 
@@ -150,6 +154,15 @@
             transition: opacity 0.3s; backdrop-filter: blur(4px); 
         }
         .overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* Contenido principal ocupa todo el ancho */
+        .main-content { 
+            margin-left: 0; flex: 1; padding: 32px; padding-top: 76px; transition: margin-left 0.3s; width: 100%; 
+        }
+        
+        /* ================================================== */
+        /* FIN DE CAMBIOS CSS                                */
+        /* ================================================== */
 
         /* ===== HEADER ===== */
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
@@ -479,10 +492,9 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) { .eventos-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); width: 280px; } 
-            .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
-            .main-content { margin-left: 0; padding: 20px; padding-top: 76px; } 
-            .menu-toggle { display: flex; }
+            .sidebar { width: 280px; }
+            .main-content { padding: 20px; padding-top: 76px; }
+            
             .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
             .eventos-grid { grid-template-columns: 1fr; gap: 16px; }
             .evento-acciones { flex-direction: column; }
@@ -502,12 +514,12 @@
 </head>
 <body>
 
-    <!-- Mobile Toggle -->
+    <!-- Botón para abrir el menú (Siempre visible) -->
     <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú"><i class="ph ph-list" style="font-size: 24px;"></i></button>
     <div class="overlay" id="menuOverlay"></div>
 
     <div class="app-container">
-        <!-- Sidebar -->
+        <!-- Sidebar (Inicia retraído) -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="brand-icon"><i class="ph-bold ph-mountains"></i></div>
@@ -853,7 +865,11 @@
         function toggleMenu() { sidebar.classList.toggle('open'); overlay.classList.toggle('active'); document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : ''; }
         function closeMenu() { sidebar.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
         menuBtn.addEventListener('click', toggleMenu); overlay.addEventListener('click', closeMenu);
-        document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', () => { if (window.innerWidth <= 768) closeMenu(); }); });
+        
+        // Cerrar menú SIEMPRE al hacer clic en un enlace (para que el contenido ocupe toda la pantalla)
+        document.querySelectorAll('.nav-link').forEach(link => { 
+            link.addEventListener('click', () => { closeMenu(); }); 
+        });
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode');
