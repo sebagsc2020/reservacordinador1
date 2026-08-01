@@ -2,643 +2,459 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Reservas - CRM Aventura Total</title>
     
-    <!-- ================================================== -->
-    <!-- PWA CONFIGURACIÓN                                      -->
-    <!-- ================================================== -->
+    <!-- PWA CONFIGURACIÓN -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AVT CRM">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#6366f1">
     <meta name="application-name" content="Aventura Total CRM">
-    <meta name="msapplication-TileColor" content="#1a1a2e">
-    <meta name="msapplication-TileImage" content="icons/icon-144.png">
     
-    <!-- Iconos para diferentes plataformas -->
-    <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="icons/icon-76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="icons/icon-114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+    <!-- Fuentes: Inter vía Fontsource -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.15/index.css">
+    
+    <!-- Iconos: Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; overflow-x: hidden; }
-        
-        /* Modo PWA (sin barra de navegación) */
-        .pwa-mode {
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #475569;
+            --sidebar-active-bg: #e0e7ff;
+            --sidebar-active-text: #4338ca;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
         }
 
-        /* ===== MENÚ FLOTANTE HAMBURGUESA ===== */
-        .menu-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            width: 50px;
-            height: 50px;
-            background: #667eea;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            border: none;
-        }
-        
-        .menu-btn:hover {
-            background: #5a6fd6;
-            transform: scale(1.05);
-        }
-        
-        .menu-btn span {
-            font-size: 24px;
-            color: white;
-        }
-        
-        /* ===== SIDEBAR ===== */
-        .sidebar { 
-            width: 250px; 
-            background: #1a1a2e; 
-            color: white; 
-            padding: 25px 0; 
-            position: fixed; 
-            height: 100vh; 
-            overflow-y: auto; 
-            z-index: 1001;
-            transition: transform 0.3s ease;
-            transform: translateX(-100%);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        
-        .sidebar.open {
-            transform: translateX(0);
-        }
-        
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .menu-overlay.active {
-            display: block;
-            opacity: 1;
-        }
-        
-        .sidebar-logo { text-align: center; padding: 0 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo .logo-icon { font-size: 40px; } 
-        .sidebar-logo h2 { font-size: 18px; margin-top: 8px; } 
-        .sidebar-logo h2 span { color: #667eea; }
-        
-        .nav-menu { list-style: none; padding: 0 15px; } 
-        .nav-menu li { margin-bottom: 5px; }
-        .nav-menu a { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            padding: 12px 15px; 
-            color: rgba(255,255,255,0.7); 
-            text-decoration: none; 
-            border-radius: 10px; 
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        .nav-menu a:hover, .nav-menu a.active { background: rgba(102,126,234,0.2); color: white; } 
-        .nav-menu a.active { background: #667eea; }
-        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        
-        .sidebar-footer { 
-            position: absolute; 
-            bottom: 20px; 
-            left: 15px; 
-            right: 15px; 
-        }
-        .btn-logout-sidebar { 
-            width: 100%; 
-            padding: 12px; 
-            background: rgba(231,76,60,0.2); 
-            color: #e74c3c; 
-            border: 1px solid rgba(231,76,60,0.3);
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 13px; 
-            transition: all 0.2s ease;
-        }
-        .btn-logout-sidebar:hover {
-            background: rgba(231,76,60,0.4);
+        body.dark-mode {
+            --bg-body: #0f172a;
+            --bg-surface: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #cbd5e1;
+            --sidebar-active-bg: #334155;
+            --sidebar-active-text: #818cf8;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
         }
 
-        /* ===== CONTENIDO PRINCIPAL ===== */
-        .main-content { 
-            margin-left: 0;
-            flex: 1; 
-            padding: 20px; 
-            min-width: 0;
-            transition: margin-left 0.3s ease;
-        }
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 30px; 
-            flex-wrap: wrap; 
-            gap: 10px; 
-        }
-        .header h1 { font-size: 26px; color: #1a1a2e; }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
         }
+
+        /* ===== LAYOUT ===== */
+        .app-container { display: flex; min-height: 100vh; }
         
-        .user-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            background: white; 
-            padding: 8px 20px; 
-            border-radius: 50px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-            font-size: 14px; 
-        }
-        .user-avatar { 
-            width: 35px; 
-            height: 35px; 
-            background: #667eea; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: 700; 
+        .sidebar {
+            width: 260px; 
+            background: var(--sidebar-bg); 
+            border-right: 1px solid var(--border-color);
+            position: fixed; height: 100vh; z-index: 1001;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
         }
         
+        .sidebar-header { 
+            padding: 20px 24px; 
+            display: flex; align-items: center; gap: 12px; 
+            border-bottom: 1px solid var(--border-color); 
+            flex-shrink: 0;
+        }
+        .brand-icon { 
+            width: 36px; height: 36px; 
+            background: linear-gradient(135deg, var(--primary), #8b5cf6); 
+            border-radius: var(--radius-sm); 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 20px; 
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
+        }
+        .brand-text { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; color: var(--text-main); }
+        .brand-text span { color: var(--primary); }
+
+        .nav-menu { list-style: none; padding: 16px 12px; flex: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            color: var(--sidebar-text); text-decoration: none; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 500; transition: all 0.2s ease;
+        }
+        .nav-link i { font-size: 20px; flex-shrink: 0; }
+        .nav-link:hover { background: var(--bg-body); color: var(--primary); }
+        .nav-link.active { background: var(--sidebar-active-bg); color: var(--sidebar-active-text); font-weight: 600; }
+        
+        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
+        .user-profile { 
+            display: flex; align-items: center; gap: 12px; padding: 12px; 
+            border-radius: var(--radius-sm); background: var(--bg-body); 
+            cursor: pointer; transition: background 0.2s;
+        }
+        .user-profile:hover { background: var(--border-color); }
+        .avatar { 
+            width: 36px; height: 36px; background: var(--primary); color: white; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-weight: 600; font-size: 14px; flex-shrink: 0;
+        }
+        .user-details { overflow: hidden; }
+        .user-details h4 { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-details p { font-size: 11px; color: var(--text-muted); }
+
+        .main-content { margin-left: 260px; flex: 1; padding: 32px; transition: margin-left 0.3s; width: 100%; }
+        
+        /* Mobile Menu */
+        .menu-toggle { 
+            display: none; position: fixed; top: 16px; left: 16px; z-index: 1002; 
+            background: var(--bg-surface); border: 1px solid var(--border-color); 
+            width: 44px; height: 44px; border-radius: var(--radius-sm); cursor: pointer; 
+            color: var(--text-main); box-shadow: var(--shadow-md); 
+            align-items: center; justify-content: center;
+        }
+        .overlay { 
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
+            z-index: 1000; opacity: 0; pointer-events: none; 
+            transition: opacity 0.3s; backdrop-filter: blur(4px); 
+        }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* ===== HEADER ===== */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+        .page-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
+        .page-title p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+        
+        .actions-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .btn { 
+            padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; 
+            cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; 
+            transition: all 0.2s ease; white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-body); border-color: var(--text-muted); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: var(--warning); color: #78350f; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-icon { 
+            width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); 
+            border: 1px solid var(--border-color); color: var(--text-muted); 
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .btn-icon:hover { color: var(--primary); border-color: var(--primary); }
+
         .btn-reserva-manual {
-            background: #e74c3c;
+            background: var(--danger);
             color: white;
             border: none;
-            padding: 8px 20px;
-            border-radius: 50px;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
             transition: all 0.2s ease;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
         }
-        .btn-reserva-manual:hover {
-            background: #c0392b;
-            transform: scale(1.02);
-        }
-        .btn-reserva-manual:active {
-            transform: scale(0.98);
-        }
+        .btn-reserva-manual:hover { background: #dc2626; transform: translateY(-2px); }
+        .btn-reserva-manual:active { transform: scale(0.97); }
 
+        /* ===== FILTERS BAR ===== */
         .filters-bar { 
-            background: white; 
-            padding: 15px 20px; 
-            border-radius: 15px; 
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05); 
-            margin-bottom: 20px; 
+            background: var(--bg-surface); 
+            padding: 16px 20px; 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow-sm); 
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px; 
             display: flex; 
-            gap: 10px; 
+            gap: 12px; 
             align-items: center; 
             flex-wrap: wrap; 
         }
         .filter-input { 
-            padding: 12px 15px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 10px; 
+            padding: 10px 16px; 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-sm); 
             font-size: 13px; 
             flex: 2; 
             min-width: 200px; 
+            background: var(--bg-body);
+            color: var(--text-main);
+            transition: border-color 0.2s;
+            font-family: 'Inter', sans-serif;
         }
         .filter-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
-        .btn-filtrar, .btn-recargar, .btn-pdf { 
-            padding: 10px 18px; 
-            border: none; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 12px; 
-            white-space: nowrap; 
-            transition: all 0.2s;
+        .dark-mode .filter-input:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
-        .btn-filtrar:active, .btn-recargar:active, .btn-pdf:active {
-            transform: scale(0.96);
-        }
-        .btn-filtrar { background: #667eea; color: white; }
-        .btn-recargar { background: #27ae60; color: white; }
-        .btn-pdf { background: #2c7da0; color: white; }
 
+        .total-reservas { 
+            font-size: 13px; 
+            color: var(--text-muted); 
+            margin-bottom: 20px; 
+            font-weight: 500;
+        }
+
+        /* ===== CARDS GRID ===== */
         .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
         .reserva-card {
-            background: white;
-            border-radius: 16px;
+            background: var(--bg-surface);
+            border-radius: var(--radius);
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .reserva-card:active {
-            transform: scale(0.99);
-        }
-        .reserva-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-        }
+        .reserva-card:active { transform: scale(0.98); }
+        .reserva-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 
         .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 15px;
+            padding: 14px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-body);
         }
         .card-id {
             font-weight: 700;
-            font-size: 13px;
-            background: rgba(255,255,255,0.2);
-            padding: 4px 10px;
+            font-size: 12px;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 4px 12px;
             border-radius: 20px;
         }
+        .dark-mode .card-id { background: rgba(99, 102, 241, 0.15); }
+        
         .btn-editar-nombre {
-            background: rgba(255,255,255,0.2);
+            background: var(--primary-light);
             border: none;
             border-radius: 20px;
-            padding: 4px 8px;
+            padding: 4px 10px;
             cursor: pointer;
-            font-size: 10px;
-            color: white;
+            font-size: 11px;
+            color: var(--primary);
             transition: all 0.2s;
+            font-weight: 600;
         }
-        .btn-editar-nombre:hover {
-            background: rgba(255,255,255,0.4);
-            transform: scale(1.05);
-        }
-        .btn-editar-nombre:active {
-            transform: scale(0.95);
-        }
+        .btn-editar-nombre:hover { background: var(--primary); color: white; }
+        .btn-editar-nombre:active { transform: scale(0.95); }
+        
         .card-estado-header {
             font-weight: 700;
-            font-size: 12px;
-            padding: 4px 10px;
+            font-size: 11px;
+            padding: 4px 12px;
             border-radius: 20px;
-            letter-spacing: 0.5px;
-            color: white;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
         }
+        .estado-pendiente { background: var(--warning-light); color: #b45309; }
+        .estado-confirmado { background: var(--success-light); color: #047857; }
+        .estado-pagado { background: var(--info-light); color: #1d4ed8; }
+        .dark-mode .estado-pendiente { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .dark-mode .estado-confirmado { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .dark-mode .estado-pagado { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        
         .card-fecha {
-            font-size: 10px;
-            opacity: 0.85;
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .card-body { padding: 15px; }
-        .card-info { margin-bottom: 12px; }
-        .card-label { font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .card-value { font-size: 13px; font-weight: 500; color: #333; word-break: break-word; }
+        .card-body { padding: 16px; }
+        .card-info { margin-bottom: 10px; }
+        .card-info:last-child { margin-bottom: 0; }
+        .card-label { 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            color: var(--text-muted); 
+            letter-spacing: 0.5px; 
+            margin-bottom: 3px; 
+            font-weight: 600;
+        }
+        .card-value { 
+            font-size: 13px; 
+            font-weight: 500; 
+            color: var(--text-main); 
+            word-break: break-word; 
+        }
 
-        .excursiones-lista-card { margin: 0; padding-left: 16px; list-style: none; }
-        .excursiones-lista-card li { font-size: 11px; padding: 3px 0; color: #555; border-bottom: 1px dashed #eee; }
+        .excursiones-lista-card { 
+            margin: 0; 
+            padding-left: 16px; 
+            list-style: none; 
+        }
+        .excursiones-lista-card li { 
+            font-size: 12px; 
+            padding: 3px 0; 
+            color: var(--text-muted); 
+            border-bottom: 1px dashed var(--border-color); 
+            position: relative;
+        }
         .excursiones-lista-card li:last-child { border-bottom: none; }
+        .excursiones-lista-card li::before {
+            content: '▸';
+            color: var(--primary);
+            position: absolute;
+            left: -14px;
+        }
 
         .card-actions {
             display: flex;
             gap: 8px;
-            padding: 12px 15px;
-            background: #f8f9fa;
-            border-top: 1px solid #f0f0f0;
+            padding: 12px 16px;
+            background: var(--bg-body);
+            border-top: 1px solid var(--border-color);
             flex-wrap: wrap;
         }
         .btn-card {
             flex: 1;
-            padding: 8px;
+            padding: 8px 10px;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             transition: all 0.2s;
             text-align: center;
+            font-family: 'Inter', sans-serif;
         }
-        .btn-card:active {
-            transform: scale(0.96);
-        }
-        .btn-card:hover { opacity: 0.9; }
-        .btn-confirmar-card { background: #27ae60; color: white; }
-        .btn-pendiente-card { background: #ffc107; color: #856404; }
-        .btn-pagar-card { background: #3498db; color: white; }
+        .btn-card:active { transform: scale(0.96); }
+        .btn-card:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-confirmar-card { background: var(--success); color: white; }
+        .btn-pendiente-card { background: var(--warning); color: #78350f; }
+        .btn-pagar-card { background: var(--info); color: white; }
         .btn-whatsapp-card { background: #25D366; color: white; }
-        .btn-excluir-card { background: #e74c3c; color: white; }
+        .btn-excluir-card { background: var(--danger); color: white; }
 
-        .total-reservas { font-size: 14px; color: #666; margin-bottom: 20px; }
-
-        /* ===== PRELOADER POPUP ===== */
-        .preloader-popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 0.3s ease;
-        }
-        .preloader-popup.oculto {
-            opacity: 0;
-            visibility: hidden;
-        }
-        .preloader-popup-contenido {
-            background: white;
-            border-radius: 24px;
-            padding: 35px 45px;
-            text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: popupFadeIn 0.3s ease;
-        }
-        @keyframes popupFadeIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .preloader-popup-icono {
-            width: 70px;
-            height: 70px;
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #667eea;
-            border-right: 4px solid #764ba2;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .preloader-popup-titulo {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 8px;
-        }
-        .preloader-popup-subtitulo {
-            font-size: 14px;
-            color: #666;
-        }
-        .puntos::after {
-            content: '';
-            animation: puntosAnim 1.5s infinite;
-        }
-        @keyframes puntosAnim {
-            0% { content: ''; }
-            25% { content: '.'; }
-            50% { content: '..'; }
-            75% { content: '...'; }
-            100% { content: ''; }
-        }
-
-        /* Scroll sidebar */
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar::-webkit-scrollbar-track {
-            background: #1a1a2e;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
-        }
-
-        /* Desktop */
-        @media (min-width: 1201px) {
-            .cards-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        /* Tablet */
-        @media (min-width: 769px) and (max-width: 1200px) {
-            .cards-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        /* Desktop menú */
-        @media (min-width: 769px) {
-            .menu-btn {
-                display: none !important;
-            }
-            
-            .sidebar {
-                transform: translateX(0) !important;
-                width: 250px;
-            }
-            
-            .menu-overlay {
-                display: none !important;
-            }
-            
-            .main-content {
-                margin-left: 250px;
-                padding: 30px;
-            }
-        }
-
-        /* Móvil */
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) {
-            .menu-btn {
-                display: flex;
-            }
-            
-            .main-content {
-                padding: 60px 12px 20px;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            .user-area {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .user-info {
-                padding: 5px 12px;
-                font-size: 12px;
-            }
-            
-            .user-avatar {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
-            
-            .btn-reserva-manual {
-                padding: 5px 12px;
-                font-size: 11px;
-            }
-            
-            .cards-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .filters-bar {
-                flex-direction: column;
-            }
-            
-            .filter-input {
-                width: 100%;
-            }
-            
-            .btn-filtrar, .btn-recargar, .btn-pdf {
-                width: 100%;
-                text-align: center;
-            }
-            
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .card-actions {
-                flex-direction: column;
-            }
-            
-            .btn-card {
-                width: 100%;
-            }
-            
-            .preloader-popup-contenido {
-                padding: 25px 35px;
-            }
-            
-            .preloader-popup-icono {
-                width: 55px;
-                height: 55px;
-            }
-            
-            .preloader-popup-titulo {
-                font-size: 18px;
-            }
+            .sidebar { transform: translateX(-100%); width: 280px; } 
+            .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 76px; } 
+            .menu-toggle { display: flex; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 16px; } 
+            .actions-group { width: 100%; justify-content: space-between; }
+            .filters-bar { flex-direction: column; }
+            .filter-input { width: 100%; }
+            .cards-grid { grid-template-columns: 1fr; gap: 16px; }
+            .card-header { flex-direction: column; align-items: flex-start; }
+            .card-actions { flex-direction: column; }
+            .btn-card { width: 100%; }
         }
-        
         @media (max-width: 480px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .user-area {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .btn-reserva-manual {
-                justify-content: center;
-            }
+            .page-title h1 { font-size: 20px; }
+            .btn-reserva-manual { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
-    <!-- Botón menú hamburguesa (solo móvil) -->
-    <button class="menu-btn" id="menuBtn">
-        <span>☰</span>
-    </button>
-    
-    <!-- Overlay para cerrar menú -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-    
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🏔️</div>
-            <h2>Aventura <span>Total</span></h2>
-            <p style="font-size:11px;opacity:0.6;">Panel CRM</p>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-            <li><a href="clientes.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
-            <li><a href="reservas.html" class="active"><span class="nav-icon">📋</span> <span>Reservas</span></a></li>
-            <li><a href="seguimiento.html"><span class="nav-icon">📈</span> <span>Seguimiento</span></a></li>
-            <li><a href="emails.html"><span class="nav-icon">💬</span> <span>WhatsApp</span></a></li>
-            <li><a href="calendario.html"><span class="nav-icon">📅</span> <span>Calendario</span></a></li>
-            <li><a href="clima.html"><span class="nav-icon">🌤️</span> <span>Clima</span></a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="btn-logout-sidebar" onclick="logout()">🚪 Cerrar sesión</button>
-        </div>
-    </nav>
 
-    <div class="main-content">
-        <div class="header">
-            <div><h1>📋 Reservas</h1></div>
-            <div class="user-area">
-                <div class="user-info">
-                    <div class="user-avatar">A</div>
-                    <span>Admin</span>
-                </div>
-                <button class="btn-reserva-manual" onclick="abrirReservaManual()">
-                    ➕ Reserva manual
-                </button>
+    <!-- Mobile Toggle -->
+    <button class="menu-toggle" id="menuBtn" aria-label="Abrir menú"><i class="ph ph-list" style="font-size: 24px;"></i></button>
+    <div class="overlay" id="menuOverlay"></div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-icon"><i class="ph-bold ph-mountains"></i></div>
+                <div class="brand-text">Aventura<span>Total</span></div>
             </div>
-        </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="ph ph-squares-four"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="clientes.html" class="nav-link"><i class="ph ph-users"></i> Clientes</a></li>
+                <li class="nav-item"><a href="reservas.html" class="nav-link active"><i class="ph ph-calendar-check"></i> Reservas</a></li>
+                <li class="nav-item"><a href="seguimiento.html" class="nav-link"><i class="ph ph-chart-line-up"></i> Seguimiento</a></li>
+                <li class="nav-item"><a href="emails.html" class="nav-link"><i class="ph ph-whatsapp-logo"></i> WhatsApp</a></li>
+                <li class="nav-item"><a href="calendario.html" class="nav-link"><i class="ph ph-calendar"></i> Calendario</a></li>
+                <li class="nav-item"><a href="clima.html" class="nav-link"><i class="ph ph-cloud-sun"></i> Clima</a></li>
+            </ul>
 
-        <div class="filters-bar">
-            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
-            <button class="btn-filtrar" id="btnFiltrar">🔍 Filtrar</button>
-            <button class="btn-recargar" id="btnRecargar">🔄 Recargar</button>
-            <button class="btn-pdf" id="btnPDFExterno">📄 Generar PDF</button>
-        </div>
+            <div class="sidebar-footer">
+                <div class="user-profile" onclick="logout()">
+                    <div class="avatar">AD</div>
+                    <div class="user-details"><h4>Administrador</h4><p>Cerrar Sesión</p></div>
+                    <i class="ph ph-sign-out" style="margin-left: auto; color: var(--text-muted); font-size: 18px;"></i>
+                </div>
+            </div>
+        </aside>
 
-        <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="page-title"><h1>📋 Reservas</h1><p>Gestión completa de todas las reservas</p></div>
+                <div class="actions-group">
+                    <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema"><i class="ph ph-moon" id="themeIcon"></i></button>
+                    <button class="btn-reserva-manual" onclick="abrirReservaManual()"><i class="ph ph-plus"></i> Reserva manual</button>
+                </div>
+            </header>
 
-        <div id="cardsContainer" class="cards-grid">
-            <div style="text-align:center; grid-column:1/-1; padding:50px;">⏳ Cargando...</div>
-        </div>
-    </div>
+            <div class="filters-bar">
+                <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre o excursión..." id="busquedaReserva">
+                <button class="btn btn-primary" id="btnFiltrar"><i class="ph ph-funnel"></i> Filtrar</button>
+                <button class="btn btn-success" id="btnRecargar"><i class="ph ph-arrows-clockwise"></i> Recargar</button>
+                <button class="btn btn-secondary" id="btnPDFExterno"><i class="ph ph-file-pdf"></i> Generar PDF</button>
+            </div>
 
-    <!-- PRELOADER POPUP -->
-    <div id="preloaderPopup" class="preloader-popup oculto">
-        <div class="preloader-popup-contenido">
-            <div class="preloader-popup-icono"></div>
-            <div class="preloader-popup-titulo">Sincronizando<span class="puntos"></span></div>
-            <div class="preloader-popup-subtitulo">Guardando datos en el servidor...</div>
-        </div>
+            <div id="totalReservasSpan" class="total-reservas">0 reservas</div>
+
+            <div id="cardsContainer" class="cards-grid">
+                <div style="text-align:center; grid-column:1/-1; padding:50px; color: var(--text-muted);">⏳ Cargando...</div>
+            </div>
+        </main>
     </div>
 
     <script>
@@ -673,40 +489,24 @@
         // ==================================================
         // MENÚ FLOTANTE
         // ==================================================
-        function initMenu() {
-            const menuBtn = document.getElementById('menuBtn');
-            const sidebar = document.getElementById('sidebar');
-            const menuOverlay = document.getElementById('menuOverlay');
-            
-            if (!menuBtn || !sidebar || !menuOverlay) return;
-            
-            function toggleMenu() {
-                sidebar.classList.toggle('open');
-                menuOverlay.classList.toggle('active');
-                document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-            }
-            
-            function closeMenu() {
-                sidebar.classList.remove('open');
-                menuOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-            
-            menuBtn.addEventListener('click', toggleMenu);
-            menuOverlay.addEventListener('click', closeMenu);
-            
-            document.querySelectorAll('.nav-menu a').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth <= 768) {
-                        closeMenu();
-                    }
-                });
-            });
-        }
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('menuOverlay');
+        const themeIcon = document.getElementById('themeIcon');
         
-        // ==================================================
-        // CONFIGURACIÓN
-        // ==================================================
+        function toggleMenu() { sidebar.classList.toggle('open'); overlay.classList.toggle('active'); document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : ''; }
+        function closeMenu() { sidebar.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
+        menuBtn.addEventListener('click', toggleMenu); overlay.addEventListener('click', closeMenu);
+        document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', () => { if (window.innerWidth <= 768) closeMenu(); }); });
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark); themeIcon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
+        }
+        if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.body.classList.add('dark-mode'); themeIcon.className = 'ph ph-sun';
+        }
+
         if (sessionStorage.getItem('crm_logged') !== 'true') { 
             window.location.href = 'index.html'; 
         }
@@ -716,33 +516,17 @@
             window.location.href = 'index.html'; 
         }
 
+        // ==================================================
+        // CONFIGURACIÓN
+        // ==================================================
         const SPREADSHEET_ID = '1-b2wCbejrgWe3TdPGe2Aslvtlw4_FURMXsTcSMhLAeI';
         const SHEET_NAME = 'Hoja 1';
         const JSON_URL = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_NAME);
-        
-        // URL del Google Apps Script - ACTUALIZAR CON TU URL
         const ESTADOS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOvtpKAbJIUTEJBy2oTODHNYkTJKqbjDLlaryP_QHgVXAXsR8potSmnpy59Etyj5cVvA/exec';
         
         let reservasData = [];
         let reservasFiltradas = [];
         let estadosGlobales = {};
-
-        // Preloader Popup
-        const preloaderPopup = document.getElementById('preloaderPopup');
-        
-        function mostrarPreloader() {
-            if (preloaderPopup) {
-                preloaderPopup.classList.remove('oculto');
-            }
-        }
-        
-        function ocultarPreloader() {
-            if (preloaderPopup) {
-                setTimeout(() => {
-                    preloaderPopup.classList.add('oculto');
-                }, 300);
-            }
-        }
 
         // ==================================================
         // GUARDAR NOMBRE EDITADO EN LA NUBE
@@ -780,8 +564,6 @@
             if (nuevoNombre === nombreActual) return;
             
             try {
-                mostrarPreloader();
-                
                 const reserva = reservasData.find(r => r.id === id);
                 if (reserva) {
                     reserva.nombre = nuevoNombre.trim();
@@ -789,12 +571,10 @@
                     const indexFiltrada = reservasFiltradas.findIndex(r => r.id === id);
                     if (indexFiltrada !== -1) reservasFiltradas[indexFiltrada].nombre = nuevoNombre.trim();
                     
-                    // Guardar en localStorage como backup
                     const nombresEditados = JSON.parse(localStorage.getItem('nombresEditados') || '{}');
                     nombresEditados[id] = nuevoNombre.trim();
                     localStorage.setItem('nombresEditados', JSON.stringify(nombresEditados));
                     
-                    // Guardar en la nube
                     await guardarNombreEnNube(id, nuevoNombre.trim());
                     
                     renderizarCards();
@@ -803,8 +583,6 @@
             } catch (error) {
                 console.error('Error al editar nombre:', error);
                 alert('❌ Error al actualizar el nombre');
-            } finally {
-                ocultarPreloader();
             }
         }
 
@@ -878,8 +656,6 @@
             if (!container) return;
 
             try {
-                mostrarPreloader();
-
                 await cargarEstadosDesdeNube();
 
                 const response = await fetch(JSON_URL + '&t=' + Date.now());
@@ -977,9 +753,7 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                container.innerHTML = '<div style="text-align:center; color:red; grid-column:1/-1; padding:50px;">❌ Error: ' + error.message + '</div>';
-            } finally {
-                ocultarPreloader();
+                container.innerHTML = '<div style="text-align:center; color:var(--danger); grid-column:1/-1; padding:50px;">❌ Error: ' + error.message + '</div>';
             }
         }
 
@@ -1044,7 +818,7 @@
             if (!container) return;
 
             if (reservasFiltradas.length === 0) {
-                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px;">📋 No hay reservas</div>';
+                container.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:50px; color: var(--text-muted);">📋 No hay reservas</div>';
                 if (totalSpan) totalSpan.textContent = '0 reservas';
                 return;
             }
@@ -1067,23 +841,23 @@
             for (let idx = 0; idx < reservasFiltradas.length; idx++) {
                 const r = reservasFiltradas[idx];
                 let estadoText = '';
-                let estadoColor = '';
+                let estadoClass = '';
                 switch(r.estado) {
                     case 'pendiente': 
                         estadoText = 'Pendiente'; 
-                        estadoColor = '#ffc107';
+                        estadoClass = 'estado-pendiente';
                         break;
                     case 'confirmado': 
                         estadoText = 'Confirmado'; 
-                        estadoColor = '#27ae60';
+                        estadoClass = 'estado-confirmado';
                         break;
                     case 'pagado': 
                         estadoText = 'Pagado'; 
-                        estadoColor = '#3498db';
+                        estadoClass = 'estado-pagado';
                         break;
                     default: 
                         estadoText = 'Confirmado'; 
-                        estadoColor = '#27ae60';
+                        estadoClass = 'estado-confirmado';
                 }
 
                 let excursionesHtml = '<ul class="excursiones-lista-card">';
@@ -1099,36 +873,34 @@
                 html += '<div class="reserva-card">' +
                             '<div class="card-header">' +
                                 '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">' +
-                                    '<span class="card-id">ID: ' + escapeHtml(r.id) + '</span>' +
-                                    '<button class="btn-editar-nombre" onclick="editarNombreReserva(\'' + r.id + '\', \'' + escapeHtml(r.nombre).replace(/'/g, "\\'") + '\')" title="Editar nombre">✏️</button>' +
-                                    '<span class="card-estado-header" style="font-weight: 700; background: ' + estadoColor + ';">' + estadoText + '</span>' +
+                                    '<span class="card-id"><i class="ph ph-hash" style="font-size:10px;"></i> ' + escapeHtml(r.id) + '</span>' +
+                                    '<button class="btn-editar-nombre" onclick="editarNombreReserva(\'' + r.id + '\', \'' + escapeHtml(r.nombre).replace(/'/g, "\\'") + '\')" title="Editar nombre"><i class="ph ph-pencil"></i></button>' +
+                                    '<span class="card-estado-header ' + estadoClass + '">' + estadoText + '</span>' +
                                 '</div>' +
-                                '<span class="card-fecha">' + escapeHtml(r.fecha) + '</span>' +
+                                '<span class="card-fecha"><i class="ph ph-calendar"></i> ' + escapeHtml(r.fecha) + '</span>' +
                             '</div>' +
                             '<div class="card-body">' +
-                                '<div class="card-info"><div class="card-label">👤 CLIENTE</div><div class="card-value">' + escapeHtml(r.nombre) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label">📧 EMAIL</div><div class="card-value">' + escapeHtml(r.email) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label">📞 TELÉFONO</div><div class="card-value">' + escapeHtml(r.telefono) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label">📍 CIUDAD</div><div class="card-value">' + escapeHtml(r.ciudad) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label">✨ EXCURSIONES</div>' + excursionesHtml + '</div>' +
-                                '<div class="card-info"><div class="card-label">👥 PERSONAS</div><div class="card-value">' + escapeHtml(r.personas) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label">💳 FORMA DE PAGO</div><div class="card-value">' + escapeHtml(r.formaPago) + '</div></div>' +
-                                '<div class="card-info"><div class="card-label">🚐 LUGAR</div><div class="card-value">' + escapeHtml(r.lugar) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label"><i class="ph ph-user"></i> CLIENTE</div><div class="card-value">' + escapeHtml(r.nombre) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label"><i class="ph ph-envelope"></i> EMAIL</div><div class="card-value">' + escapeHtml(r.email) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label"><i class="ph ph-phone"></i> TELÉFONO</div><div class="card-value">' + escapeHtml(r.telefono) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label"><i class="ph ph-map-pin"></i> CIUDAD</div><div class="card-value">' + escapeHtml(r.ciudad) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label"><i class="ph ph-tree"></i> EXCURSIONES</div>' + excursionesHtml + '</div>' +
+                                '<div class="card-info"><div class="card-label"><i class="ph ph-users"></i> PERSONAS</div><div class="card-value">' + escapeHtml(r.personas) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label"><i class="ph ph-credit-card"></i> FORMA DE PAGO</div><div class="card-value">' + escapeHtml(r.formaPago) + '</div></div>' +
+                                '<div class="card-info"><div class="card-label"><i class="ph ph-map-trifold"></i> LUGAR</div><div class="card-value">' + escapeHtml(r.lugar) + '</div></div>' +
                             '</div>' +
                             '<div class="card-actions">' +
-                                '<button class="btn-card btn-confirmar-card" data-id="' + escapeHtml(r.id) + '" data-estado="confirmado">✅ Confirmada</button>' +
-                                '<button class="btn-card btn-pendiente-card" data-id="' + escapeHtml(r.id) + '" data-estado="pendiente">⏳ Pendiente</button>' +
-                                '<button class="btn-card btn-pagar-card" data-id="' + escapeHtml(r.id) + '" data-estado="pagado">💰 Paga</button>' +
-                                '<button class="btn-card btn-whatsapp-card" data-id="' + escapeHtml(r.id) + '">💬 WhatsApp</button>' +
-                                '<button class="btn-card btn-excluir-card" data-id="' + escapeHtml(r.id) + '">🗑️ Apagar Reserva</button>' +
+                                '<button class="btn-card btn-confirmar-card" data-id="' + escapeHtml(r.id) + '" data-estado="confirmado"><i class="ph ph-check-circle"></i> Confirmada</button>' +
+                                '<button class="btn-card btn-pendiente-card" data-id="' + escapeHtml(r.id) + '" data-estado="pendiente"><i class="ph ph-clock"></i> Pendiente</button>' +
+                                '<button class="btn-card btn-pagar-card" data-id="' + escapeHtml(r.id) + '" data-estado="pagado"><i class="ph ph-currency-dollar"></i> Pagada</button>' +
+                                '<button class="btn-card btn-whatsapp-card" data-id="' + escapeHtml(r.id) + '"><i class="ph ph-whatsapp-logo"></i> WhatsApp</button>' +
+                                '<button class="btn-card btn-excluir-card" data-id="' + escapeHtml(r.id) + '"><i class="ph ph-trash"></i> Apagar</button>' +
                             '</div>' +
                         '</div>';
             }
             container.innerHTML = html;
 
-            // ==================================================
-            // ACTUALIZAR CONTADOR CON TOTAL DE PASAJEROS
-            // ==================================================
+            // Actualizar contador con total de pasajeros
             const totalPasajeros = calcularTotalPasajeros(reservasFiltradas);
             const totalReservas = reservasFiltradas.length;
             const totalOriginal = reservasData.length;
@@ -1219,8 +991,6 @@
         // INICIALIZAR
         // ==================================================
         function init() {
-            initMenu();
-            
             const btnFiltrar = document.getElementById('btnFiltrar');
             const btnRecargar = document.getElementById('btnRecargar');
             const btnPDFExterno = document.getElementById('btnPDFExterno');
@@ -1251,6 +1021,7 @@
         window.generarPDFExterno = generarPDFExterno;
         window.abrirReservaManual = abrirReservaManual;
         window.editarNombreReserva = editarNombreReserva;
+        window.toggleTheme = toggleTheme;
         
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
